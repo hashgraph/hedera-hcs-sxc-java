@@ -11,6 +11,8 @@
     <description>HCS Library</description>
 
     <properties>
+        <maven.compiler.source>1.6</maven.compiler.source>
+        <maven.compiler.target>1.6</maven.compiler.target>
         <java.version>11</java.version>
         <hedera-sdk.version>0.7.0</hedera-sdk.version>
         <java-dotenv.version>5.0.1</java-dotenv.version>

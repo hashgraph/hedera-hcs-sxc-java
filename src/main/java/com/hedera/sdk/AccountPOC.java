@@ -21,7 +21,7 @@ public class AccountPOC {
 
         Client client = new Client(config.getNodesMap());
         client.setOperator(
-                AccountId.fromString(config.getOperatorAccountId())
+                config.getOperatorAccountId()
                 , config.getOperatorKey()
                 );
 

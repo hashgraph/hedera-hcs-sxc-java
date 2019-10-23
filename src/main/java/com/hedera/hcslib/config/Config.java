@@ -10,19 +10,45 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 public final class Config {
     
-    private Dotenv dotEnv;
+    /** 
+     * Manages the readonly configuration data 
+     */
     
+    private Dotenv dotEnv;
+
     public Config() {
         Dotenv.configure().ignoreIfMissing();
         this.dotEnv = Dotenv.load();        
     }
- 
+
+    /** 
+     * Returns an Ed25519PrivateKey from the OPERATOR_KEY environment variable
+     * @return Ed25519PrivateKey
+     */
     public Ed25519PrivateKey getOperatorKey() {
         return Ed25519PrivateKey.fromString(dotEnv.get("OPERATOR_KEY"));
     }
-    public String getOperatorAccountId() {
+
+    /** 
+     * Returns a string representing the value of the OPERATOR_ID environment variable
+     * @return String
+     */
+    public String getOperatorAccount() {
         return dotEnv.get("OPERATOR_ID");
     }
+
+    /** 
+     * Returns a string representing the value of the OPERATOR_ID environment variable
+     * @return AccountId
+     */
+    public AccountId getOperatorAccountId() {
+        return AccountId.fromString(dotEnv.get("OPERATOR_ID"));
+    }
+
+    /** 
+     * Returns an AccountId representing the value of the OPERATOR_ID environment variable
+     * @return AccountId
+     */
     public Map<AccountId, String> getNodesMap() {
         
         String nodes = dotEnv.get("NODES");

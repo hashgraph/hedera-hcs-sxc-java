@@ -5,19 +5,16 @@ import java.security.KeyPair;
 import java.util.Arrays;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
-//@RunWith(SpringJUnit4ClassRunner.class) // don't boot server for tests
-//@ActiveProfiles("test")
 public class CryptographyTest {
     
     
     
     
     static byte[] sharedSecret;
-    String cleartext = "Hear my cries Hear 234sdf! Â£$%&*)_+ my call Lend me your ears See my fall See my error Know my faults Time halts See my loss ";
+    String cleartext = "Hear my cries Hear 234sdf! £$%&*)_+ my call Lend me your ears See my fall See my error Know my faults Time halts See my loss ";
     KeyPair generateRsaKeyPair = null;
     byte[] privateKeyBytes = null;
     String privateKeyHexEncoded = null;
@@ -27,7 +24,7 @@ public class CryptographyTest {
     public CryptographyTest() {
     }
 
-    @BeforeAll
+    @BeforeClass
     public static void initCalss(){
         KeyRotation keyRotation = new KeyRotation();
         byte[] alicePublic = keyRotation.aliceFirst();

@@ -3,11 +3,9 @@ package com.hedera.hcslib.cryptography;
 import java.util.Arrays;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
-import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
-//@RunWith(SpringJUnit4ClassRunner.class) // don't boot server for tests
-//@ActiveProfiles("test")
+
 public class KeyRotationTest {
     
     public KeyRotationTest() {

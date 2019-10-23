@@ -1,7 +1,7 @@
 package com.hedera.hcslib.cryptography;
 
 import com.hedera.hcslib.utils.StringUtils;
-import lombok.extern.log4j.Log4j2;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
@@ -30,7 +30,6 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 
-@Log4j2
 public class Cryptography {
     
     /**

@@ -1,15 +1,13 @@
 package com.hedera.hcslib.cryptography;
+
 import java.util.Arrays;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-@RunWith(SpringJUnit4ClassRunner.class) // don't boot server for tests
-@ActiveProfiles("test")
+//@RunWith(SpringJUnit4ClassRunner.class) // don't boot server for tests
+//@ActiveProfiles("test")
 public class KeyRotationTest {
     
     public KeyRotationTest() {

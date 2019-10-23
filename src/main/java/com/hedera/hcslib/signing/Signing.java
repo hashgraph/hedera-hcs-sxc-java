@@ -1,6 +1,5 @@
 package com.hedera.hcslib.signing;
 
-import lombok.extern.log4j.Log4j2;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 
@@ -14,8 +13,6 @@ import java.security.SignatureException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
-@Log4j2
 public class Signing {
  
     //solutionSDK.signMessage

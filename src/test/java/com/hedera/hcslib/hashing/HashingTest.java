@@ -1,20 +1,16 @@
 package com.hedera.hcslib.hashing;
 
-
 import com.hedera.hcslib.utils.StringUtils;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 /**
  *
  * @author User
  */
-@RunWith(SpringJUnit4ClassRunner.class) // don't boot server for tests
-@ActiveProfiles("test")
+//@RunWith(SpringJUnit4ClassRunner.class) // don't boot server for tests
+//@ActiveProfiles("test")
 public class HashingTest {
     
     public HashingTest() {

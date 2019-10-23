@@ -1,6 +1,5 @@
 package com.hedera.hcslib.hashing;
 
-import lombok.extern.log4j.Log4j2;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
@@ -11,8 +10,6 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
-@Log4j2
 public class Hashing {
 
    //solutionSDK.hashMessage

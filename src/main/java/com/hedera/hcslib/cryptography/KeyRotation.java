@@ -1,6 +1,5 @@
 package com.hedera.hcslib.cryptography;
 
-import lombok.extern.log4j.Log4j2;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -21,9 +20,6 @@ import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.DHParameterSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
-
-
-@Log4j2
 public class KeyRotation {
 
     private KeyAgreement aliceKeyAgree;

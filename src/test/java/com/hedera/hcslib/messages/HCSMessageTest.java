@@ -6,28 +6,25 @@ import com.hedera.hcslib.hashing.Hashing;
 import com.hedera.hcslib.signing.Signing;
 import java.security.KeyPair;
 import java.util.Arrays;
-import javax.print.attribute.HashAttributeSet;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.Before;
+import org.junit.Test;
 
-//@RunWith(SpringJUnit4ClassRunner.class) // don't boot server for tests
-//@ActiveProfiles("test")
+
 public class HCSMessageTest {
     
     static byte[] sharedSecret;
     static byte[] publicKeyBytes;
     static byte[] privateKeyBytes;
     static KeyPair rsaKeyPair;
-    String cleartext = "Hear my cries Hear 234sdf! Â£$%&*)_+ my call Lend me your ears See my fall See my error Know my faults Time halts See my loss ";
+    String cleartext = "Hear my cries Hear 234sdf! £$%&*)_+ my call Lend me your ears See my fall See my error Know my faults Time halts See my loss ";
     
     public HCSMessageTest() {
     }
 
-    @BeforeAll
-    public static void initCalss() throws Exception{
+    @Before
+    public  void initCalss() throws Exception{
         
         /*
             Create a shared key using the KeyRotation tool

@@ -277,50 +277,8 @@ public class HCSMessage implements Serializable {
             } 
         return true;
     }
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     // Getters Setters
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     public List<HCSMessagePart> getParts(){
         Preconditions.checkState(isComplete, "The message is partial");
         
@@ -411,8 +369,4 @@ public class HCSMessage implements Serializable {
         
         return true;
     }
-    
-
-
-       
 }

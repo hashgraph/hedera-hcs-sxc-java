@@ -1,8 +1,8 @@
 package com.hedera.hcslib.config;
 
 public class Node {
-    private String address;
-    private String account;
+    private String address = "";
+    private String account = "";
 
     public void setAddress(String address) {
         this.address = address;

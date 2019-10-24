@@ -1,4 +1,4 @@
-package com.hedera.hcslib.config;
+package com.hedera.demo.config;
 
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
@@ -40,5 +40,12 @@ public final class Environment {
      */
     public AccountId getOperatorAccountId() {
         return AccountId.fromString(dotEnv.get("OPERATOR_ID"));
+    }
+    
+    /** 
+     * Returns the app id
+     */
+    public int getAppId() {
+        return Integer.parseInt(dotEnv.get("APP_ID"));
     }
 }

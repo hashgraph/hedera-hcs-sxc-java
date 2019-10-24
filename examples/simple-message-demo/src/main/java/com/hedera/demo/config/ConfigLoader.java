@@ -1,4 +1,4 @@
-package com.hedera.hcslib.config;
+package com.hedera.demo.config;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,7 +18,7 @@ import com.hedera.hashgraph.sdk.account.AccountId;
  */
 
 public final class ConfigLoader {
-    private Config config = new Config();
+    public Config config = new Config();
     
     public ConfigLoader() throws FileNotFoundException, IOException {
         Yaml yaml = new Yaml(new Constructor(Config.class));

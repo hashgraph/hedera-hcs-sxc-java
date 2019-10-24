@@ -1,4 +1,4 @@
-package com.hedera.hcslib.config;
+package com.hedera.demo.config;
 
 public class Node {
     private String address = "";

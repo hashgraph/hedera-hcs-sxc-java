@@ -4,4 +4,9 @@ Simple demo to showcase HCS-SXC
 
 ## startup
 
-docker-compose -f docker-compose.yml up -d
+install Docker
+
+command line
+```
+docker-compose up
+```

@@ -3,42 +3,41 @@ package simplemessagedemo;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import com.hedera.demo.config.ConfigLoader;
-import com.hedera.demo.config.Environment;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hcslib.HCSLib;
 import com.hedera.hcslib.callback.OnHCSMessageCallback;
+import com.hedera.hcslib.outbound.OutboundHCSMessage;
 
 /**
  * Hello world!
  *
  */
-public class App 
+public final class App 
 {
     public static void main(String[] args) throws FileNotFoundException, IOException
     {
-        ConfigLoader configLoader = new ConfigLoader();
-        Environment environment = new Environment();
         
         // example call back setup
-        OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback();
-        onHCSMessageCallback.addObserver(message -> {
-            System.out.println("notified " + message);
-        });
-        onHCSMessageCallback.triggerCallBack();
+//        OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback();
+//        onHCSMessageCallback.addObserver(message -> {
+//            System.out.println("notified " + message);
+//        });
+//        onHCSMessageCallback.triggerCallBack();
         
+        // HCSLib setup example
         HCSLib hcsLib = new HCSLib()
-                .withEncryptedMessages(configLoader.config.getAppNet().getEncryptMessages())
-                .withKeyRotation(configLoader.config.getAppNet().getRotateKeys(), configLoader.config.getAppNet().getRotateKeyFrequency())
-                .withKmsSolution(configLoader.config.getAppNet().getKmsSolution())
-                .withMessageSignature(configLoader.config.getAppNet().getSignMessages())
-                .withQueueProtocol(configLoader.config.getAppNet().getQueueProtocol())
-                .withOperatorAccountId(environment.getOperatorAccountId())
-                .withOperatorKey(environment.getOperatorKey());
+            .withEncryptedMessages(true)
+            .withKeyRotation(true, 10)
+            .withMessageSignature(true);
         
+        // Outbound message (app->lib->hedera example)
         try {
-            hcsLib.sendMessage("testing");
+            Boolean success = new OutboundHCSMessage(hcsLib)
+                .overrideEncryptedMessages(true)
+                .overrideKeyRotation(true, 10)
+                .overrideMessageSignature(false)
+                .sendMessage("test");
         } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

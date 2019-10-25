@@ -1,4 +1,4 @@
-package com.hedera.demo.config;
+package com.hedera.hcslib.config;
 
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
@@ -14,8 +14,7 @@ public final class Environment {
     private Dotenv dotEnv;
 
     public Environment() {
-        Dotenv.configure().ignoreIfMissing();
-        this.dotEnv = Dotenv.load();        
+        this.dotEnv = Dotenv.configure().ignoreIfMissing().load();        
     }
 
     /** 

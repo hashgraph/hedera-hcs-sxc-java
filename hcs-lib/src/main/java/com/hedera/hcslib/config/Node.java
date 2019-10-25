@@ -1,6 +1,6 @@
-package com.hedera.demo.config;
+package com.hedera.hcslib.config;
 
-public class Node {
+public final class Node {
     private String address = "";
     private String account = "";
 

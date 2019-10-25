@@ -1,13 +1,11 @@
-package com.hedera.demo.config;
+package com.hedera.hcslib.config;
 
 public final class AppNet {
     private boolean signMessages = false;
     private boolean encryptMessages = false;
     private boolean rotateKeys = false;
     private int rotateKeyFrequency = 0;
-    private String kmsSolution = "";
     private String mirrorAddress = "";
-    private String queueProtocol = "";
 
     public boolean getSignMessages() {
         return signMessages;
@@ -33,22 +31,10 @@ public final class AppNet {
     public void setRotateKeyFrequency(int rotateKeyFrequency) {
         this.rotateKeyFrequency = rotateKeyFrequency;
     }
-    public String getKmsSolution() {
-        return this.kmsSolution;
-    }
-    public void setKmsSolution(String kmsSolution) {
-        this.kmsSolution = kmsSolution;
-    }
     public String getMirrorAddress() {
         return this.mirrorAddress;
     }
     public void setMirrorAddress(String mirrorAddress) {
         this.mirrorAddress = mirrorAddress;
-    }
-    public String getQueueProtocol() {
-        return queueProtocol;
-    }
-    public void setQueueProtocol(String queueProtocol) {
-        this.queueProtocol = queueProtocol;
     }
 }

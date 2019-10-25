@@ -1,5 +1,14 @@
+appNet:
+  signMessages: false
+  encryptMessages: false
+  rotateKeys: false
+  rotateKeyFrequency: 0
+  topics:
+    - topic: 0.0.10
+    - topic: 0.0.11
+
 nodes:
-  - address: 0.testnet.hedera.com:50211
+  - address: 35.222.103.151:50211
     account: 0.0.3
 # Commented out due to bug in java SDK
 #  - address: 1.testnet.hedera.com:50211

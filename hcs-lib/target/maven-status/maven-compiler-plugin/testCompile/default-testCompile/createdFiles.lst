@@ -1,5 +1,0 @@
-com\hedera\hcslib\HCSLibTests.class
-com\hedera\hcslib\messages\HCSMessageTest.class
-com\hedera\hcslib\cryptography\KeyRotationTest.class
-com\hedera\hcslib\cryptography\CryptographyTest.class
-com\hedera\hcslib\hashing\HashingTest.class

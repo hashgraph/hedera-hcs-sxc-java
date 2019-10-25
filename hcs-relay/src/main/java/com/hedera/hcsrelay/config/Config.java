@@ -1,4 +1,4 @@
-package com.hedera.hcslib.config;
+package com.hedera.hcsrelay.config;
 
 import java.io.File;
 import java.io.FileInputStream;

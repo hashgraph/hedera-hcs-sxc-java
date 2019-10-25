@@ -3,9 +3,9 @@ package com.hedera.hcslib.utils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
@@ -37,7 +37,7 @@ public class StringUtils {
     }
     
     public static String byteArrayToHexString(byte[] byteArray){
-        return   Hex.encodeHexString(byteArray);
+        return Hex.encodeHexString(byteArray);
     }
     
     public static byte[] hexStringToByteArray(String s){

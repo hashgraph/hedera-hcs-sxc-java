@@ -24,3 +24,5 @@ hs_err_pid*
 /target/
 .env
 config.yaml
+/hcs-lib/target/
+/hcs-relay/target/

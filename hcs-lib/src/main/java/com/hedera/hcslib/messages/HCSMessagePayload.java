@@ -9,26 +9,41 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
 
-
+/**
+ * Payload object which is composed in an HCSMessage. The object
+ * is used internally only. TODO: add as a private static inner class. 
+ * to HCSMessage. 
+ * 
+ */
 public class HCSMessagePayload implements Serializable {
 
     static int headerSize = 32 + 256;
-    public String message = null;
+    public String message = null; // this it the message. it may be encrypted or decrypted.
     public byte[] hashOfUnencryptedMessage = null;
     public byte[] signatureOfEncryptedMessage = null;
 
     public HCSMessagePayload() {
     }
 
+    /**
+     * Construct payload from a serialised string. The object has all it's fields
+     * initialised after construction. 
+     * @param embeddable 
+     */
     public HCSMessagePayload(String embeddable) {
         Preconditions.checkArgument(
-                embeddable.length() > 32 + 256,
+                embeddable.length() > headerSize,
                  "The embedable minimum size is not met");
         this.hashOfUnencryptedMessage = StringUtils.stringToByteArray(embeddable.substring(0, 32));
         this.signatureOfEncryptedMessage = StringUtils.stringToByteArray(embeddable.substring(32, 32 + 256));
-        this.message = embeddable.substring(32 + 256, embeddable.length());
+        this.message = embeddable.substring(headerSize, embeddable.length());
     }
 
+    /**
+     * Serialize the objects fields into an embeddeable string. It is this string
+     * that is broken up in and used in chunks {@link HCSMessageChunk}
+     * @return 
+     */
     public String getEmbeddable() {
         return StringUtils.byteArrayToString(this.hashOfUnencryptedMessage)
                 + StringUtils.byteArrayToString(this.signatureOfEncryptedMessage)

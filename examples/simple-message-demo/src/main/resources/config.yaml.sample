@@ -2,17 +2,17 @@ appNet:
   signMessages: false
   encryptMessages: false
   rotateKeys: false
-  kmsProvider: hedera
+  rotateKeyFrequency: 0
   mirrorAddress: 127.0.0.1:8080
-relay:
-  mirrorComms: grpc
-pubSub:
-  queueProvider: AMQP
-  queueEndPoint: 127.0.0.1:5001
-appInstances:
-  - clientName: "Player 1"
-    clientKey: "player 1 key"
-  - clientName: "Player 2"
-    clientKey: "player 2 key"
+
+nodes:
+  - address: 0.testnet.hedera.com:50211
+    account: 0.0.3
+# Commented out due to bug in java SDK
+#  - address: 1.testnet.hedera.com:50211
+#    account: 0.0.4
+#  - address: 2.testnet.hedera.com:50211
+#    account: 0.0.5
+#  - address: 3.testnet.hedera.com:50211
+#    account: 0.0.6
     
-  

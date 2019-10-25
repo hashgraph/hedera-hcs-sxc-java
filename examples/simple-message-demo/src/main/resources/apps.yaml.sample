@@ -1,0 +1,5 @@
+appClients:
+  - clientName: "Player 1"
+    clientKey: "player 1 key"
+  - clientName: "Player 2"
+    clientKey: "player 2 key"

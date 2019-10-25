@@ -14,8 +14,7 @@ public final class Environment {
     private Dotenv dotEnv;
 
     public Environment() {
-        Dotenv.configure().ignoreIfMissing();
-        this.dotEnv = Dotenv.load();        
+        this.dotEnv = Dotenv.configure().ignoreIfMissing().load();        
     }
 
     /** 
@@ -40,5 +39,12 @@ public final class Environment {
      */
     public AccountId getOperatorAccountId() {
         return AccountId.fromString(dotEnv.get("OPERATOR_ID"));
+    }
+    
+    /** 
+     * Returns the app id
+     */
+    public int getAppId() {
+        return Integer.parseInt(dotEnv.get("APP_ID"));
     }
 }

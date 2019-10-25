@@ -25,6 +25,9 @@ public final class OnHCSMessageCallback {
     void notifyObservers(String message){
         observers.forEach(listener -> listener.onMessage(message));
     }
+    
+  
+    
     /**
      * For test purposes for now
      */

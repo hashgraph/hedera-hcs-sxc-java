@@ -9,20 +9,35 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 
-
-public  class HCSMessagePart implements Serializable{
-        public String header;
-        public int topic;
-        public int messageNo;
-        public byte partNo;
-        public byte noOfParts;
-        public String payload;
-        public long timestampSeconds;
-        public byte[] serialized;
+/**
+ * 
+ * A message chunk is a part of a #{@link HCSMessage}
+ * A list of such chunks is kept in the message object
+ */
+public  class HCSMessageChunk implements Serializable{
+        //header
+        public @Nonnull String header; 
+        public @Nonnull int topic;
+        public @Nonnull int messageNo;
+        public @Nonnull byte partNo;
+        public @Nonnull byte noOfParts;
+        public @Nonnull long timestampSeconds;
+        //body
+        public @Nonnull String payload;
         
+        public byte[] serialized;// buffer that hold above fields
         
-        public HCSMessagePart(byte[] serialized) {
+        /**
+         * Construct a chunk, when message is received, by parsing a byte array. The constructed chunk has
+         * all non-null fields initialized. Use this constructor {@link  #onMessage}
+         * of your Queue Or Topic message call back and add each constructed chunk
+         * to an HCSMessage using {@link HCSMessage#addPart(com.hedera.hcslib.messages.HCSMessageChunk) }
+         * to construct an HCSMessage incrementally while parts become available.
+         * @param serialized 
+         */
+        public HCSMessageChunk(byte[] serialized) {
             Preconditions.checkArgument(serialized.length < 100, "buffler length: %d too long", serialized.length); 
             ByteBuffer wrap = ByteBuffer.wrap(serialized);
             this.serialized = serialized;
@@ -32,7 +47,7 @@ public  class HCSMessagePart implements Serializable{
             byte[] _2ByteInt = ByteBuffer.allocate(2).array();
             wrap.get(_2ByteInt);
             this.topic = ((_2ByteInt[1] & 0xff) << 8) | (_2ByteInt[0] & 0xff);
-            this.messageNo =  wrap.getInt();// ((_3ByteInt[2] & 0xff) << 8) & ((_3ByteInt[1] & 0xff) << 8) | (_3ByteInt[0] & 0xff);
+            this.messageNo =  wrap.getInt();
             this.partNo = wrap.get();
             this.noOfParts = wrap.get();
             byte[] _86ByteString = ByteBuffer.allocate(86).array();
@@ -40,7 +55,16 @@ public  class HCSMessagePart implements Serializable{
             this.payload = StringUtils.byteArrayToString(trim(_86ByteString));
         }
         
-        HCSMessagePart (int topic, int messageNo, byte chunkNo, byte totalChunks, String payload) throws UnsupportedEncodingException{
+        /**
+         * Construct a chunk when message is to be disassembled.
+         * @param topic
+         * @param messageNo
+         * @param chunkNo
+         * @param totalChunks
+         * @param payload
+         * @throws UnsupportedEncodingException 
+         */
+        HCSMessageChunk (int topic, int messageNo, byte chunkNo, byte totalChunks, String payload) throws UnsupportedEncodingException{
             this.header = "HCS";
             this.topic  = topic;
             this.messageNo = messageNo;
@@ -75,7 +99,7 @@ public  class HCSMessagePart implements Serializable{
             if (getClass() != obj.getClass()) {
                 return false;
             }
-            final HCSMessagePart other = (HCSMessagePart) obj;
+            final HCSMessageChunk other = (HCSMessageChunk) obj;
             if (this.topic != other.topic) {
                 return false;
             }
@@ -103,7 +127,8 @@ public  class HCSMessagePart implements Serializable{
             
             return true;
         }
-     
+        
+        //TODO exhaustive test regarding EOF character
         private static byte[] trim(byte[] bytes) {
             int i = bytes.length - 1;
             while (i >= 0 && bytes[i] == 0)

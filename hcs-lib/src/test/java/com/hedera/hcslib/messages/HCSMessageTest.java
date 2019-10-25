@@ -1,5 +1,6 @@
 package com.hedera.hcslib.messages;
 
+import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hcslib.cryptography.Cryptography;
 import com.hedera.hcslib.cryptography.KeyRotation;
 import com.hedera.hcslib.hashing.Hashing;
@@ -55,7 +56,7 @@ public class HCSMessageTest {
             /*
                 Encrypt the clear text  message and test if payload meets requirements
             */
-            HCSMessage a = HCSMessage.prepareEncrypted(sharedSecret, 3, 4, this.cleartext, rsaKeyPair.getPrivate());
+            HCSMessage a = HCSMessage.prepareMessage(sharedSecret, 3, 4, this.cleartext, rsaKeyPair.getPrivate());
             
             // can we identify the signer while message encrypted?
             Assert.assertTrue(Signing.verify(a.payload.message, a.payload.signatureOfEncryptedMessage, rsaKeyPair.getPublic()));
@@ -66,7 +67,7 @@ public class HCSMessageTest {
                 requriements are still met. 
             */
             
-            HCSMessage b = HCSMessage.decryptAndAssembleIfAllPartsAvailable(sharedSecret, Arrays.asList(a.parts));
+            HCSMessage b = HCSMessage.processMessage(sharedSecret, Arrays.asList(a.parts));
             
             // is the stored hash of the original message unaffected?
             Assert.assertArrayEquals(a.payload.hashOfUnencryptedMessage, Hashing.sha(this.cleartext));
@@ -81,7 +82,6 @@ public class HCSMessageTest {
             
             // does the decryption work?
             Assert.assertEquals(b.payload.message, this.cleartext);
-            
             
         } catch (Exception ex) {
             Assert.fail();

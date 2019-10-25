@@ -1,4 +1,4 @@
-mirrorAddress: 127.0.0.1:8080
+mirrorAddress: 35.222.103.151:9090
 topics:
   - topic: 0.0.10
   - topic: 0.0.11

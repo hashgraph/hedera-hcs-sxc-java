@@ -10,7 +10,6 @@ public final class AppNet {
     private boolean encryptMessages = false;
     private boolean rotateKeys = false;
     private int rotateKeyFrequency = 0;
-    private String mirrorAddress = "";
     private List<Topic> topics = new ArrayList<Topic>();
 
     public boolean getSignMessages() {
@@ -36,12 +35,6 @@ public final class AppNet {
     }
     public void setRotateKeyFrequency(int rotateKeyFrequency) {
         this.rotateKeyFrequency = rotateKeyFrequency;
-    }
-    public String getMirrorAddress() {
-        return this.mirrorAddress;
-    }
-    public void setMirrorAddress(String mirrorAddress) {
-        this.mirrorAddress = mirrorAddress;
     }
     public List<Topic> getTopics() {
         return this.topics;

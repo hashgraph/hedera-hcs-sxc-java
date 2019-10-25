@@ -24,6 +24,7 @@
         <jackson-databind.version>2.10.0</jackson-databind.version>
         <snakeyaml.version>1.21</snakeyaml.version>
         <commons-lang3.version>3.9</commons-lang3.version>
+        <artemis-jms-client-all.version>2.10.1</artemis-jms-client-all.version>
     </properties>
 
     <dependencies>
@@ -78,6 +79,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${commons-lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>artemis-jms-client-all</artifactId>
+            <version>${artemis-jms-client-all.version}</version>
         </dependency>
     </dependencies>
 

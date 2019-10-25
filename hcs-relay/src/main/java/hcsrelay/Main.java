@@ -10,7 +10,6 @@ import javax.jms.Topic;
 import javax.jms.TopicSubscriber;
 import javax.naming.InitialContext;
 
-
 import javax.naming.Context;
 
 /**
@@ -19,22 +18,20 @@ import javax.naming.Context;
  */
 public class Main {
 
-
-
     public static void main(final String[] args) throws Exception {
         Connection connection = null;
         InitialContext initialContext = null;
         try {
-            
+
             /**
              * Create properties to connect to the hsc-queue / topic server
-             * Note, these environment settings can be put it 
+             * Note, these environment settings can be put it
              * src/main/resources/jndi.properties and use this format:
-             * 
+             *
              * java.naming.factory.initial=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory
              * connectionFactory.ConnectionFactory=tcp://localhost:61616
              * topic.topic/exampleTopic=exampleTopic
-             * 
+             *
              * Then that file can be shared across different clients.
              */
             Hashtable<String, Object> props = new Hashtable<>();
@@ -49,12 +46,9 @@ public class Main {
             ctx.lookup("TCPConnectionFactory");
             //ctx.lookup("UDPConnectionFactory");
             ctx.lookup("JGroupsConnectionFactory");
-            
-            
-   
-            
+
             // Step 1. Create an initial context to perform the JNDI lookup.
-            initialContext =  ctx;
+            initialContext = ctx;
 
             // Step 2. Look-up the JMS topic
             Topic topic = (Topic) initialContext.lookup("topic/exampleTopic");
@@ -116,7 +110,7 @@ public class Main {
 
             // Step 18. Delete the durable subscription
             session.unsubscribe("subscriber-1");
-        } catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();;
         } finally {
             if (connection != null) {

@@ -2,6 +2,7 @@ version: '3.3'
 services:
   hcsqueue:
     image: webcenter/activemq:5.14.3
+    restart: on-failure
     ports:
       # mqtt
       - "1883:1883"
@@ -35,6 +36,7 @@ services:
 
   postgres-queue:
     image: healthcheck/postgres:alpine
+    restart: on-failure
     ports: ["5432:5432"]
     networks: [backing-services]
     volumes: ["postgres-data:/var/lib/postgresql/data"]
@@ -44,22 +46,22 @@ services:
       POSTGRES_PASSWORD: password
 
   hcs-relay:
-    image: 14-jdk-alpine
-    restart: unless-stopped
+    image: hederahashgraph/hcs-relay
+    restart: on-failure
 
   # this runs the apps
   # player1:
-  #   image:
-  #   restart: unless-stopped
-  #   environment:
-  #     - APPID=0
-  #   tty: true
-  #   ports:
-  #     - 8080:8080
-  #
+  #  image: hederahashgraph/hcs-app
+  #  restart: always
+  #  environment:
+  #    - APPID=0
+  #  tty: true
+  #  ports:
+  #    - 8080:8080
+ 
   # player2:
   #   image:
-  #   restart: unless-stopped
+  #   restart: always
   #   environment:
   #     - APPID=1
   #   tty: true

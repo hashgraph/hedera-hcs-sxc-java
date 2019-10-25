@@ -1,34 +1,83 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.hedera.hscapp</groupId>
-  <artifactId>simple-message-demo</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
+    <groupId>com.hedera.hscapp</groupId>
+    <artifactId>simple-message-demo</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
-  <name>simple-message-demo</name>
-  <url>http://maven.apache.org</url>
+    <name>simple-message-demo</name>
+    <url>http://maven.apache.org</url>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>10</maven.compiler.source>
         <maven.compiler.target>10</maven.compiler.target>
         <junit.version>4.12</junit.version>
         <hcslib.version>0.0.1-SNAPSHOT</hcslib.version>
-  </properties>
+        <jib.version>1.5.1</jib.version>
+    </properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>com.hedera</groupId>
-        <artifactId>hcslib</artifactId>
-      <version>${hcslib.version}</version>
-    </dependency>
-  </dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hedera</groupId>
+            <artifactId>hcslib</artifactId>
+            <version>${hcslib.version}</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugin>
+            <groupId>com.google.cloud.tools</groupId>
+            <artifactId>jib-maven-plugin</artifactId>
+            <version>${jib.version}</version>
+            <configuration>
+                <to>
+                    <image>hederahashgraph/hcs-app</image>
+                    <tags>
+                        <tag>${project.version}</tag>
+                    </tags>
+                </to>
+            </configuration>
+            <executions>
+                <execution>
+                    <phase>install</phase>
+                    <goals>
+                        <goal>dockerBuild</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <configuration>
+                <executable>docker</executable>
+                <arguments>
+                    <argument>build</argument>
+                    <argument>-t</argument>
+                    <argument>hederahashgraph/hcs-app</argument>
+                    <argument>-t</argument>
+                    <argument>hederahashgraph/hcs-app:${project.version}</argument>
+                </arguments>
+            </configuration>
+            <executions>
+                <execution>
+                    <phase>install</phase>
+                    <goals>
+                        <goal>exec</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+        <plugins />
+    </build>
 </project>

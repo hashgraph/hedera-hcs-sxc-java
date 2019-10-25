@@ -1,5 +1,6 @@
 package hcsrelay;
 
+import java.util.Hashtable;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.MessageProducer;
@@ -9,9 +10,7 @@ import javax.jms.Topic;
 import javax.jms.TopicSubscriber;
 import javax.naming.InitialContext;
 
-import com.hedera.hcslib.callback.OnHCSMessageCallback;
-import java.util.Hashtable;
-import java.util.Properties;
+
 import javax.naming.Context;
 
 /**

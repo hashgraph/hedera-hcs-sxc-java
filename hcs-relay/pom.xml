@@ -16,6 +16,7 @@
         <java.version>11</java.version>
         <snakeyaml.version>1.21</snakeyaml.version>
         <hedera-sdk.version>0.5.2.1-SNAPSHOT</hedera-sdk.version>
+        <jib.version>1.5.1</jib.version>
     </properties>
 
     <dependencies>
@@ -30,5 +31,39 @@
             <version>${hedera-sdk.version}</version>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>${jib.version}</version>
+                <configuration>
+                    <from>
+                        <image>gcr.io/distroless/java:11</image>
+                    </from>
+                    <to>
+                        <image>hederahashgraph/hcs-relay</image>
+                        <tags>
+                            <tag>${project.version}</tag>
+                        </tags>
+                    </to>
+                    <extraDirectories>
+                        <paths>
+                            <path>src/main/resources</path>
+                        </paths>
+                    </extraDirectories>
+                    <mainClass>com.hedera.hcsrelay.Launch</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>dockerBuild</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

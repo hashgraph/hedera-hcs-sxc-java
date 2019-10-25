@@ -2,6 +2,6 @@
 
 A component of an hcs network which queues messages for delivery to apps
 
-Uses Apache ActiveMQ Artemis 
-
-Downlaod from  https://activemq.apache.org/components/artemis/download/
+Example ActiveMQ Artemis docker image
+docker pull vromero/activemq-artemis
+https://github.com/vromero/activemq-artemis-docker/blob/master/README.md

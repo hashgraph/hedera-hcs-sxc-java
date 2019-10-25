@@ -9,9 +9,9 @@ import com.hedera.hcsrelay.config.Config;
  * Subscribes to topic(s) against a mirror node
  *
  */
-public final class TopicsSubscriber {
+public final class MirrorTopicsSubscriber {
 
-    public TopicsSubscriber() throws FileNotFoundException, IOException {
+    public MirrorTopicsSubscriber() throws FileNotFoundException, IOException {
         Config config = new Config();
         
         String mirrorAddress = config.getConfig().getMirrorAddress();

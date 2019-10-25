@@ -4,9 +4,12 @@ appNet:
   rotateKeys: false
   rotateKeyFrequency: 0
   mirrorAddress: 127.0.0.1:8080
+  topics:
+    - topic: 0.0.10
+    - topic: 0.0.11
 
 nodes:
-  - address: 0.testnet.hedera.com:50211
+  - address: 35.222.103.151:50211
     account: 0.0.3
 # Commented out due to bug in java SDK
 #  - address: 1.testnet.hedera.com:50211

@@ -1,11 +1,17 @@
 package com.hedera.hcslib.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.hedera.hashgraph.sdk.consensus.TopicId;
+
 public final class AppNet {
     private boolean signMessages = false;
     private boolean encryptMessages = false;
     private boolean rotateKeys = false;
     private int rotateKeyFrequency = 0;
     private String mirrorAddress = "";
+    private List<Topic> topics = new ArrayList<Topic>();
 
     public boolean getSignMessages() {
         return signMessages;
@@ -37,4 +43,22 @@ public final class AppNet {
     public void setMirrorAddress(String mirrorAddress) {
         this.mirrorAddress = mirrorAddress;
     }
-}
+    public List<Topic> getTopics() {
+        return this.topics;
+    }
+    public void setTopics(List<Topic> topics) {
+        this.topics = topics;
+    }
+    /** 
+     * Returns a list of TopicIds
+     * @return List<TopicId> 
+     */
+    public List<TopicId> getTopicIds() {
+        List<TopicId> topicIds = new ArrayList<TopicId>();
+        
+        for (Topic topic : this.topics) {
+            topicIds.add(TopicId.fromString(topic.getTopic()));
+        }
+        
+        return topicIds;
+    }}

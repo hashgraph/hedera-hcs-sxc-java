@@ -1,14 +1,18 @@
-package com.hedera.hcslib.outbound;
+package com.hedera.hcslib.consensus;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
+import com.hedera.hashgraph.sdk.consensus.SubmitMessageTransaction;
+import com.hedera.hashgraph.sdk.consensus.TopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcslib.HCSLib;
 
@@ -19,7 +23,8 @@ public final class OutboundHCSMessage {
     private int rotationFrequency = 0;
     private Map<AccountId, String> nodeMap = new HashMap<AccountId, String>();
     private AccountId operatorAccountId = new AccountId(0, 0, 0); 
-    private Ed25519PrivateKey ed25519PrivateKey; 
+    private Ed25519PrivateKey ed25519PrivateKey;
+    private List<TopicId> topicIds = new ArrayList<TopicId>();
     
     public OutboundHCSMessage(HCSLib hcsLib) {
         this.signMessages = hcsLib.getSignMessages();
@@ -28,6 +33,7 @@ public final class OutboundHCSMessage {
         this.nodeMap = hcsLib.getNodeMap();
         this.operatorAccountId = hcsLib.getOperatorAccountId();
         this.ed25519PrivateKey = hcsLib.getEd25519PrivateKey();
+        this.topicIds = hcsLib.getTopicIds();
     }
 
     public OutboundHCSMessage overrideMessageSignature(boolean signMessages) {
@@ -56,7 +62,7 @@ public final class OutboundHCSMessage {
         return this;
     }
     
-    public boolean sendMessage(String message) throws HederaNetworkException, IllegalArgumentException, HederaException {
+    public boolean sendMessage(int topicIndex, String message) throws HederaNetworkException, IllegalArgumentException, HederaException {
 
         if (signMessages) {
             
@@ -76,18 +82,13 @@ public final class OutboundHCSMessage {
             this.operatorAccountId
             ,this.ed25519PrivateKey
         );
-
-        TransactionId id = new TransactionId(this.operatorAccountId); 
         client.setMaxTransactionFee(100_000_000L);
-        
-        id = new CryptoTransferTransaction(client)
-            .addSender(this.operatorAccountId, 1)
-            .addRecipient(AccountId.fromString("0.0.3"), 1)
-            .setMemo(message)
-            .setTransactionId(id)
-            .execute();
-        
+
+        TransactionReceipt receipt = new SubmitMessageTransaction(client)
+                .setMessage(message.getBytes())
+                .setTopicId(this.topicIds.get(topicIndex))
+                .executeForReceipt();
+                
         return true;
     }
-
 }

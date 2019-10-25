@@ -11,7 +11,7 @@ public final class YAMLConfig {
 
     private List<Node> nodes = new ArrayList<Node>();
     private AppNet appNet = new AppNet();
-
+    
     public List<Node> getNodes() {
         return this.nodes;
     }
@@ -37,5 +37,4 @@ public final class YAMLConfig {
         
         return nodeList;
     }
-    
 }

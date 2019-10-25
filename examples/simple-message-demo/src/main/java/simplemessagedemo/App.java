@@ -7,7 +7,6 @@ import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hcslib.HCSLib;
 import com.hedera.hcslib.callback.OnHCSMessageCallback;
-import com.hedera.hcslib.outbound.OutboundHCSMessage;
 
 /**
  * Hello world!
@@ -30,8 +29,8 @@ public final class App
         
         // Outbound message (app->lib->hedera example)
         try {
-            Boolean success = new OutboundHCSMessage(hcsLib)
-                .sendMessage("test");
+            Boolean success = new com.hedera.hcslib.consensus.OutboundHCSMessage(hcsLib)
+                .sendMessage(0, "test");
         } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -46,11 +45,11 @@ public final class App
         
         // More complex outbound message (app->lib->hedera example) with overrides
         try {
-            Boolean success = new OutboundHCSMessage(hcsLib2)
+            Boolean success = new com.hedera.hcslib.consensus.OutboundHCSMessage(hcsLib2)
                 .overrideEncryptedMessages(true)
                 .overrideKeyRotation(true, 10)
                 .overrideMessageSignature(false)
-                .sendMessage("test");
+                .sendMessage(0, "test");
         } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

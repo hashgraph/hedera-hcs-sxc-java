@@ -17,10 +17,12 @@ services:
       , "activemq-data:/opt/jmx-exporter/etc-override"
     ]
     
-    environment:
+    environment: [
       ARTEMIS_USERNAME=hcsdemo
-      ARTEMIS_PASSWORD=hcsdemo
-
+      ,ARTEMIS_PASSWORD=hcsdemo
+      ,RESTORE_CONFIGURATION=true
+    ]
+    
   hcs-relay:
     image: hederahashgraph/hcs-relay
     restart: on-failure

@@ -17,6 +17,7 @@ public final class TopicsSubscriber {
         String mirrorAddress = config.getConfig().getMirrorAddress();
         
         for (TopicId topic : config.getConfig().getTopicIds()) {
+            System.out.println("Subscribing to topic number " + topic.getTopicNum());
             // send subscription request to mirrorAddress for topic using the SDK
             // likely needs a callback method
         }

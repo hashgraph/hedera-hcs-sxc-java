@@ -15,7 +15,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <java.version>11</java.version>
         <snakeyaml.version>1.21</snakeyaml.version>
-        <hedera-sdk.version>0.5.2.1-SNAPSHOT</hedera-sdk.version>
+        <hedera-sdk.version>0.5.2.2-SNAPSHOT</hedera-sdk.version>
         <jib.version>1.5.1</jib.version>
         <artemis-jms-client-all.version>2.10.1</artemis-jms-client-all.version>
     </properties>

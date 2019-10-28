@@ -1,5 +1,7 @@
 package com.hedera.hcsrelay.subscribe;
 
+import java.util.concurrent.TimeUnit;
+
 import com.hedera.hashgraph.sdk.consensus.TopicId;
 import com.hedera.hashgraph.sdk.consensus.TopicSubscriber;
 import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages.MirrorGetTopicMessagesResponse;
@@ -16,6 +18,21 @@ public final class MirrorTopicSubscriber extends Thread {
     private int mirrorPort = 0;
     private TopicId topicId;
     private TopicSubscriber subscriber;
+    
+    public class SusbcriberCloseHook extends Thread {
+        private TopicSubscriber subscriber;
+        public SusbcriberCloseHook(TopicSubscriber subscriber) {
+           this.subscriber = subscriber;
+        }
+        @Override
+        public void run() {
+            try {
+                this.subscriber.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
     
     public MirrorTopicSubscriber(String mirrorAddress, int mirrorPort, TopicId topicId) {
         this.mirrorAddress = mirrorAddress;
@@ -37,14 +54,27 @@ public final class MirrorTopicSubscriber extends Thread {
     }
 
     public void run() {
+        boolean retry = true;
+        
         try (TopicSubscriber subscriber = new TopicSubscriber(this.mirrorAddress, this.mirrorPort))
         {
-            Runtime.getRuntime().addShutdownHook(new Thread(closeSubscription()));
+            Runtime.getRuntime().addShutdownHook(new SusbcriberCloseHook(subscriber));
             this.subscriber = subscriber;
-            subscriber.subscribe(this.topicId, consumer -> onMirrorMessage(consumer));
-        } catch (Exception e) {
-            e.printStackTrace();
-        };
+        
+            while (retry) {
+                try {
+                    subscriber.subscribe(this.topicId, consumer -> onMirrorMessage(consumer));
+                } catch (io.grpc.StatusRuntimeException e) {
+                    System.out.println("Unable to connect to mirror node: " + mirrorAddress + ":" + mirrorPort + " topic: " + topicId.getTopicNum() + " - retrying in 3s");
+                    TimeUnit.SECONDS.sleep(3);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    retry = false;
+                }
+            }
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
     }        
     
 }

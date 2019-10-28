@@ -35,6 +35,7 @@
         </dependency>
     </dependencies>
     <build>
+        <plugins>
         <plugin>
             <groupId>com.google.cloud.tools</groupId>
             <artifactId>jib-maven-plugin</artifactId>
@@ -78,6 +79,6 @@
                 </execution>
             </executions>
         </plugin>
-        <plugins />
+        </plugins >
     </build>
 </project>

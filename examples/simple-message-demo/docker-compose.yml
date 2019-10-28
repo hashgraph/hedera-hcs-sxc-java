@@ -18,26 +18,20 @@ services:
     ]
     
     environment: [
-      ARTEMIS_USERNAME=hcsdemo
-      ,ARTEMIS_PASSWORD=hcsdemo
-      ,RESTORE_CONFIGURATION=true
+      DISABLE_SECURITY=true
+      , ARTEMIS_USERNAME=hcsdemo
+      , ARTEMIS_PASSWORD=hcsdemo
+      , RESTORE_CONFIGURATION=true
     ]
     
-  hcs-relay:
-    image: hederahashgraph/hcs-relay
-    restart: on-failure
-    networks: [backing-services]
+      
+    #hcs-relay:
+    #  image: hederahashgraph/hcs-relay
+    #  restart: on-failure
+    #  networks: [backing-services]
 
-  # this runs the apps
-  # player1:
-  #  image: hederahashgraph/hcs-app
-  #  restart: always
-  #  environment:
-  #    - APPID=0
-  #  tty: true
-  #  ports:
-  #    - 8080:8080
- 
+    # this runs the apps
+    
   # player2:
   #   image:
   #   restart: always
@@ -53,3 +47,13 @@ volumes:
 networks:
   backing-services:
     driver: bridge
+
+player1:
+       build:
+       restart: always
+       environment:
+   
+       tty: true
+       ports:
+   
+    

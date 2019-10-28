@@ -18,6 +18,7 @@ public class MQListener implements MessageListener{
  
     @Override
     public void onMessage(Message message) {
+        System.out.println("here hit");
         if (acknowledge) {
             try {
                 message.acknowledge();

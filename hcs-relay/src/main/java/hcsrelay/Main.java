@@ -60,7 +60,7 @@ public class Main {
             connection = cf.createConnection();
 
             // Step 5. Set the client-id on the connection
-            connection.setClientID("durable-client");
+            connection.setClientID("durable-client-relay");
 
             // Step 6. Start the connection
             connection.start();
@@ -98,7 +98,7 @@ public class Main {
             subscriber.close();
 
             // Step 15. Create a new subscriber on the *same* durable subscription.
-            subscriber = session.createDurableSubscriber(topic, "subscriber-1");
+            subscriber = session.createDurableSubscriber(topic, "useless-subscriber-in-relay");
 
             // Step 16. Consume the message
             messageReceived = (TextMessage) subscriber.receive();

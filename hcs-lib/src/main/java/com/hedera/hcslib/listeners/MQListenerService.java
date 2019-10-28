@@ -3,13 +3,8 @@ package com.hedera.hcslib.listeners;
 import java.net.URISyntaxException;
 import java.util.Hashtable;
 import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.MessageProducer;
 import javax.jms.Session;
-import javax.jms.TextMessage;
 import javax.jms.Topic;
 import javax.jms.TopicSubscriber;
 import javax.naming.Context;
@@ -65,11 +60,11 @@ public class MQListenerService {
             connection = cf.createConnection();
 
             // Step 5. Set the client-id on the connection
-            connection.setClientID("durable-client");
+            connection.setClientID("durable-client-hcs-lib");
 
             // Step 6. Start the connection
-           
-
+            connection.start();
+            
             // Step 7. Create a JMS session
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
@@ -77,15 +72,21 @@ public class MQListenerService {
             //MessageProducer messageProducer = session.createProducer(topic);
 
             // Step 9. Create the subscription and the subscriber.
-            TopicSubscriber subscriber = session.createDurableSubscriber(topic, "subscriber-1");
+            TopicSubscriber subscriber = session.createDurableSubscriber(topic, "subscriber-1-in-lib");
+            
+            Message receive = subscriber.receive();
+            System.out.print(((javax.jms.TextMessage)receive).getText());
             subscriber.setMessageListener(new MQListener(true));
      
     
-             
+           Object lock = new Object();
+           synchronized (lock) {
+               lock.wait();
+           }
         
            //connection.start();     
              
-            Thread.sleep(1000);
+            //Thread.sleep(1000);
              
             System.out.println("Change the message listener to acknowledge");
             // System.out.println("Sending text '" + payload + "'");
@@ -93,7 +94,7 @@ public class MQListenerService {
             //consumer.setMessageListener(
             //        new AckMessageListener(true));
              
-            Thread.sleep(1000);
+            //Thread.sleep(1000);
             session.close();
         } finally {
             if (connection != null) {

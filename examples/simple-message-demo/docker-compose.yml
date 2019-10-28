@@ -1,45 +1,54 @@
 version: '3.3'
 services:
-  hcsqueue:
-    image: vromero/activemq-artemis:2.10.1-alpine
-    restart: on-failure
-    ports:
-      # ui
-      - "8161:8161"
-      # jms
-      - "61616:61616"
-    networks: [backing-services]
-    volumes: [
-      "activemq-data:/var/lib/artemis/data"
-      , "activemq-data:/var/lib/artemis/etc"
-      , "activemq-data:/var/lib/artemis/etc-override"
-      , "activemq-data:/var/lib/artemis/lock"
-      , "activemq-data:/opt/jmx-exporter/etc-override"
-    ]
-    
-    environment: [
-      DISABLE_SECURITY=true
-      , ARTEMIS_USERNAME=hcsdemo
-      , ARTEMIS_PASSWORD=hcsdemo
-      , RESTORE_CONFIGURATION=true
-    ]
-    
-      
-    #hcs-relay:
-    #  image: hederahashgraph/hcs-relay
-    #  restart: on-failure
-    #  networks: [backing-services]
+    hcsqueue:
+      image: vromero/activemq-artemis:2.10.1-alpine
+      restart: on-failure
+      ports:
+        # ui
+        - "8161:8161"
+        # jms
+        - "61616:61616"
+      networks: [backing-services]
+      volumes: [
+        "activemq-data:/var/lib/artemis/data"
+        , "activemq-data:/var/lib/artemis/etc"
+        , "activemq-data:/var/lib/artemis/etc-override"
+        , "activemq-data:/var/lib/artemis/lock"
+        , "activemq-data:/opt/jmx-exporter/etc-override"
+      ]
 
-    # this runs the apps
-    
-  # player2:
-  #   image:
-  #   restart: always
-  #   environment:
-  #     - APPID=1
-  #   tty: true
-  #   ports:
-  #     - 8080:8081
+      environment: [
+        DISABLE_SECURITY=true
+        , ARTEMIS_USERNAME=hcsdemo
+        , ARTEMIS_PASSWORD=hcsdemo
+        , RESTORE_CONFIGURATION=true
+      ]
+    hcs-relay:
+        depends_on:
+            - hcsqueue
+        image: hederahashgraph/hcs-relay
+        restart: on-failure
+        networks: [backing-services]
+
+           
+    # player2:
+    #   image:
+    #   restart: always
+    #   environment:
+    #     - APPID=1
+    #   tty: true
+    #   ports:
+    #     - 8080:8081
+   
+       
+    # player2:
+    #   image:
+    #   restart: always
+    #   environment:
+    #     - APPID=1
+    #   tty: true
+    #   ports:
+    #     - 8080:8081
 
 volumes:
   activemq-data: {}
@@ -48,12 +57,3 @@ networks:
   backing-services:
     driver: bridge
 
-player1:
-       build:
-       restart: always
-       environment:
-   
-       tty: true
-       ports:
-   
-    

@@ -1,4 +1,12 @@
-mirrorAddress: 35.222.103.151:9090
+mirrorAddress: "35.222.103.151:9090"
 topics:
-  - topic: 0.0.10
-  - topic: 0.0.11
+  - topic: "0.0.10"
+  - topic: "0.0.11"
+
+queue:
+  initialContextFactory: "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
+  topic: "exampleTopic"
+  vmConnectionFactory: "vm://0"
+  tcpConnectionFactory: "tcp://localhost:61616"
+  JGroupsConnectionFactory: "jgroups://mychannelid?file=test-jgroups-file_ping.xml"
+  

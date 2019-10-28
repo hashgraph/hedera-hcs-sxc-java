@@ -15,17 +15,27 @@ import org.yaml.snakeyaml.constructor.Constructor;
 public final class Config {
     private YAMLConfig yamlConfig = new YAMLConfig();
     
-    public Config() throws FileNotFoundException, IOException {
+    public Config() throws Exception {
         Yaml yaml = new Yaml(new Constructor(YAMLConfig.class));
         
-        InputStream inputStream = this.getClass()
-                .getClassLoader()
-                .getResourceAsStream("config.yaml");
-
+        InputStream inputStream;
         File configFile = new File("./config.yaml");
         if (configFile.exists()) {
             // config file exists outside of jar, use it
-            inputStream = new FileInputStream(configFile.getCanonicalPath());
+            try {
+                inputStream = new FileInputStream(configFile.getCanonicalPath());
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                throw new Exception ("Unable to locate ./config.yaml file");
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new Exception ("Error reading ./config.yaml file");
+            }
+        } else {
+            inputStream = this.getClass()
+                    .getClassLoader()
+                    .getResourceAsStream("config.yaml");
+
         }
         yamlConfig = yaml.load(inputStream);
     }

@@ -9,6 +9,9 @@ import javax.jms.Topic;
 import javax.jms.TopicSubscriber;
 import javax.naming.InitialContext;
 
+import com.hedera.hcsrelay.config.Config;
+import com.hedera.hcsrelay.config.Queue;
+
 import java.util.Hashtable;
 import javax.naming.Context;
 
@@ -36,21 +39,23 @@ public class Main {
              * 
              * Then that file can be shared across different clients.
              */
+            
+            Config config = new Config();
+            Queue queueConfig = config.getConfig().getQueue();
+
             Hashtable<String, Object> props = new Hashtable<>();
-            props.put(Context.INITIAL_CONTEXT_FACTORY, "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory");
-            props.put("topic.topic/exampleTopic", "exampleTopic");
-            props.put("connectionFactory.VmConnectionFactory", "vm://0");
-            props.put("connectionFactory.TCPConnectionFactory", "tcp://localhost:61616");
+            props.put(Context.INITIAL_CONTEXT_FACTORY, queueConfig.getInitialContextFactory());
+            props.put("topic.topic/exampleTopic", queueConfig.getTopic());
+            props.put("connectionFactory.VmConnectionFactory", queueConfig.getVmConnectionFactory());
+            props.put("connectionFactory.TCPConnectionFactory", queueConfig.getTcpConnectionFactory());
             //props.put("connectionFactory.UDPConnectionFactory", "udp://" + getUDPDiscoveryAddress() + ":" + getUDPDiscoveryPort());
-            props.put("connectionFactory.JGroupsConnectionFactory", "jgroups://mychannelid?file=test-jgroups-file_ping.xml");
+            props.put("connectionFactory.JGroupsConnectionFactory", queueConfig.getJGroupsConnectionFactory());
+
             InitialContext ctx = new InitialContext(props);
             ctx.lookup("VmConnectionFactory");
             ctx.lookup("TCPConnectionFactory");
             //ctx.lookup("UDPConnectionFactory");
             ctx.lookup("JGroupsConnectionFactory");
-            
-            
-   
             
             // Step 1. Create an initial context to perform the JNDI lookup.
             initialContext =  ctx;

@@ -1,7 +1,5 @@
 package com.hedera.hcsrelay.subscribe;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import com.hedera.hashgraph.sdk.consensus.TopicId;
 import com.hedera.hcsrelay.config.Config;
 
@@ -11,7 +9,7 @@ import com.hedera.hcsrelay.config.Config;
  */
 public final class MirrorTopicsSubscriber {
 
-    public MirrorTopicsSubscriber() throws FileNotFoundException, IOException {
+    public MirrorTopicsSubscriber() throws Exception {
         Config config = new Config();
         
         String mirrorAddress = config.getConfig().getMirrorAddress();

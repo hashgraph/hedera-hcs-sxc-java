@@ -8,7 +8,8 @@ public final class YAMLConfig {
 
     private String mirrorAddress = "";
     private List<Topic> topics = new ArrayList<Topic>();
-
+    private Queue queue = new Queue();
+    
     public String getMirrorAddress() {
         return this.mirrorAddress;
     }
@@ -20,6 +21,12 @@ public final class YAMLConfig {
     }
     public void setTopics(List<Topic> topics) {
         this.topics = topics;
+    }
+    public Queue getQueue() {
+        return this.queue;
+    }
+    public void setQueue(Queue queue) {
+        this.queue = queue;
     }
     /** 
      * Returns a list of TopicIds

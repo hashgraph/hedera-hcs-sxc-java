@@ -1,10 +1,11 @@
 package com.hedera.hcslib.hashing;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
+
 import com.hedera.hcslib.utils.StringUtils;
-import org.junit.Assert;
-import org.junit.Test;
-
-
 
 public class HashingTest {
     
@@ -19,7 +20,7 @@ public class HashingTest {
         System.out.println("sha");
         byte[] expResult = StringUtils.hexStringToByteArray(hexOfHashOfPlainText);
         byte[] result = Hashing.sha(plaintext);
-        Assert.assertArrayEquals(expResult, result);
+        assertArrayEquals(expResult, result);
     }
 
     @Test
@@ -28,7 +29,7 @@ public class HashingTest {
         byte[] sha2 = Hashing.sha(plaintext);
         boolean expResult = true;
         boolean result = Hashing.matchSHA(sha1, sha2);
-        Assert.assertEquals(expResult, result);
+        assertEquals(expResult, result);
     }
 
     @Test
@@ -37,7 +38,7 @@ public class HashingTest {
         String _plaintext = this.plaintext;
         boolean expResult = true;
         boolean result = Hashing.verifySHA(sha, _plaintext);
-        Assert.assertEquals(expResult, result);
+        assertEquals(expResult, result);
     }
     
 }

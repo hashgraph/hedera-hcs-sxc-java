@@ -5,13 +5,17 @@ import com.hedera.hcslib.cryptography.Cryptography;
 import com.hedera.hcslib.cryptography.KeyRotation;
 import com.hedera.hcslib.hashing.Hashing;
 import com.hedera.hcslib.signing.Signing;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.security.KeyPair;
 import java.util.Arrays;
 import org.apache.commons.lang3.tuple.Pair;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class HCSMessageTest {
     
@@ -19,12 +23,12 @@ public class HCSMessageTest {
     static byte[] publicKeyBytes;
     static byte[] privateKeyBytes;
     static KeyPair rsaKeyPair;
-    String cleartext = "Hear my cries Hear 234sdf! £$%&*)_+ my call Lend me your ears See my fall See my error Know my faults Time halts See my loss ";
+    String cleartext = "Hear my cries Hear 234sdf! ï¿½$%&*)_+ my call Lend me your ears See my fall See my error Know my faults Time halts See my loss ";
     
     public HCSMessageTest() {
     }
 
-    @Before
+    @BeforeAll
     public  void initCalss() throws Exception{
         
         /*
@@ -37,7 +41,7 @@ public class HCSMessageTest {
         byte[] bobPublic = bobPubSecret.getLeft();
         byte[] bobSharedSecret = bobPubSecret.getRight(); 
         byte[] aliceSharedSecret = keyRotation.aliceFinish(bobPublic);
-        Assert.assertTrue(Arrays.equals(aliceSharedSecret, bobSharedSecret));
+        assertTrue(Arrays.equals(aliceSharedSecret, bobSharedSecret));
         sharedSecret = aliceSharedSecret;
         
         /*
@@ -59,7 +63,7 @@ public class HCSMessageTest {
             HCSMessage a = HCSMessage.prepareMessage(sharedSecret, 3, 4, this.cleartext, rsaKeyPair.getPrivate());
             
             // can we identify the signer while message encrypted?
-            Assert.assertTrue(Signing.verify(a.payload.message, a.payload.signatureOfEncryptedMessage, rsaKeyPair.getPublic()));
+            assertTrue(Signing.verify(a.payload.message, a.payload.signatureOfEncryptedMessage, rsaKeyPair.getPublic()));
            
             
             /*
@@ -70,10 +74,10 @@ public class HCSMessageTest {
             HCSMessage b = HCSMessage.processMessage(sharedSecret, Arrays.asList(a.parts));
             
             // is the stored hash of the original message unaffected?
-            Assert.assertArrayEquals(a.payload.hashOfUnencryptedMessage, Hashing.sha(this.cleartext));
+            assertArrayEquals(a.payload.hashOfUnencryptedMessage, Hashing.sha(this.cleartext));
             
             // is the hash of the decrypted message the same as the hash of the original?
-            Assert.assertTrue(
+            assertTrue(
                     Hashing.matchSHA(
                             Hashing.sha(cleartext), 
                             Hashing.sha(b.payload.message)  
@@ -81,10 +85,10 @@ public class HCSMessageTest {
             );  
             
             // does the decryption work?
-            Assert.assertEquals(b.payload.message, this.cleartext);
+            assertEquals(b.payload.message, this.cleartext);
             
         } catch (Exception ex) {
-            Assert.fail();
+            fail();
         } 
     } 
     

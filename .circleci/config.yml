@@ -8,23 +8,8 @@ workflows:
   main:
     jobs:
       - build_hcs_lib:
-        filters: # required since `release_artifacts` has tag filters AND requires `this`
-            branches:
-              only: /.*/
-            tags:
-              only: /.*/
       # - build_hcs_relay:
-      #     filters: # required since `release_artifacts` has tag filters AND requires `this`
-      #       branches:
-      #         only: /.*/
-      #       tags:
-      #         only: /.*/
       # - build_hcs_example:
-      #     filters: # required since `release_artifacts` has tag filters AND requires `this`
-      #       branches:
-      #         only: /.*/
-      #       tags:
-      #         only: /.*/
 jobs:
   build_hcs_lib:
     docker:

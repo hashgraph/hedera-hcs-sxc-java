@@ -4,7 +4,6 @@ import java.util.concurrent.TimeUnit;
 
 import com.hedera.hashgraph.sdk.consensus.TopicId;
 import com.hedera.hashgraph.sdk.consensus.TopicSubscriber;
-import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages.MirrorGetTopicMessagesResponse;
 
 /**
  * 
@@ -61,7 +60,9 @@ public final class MirrorTopicSubscriber extends Thread {
         
             while (retry) {
                 try {
-                    subscriber.subscribe(this.topicId, MirrorMessageHandler::onMirrorMessage);
+                    subscriber.subscribe(this.topicId, (tm) -> {
+                        MirrorMessageHandler.onMirrorMessage(tm, this.topicId);   
+                    });
                 } catch (io.grpc.StatusRuntimeException e) {
                     System.out.println("Unable to connect to mirror node: " + mirrorAddress + ":" + mirrorPort + " topic: " + topicId.getTopicNum() + " - retrying in 3s");
                     TimeUnit.SECONDS.sleep(3);

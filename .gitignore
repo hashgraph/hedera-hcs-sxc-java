@@ -26,3 +26,5 @@ hs_err_pid*
 config.yaml
 /hcs-lib/target/
 /hcs-relay/target/
+hcs-lib/.idea/
+hcs-lib/hcslib.iml

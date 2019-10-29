@@ -40,10 +40,6 @@ public final class MirrorTopicSubscriber extends Thread {
         this.topicId = topicId;
     }
     
-    public void onMirrorMessage(MirrorGetTopicMessagesResponse consumer) {
-        System.out.println("Got message from mirror node: " + consumer.getConsensusTimestamp() + consumer.getMessage().toString());
-    }
-    
     public Runnable closeSubscription() {
         try {
             this.subscriber.close();
@@ -63,7 +59,7 @@ public final class MirrorTopicSubscriber extends Thread {
         
             while (retry) {
                 try {
-                    subscriber.subscribe(this.topicId, consumer -> onMirrorMessage(consumer));
+                    subscriber.subscribe(this.topicId, MirrorMessageHandler::onMirrorMessage);
                 } catch (io.grpc.StatusRuntimeException e) {
                     System.out.println("Unable to connect to mirror node: " + mirrorAddress + ":" + mirrorPort + " topic: " + topicId.getTopicNum() + " - retrying in 3s");
                     TimeUnit.SECONDS.sleep(3);

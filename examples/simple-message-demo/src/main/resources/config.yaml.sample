@@ -4,8 +4,7 @@ appNet:
   rotateKeys: false
   rotateKeyFrequency: 0
   topics:
-    - topic: 0.0.10
-    - topic: 0.0.11
+    - topic: 0.0.1004
 
 nodes:
   - address: 35.222.103.151:50211

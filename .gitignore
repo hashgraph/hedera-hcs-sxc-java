@@ -27,3 +27,5 @@ config.yaml
 /hcs-lib/target/
 /hcs-relay/target/
 *.classpath
+hcs-lib/.idea/
+hcs-lib/hcslib.iml

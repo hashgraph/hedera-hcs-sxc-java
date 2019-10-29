@@ -1,4 +1,4 @@
-package simplemessagedemo;
+package com.hedera.hcsapp;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -6,7 +6,6 @@ import java.io.IOException;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hcslib.HCSLib;
-import com.hedera.hcslib.callback.OnHCSMessageCallback;
 
 /**
  * Hello world!

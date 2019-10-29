@@ -20,13 +20,16 @@ public final class HCSSend
         HCSLib hcsLib = new HCSLib();
         
         // Outbound message (app->lib->hedera example)
-//        try {
-//            Boolean success = new com.hedera.hcslib.consensus.OutboundHCSMessage(hcsLib)
-//                .sendMessage(0, "test");
-//        } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
+        try {
+            Boolean success = new com.hedera.hcslib.consensus.OutboundHCSMessage(hcsLib)
+                .sendMessage(0, "test");
+            if (success) {
+                System.out.println("Message sent");
+            }
+        } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         
         
         // More complex HCSLib setup example

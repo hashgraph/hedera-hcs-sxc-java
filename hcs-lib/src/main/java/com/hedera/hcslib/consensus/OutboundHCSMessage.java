@@ -88,6 +88,7 @@ public final class OutboundHCSMessage {
                 .setMessage(message.getBytes())
                 .setTopicId(this.topicIds.get(topicIndex))
                 .executeForReceipt();
+        System.out.println(receipt.getTopicSequenceNumber());
                 
         return true;
     }

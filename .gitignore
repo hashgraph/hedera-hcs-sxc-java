@@ -29,3 +29,5 @@ config.yaml
 *.classpath
 hcs-lib/.idea/
 hcs-lib/hcslib.iml
+hcs-relay/bin/.settings/org.eclipse.jdt.core.prefs
+hcs-relay/bin/.settings/org.eclipse.m2e.core.prefs

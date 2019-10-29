@@ -15,6 +15,5 @@ public final class Launch {
         }
         
         MirrorTopicsSubscribers topicsSubscriber = new MirrorTopicsSubscribers(mirrorDetails[0], Integer.parseInt(mirrorDetails[1]), config);
-        System.out.println("Relay started");
     }
 }

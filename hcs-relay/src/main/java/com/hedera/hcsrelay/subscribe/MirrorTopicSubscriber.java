@@ -52,6 +52,8 @@ public final class MirrorTopicSubscriber extends Thread {
     public void run() {
         boolean retry = true;
         
+        System.out.println("Subscribing to topic number " + this.topicId.getTopicNum());
+        
         try (TopicSubscriber subscriber = new TopicSubscriber(this.mirrorAddress, this.mirrorPort))
         {
             Runtime.getRuntime().addShutdownHook(new SusbcriberCloseHook(subscriber));

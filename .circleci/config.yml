@@ -5,7 +5,6 @@
 version: 2
 jobs:
   build
-    working_directory: ~/hcs-lib
     docker:
       # specify the version you desire here
       - image: circleci/openjdk:10-jdk

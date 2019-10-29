@@ -10,7 +10,33 @@
     <packaging>jar</packaging>
 
     <name>simple-message-demo</name>
-    <url>http://maven.apache.org</url>
+    <ciManagement>
+        <system>CircleCI</system>
+        <url>https://circleci.com/gh/hashgraph/hedera-hcs-sxc</url>
+    </ciManagement>
+    <inceptionYear>2019</inceptionYear>
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/hashgraph/hedera-hcs-sxc/issues</url>
+    </issueManagement>
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <organization>
+        <name>Hedera Hashgraph, LLC</name>
+        <url>https://hedera.com</url>
+    </organization>
+    <scm>
+        <connection>https://github.com/hashgraph/hedera-hcs-sxc.git</connection>
+        <tag>master</tag>
+        <url>https://github.com/hashgraph/hedera-hcs-sxc/tree/master</url>
+    </scm>
+    <url>https://github.com/hashgraph/hedera-hcs-sxc</url>
+
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -36,6 +62,27 @@
     </dependencies>
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.0.0</version>
+                <configuration>
+                    <canUpdateCopyright>true</canUpdateCopyright>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                    <licenseName>apache_v2</licenseName>
+                    <roots>
+                        <root>src/main/java</root>
+                        <root>src/test/java</root>
+                    </roots>
+                    <!-- These contain unprintable characters to suppress 
+                        showing the delimiters -->
+                    <processEndTag>‍</processEndTag>
+                    <processStartTag>‌</processStartTag>
+                    <sectionDelimiter>​</sectionDelimiter>
+                </configuration>
+            </plugin>
         <plugin>
             <groupId>com.google.cloud.tools</groupId>
             <artifactId>jib-maven-plugin</artifactId>

@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;
+import com.hedera.hashgraph.sdk.consensus.CreateTopicTransaction;
 import com.hedera.hashgraph.sdk.consensus.SubmitMessageTransaction;
 import com.hedera.hashgraph.sdk.consensus.TopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
@@ -39,14 +40,12 @@ public final class CreateHCSTopic {
 
     /**
      * Creates a new topic on a Hedera network
-     * @param topicIndex
-     * @param message
-     * @return
+     * @return TopicId
      * @throws HederaNetworkException
      * @throws IllegalArgumentException
      * @throws HederaException
      */
-    public TopicId execute(int topicIndex, String message) throws HederaNetworkException, IllegalArgumentException, HederaException {
+    public TopicId execute() throws HederaNetworkException, IllegalArgumentException, HederaException {
 
         Client client = new Client(this.nodeMap);
         client.setOperator(
@@ -55,8 +54,7 @@ public final class CreateHCSTopic {
         );
         client.setMaxTransactionFee(100_000_000L);
 
-        TransactionReceipt receipt = new SubmitMessageTransaction(client)
-                .setMessage(message.getBytes())
+        TransactionReceipt receipt = new CreateTopicTransaction(client)
                 .executeForReceipt();
                 
         return receipt.getTopicId();

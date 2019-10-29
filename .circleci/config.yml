@@ -5,7 +5,7 @@
 version: 2
 jobs:
   build
-    working_directory: ~/
+    working_directory: ~/hcs-lib
     docker:
       # specify the version you desire here
       - image: circleci/openjdk:10-jdk
@@ -46,12 +46,12 @@ jobs:
   build-hcs-lib:
     working_directory: ~/hcs-lib
     steps:
-      - run: mvn integration-test
+      - run: cd hcs-lib; ./mvnw package
   build-hcs-relay:
-    working_directory: ~/hcs-relay
+    working_directory: ~/hcs-lib
     steps:
-      - run: mvn integration-test
+      - run: cd hcs-relay; ./mvnw package
   build-hcs-simple-message-demo:
-    working_directory: ~/examples/simple-message-demo
+    working_directory: ~/hcs-lib
     steps:
-      - run: mvn integration-test
+      - run: cd examples/simple-message-demo; ./mvnw package

@@ -3,54 +3,97 @@
 # Check https://circleci.com/docs/2.0/language-java/ for more details
 #
 version: 2
-jobs:
-  build
-    docker:
-      # specify the version you desire here
-      - image: circleci/openjdk:10-jdk
+workflows:
+  version: 2
+  main:
+    jobs:
+      - build_hcs_lib:
+        filters: # required since `release_artifacts` has tag filters AND requires `this`
+            branches:
+              only: /.*/
+            tags:
+              only: /.*/
+      # - build_hcs_relay:
+      #     filters: # required since `release_artifacts` has tag filters AND requires `this`
+      #       branches:
+      #         only: /.*/
+      #       tags:
+      #         only: /.*/
+      # - build_hcs_example:
+      #     filters: # required since `release_artifacts` has tag filters AND requires `this`
+      #       branches:
+      #         only: /.*/
+      #       tags:
+      #         only: /.*/
+  jobs:
+    build_hcs_lib:
+      docker:
+        - image: adoptopenjdk:10-jdk-hotspot
+          environment:
+            # Customize the JVM maximum heap limit
+            MAVEN_OPTS: -Xmx3200m
 
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    environment:
-      # Customize the JVM maximum heap limit
-      MAVEN_OPTS: -Xmx3200m
-
-    steps:
-      - checkout
-
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "pom.xml" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-
-      - run: mvn dependency:go-offline
-
-      - save_cache:
-          paths:
+      steps:
+        - checkout
+        - restore_cache:
+            keys:
+              - maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
+              - maven-v1-{{ .Branch }}
+              - maven-v1-
+        - run:
+            name: Running maven (validate, compile, test, package)
+            command: cd hcs-lib; ./mvnw package
+        - save_cache:
+            key: maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
+            paths:
             - ~/.m2
-          key: v1-dependencies-{{ checksum "pom.xml" }}
+        - store_test_results:
+            path: target/surefire-reports
 
-      # run tests!
-      - run:
-          name: Trigger Builds
-          command:
-            trigger_job build-hcs-lib
-            trigger_job build-hcs-relay
-            trigger_job build-hcs-simple-message-demo
-  build-hcs-lib:
-    working_directory: ~/hcs-lib
-    steps:
-      - run: cd hcs-lib; ./mvnw package
-  build-hcs-relay:
-    working_directory: ~/hcs-lib
-    steps:
-      - run: cd hcs-relay; ./mvnw package
-  build-hcs-simple-message-demo:
-    working_directory: ~/hcs-lib
-    steps:
-      - run: cd examples/simple-message-demo; ./mvnw package
+    build_hcs_relay:
+      docker:
+        - image: adoptopenjdk:10-jdk-hotspot
+          environment:
+            # Customize the JVM maximum heap limit
+            MAVEN_OPTS: -Xmx3200m
+
+      steps:
+        - checkout
+        - restore_cache:
+            keys:
+              - maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
+              - maven-v1-{{ .Branch }}
+              - maven-v1-
+        - run:
+            name: Running maven (validate, compile, test, package)
+            command: cd hcs-lib; ./mvnw package
+        - save_cache:
+            key: maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
+            paths:
+            - ~/.m2
+        - store_test_results:
+            path: target/surefire-reports
+
+    build_hcs_relay:
+      docker:
+        - image: adoptopenjdk:10-jdk-hotspot
+          environment:
+            # Customize the JVM maximum heap limit
+            MAVEN_OPTS: -Xmx3200m
+
+      steps:
+        - checkout
+        - restore_cache:
+            keys:
+              - maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
+              - maven-v1-{{ .Branch }}
+              - maven-v1-
+        - run:
+            name: Running maven (validate, compile, test, package)
+            command: cd examples/simple-message-demo; ./mvnw package
+        - save_cache:
+            key: maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
+            paths:
+            - ~/.m2
+        - store_test_results:
+            path: target/surefire-reports

@@ -32,3 +32,5 @@ hcs-lib/.project
 hcs-lib/.settings
 hcs-relay/.project
 hcs-relay/.settings
+examples/simple-message-demo/.project
+examples/simple-message-demo/.settings

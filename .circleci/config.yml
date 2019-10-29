@@ -7,9 +7,9 @@ workflows:
   version: 2
   main:
     jobs:
-      - build_hcs_lib:
-      # - build_hcs_relay:
-      # - build_hcs_example:
+      - build_hcs_lib
+      # - build_hcs_relay
+      # - build_hcs_example
 jobs:
   build_hcs_lib:
     docker:

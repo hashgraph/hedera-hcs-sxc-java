@@ -30,3 +30,5 @@ hcs-lib/.idea/
 hcs-lib/hcslib.iml
 hcs-lib/.project
 hcs-lib/.settings
+hcs-relay/.project
+hcs-relay/.settings

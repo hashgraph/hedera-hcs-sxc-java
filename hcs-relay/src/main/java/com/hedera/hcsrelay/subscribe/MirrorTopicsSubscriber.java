@@ -1,6 +1,14 @@
 package com.hedera.hcsrelay.subscribe;
-
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.consensus.TopicId;
+import com.hedera.hashgraph.sdk.proto.ConsensusSubmitMessageTransactionBody;
+import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
+import com.hedera.hashgraph.sdk.proto.TopicID;
+import com.hedera.hashgraph.sdk.proto.Transaction;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionReceipt;
+import com.hedera.hashgraph.sdk.proto.TransactionRecord;
 import com.hedera.hcsrelay.config.Config;
 import com.hedera.hcsrelay.config.Queue;
 import java.util.Hashtable;
@@ -18,12 +26,14 @@ import javax.naming.NamingException;
 
 /**
  * Subscribes to topic(s) against a mirror node
- *
+ * Listens to mirror messages, filters by topic and forwards to mq
  */
 public final class MirrorTopicsSubscriber {
-
+    
+    Config config = new Config();
+    
     public MirrorTopicsSubscriber() throws Exception {
-        Config config = new Config();
+        
         
         String mirrorAddress = config.getConfig().getMirrorAddress();
         
@@ -32,38 +42,74 @@ public final class MirrorTopicsSubscriber {
                 System.out.println("Subscribing to topic number " + topic.getTopicNum());
 
                 System.out.println("Seting up MQ Artemis to topic number " + topic.getTopicNum());
-                 setupJmsTopic(config, topic.getTopicNum());
+                this.setupJmsTopic(config, topic.getTopicNum());
               
                 // send subscription request to mirrorAddress for topic using the SDK
-                // likely needs a callback method
+                // likely needs a callback method       
         }
         
-        
-        
-       
-
-        
-      
     }
 
+    /**
+     * TODO implement jax-rs POST or similar
+     * @param txRcd
+     * @param txRcp 
+     */
+     public void onMirrorMessage(Transaction transaction, TransactionRecord txRecord) throws InvalidProtocolBufferException{
+            //step 1 filter topics
+            TransactionBody body = null;
+            if (transaction.hasBody()) {
+                    body = transaction.getBody();
+            } else {
+                    body = TransactionBody.parseFrom(transaction.getBodyBytes());
+            }
+
+        
+            TransactionReceipt receipt = txRecord.getReceipt();
+            
+            if (receipt.getStatus() == ResponseCodeEnum.SUCCESS) {
+                    // transaction was successful
+            } else {
+                    // transaction failed for some reason.
+            }
+
+            if (body.hasConsensusCreateTopic()){
+
+            } else if (body.hasConsensusDeleteTopic()){
+
+            } else if (body.hasConsensusSubmitMessage()){
+                ConsensusSubmitMessageTransactionBody consensusSubmitMessage = body.getConsensusSubmitMessage();
+                TopicID topicID = consensusSubmitMessage.getTopicID();
+                long realmNum = topicID.getRealmNum();
+                long shardNum = topicID.getShardNum();
+                long topicNum = topicID.getTopicNum();  
+                TopicId  topicId = new TopicId(shardNum, realmNum, topicNum);
+                
+                Long consensusTimeStampSeconds = txRecord.getConsensusTimestamp().getSeconds();
+                int consensusTimeStampNanos = txRecord.getConsensusTimestamp().getNanos();
+                ByteString message = consensusSubmitMessage.getMessage();
+
+                // filter topic and push tx to mq
+                
+                if (config.getConfig().getTopicIds().contains(topicId)){
+                    
+                }
+
+            } else if (body.hasConsensusUpdateTopic()){
+
+            } else {
+
+            }
+                
+            
+    }
+    
     private void setupJmsTopic(Config config, long topicNum) throws JMSException, NamingException {
         //JMS config
         Connection connection = null;
         InitialContext initialContext = null;
         
         try {
-
-            /**
-             * Create properties to connect to the hsc-queue / topic server
-             * Note, these environment settings can be put it
-             * src/main/resources/jndi.properties and use this format:
-             *
-             * java.naming.factory.initial=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory
-             * connectionFactory.ConnectionFactory=tcp://localhost:61616
-             * topic.topic/exampleTopic=exampleTopic
-             *
-             * Then that file can be shared across different clients.
-             */
             
             Queue queueConfig = config.getConfig().getQueue();
             
@@ -71,9 +117,6 @@ public final class MirrorTopicsSubscriber {
             props.put(Context.INITIAL_CONTEXT_FACTORY, queueConfig.getInitialContextFactory());
             props.put("topic.topic/hcsTopic",  "0.0."+topicNum);
             
-            
-            
-       
             props.put("connectionFactory.TCPConnectionFactory", queueConfig.getTcpConnectionFactory());
             InitialContext ctx = new InitialContext(props);
             ctx.lookup("TCPConnectionFactory");
@@ -87,27 +130,26 @@ public final class MirrorTopicsSubscriber {
             // Step 3. Look-up the JMS connection factory
             ConnectionFactory cf = (ConnectionFactory) initialContext.lookup("TCPConnectionFactory");
 
-            // Step 4. Create a JMS connection
+            // Step 4. Create a JMS connection and wait until server available
             System.out.println("Waiting for MQ Artemis to start ...");
-         
+            
             boolean scanning = true;
             do {
                 try {
-                    Thread.sleep(6000);
                     connection = cf.createConnection();
                     scanning = false;
                 } catch (Exception ie) {
-                    ie.printStackTrace();
+                    System.out.println("Is Artemis up? Is the hostname hcsqueue? Point your hosts file to hcsqueue if running outside of docker");
+                    Thread.sleep(6000);
                 }
                 
             } while (scanning);
 
             // Step 5. Set the client-id on the connection
-            connection.setClientID("durable-client-relay");
+            connection.setClientID("topic-setup-relay:"+topicNum);
 
             // Step 6. Start the connection
             connection.start();
-            
 
             // Step 7. Create a JMS session
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -115,56 +157,42 @@ public final class MirrorTopicsSubscriber {
             // Step 8. Create a JMS message producer
             MessageProducer messageProducer = session.createProducer(topic);
 
-            // Step 9. Create the subscription and the subscriber.
-            TopicSubscriber subscriber = session.createDurableSubscriber(topic, "subscriber-1");
+            // Step 9. Create the subscription and the first test subscriber (he is removed at the end of the test).
+             TopicSubscriber subscriber = session.createDurableSubscriber(topic, "text-subscriber-topic-"+topicNum);
 
             // Step 10. Create a text message
-            TextMessage message1 = session.createTextMessage("This is a text message 1");
+            TextMessage message1 = session.createTextMessage("Test message on topic " + topicNum);
 
             // Step 11. Send the text message to the topic
             messageProducer.send(message1);
 
-            System.out.println("Sent message: " + message1.getText());
+            System.out.println("Sent message: " + message1.getText() + "prducer " + topicNum);
 
             // Step 12. Consume the message from the durable subscription
             TextMessage messageReceived = (TextMessage) subscriber.receive();
 
             System.out.println("Received message: " + messageReceived.getText());
-
-            // Step 13. Create and send another message
-            TextMessage message2 = session.createTextMessage("This is a text message 2");
-
-            messageProducer.send(message2);
-
-            System.out.println("Sent message: " + message2.getText());
-
-            // Step 14. Close the subscriber - the server could even be stopped at this point!
+            
             subscriber.close();
 
-            // Step 15. Create a new subscriber on the *same* durable subscription.
-            subscriber = session.createDurableSubscriber(topic, "useless-subscriber-in-relay");
-
-            // Step 16. Consume the message
-            messageReceived = (TextMessage) subscriber.receive();
-
-            System.out.println("Received message: " + messageReceived.getText());
-
-            // Step 17. Close the subscriber
-            subscriber.close();
-
-            // Step 18. Delete the durable subscription
-            session.unsubscribe("subscriber-1");
+            // Step 13. Delete the durable subscription
+            session.unsubscribe("text-subscriber-topic-"+topicNum);
+            
         } catch (Exception e) {
             e.printStackTrace();;
         } finally {
             if (connection != null) {
-                // Step 19. Be sure to close our JMS resources!
                 connection.close();
             }
             if (initialContext != null) {
-                // Step 20. Also close the initialContext!
                 initialContext.close();
             }
         }
     }
+
+
+    private void postToJmsTopic(Config config, long topicNum, Object message) {
+        
+    }
+
 }

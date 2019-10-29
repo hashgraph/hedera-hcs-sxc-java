@@ -14,7 +14,7 @@ jobs:
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/postgres:9.4
 
-    working_directory: ~/hsc-lib
+    working_directory: ~/hcs-lib
 
     environment:
       # Customize the JVM maximum heap limit
@@ -49,7 +49,7 @@ jobs:
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/postgres:9.4
 
-    working_directory: ~/hsc-relay
+    working_directory: ~/hcs-relay
 
     environment:
       # Customize the JVM maximum heap limit

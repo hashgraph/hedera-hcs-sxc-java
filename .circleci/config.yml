@@ -74,7 +74,7 @@ workflows:
         - store_test_results:
             path: target/surefire-reports
 
-    build_hcs_relay:
+    build_hcs_example:
       docker:
         - image: adoptopenjdk:10-jdk-hotspot
           environment:

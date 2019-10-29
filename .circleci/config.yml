@@ -25,75 +25,75 @@ workflows:
       #         only: /.*/
       #       tags:
       #         only: /.*/
-  jobs:
-    build_hcs_lib:
-      docker:
-        - image: adoptopenjdk:10-jdk-hotspot
-          environment:
-            # Customize the JVM maximum heap limit
-            MAVEN_OPTS: -Xmx3200m
+jobs:
+  build_hcs_lib:
+    docker:
+      - image: adoptopenjdk:10-jdk-hotspot
+        environment:
+          # Customize the JVM maximum heap limit
+          MAVEN_OPTS: -Xmx3200m
 
-      steps:
-        - checkout
-        - restore_cache:
-            keys:
-              - maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
-              - maven-v1-{{ .Branch }}
-              - maven-v1-
-        - run:
-            name: Running maven (validate, compile, test, package)
-            command: cd hcs-lib; ./mvnw package
-        - save_cache:
-            key: maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
-            paths:
-            - ~/.m2
-        - store_test_results:
-            path: target/surefire-reports
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
+            - maven-v1-{{ .Branch }}
+            - maven-v1-
+      - run:
+          name: Running maven (validate, compile, test, package)
+          command: cd hcs-lib; ./mvnw package
+      - save_cache:
+          key: maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
+          paths:
+          - ~/.m2
+      - store_test_results:
+          path: target/surefire-reports
 
-    build_hcs_relay:
-      docker:
-        - image: adoptopenjdk:10-jdk-hotspot
-          environment:
-            # Customize the JVM maximum heap limit
-            MAVEN_OPTS: -Xmx3200m
+  build_hcs_relay:
+    docker:
+      - image: adoptopenjdk:10-jdk-hotspot
+        environment:
+          # Customize the JVM maximum heap limit
+          MAVEN_OPTS: -Xmx3200m
 
-      steps:
-        - checkout
-        - restore_cache:
-            keys:
-              - maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
-              - maven-v1-{{ .Branch }}
-              - maven-v1-
-        - run:
-            name: Running maven (validate, compile, test, package)
-            command: cd hcs-lib; ./mvnw package
-        - save_cache:
-            key: maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
-            paths:
-            - ~/.m2
-        - store_test_results:
-            path: target/surefire-reports
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
+            - maven-v1-{{ .Branch }}
+            - maven-v1-
+      - run:
+          name: Running maven (validate, compile, test, package)
+          command: cd hcs-lib; ./mvnw package
+      - save_cache:
+          key: maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
+          paths:
+          - ~/.m2
+      - store_test_results:
+          path: target/surefire-reports
 
-    build_hcs_example:
-      docker:
-        - image: adoptopenjdk:10-jdk-hotspot
-          environment:
-            # Customize the JVM maximum heap limit
-            MAVEN_OPTS: -Xmx3200m
+  build_hcs_example:
+    docker:
+      - image: adoptopenjdk:10-jdk-hotspot
+        environment:
+          # Customize the JVM maximum heap limit
+          MAVEN_OPTS: -Xmx3200m
 
-      steps:
-        - checkout
-        - restore_cache:
-            keys:
-              - maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
-              - maven-v1-{{ .Branch }}
-              - maven-v1-
-        - run:
-            name: Running maven (validate, compile, test, package)
-            command: cd examples/simple-message-demo; ./mvnw package
-        - save_cache:
-            key: maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
-            paths:
-            - ~/.m2
-        - store_test_results:
-            path: target/surefire-reports
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
+            - maven-v1-{{ .Branch }}
+            - maven-v1-
+      - run:
+          name: Running maven (validate, compile, test, package)
+          command: cd examples/simple-message-demo; ./mvnw package
+      - save_cache:
+          key: maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
+          paths:
+          - ~/.m2
+      - store_test_results:
+          path: target/surefire-reports

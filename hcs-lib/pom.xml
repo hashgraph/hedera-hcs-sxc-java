@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-    
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.hedera</groupId>
     <artifactId>hcslib</artifactId>
@@ -10,11 +10,37 @@
     <name>hcslib</name>
     <description>HCS Library</description>
 
+    <ciManagement>
+        <system>CircleCI</system>
+        <url>https://circleci.com/gh/hashgraph/hedera-hcs-sxc</url>
+    </ciManagement>
+    <inceptionYear>2019</inceptionYear>
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/hashgraph/hedera-hcs-sxc/issues</url>
+    </issueManagement>
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <organization>
+        <name>Hedera Hashgraph, LLC</name>
+        <url>https://hedera.com</url>
+    </organization>
+    <scm>
+        <connection>https://github.com/hashgraph/hedera-hcs-sxc.git</connection>
+        <tag>master</tag>
+        <url>https://github.com/hashgraph/hedera-hcs-sxc/tree/master</url>
+    </scm>
+    <url>https://github.com/hashgraph/hedera-hcs-sxc</url>
+
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <java.version>11</java.version>
-        <hedera-sdk.version>0.5.2.1-SNAPSHOT</hedera-sdk.version>
+        <maven.compiler.source>10</maven.compiler.source>
+        <maven.compiler.target>10</maven.compiler.target>
+        <hedera-sdk.version>0.5.2.2-SNAPSHOT</hedera-sdk.version>
         <java-dotenv.version>5.0.1</java-dotenv.version>
         <junit-jupiter-api.version>5.5.2</junit-jupiter-api.version>
         <guava.version>28.1-jre</guava.version>
@@ -86,5 +112,29 @@
             <version>${artemis-jms-client-all.version}</version>
         </dependency>
     </dependencies>
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.0.0</version>
+                <configuration>
+                    <canUpdateCopyright>true</canUpdateCopyright>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                    <licenseName>apache_v2</licenseName>
+                    <roots>
+                        <root>src/main/java</root>
+                        <root>src/test/java</root>
+                    </roots>
+                    <!-- These contain unprintable characters to suppress 
+                        showing the delimiters -->
+                    <processEndTag>‍</processEndTag>
+                    <processStartTag>‌</processStartTag>
+                    <sectionDelimiter>​</sectionDelimiter>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

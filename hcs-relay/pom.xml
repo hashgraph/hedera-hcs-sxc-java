@@ -44,6 +44,7 @@
         <junit-jupiter.version>5.5.2</junit-jupiter.version>
         <jib.version>1.5.1</jib.version>
         <artemis-jms-client-all.version>2.10.1</artemis-jms-client-all.version>
+        <hcslib.version>0.0.1-SNAPSHOT</hcslib.version>
     </properties>
 
     <dependencies>
@@ -61,6 +62,11 @@
             <groupId>com.hedera.hashgraph</groupId>
             <artifactId>sdk</artifactId>
             <version>${hedera-sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hedera</groupId>
+            <artifactId>hcslib</artifactId>
+            <version>${hcslib.version}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

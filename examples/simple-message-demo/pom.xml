@@ -110,6 +110,29 @@
                 </execution>
             </executions>
         </plugin>
+
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <configuration>
+                <executable>docker</executable>
+                <arguments>
+                    <argument>build</argument>
+                    <argument>-t</argument>
+                    <argument>hederahashgraph/hcs-app</argument>
+                    <argument>-t</argument>
+                    <argument>hederahashgraph/hcs-app:${project.version}</argument>
+                </arguments>
+            </configuration>
+            <executions>
+                <execution>
+                    <phase>install</phase>
+                    <goals>
+                        <goal>exec</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
         </plugins>
     </build>
 </project>

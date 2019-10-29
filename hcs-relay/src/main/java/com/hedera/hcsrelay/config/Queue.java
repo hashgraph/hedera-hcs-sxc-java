@@ -37,4 +37,6 @@ public final class Queue {
     public void setJGroupsConnectionFactory(String jGroupsConnectionFactory) {
         this.JGroupsConnectionFactory = jGroupsConnectionFactory;
     }
+    
+    
 }

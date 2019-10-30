@@ -21,7 +21,6 @@ public final class MirrorMessageHandler {
             System.out.println("  Sequence: " + messagesResponse.getSequenceNumber());
             System.out.println("  Message: "+ messagesResponse.getMessage().toStringUtf8());
             
-            if (!config.getConfig().getTopicIds().contains(topicId)) throw new Exception("Received undifined topicId from mirror: " + topicId);
             QueueTopicOperations.addMessage(config, messagesResponse, topicId);
             
         } catch (Exception ex) {

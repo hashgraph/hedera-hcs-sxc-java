@@ -10,16 +10,21 @@ import com.hedera.hcsrelay.config.Config;
 public final class MirrorTopicsSubscribers {
 
     public MirrorTopicsSubscribers(String nodeAddress, int nodePort, Config config) throws Exception {
-        System.out.println("Topics to subscribe to");
+        System.out.println("Relay topics to subscribe to from mirror and queue");
         for (TopicId topic : config.getConfig().getTopicIds()) {
-            System.out.println(" " + topic.getTopicNum());
+            System.out.println("Processing topic num: " + topic.getTopicNum());
             // create queue topic
             boolean blockingSetupJmsTopic = QueueTopicOperations.blockingCreateJmsTopic(config,  topic.getTopicNum());
+            if (blockingSetupJmsTopic) {
+                System.out.println("Queue is setup for topic num " + topic.getTopicNum());
             
-            // subscribe to topic with mirror node
-            MirrorTopicSubscriber subscriber = new MirrorTopicSubscriber(nodeAddress, nodePort, topic);
-            Thread subscriberThread = new Thread(subscriber);
-            subscriberThread.start();
+                // subscribe to topic with mirror node
+                MirrorTopicSubscriber subscriber = new MirrorTopicSubscriber(nodeAddress, nodePort, topic);
+                Thread subscriberThread = new Thread(subscriber);
+                subscriberThread.start();
+            } else {
+                throw new Exception("Queue topic subscription error");
+            }
         }
     }
     

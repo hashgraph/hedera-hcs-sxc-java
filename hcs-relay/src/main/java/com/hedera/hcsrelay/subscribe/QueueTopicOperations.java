@@ -95,17 +95,17 @@ public class QueueTopicOperations {
              TopicSubscriber subscriber = session.createDurableSubscriber(topic, "text-subscriber-topic-"+topicNum);
 
             // Step 10. Create a text message
-            TextMessage message1 = session.createTextMessage("Test message on topic " + topicNum);
+            TextMessage message1 = session.createTextMessage("Test queue message on topic " + topicNum);
 
             // Step 11. Send the text message to the topic
             messageProducer.send(message1);
 
-            System.out.println("Sent message: " + message1.getText() + "prducer " + topicNum);
+            System.out.println("Sent test queue message: " + message1.getText() + " from producer  " + topicNum);
 
             // Step 12. Consume the message from the durable subscription
             TextMessage messageReceived = (TextMessage) subscriber.receive();
 
-            System.out.println("Received message: " + messageReceived.getText());
+            System.out.println("Received message from queue from test subscriber. Message: " + messageReceived.getText());
             
             subscriber.close();
 

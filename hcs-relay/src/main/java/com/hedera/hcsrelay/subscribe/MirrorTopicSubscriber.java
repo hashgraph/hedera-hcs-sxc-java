@@ -58,7 +58,7 @@ public final class MirrorTopicSubscriber extends Thread {
         
             while (retry) {
                 try {
-                    System.out.println("Subscribing to topic number " + this.topicId.getTopicNum() + " on mirror node: " + this.mirrorAddress + ":" + this.mirrorPort);
+                    System.out.println("Mirror Subscribing to topic number " + this.topicId.getTopicNum() + " on mirror node: " + this.mirrorAddress + ":" + this.mirrorPort);
                     subscriber.subscribe(this.topicId, (tm) -> {
                         MirrorMessageHandler.onMirrorMessage(tm, this.topicId);   
                     });

@@ -24,7 +24,7 @@ public final class HCSSend
             Boolean success = new com.hedera.hcslib.consensus.OutboundHCSMessage(hcsLib)
                 .sendMessage(0, "test");
             if (success) {
-                System.out.println("Message sent");
+                System.out.println("Message sent to HH network");
             }
         } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
             // TODO Auto-generated catch block

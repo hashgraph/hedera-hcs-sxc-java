@@ -89,7 +89,9 @@
                     <sectionDelimiter>​</sectionDelimiter>
                 </configuration>
             </plugin>
+        <!--
         <plugin>
+            
             <groupId>com.google.cloud.tools</groupId>
             <artifactId>jib-maven-plugin</artifactId>
             <version>${jib.version}</version>
@@ -110,7 +112,7 @@
                 </execution>
             </executions>
         </plugin>
-
+       
         <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
@@ -133,6 +135,7 @@
                 </execution>
             </executions>
         </plugin>
+                     -->
         </plugins>
     </build>
 </project>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.hedera</groupId>
+    <artifactId>hcs-sxc</artifactId>
+    <packaging>pom</packaging>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>hcs-sxc</name>
+    <description>HCS Secure Comms Extension</description>
+
+    <ciManagement>
+        <system>CircleCI</system>
+        <url>https://circleci.com/gh/hashgraph/hedera-hcs-sxc</url>
+    </ciManagement>
+    <inceptionYear>2019</inceptionYear>
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/hashgraph/hedera-hcs-sxc/issues</url>
+    </issueManagement>
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <organization>
+        <name>Hedera Hashgraph, LLC</name>
+        <url>https://hedera.com</url>
+    </organization>
+    <scm>
+        <connection>https://github.com/hashgraph/hedera-hcs-sxc.git</connection>
+        <tag>master</tag>
+        <url>https://github.com/hashgraph/hedera-hcs-sxc/tree/master</url>
+    </scm>
+    <url>https://github.com/hashgraph/hedera-hcs-sxc</url>
+
+    <modules>
+      <module>hcs-lib</module>
+      <module>hcs-relay</module>
+      <module>hcs-sxc-examples</module>
+    </modules>
+</project>

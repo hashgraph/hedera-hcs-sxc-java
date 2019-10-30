@@ -33,7 +33,7 @@ public class ConfigTest extends AbstractConfigTest {
         nodeMap = yamlConfig.getNodesMap();
     }
     @Test
-    public void LoadConfig() throws Exception {
+    public void loadConfig() throws Exception {
         
         assertAll(
                 

@@ -1,6 +1,5 @@
 package com.hedera.hcslib.messages;
 
-import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hcslib.cryptography.Cryptography;
 import com.hedera.hcslib.cryptography.KeyRotation;
 import com.hedera.hcslib.hashing.Hashing;
@@ -9,8 +8,6 @@ import com.hedera.hcslib.signing.Signing;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.security.KeyPair;
 import java.util.Arrays;
 import org.apache.commons.lang3.tuple.Pair;
@@ -23,13 +20,15 @@ public class HCSMessageTest {
     static byte[] publicKeyBytes;
     static byte[] privateKeyBytes;
     static KeyPair rsaKeyPair;
-    String cleartext = "Hear my cries Hear 234sdf! �$%&*)_+ my call Lend me your ears See my fall See my error Know my faults Time halts See my loss ";
+    //TODO: clear text to include non ascii characters
+//    String cleartext = "Hear my cries Hear 234sdf! �$%&*)_+ my call Lend me your ears See my fall See my error Know my faults Time halts See my loss ";
+    String cleartext = "Hear my cries Hear 234sdf! $%&*)_+ my call Lend me your ears See my fall See my error Know my faults Time halts See my loss ";
     
     public HCSMessageTest() {
     }
 
     @BeforeAll
-    public  void initCalss() throws Exception{
+    public static void initClass() throws Exception{
         
         /*
             Create a shared key using the KeyRotation tool
@@ -56,40 +55,36 @@ public class HCSMessageTest {
     
     @Test 
     public void encryptDecryptHCSMessageTest(){
-        try {
-            /*
-                Encrypt the clear text  message and test if payload meets requirements
-            */
-            HCSMessage a = HCSMessage.prepareMessage(sharedSecret, 3, 4, this.cleartext, rsaKeyPair.getPrivate());
+        /*
+            Encrypt the clear text  message and test if payload meets requirements
+        */
+        HCSMessage a = HCSMessage.prepareMessage(sharedSecret, 3, 4, this.cleartext, rsaKeyPair.getPrivate());
+        
+        // can we identify the signer while message encrypted?
+        assertTrue(Signing.verify(a.payload.message, a.payload.signatureOfEncryptedMessage, rsaKeyPair.getPublic()));
+       
+        
+        /*
+            Decrypt the previously encrypted and broken up message and test if the 
+            requriements are still met. 
+        */
+        
+        HCSMessage b = HCSMessage.processMessage(sharedSecret, Arrays.asList(a.parts));
+        
+        // is the stored hash of the original message unaffected?
+        assertArrayEquals(a.payload.hashOfUnencryptedMessage, Hashing.sha(this.cleartext));
+        
+        // is the hash of the decrypted message the same as the hash of the original?
+        assertTrue(
+                Hashing.matchSHA(
+                        Hashing.sha(cleartext), 
+                        Hashing.sha(b.payload.message)  
+                )
+        );  
+        
+        // does the decryption work?
+        assertEquals(b.payload.message, this.cleartext);
             
-            // can we identify the signer while message encrypted?
-            assertTrue(Signing.verify(a.payload.message, a.payload.signatureOfEncryptedMessage, rsaKeyPair.getPublic()));
-           
-            
-            /*
-                Decrypt the previously encrypted and broken up message and test if the 
-                requriements are still met. 
-            */
-            
-            HCSMessage b = HCSMessage.processMessage(sharedSecret, Arrays.asList(a.parts));
-            
-            // is the stored hash of the original message unaffected?
-            assertArrayEquals(a.payload.hashOfUnencryptedMessage, Hashing.sha(this.cleartext));
-            
-            // is the hash of the decrypted message the same as the hash of the original?
-            assertTrue(
-                    Hashing.matchSHA(
-                            Hashing.sha(cleartext), 
-                            Hashing.sha(b.payload.message)  
-                    )
-            );  
-            
-            // does the decryption work?
-            assertEquals(b.payload.message, this.cleartext);
-            
-        } catch (Exception ex) {
-            fail();
-        } 
     } 
     
 }

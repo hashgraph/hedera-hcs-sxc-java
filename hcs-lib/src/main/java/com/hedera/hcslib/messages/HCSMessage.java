@@ -29,8 +29,6 @@ public class HCSMessage implements Serializable {
 
     private static final Logger LOG = Logger.getLogger(HCSMessage.class.getName());
     
-    
-    
     public @Nullable String from; // set this when you know who this message is from
     public @Nullable int receivedPartsSize; // used when not all parts available and message constructed incrementaly. 
     public HCSMessagePayload payload; // this is where the cleartext or encrypted message resides. 
@@ -39,7 +37,7 @@ public class HCSMessage implements Serializable {
     public int messageNo; //FIXME: Needs to be a unique number. Use epoch or UUID.most significant bits
     public @Nullable byte noOfParts;  
     public boolean isComplete; // is true if all parts available
-    public long timestamp;  // last/max chronoligal timpestamp received - 
+    public long timestamp;  // last/max chronological timestamp received - 
     // extra business logic fields
     public @Nullable String extStatus; // optional status flag to record business status flags
     public @Nullable Integer threadNo;
@@ -129,7 +127,7 @@ public class HCSMessage implements Serializable {
     private HCSMessage(byte[] sharedSecret, List<HCSMessageChunk> parts){
         Preconditions.checkArgument(
                 parts.size() > 0
-                , "There nedds to be a list one part for a valid message"); 
+                , "There needs to be a list one part for a valid message"); 
         Preconditions.checkArgument(
                 parts.stream().map(m-> m.topic).distinct().count() == 1
                 , "All parts must have the same topic number"); 
@@ -220,16 +218,16 @@ public class HCSMessage implements Serializable {
                 this.payload.signatureOfEncryptedMessage = Signing.sign(this.payload.message.getBytes(StandardCharsets.ISO_8859_1), privateKey);
             }
     
-            String embedable = this.payload.getEmbeddable();
+            String embeddable = this.payload.getEmbeddable();
     
-            this.noOfParts = (byte)((embedable.length() / 79 ) + (embedable.length() % 79 ==0?0:1));
+            this.noOfParts = (byte)((embeddable.length() / 79 ) + (embeddable.length() % 79 ==0?0:1));
             this.parts = new HCSMessageChunk[this.noOfParts];
 
             for (byte part = 0;  part < this.noOfParts; part++){
                 int beginIndex = part * 79;
                 int endIndex = beginIndex + 79;
 
-                String bodyPart = embedable.substring(beginIndex, (endIndex>embedable.length()?embedable.length():endIndex));
+                String bodyPart = embeddable.substring(beginIndex, (endIndex>embeddable.length()?embeddable.length():endIndex));
                 parts[part] = (new HCSMessageChunk(topic, messageNo, (byte)(part+1) , this.noOfParts, bodyPart));
             }
             this.receivedPartsSize = this.noOfParts;

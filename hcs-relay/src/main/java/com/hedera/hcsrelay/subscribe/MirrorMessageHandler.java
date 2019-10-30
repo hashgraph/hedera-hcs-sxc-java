@@ -19,9 +19,7 @@ public final class MirrorMessageHandler {
             System.out.println("  Consensus TimeStamp: " + messagesResponse.getConsensusTimestamp());
             System.out.println("  Running Hash: " + messagesResponse.getRunningHash());
             System.out.println("  Sequence: " + messagesResponse.getSequenceNumber());
-            System.out.println("  Message: "+ messagesResponse.getMessage().toString());
-            
-         
+            System.out.println("  Message: "+ messagesResponse.getMessage().toStringUtf8());
             
             if (!config.getConfig().getTopicIds().contains(topicId)) throw new Exception("Received undifined topicId from mirror: " + topicId);
             QueueTopicOperations.addMessage(config, messagesResponse, topicId);

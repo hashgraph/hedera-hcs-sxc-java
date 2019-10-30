@@ -35,3 +35,9 @@ hcs-relay/.settings/org.eclipse.jdt.core.prefs
 hcs-relay/bin/.project
 hcs-lib/.classpath
 hcs-lib/.project
+hcs-lib/.classpath
+hcs-lib/.settings/org.eclipse.jdt.core.prefs
+hcs-sxc-examples/simple-message-demo/.settings/org.eclipse.core.resources.prefs
+hcs-sxc-examples/simple-message-demo/.settings/org.eclipse.jdt.core.prefs
+hcs-sxc-examples/simple-message-demo/.settings/org.eclipse.m2e.core.prefs
+hcs-sxc-examples/simple-message-demo/.project

@@ -66,13 +66,13 @@ public class HCSMessageTest {
         
         /*
             Decrypt the previously encrypted and broken up message and test if the 
-            requriements are still met. 
+            requirements are still met. 
         */
         
         HCSMessage b = HCSMessage.processMessage(sharedSecret, Arrays.asList(a.parts));
         
         // is the stored hash of the original message unaffected?
-        assertArrayEquals(a.payload.hashOfUnencryptedMessage, Hashing.sha(this.cleartext));
+        assertArrayEquals(Hashing.sha(this.cleartext), a.payload.hashOfUnencryptedMessage);
         
         // is the hash of the decrypted message the same as the hash of the original?
         assertTrue(
@@ -83,7 +83,7 @@ public class HCSMessageTest {
         );  
         
         // does the decryption work?
-        assertEquals(b.payload.message, this.cleartext);
+        assertEquals(this.cleartext, b.payload.message);
             
     } 
     

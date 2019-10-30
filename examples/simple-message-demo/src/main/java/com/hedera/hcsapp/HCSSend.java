@@ -6,6 +6,7 @@ import java.io.IOException;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hcslib.HCSLib;
+import com.hedera.hcslib.callback.OnHCSMessageCallback;
 
 /**
  * Hello world!
@@ -13,7 +14,7 @@ import com.hedera.hcslib.HCSLib;
  */
 public final class HCSSend 
 {
-    public static void main(String[] args) throws FileNotFoundException, IOException, HederaNetworkException, IllegalArgumentException, HederaException
+    public static void main(String[] args) throws FileNotFoundException, IOException, HederaNetworkException, IllegalArgumentException, HederaException, Exception
     {
         
         // Simplest setup and send
@@ -26,6 +27,13 @@ public final class HCSSend
             if (success) {
                 System.out.println("Message sent to HH network");
             }
+            
+            // create a callback obect to receivet the message
+            OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(null);
+            onHCSMessageCallback.addObserver(message -> {
+                
+            });
+            
         } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

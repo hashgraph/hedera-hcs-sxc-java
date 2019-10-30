@@ -18,9 +18,11 @@ public class MQListener implements MessageListener{
  
     @Override
     public void onMessage(Message message) {
-        System.out.println("here hit");
+        System.out.println("Message received from queue in MQListener.java");
         if (acknowledge) {
             try {
+               
+                
                 message.acknowledge();
             } catch (JMSException e1) {
                 e1.printStackTrace();

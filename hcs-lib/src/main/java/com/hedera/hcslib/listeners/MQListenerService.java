@@ -21,37 +21,20 @@ public class MQListenerService {
         javax.jms.Connection connection = null;
         
         try {
-       
+            System.out.println("Starting hcs topic listener in hcs-lib");
             
-                /**
-             * Create properties to connect to the hsc-queue / topic server
-             * Note, these environment settings can be put it
-             * src/main/resources/jndi.properties and use this format:
-             *
-             * java.naming.factory.initial=org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory
-             * connectionFactory.ConnectionFactory=tcp://localhost:61616
-             * topic.topic/exampleTopic=exampleTopic
-             *
-             * Then that file can be shared across different clients.
-             */
             Hashtable<String, Object> props = new Hashtable<>();
             props.put(Context.INITIAL_CONTEXT_FACTORY, "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory");
-            props.put("topic.topic/exampleTopic", "exampleTopic");
-            props.put("connectionFactory.VmConnectionFactory", "vm://0");
+            props.put("topic.topic/hcsTopic", "hcsTopic");
             props.put("connectionFactory.TCPConnectionFactory", "tcp://localhost:61616");
-            //props.put("connectionFactory.UDPConnectionFactory", "udp://" + getUDPDiscoveryAddress() + ":" + getUDPDiscoveryPort());
-            props.put("connectionFactory.JGroupsConnectionFactory", "jgroups://mychannelid?file=test-jgroups-file_ping.xml");
             InitialContext ctx = new InitialContext(props);
-            ctx.lookup("VmConnectionFactory");
             ctx.lookup("TCPConnectionFactory");
-            //ctx.lookup("UDPConnectionFactory");
-            ctx.lookup("JGroupsConnectionFactory");
 
             // Step 1. Create an initial context to perform the JNDI lookup.
             initialContext = ctx;
 
             // Step 2. Look-up the JMS topic
-            Topic topic = (Topic) initialContext.lookup("topic/exampleTopic");
+            Topic topic = (Topic) initialContext.lookup("topic/hcsTopic");
 
             // Step 3. Look-up the JMS connection factory
             ConnectionFactory cf = (ConnectionFactory) initialContext.lookup("TCPConnectionFactory");
@@ -72,10 +55,14 @@ public class MQListenerService {
             //MessageProducer messageProducer = session.createProducer(topic);
 
             // Step 9. Create the subscription and the subscriber.
+            
             TopicSubscriber subscriber = session.createDurableSubscriber(topic, "subscriber-1-in-lib");
             
+            //for synchronus receive do
             Message receive = subscriber.receive();
             System.out.print(((javax.jms.TextMessage)receive).getText());
+            
+            //for aync receive do
             subscriber.setMessageListener(new MQListener(true));
      
     
@@ -84,13 +71,7 @@ public class MQListenerService {
                lock.wait();
            }
         
-           //connection.start();     
-             
-            //Thread.sleep(1000);
-             
-            System.out.println("Change the message listener to acknowledge");
-            // System.out.println("Sending text '" + payload + "'");
-            //
+     
             //consumer.setMessageListener(
             //        new AckMessageListener(true));
              

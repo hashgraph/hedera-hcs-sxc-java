@@ -7,3 +7,6 @@ cd ../hcs-relay
 
 cd ../examples/simple-message-demo
 ./mvnw install -DskipTests
+
+cd ../..
+

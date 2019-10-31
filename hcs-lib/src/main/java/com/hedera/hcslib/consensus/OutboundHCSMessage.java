@@ -84,9 +84,25 @@ public final class OutboundHCSMessage {
         );
         client.setMaxTransactionFee(100_000_000L);
 
+        // generate TXId for main and first message
+        TransactionId transactionId = new TransactionId(this.operatorAccountId);
+        
+        // create complete message (from app provided data) in protobuf (CompleteMessage)
+            //-> TxId
+            //-> Complete App Message (ByteArray) (bytes in protobuf -> ByteString in java)
+            
+        // convert above protobuf message to byte array
+        
+        // break up byte array into 3500 bytes parts
+        
+        // protobuf message part objects (iterate) -> MessagePart
+            // include above part(s) into each
+            // -> (?) convert to byte array and send to JMS
+        
         TransactionReceipt receipt = new SubmitMessageTransaction(client)
                 .setMessage(message.getBytes())
                 .setTopicId(this.topicIds.get(topicIndex))
+                .setTransactionId(transactionId)
                 .executeForReceipt();
         System.out.println(receipt.getTopicSequenceNumber());
                 

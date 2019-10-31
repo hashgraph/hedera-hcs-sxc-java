@@ -3,7 +3,8 @@
  */
 package com.hedera.hcslib.messages;
 
-import com.hedera.hashgraph.sdk.consensus.TopicId;
+
+import com.hedera.hashgraph.sdk.proto.TopicID;
 import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages;
 import java.io.Serializable;
 import java.util.Objects;
@@ -14,9 +15,9 @@ import java.util.Objects;
  */
 public class HCSRelayMessage implements Serializable {
     private MirrorGetTopicMessages.MirrorGetTopicMessagesResponse topicMessagesResponse;
-    private TopicId topicId;
+    private TopicID topicId;
     
-    public HCSRelayMessage(MirrorGetTopicMessages.MirrorGetTopicMessagesResponse messagesResponse, TopicId topicId) {
+    public HCSRelayMessage(MirrorGetTopicMessages.MirrorGetTopicMessagesResponse messagesResponse, TopicID topicId) {
         this.topicMessagesResponse = messagesResponse;
         this.topicId = topicId;
     }
@@ -29,11 +30,11 @@ public class HCSRelayMessage implements Serializable {
         this.topicMessagesResponse = topicMessagesResponse;
     }
 
-    public TopicId getTopicId() {
+    public TopicID getTopicId() {
         return topicId;
     }
 
-    public void setTopicId(TopicId topicId) {
+    public void setTopicID(TopicID topicId) {
         this.topicId = topicId;
     }
 

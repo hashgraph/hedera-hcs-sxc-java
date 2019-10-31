@@ -19,7 +19,7 @@ public final class HCSLibCallbackSetup
     {
         
         try {
-            // TODO pass the config in teh custructor
+            // TODO pass the config in the custructor
             OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(null);
             onHCSMessageCallback.addObserver(
                     message -> {

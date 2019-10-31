@@ -41,7 +41,7 @@
     <url>https://github.com/hashgraph/hedera-hcs-sxc</url>
 
     <properties>
-      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>10</maven.compiler.source>
         <maven.compiler.target>10</maven.compiler.target>
         <snakeyaml.version>1.21</snakeyaml.version>
@@ -59,9 +59,16 @@
         <commons-lang3.version>3.9</commons-lang3.version>
         <protoc.version>3.7.1</protoc.version>
         <protobuf-java.version>3.7.1</protobuf-java.version>
+        <lombok.version>1.18.10</lombok.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>compile</scope>
+          <version>${lombok.version}</version>
+        </dependency>
       <dependency>
           <groupId>com.google.guava</groupId>
           <artifactId>guava</artifactId>

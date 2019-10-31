@@ -11,12 +11,18 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.hedera</groupId>
     <artifactId>hcs-relay</artifactId>
 
     <name>hcs-relay</name>
     <description>HCS Relay</description>
 
+    <dependencies>
+            <dependency>
+            <groupId>com.hedera</groupId>
+            <artifactId>hcs-lib</artifactId>
+            <version>${hcslib.version}</version>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
             <plugin>

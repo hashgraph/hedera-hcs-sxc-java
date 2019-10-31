@@ -1,5 +1,6 @@
 appClients:
   - clientName: "Player 1"
-    clientKey: "player 1 key"
+    clientKey: "player 1 public key"
   - clientName: "Player 2"
-    clientKey: "player 2 key"
+    clientKey: "player 2 public key"
+    

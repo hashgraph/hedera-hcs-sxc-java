@@ -11,11 +11,19 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.hedera.hscapp</groupId>
+    <groupId>com.hedera</groupId>
     <artifactId>simple-message-demo</artifactId>
     <packaging>jar</packaging>
 
     <name>simple-message-demo</name>
+
+    <dependencies>
+            <dependency>
+            <groupId>com.hedera</groupId>
+            <artifactId>hcs-lib</artifactId>
+            <version>${hcslib.version}</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -35,7 +43,7 @@
                             <path>src/main/resources</path>
                         </paths>
                     </extraDirectories>
-                    <mainClass>com.hedera.hcsapp.HCSLibCallBackSetup</mainClass>
+                    <mainClass>com.hedera.simple-message-demo.HCSLibCallBackSetup</mainClass>
                 </configuration>
                 <executions>
                     <execution>

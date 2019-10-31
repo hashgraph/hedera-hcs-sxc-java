@@ -11,7 +11,6 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.hedera</groupId>
     <artifactId>hcs-lib</artifactId>
 
     <name>hcs-lib</name>

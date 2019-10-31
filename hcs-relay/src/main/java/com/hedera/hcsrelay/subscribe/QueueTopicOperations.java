@@ -4,11 +4,13 @@
 package com.hedera.hcsrelay.subscribe;
 
 import com.hedera.hashgraph.sdk.consensus.TopicId;
+import com.hedera.hashgraph.sdk.proto.TopicID;
 import com.hedera.hcslib.messages.HCSRelayMessage;
 import com.hedera.hcsrelay.config.Config;
 import com.hedera.hcsrelay.config.Queue;
 import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages;
 import java.util.Hashtable;
+import java.util.logging.Logger;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
@@ -27,7 +29,9 @@ import javax.naming.NamingException;
  * @author User
  */
 public class QueueTopicOperations {
-    
+   
+    private static final Logger LOG = Logger.getLogger(QueueTopicOperations.class.getName());
+   
     /**
      * Sets up jms topic.It blocks until the jms queue becomes available. 
      * @param config
@@ -36,7 +40,7 @@ public class QueueTopicOperations {
      * @throws JMSException
      * @throws NamingException 
      */
-    public static boolean blockingCreateJmsTopic(Config config, long topicNum) throws JMSException, NamingException {
+    public static boolean blockingCreateJmsTopic(Config config) throws JMSException, NamingException {
         //JMS config
         Connection connection = null;
         InitialContext initialContext = null;
@@ -48,7 +52,7 @@ public class QueueTopicOperations {
             
             Hashtable<String, Object> props = new Hashtable<>();
             props.put(Context.INITIAL_CONTEXT_FACTORY, queueConfig.getInitialContextFactory());
-            props.put("topic.topic/hcsTopic",  "0.0."+topicNum);
+            props.put("topic.topic/hcsTopic",  "hcsCatchAllTopics");
             
             props.put("connectionFactory.TCPConnectionFactory", queueConfig.getTcpConnectionFactory());
             InitialContext ctx = new InitialContext(props);
@@ -80,7 +84,7 @@ public class QueueTopicOperations {
             } while (scanning);
 
             // Step 5. Set the client-id on the connection
-            connection.setClientID("topic-setup-relay:"+topicNum);
+            connection.setClientID("topic-setup-relay:hcsCatchAllTopics");
 
             // Step 6. Start the connection
             connection.start();
@@ -92,15 +96,15 @@ public class QueueTopicOperations {
             MessageProducer messageProducer = session.createProducer(topic);
 
             // Step 9. Create the subscription and the first test subscriber (he is removed at the end of the test).
-             TopicSubscriber subscriber = session.createDurableSubscriber(topic, "text-subscriber-topic-"+topicNum);
+             TopicSubscriber subscriber = session.createDurableSubscriber(topic, "text-subscriber-topic-hcsCatchAllTopics");
 
             // Step 10. Create a text message
-            TextMessage message1 = session.createTextMessage("Test queue message on topic " + topicNum);
+            TextMessage message1 = session.createTextMessage("Test queue message on topic hcsCatchAllTopics" );
 
             // Step 11. Send the text message to the topic
             messageProducer.send(message1);
 
-            System.out.println("Sent test queue message: " + message1.getText() + " from producer  " + topicNum);
+            System.out.println("Sent test queue message: " + message1.getText() + " from producer  hcsCatchAllTopics" );
 
             // Step 12. Consume the message from the durable subscription
             TextMessage messageReceived = (TextMessage) subscriber.receive();
@@ -110,7 +114,7 @@ public class QueueTopicOperations {
             subscriber.close();
 
             // Step 13. Delete the durable subscription
-            session.unsubscribe("text-subscriber-topic-"+topicNum);
+            session.unsubscribe("text-subscriber-topic-hcsCatchAllTopics");
             r = true;
             
         } catch (Exception e) {
@@ -133,17 +137,13 @@ public class QueueTopicOperations {
         boolean r = false;
         
         try {
-            
             Queue queueConfig = config.getConfig().getQueue();
-            
             Hashtable<String, Object> props = new Hashtable<>();
             props.put(Context.INITIAL_CONTEXT_FACTORY, queueConfig.getInitialContextFactory());
-            props.put("topic.topic/hcsTopic",  "0.0."+topicNum);
-            
+            props.put("topic.topic/hcsTopic",  "hcsCatchAllTopics");
             props.put("connectionFactory.TCPConnectionFactory", queueConfig.getTcpConnectionFactory());
             InitialContext ctx = new InitialContext(props);
             ctx.lookup("TCPConnectionFactory");
-
             // Step 1. Create an initial context to perform the JNDI lookup.
             initialContext = ctx;
 
@@ -185,7 +185,14 @@ public class QueueTopicOperations {
             //TopicSubscriber subscriber = session.createDurableSubscriber(topic, "text-subscriber-topic-"+topicNum);
             // Step 10. Create a message
             
-            HCSRelayMessage relayMessage = new HCSRelayMessage(messagesResponse, topicId);
+            HCSRelayMessage relayMessage = new HCSRelayMessage(
+                    messagesResponse, 
+                    TopicID.newBuilder()
+                            .setRealmNum(topicId.getTopicNum())
+                            .setShardNum(topicId.getShardNum())
+                            .setTopicNum(topicId.getTopicNum())
+                            .build()
+            );
             ObjectMessage objectMessage = session.createObjectMessage(relayMessage);
             
            
@@ -210,5 +217,6 @@ public class QueueTopicOperations {
     
     }
    
+    
     
 }

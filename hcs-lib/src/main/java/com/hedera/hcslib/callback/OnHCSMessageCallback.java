@@ -1,7 +1,8 @@
 package com.hedera.hcslib.callback;
 
 import com.hedera.hcslib.config.Config;
-import com.hedera.hcslib.listeners.MQListener;
+
+import com.hedera.hcslib.messages.HCSRelayMessage;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -11,12 +12,15 @@ import java.util.logging.Logger;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.Topic;
 import javax.jms.TopicSubscriber;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import org.apache.activemq.artemis.jms.client.ActiveMQObjectMessage;
+import org.apache.activemq.artemis.jms.client.ActiveMQTextMessage;
 
 /**
  * 
@@ -39,7 +43,7 @@ public final class OnHCSMessageCallback {
 
                 Hashtable<String, Object> props = new Hashtable<>();
                 props.put(Context.INITIAL_CONTEXT_FACTORY, "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory");
-                props.put("topic.topic/hcsTopic", "hcsTopic");
+                props.put("topic.topic/hcsTopic", "hcsCatchAllTopics");
                 props.put("connectionFactory.TCPConnectionFactory", "tcp://localhost:61616");
                 InitialContext ctx = new InitialContext(props);
                 ctx.lookup("TCPConnectionFactory");
@@ -70,24 +74,32 @@ public final class OnHCSMessageCallback {
 
                 // Step 9. Create the subscription and the subscriber.
 
-                TopicSubscriber subscriber = session.createDurableSubscriber(topic, "subscriber-1-in-lib");
+                TopicSubscriber subscriber = session.createDurableSubscriber(topic, "subscriber-hcsCatchAllTopics-in-lib");
 
                 //for synchronus receive do
                 //Message receive = subscriber.receive();
                 //System.out.print(((javax.jms.TextMessage)receive).getText());
 
                 //for aync receive do
-                subscriber.setMessageListener(
-                        messageFromJMS -> {
-                                try {
-                                    System.out.println("Message Received from JMS forward to app.java observers");
-                                    this.notifyObservers(((javax.jms.TextMessage)messageFromJMS).getText());
-                                    messageFromJMS.acknowledge();
-                                } catch (JMSException ex) {
-                                    Logger.getLogger(OnHCSMessageCallback.class.getName()).log(Level.SEVERE, null, ex);
-                                }
+                subscriber.setMessageListener(new MessageListener() {
+                    @Override
+                    public void onMessage(Message messageFromJMS) {
+                        try {
+                            System.out.println("Message Received from JMS forward to app.java observers");
+                            // notify subscribed observer from App.java
+                            if (messageFromJMS instanceof ActiveMQTextMessage) {
+                                OnHCSMessageCallback.this.notifyObservers(((ActiveMQTextMessage)messageFromJMS).getText());
+                            } else if (messageFromJMS instanceof ActiveMQObjectMessage) {
+                                
+                                HCSRelayMessage rlm = (HCSRelayMessage)((ActiveMQObjectMessage) messageFromJMS).getObject();
+                                OnHCSMessageCallback.this.notifyObservers("The object says topicNum = "+rlm.getTopicId().getTopicNum());
+                            }
+                            messageFromJMS.acknowledge();
+                        }catch (JMSException ex) {
+                            Logger.getLogger(OnHCSMessageCallback.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                );
+                    }
+                });
 
                Object lock = new Object();
                synchronized (lock) {
@@ -130,7 +142,7 @@ public final class OnHCSMessageCallback {
      * @param listener
      */
     public void addObserver(HCSCallBackInterface listener) {
-        observers.add(listener);
+       observers.add(listener);
     }
     /**
      * Notifies all observers with the supplied message

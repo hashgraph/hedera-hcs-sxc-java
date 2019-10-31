@@ -16,6 +16,9 @@ import com.hedera.hashgraph.sdk.consensus.TopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcslib.HCSLib;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 public final class OutboundHCSMessage {
     private boolean signMessages = false;
     private boolean encryptMessages = false;
@@ -104,7 +107,7 @@ public final class OutboundHCSMessage {
                 .setTopicId(this.topicIds.get(topicIndex))
                 .setTransactionId(transactionId)
                 .executeForReceipt();
-        System.out.println(receipt.getTopicSequenceNumber());
+        log.info(receipt.getTopicSequenceNumber());
                 
         return true;
     }

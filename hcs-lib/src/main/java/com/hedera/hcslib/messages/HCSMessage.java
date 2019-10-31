@@ -7,6 +7,9 @@ import com.hedera.hashgraph.sdk.account.CryptoTransferTransaction;
 import com.hedera.hcslib.cryptography.Cryptography;
 import com.hedera.hcslib.cryptography.KeyRotation;
 import com.hedera.hcslib.utils.StringUtils;
+
+import lombok.extern.log4j.Log4j2;
+
 import com.hedera.hcslib.hashing.Hashing;
 import com.hedera.hcslib.signing.Signing;
 import java.io.Serializable;
@@ -17,18 +20,15 @@ import java.security.PrivateKey;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Nullable;
 
 /**
  * An HCSMessage is 
  * 
  */
+@Log4j2
 public class HCSMessage implements Serializable {
 
-    private static final Logger LOG = Logger.getLogger(HCSMessage.class.getName());
-    
     public @Nullable String from; // set this when you know who this message is from
     public @Nullable int receivedPartsSize; // used when not all parts available and message constructed incrementaly. 
     public HCSMessagePayload payload; // this is where the cleartext or encrypted message resides. 
@@ -114,9 +114,9 @@ public class HCSMessage implements Serializable {
             try {
                 t.execute();
             } catch (HederaException ex) {
-                LOG.log(Level.SEVERE, null, ex);
+                log.error(ex);
             } catch (HederaNetworkException ex) {
-                LOG.log(Level.SEVERE, null, ex);
+                log.error(ex);
             }
             
         });
@@ -179,7 +179,7 @@ public class HCSMessage implements Serializable {
 
        
             } catch (Exception ex) {
-                Logger.getLogger(HCSMessage.class.getName()).log(Level.SEVERE, null, ex);
+                log.error(ex);
             } 
         
         } else {
@@ -233,7 +233,7 @@ public class HCSMessage implements Serializable {
             this.receivedPartsSize = this.noOfParts;
             this.isComplete = true;
         } catch (Exception ex) {
-            Logger.getLogger(HCSMessage.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex);
         } 
     }
     
@@ -299,7 +299,7 @@ public class HCSMessage implements Serializable {
                         )
                 );
             } catch (Exception ex) {
-                //Logger.getLogger(HCSMessage.class.getName()).log(Level.SEVERE, null, ex);
+                //log.error(ex);
                 return false;
             } 
         return true;

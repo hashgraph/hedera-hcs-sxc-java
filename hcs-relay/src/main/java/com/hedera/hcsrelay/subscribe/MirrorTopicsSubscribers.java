@@ -3,20 +3,23 @@ package com.hedera.hcsrelay.subscribe;
 import com.hedera.hashgraph.sdk.consensus.TopicId;
 import com.hedera.hcsrelay.config.Config;
 
+import lombok.extern.log4j.Log4j2;
+
 /**
  * Subscribes to topic(s) against a mirror node and sets up topics on mq
  */
+@Log4j2
 public final class MirrorTopicsSubscribers {
 
     public MirrorTopicsSubscribers(String nodeAddress, int nodePort, Config config) throws Exception {
-        System.out.println("Relay topics to subscribe to from mirror and queue");
+        log.info("Relay topics to subscribe to from mirror and queue");
         boolean blockingSetupJmsTopic = QueueTopicOperations.blockingCreateJmsTopic(config);
         if (blockingSetupJmsTopic) {
             for (TopicId topic : config.getConfig().getTopicIds()) {
-                System.out.println("Processing topic num: " + topic.getTopicNum());
+                log.info("Processing topic num: " + topic.getTopicNum());
                 // create queue topic
 
-                System.out.println("Queue is setup for topic num " + topic.getTopicNum());
+                log.info("Queue is setup for topic num " + topic.getTopicNum());
 
                 // subscribe to topic with mirror node
                 MirrorTopicSubscriber subscriber = new MirrorTopicSubscriber(nodeAddress, nodePort, topic);

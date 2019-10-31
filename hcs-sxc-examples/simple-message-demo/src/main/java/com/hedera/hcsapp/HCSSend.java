@@ -7,10 +7,13 @@ import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hcslib.HCSLib;
 
+import lombok.extern.log4j.Log4j2;
+
 /**
  * Hello world!
  *
  */
+@Log4j2
 public final class HCSSend 
 {
 //    public static void main(String[] args) throws FileNotFoundException, IOException, HederaNetworkException, IllegalArgumentException, HederaException
@@ -24,7 +27,7 @@ public final class HCSSend
 //            Boolean success = new com.hedera.hcslib.consensus.OutboundHCSMessage(hcsLib)
 //                .sendMessage(0, "test");
 //            if (success) {
-//                System.out.println("Message sent");
+//                log.info("Message sent");
 //            }
 //        } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
 //            // TODO Auto-generated catch block

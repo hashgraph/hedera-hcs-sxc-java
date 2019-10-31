@@ -10,9 +10,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.hedera</groupId>
     <artifactId>hcs-lib</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
     <name>hcs-lib</name>
     <description>HCS Library</description>
 

@@ -28,7 +28,7 @@ public final class HCSSend {
             }
             
             // create a callback obect to receivet the message
-            OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(null);
+            OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsLib);
             onHCSMessageCallback.addObserver(message -> {
                 
             });

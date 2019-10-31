@@ -64,6 +64,7 @@ public final class MirrorTopicSubscriber extends Thread {
                     });
                 } catch (io.grpc.StatusRuntimeException e) {
                     System.out.println("Unable to connect to mirror node: " + mirrorAddress + ":" + mirrorPort + " topic: " + topicId.getTopicNum() + " - retrying in 3s");
+                    e.printStackTrace();
                     TimeUnit.SECONDS.sleep(3);
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -3,11 +3,17 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+    <parent>
+        <groupId>com.hedera</groupId>
+        <artifactId>hcs-sxc</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.hedera</groupId>
-    <artifactId>hcslib</artifactId>
+    <artifactId>hcs-lib</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>hcslib</name>
+    <name>hcs-lib</name>
     <description>HCS Library</description>
 
     <ciManagement>
@@ -50,9 +56,16 @@
         <junit-jupiter.version>5.5.2</junit-jupiter.version>
         <commons-lang3.version>3.9</commons-lang3.version>
         <artemis-jms-client-all.version>2.10.1</artemis-jms-client-all.version>
+        <protoc.version>3.7.1</protoc.version>
+        <protobuf-java.version>3.7.1</protobuf-java.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>${protobuf-java.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
@@ -113,7 +126,72 @@
         </dependency>
     </dependencies>
     <build>
+      <resources>
+          <resource>
+              <directory>src/main/resources</directory>
+          </resource>
+      </resources>
+      <testResources>
+          <testResource>
+              <directory>src/test/resources</directory>
+          </testResource>
+      </testResources>
+
+        <extensions>
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>1.6.1</version>
+            </extension>
+        </extensions>
         <plugins>
+          <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>build-helper-maven-plugin</artifactId>
+              <version>3.0.0</version>
+              <executions>
+                  <execution>
+                      <phase>generate-sources</phase>
+                      <goals>
+                          <goal>add-source</goal>
+                      </goals>
+                      <configuration>
+                          <sources>
+                            <source>src/main/java</source>
+                            <source>target/generated-sources/protobuf/java</source>
+                          </sources>
+                      </configuration>
+                  </execution>
+                  <execution>
+                      <id>add-test-source</id>
+                      <phase>generate-test-sources</phase>
+                      <goals>
+                          <goal>add-test-source</goal>
+                      </goals>
+                      <configuration>
+                          <sources>
+                            <source>src/test/java</source>
+                          </sources>
+                      </configuration>
+                  </execution>
+              </executions>
+          </plugin>
+            <plugin>
+                <groupId>org.xolstice.maven.plugins</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <version>0.5.1</version>
+                <configuration>
+                    <protocArtifact>com.google.protobuf:protoc:${protoc.version}:exe:${os.detected.classifier}
+                    </protocArtifact>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
@@ -128,7 +206,7 @@
                         <root>src/main/java</root>
                         <root>src/test/java</root>
                     </roots>
-                    <!-- These contain unprintable characters to suppress 
+                    <!-- These contain unprintable characters to suppress
                         showing the delimiters -->
                     <processEndTag>‍</processEndTag>
                     <processStartTag>‌</processStartTag>

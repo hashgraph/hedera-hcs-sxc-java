@@ -3,11 +3,17 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+    <parent>
+        <groupId>com.hedera</groupId>
+        <artifactId>hcs-sxc</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.hedera</groupId>
-    <artifactId>hcsrelay</artifactId>
+    <artifactId>hcs-relay</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>hcsrelay</name>
+    <name>hcs-relay</name>
     <description>HCS Relay</description>
     <ciManagement>
         <system>CircleCI</system>
@@ -65,7 +71,7 @@
         </dependency>
         <dependency>
             <groupId>com.hedera</groupId>
-            <artifactId>hcslib</artifactId>
+            <artifactId>hcs-lib</artifactId>
             <version>${hcslib.version}</version>
         </dependency>
         <dependency>
@@ -82,7 +88,47 @@
         </dependency>
     </dependencies>
     <build>
+      <resources>
+          <resource>
+              <directory>src/main/resources</directory>
+          </resource>
+      </resources>
+      <testResources>
+          <testResource>
+              <directory>src/test/resources</directory>
+          </testResource>
+      </testResources>
         <plugins>
+          <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>build-helper-maven-plugin</artifactId>
+              <version>3.0.0</version>
+              <executions>
+                  <execution>
+                      <phase>generate-sources</phase>
+                      <goals>
+                          <goal>add-source</goal>
+                      </goals>
+                      <configuration>
+                          <sources>
+                            <source>src/main/java</source>
+                          </sources>
+                      </configuration>
+                  </execution>
+                  <execution>
+                      <id>add-test-source</id>
+                      <phase>generate-test-sources</phase>
+                      <goals>
+                          <goal>add-test-source</goal>
+                      </goals>
+                      <configuration>
+                          <sources>
+                            <source>src/test/java</source>
+                          </sources>
+                      </configuration>
+                  </execution>
+              </executions>
+          </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
@@ -97,7 +143,7 @@
                         <root>src/main/java</root>
                         <root>src/test/java</root>
                     </roots>
-                    <!-- These contain unprintable characters to suppress 
+                    <!-- These contain unprintable characters to suppress
                         showing the delimiters -->
                     <processEndTag>‍</processEndTag>
                     <processStartTag>‌</processStartTag>

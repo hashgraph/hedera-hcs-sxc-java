@@ -12,7 +12,7 @@ public class KeyRotationTest {
     }
 
     @Test
-    public void testCreateCommonSecret() {
+    public void createCommonSecret() {
         KeyRotation keyRotation = new KeyRotation();
         byte[] alicePublic = keyRotation.aliceFirst();
         Pair<byte[], byte[]> bobPubSecret = KeyRotation.bobGenFromAlice(alicePublic);

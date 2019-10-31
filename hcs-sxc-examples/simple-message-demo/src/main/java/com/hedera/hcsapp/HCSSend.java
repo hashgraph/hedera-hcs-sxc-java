@@ -31,7 +31,7 @@ public final class HCSSend {
             // create a callback obect to receivet the message
             OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsLib);
             onHCSMessageCallback.addObserver(message -> {
-                
+                System.out.println("Observer received : "+ message);
             });
             
         } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
@@ -39,8 +39,7 @@ public final class HCSSend {
             e.printStackTrace();
         }
     }
-}
-        
+ 
 //    public static void main(String[] args) throws FileNotFoundException, IOException, HederaNetworkException, IllegalArgumentException, HederaException
 //    {
 //        
@@ -78,5 +77,7 @@ public final class HCSSend {
 ////            e.printStackTrace();
 ////        }
 //    }
+//
 
-
+}
+       

@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Test;
 
 import com.hedera.hcslib.utils.StringUtils;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 public class HashingTest {
     
     public HashingTest() {
@@ -17,7 +20,7 @@ public class HashingTest {
 
     @Test
     public void Sha() {
-        System.out.println("sha");
+        log.info("sha");
         byte[] expResult = StringUtils.hexStringToByteArray(hexOfHashOfPlainText);
         byte[] result = Hashing.sha(plaintext);
         assertArrayEquals(expResult, result);

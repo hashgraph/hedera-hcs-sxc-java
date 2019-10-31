@@ -5,12 +5,15 @@ import java.util.concurrent.TimeUnit;
 import com.hedera.hashgraph.sdk.consensus.TopicId;
 import com.hedera.hashgraph.sdk.consensus.TopicSubscriber;
 
+import lombok.extern.log4j.Log4j2;
+
 /**
  * 
  * Class to manage Mirror node topic subscribers
  * the subscription is a blocking gRPC process which requires its own thread
  * if multiple topics are to be subscribed to
  */
+@Log4j2
 public final class MirrorTopicSubscriber extends Thread {
     
     private String mirrorAddress = "";
@@ -58,12 +61,12 @@ public final class MirrorTopicSubscriber extends Thread {
         
             while (retry) {
                 try {
-                    System.out.println("Mirror Subscribing to topic number " + this.topicId.getTopicNum() + " on mirror node: " + this.mirrorAddress + ":" + this.mirrorPort);
+                    log.info("Mirror Subscribing to topic number " + this.topicId.getTopicNum() + " on mirror node: " + this.mirrorAddress + ":" + this.mirrorPort);
                     subscriber.subscribe(this.topicId, (tm) -> {
                         MirrorMessageHandler.onMirrorMessage(tm, this.topicId);   
                     });
                 } catch (io.grpc.StatusRuntimeException e) {
-                    System.out.println("Unable to connect to mirror node: " + mirrorAddress + ":" + mirrorPort + " topic: " + topicId.getTopicNum() + " - retrying in 3s");
+                    log.info("Unable to connect to mirror node: " + mirrorAddress + ":" + mirrorPort + " topic: " + topicId.getTopicNum() + " - retrying in 3s");
                     e.printStackTrace();
                     TimeUnit.SECONDS.sleep(3);
                 } catch (Exception e) {

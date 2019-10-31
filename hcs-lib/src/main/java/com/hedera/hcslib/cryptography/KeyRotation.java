@@ -12,14 +12,15 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.crypto.KeyAgreement;
 
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.DHParameterSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 public class KeyRotation {
 
     private KeyAgreement aliceKeyAgree;
@@ -56,7 +57,7 @@ public class KeyRotation {
             // encode  public key and give it to Bob.
             alicePubKeyEnc = aliceKpair.getPublic().getEncoded();
         } catch (InvalidKeyException | NoSuchAlgorithmException ex) {
-            Logger.getLogger(KeyRotation.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex);
         }
         return alicePubKeyEnc;
     }
@@ -91,7 +92,7 @@ public class KeyRotation {
             bobKeyAgree.doPhase(alicePubKey, true);
             bobSecret = bobKeyAgree.generateSecret();
         } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidAlgorithmParameterException | InvalidKeyException ex) {
-            Logger.getLogger(KeyRotation.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex);
         }
         return Pair.of(bobPubKeyEnc, bobSecret);
 
@@ -113,7 +114,7 @@ public class KeyRotation {
             aliceKeyAgree.doPhase(bobPubKey, true);
             
         } catch (InvalidKeySpecException | InvalidKeyException | IllegalStateException | NoSuchAlgorithmException ex) {
-            Logger.getLogger(KeyRotation.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex);
         }
         return aliceKeyAgree.generateSecret();
     }

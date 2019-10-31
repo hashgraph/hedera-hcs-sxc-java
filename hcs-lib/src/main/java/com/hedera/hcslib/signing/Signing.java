@@ -9,10 +9,9 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 
+import lombok.extern.log4j.Log4j2;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+@Log4j2
 public class Signing {
  
     //solutionSDK.signMessage
@@ -33,7 +32,7 @@ public class Signing {
             publicSignature.update(plainText.getBytes(StandardCharsets.ISO_8859_1));
             b = publicSignature.verify(signature);
         } catch (InvalidKeyException | SignatureException | NoSuchAlgorithmException ex) {
-            Logger.getLogger(Signing.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex);
         }
         return b;
     }

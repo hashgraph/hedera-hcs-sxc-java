@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hcslib.HCSLib;
 import com.hedera.hcslib.callback.OnHCSMessageCallback;
+import java.time.LocalDateTime;
 
 /**
  * Hello world!
@@ -22,7 +23,7 @@ public final class HCSSend {
         // Outbound message (app->lib->hedera example)
         try {
             Boolean success = new com.hedera.hcslib.consensus.OutboundHCSMessage(hcsLib)
-                .sendMessage(0, "test");
+                .sendMessage(0, "HCSSend - "+LocalDateTime.now().toString());
             if (success) {
                 System.out.println("Message sent to HH network");
             }

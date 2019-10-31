@@ -1,6 +1,3 @@
-/*
- *  Copyirght hash-hash.info
- */
 package com.hedera.hcslib.messages;
 
 

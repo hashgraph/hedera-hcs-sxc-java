@@ -96,7 +96,7 @@ public final class OnHCSMessageCallback {
                             } else if (messageFromJMS instanceof ActiveMQObjectMessage) {
                                 
                                 HCSRelayMessage rlm = (HCSRelayMessage)((ActiveMQObjectMessage) messageFromJMS).getObject();
-                                OnHCSMessageCallback.this.notifyObservers("The object says topicNum = "+rlm.getTopicId().getTopicNum());
+                                OnHCSMessageCallback.this.notifyObservers("The object received from queue says: = "+rlm.getTopicMessagesResponse().getMessage().toString());
                             }
                             messageFromJMS.acknowledge();
                         }catch (JMSException ex) {

@@ -12,12 +12,19 @@ message MessageId {
     int64 fromAccountShardNum = 1; // The shard number of the account generating the HCS transaction
     int64 fromAccountRealmNum = 2; // The realm number of the account generating the HCS transaction
     int64 fromAccountNum = 3;  // The account number of the account generating the HCS transaction
+
     int64 seconds = 4; // The number of complete seconds since the start of epoch
     int64 nanos = 5;  // The number of nanoseconds since the start of the last second
 }
 
-message MessagePart {
+// a complete message containing data provided by an app to the library
+message CompleteMessage {
+    MessageId completeMessageId = 1;
+    bytes completeMessage = 2;
+}
 
+// parts of a complete message
+message MessagePart {
     MessageId completeMessageId = 1;
     int32 partsTotal = 2; // The total number of parts to make up a complete message
     int32 partId = 3; // This message part index

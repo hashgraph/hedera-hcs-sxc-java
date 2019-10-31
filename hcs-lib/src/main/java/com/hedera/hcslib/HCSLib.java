@@ -36,7 +36,7 @@ public final class HCSLib {
         this.operatorAccountId = environment.getOperatorAccountId();
         this.ed25519PrivateKey = environment.getOperatorKey();
         this.topicIds = config.getConfig().getAppNet().getTopicIds();
-        this.jmsAddress = config.getConfig().getQueue().getInitialContextFactory();
+        this.jmsAddress = config.getConfig().getQueue().getTcpConnectionFactory();
     }
     public HCSLib withMessageSignature(boolean signMessages) {
         this.signMessages = signMessages;

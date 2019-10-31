@@ -84,9 +84,11 @@ public final class OutboundHCSMessage {
         );
         client.setMaxTransactionFee(100_000_000L);
 
+        TransactionId transactionId = new TransactionId(this.operatorAccountId);
         TransactionReceipt receipt = new SubmitMessageTransaction(client)
                 .setMessage(message.getBytes())
                 .setTopicId(this.topicIds.get(topicIndex))
+                .setTransactionId(transactionId)
                 .executeForReceipt();
         System.out.println(receipt.getTopicSequenceNumber());
                 

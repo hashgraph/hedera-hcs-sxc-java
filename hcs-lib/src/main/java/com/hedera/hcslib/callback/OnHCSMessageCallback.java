@@ -1,11 +1,8 @@
 package com.hedera.hcslib.callback;
 
 import com.hedera.hcslib.HCSLib;
-import com.hedera.hcslib.config.Config;
 
 import com.hedera.hcslib.messages.HCSRelayMessage;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -30,21 +27,18 @@ import org.apache.activemq.artemis.jms.client.ActiveMQTextMessage;
  *
  */
 public final class OnHCSMessageCallback {
-    
     public OnHCSMessageCallback (HCSLib hcsLib) {
       
         String jmsAddress = hcsLib.getJmsAddress();
        
         Runnable runnable =
             () -> { 
-            // use config from app to setup  mq
             InitialContext initialContext = null;
 
             javax.jms.Connection connection = null;
 
             try {
                 System.out.println("Starting hcs topic listener in hcs-lib");
-
                 Hashtable<String, Object> props = new Hashtable<>();
                 props.put(Context.INITIAL_CONTEXT_FACTORY, "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory");
                 props.put("topic.topic/hcsTopic", "hcsCatchAllTopics");
@@ -65,7 +59,7 @@ public final class OnHCSMessageCallback {
                 connection = cf.createConnection();
 
                 // Step 5. Set the client-id on the connection
-                connection.setClientID("durable-client-hcs-lib");
+                connection.setClientID("operator-client-"+hcsLib.getOperatorAccountId().getAccountNum());
 
                 // Step 6. Start the connection
                 connection.start();

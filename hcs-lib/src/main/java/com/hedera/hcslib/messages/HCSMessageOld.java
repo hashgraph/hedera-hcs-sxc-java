@@ -22,17 +22,17 @@ import java.util.logging.Logger;
 import javax.annotation.Nullable;
 
 /**
- * An HCSMessage is 
+ * An HCSMessageOld is 
  * 
  */
-public class HCSMessage implements Serializable {
+public class HCSMessageOld implements Serializable {
 
-    private static final Logger LOG = Logger.getLogger(HCSMessage.class.getName());
+    private static final Logger LOG = Logger.getLogger(HCSMessageOld.class.getName());
     
     public @Nullable String from; // set this when you know who this message is from
     public @Nullable int receivedPartsSize; // used when not all parts available and message constructed incrementaly. 
-    public HCSMessagePayload payload; // this is where the cleartext or encrypted message resides. 
-    public HCSMessageChunk[] parts;
+    public HCSMessagePayloadOld payload; // this is where the cleartext or encrypted message resides. 
+    public HCSMessageChunkOld[] parts;
     public int topic;
     public int messageNo; //FIXME: Needs to be a unique number. Use epoch or UUID.most significant bits
     public @Nullable byte noOfParts;  
@@ -47,16 +47,16 @@ public class HCSMessage implements Serializable {
     
     /**
      * Creates an encrypted HCSMessage ready to be sent to the HH Network.
-     * <p>Use {@link #getParts()} to retrieve all message parts {@link HCSMessageChunk} 
+     * <p>Use {@link #getParts()} to retrieve all message parts {@link HCSMessageChunkOld} 
      * of the constructed message. Under the hood, the method:</p>
      * <ol>
      * <li>  encrypts {@param message} using {@param sharedSecret} generated 
      * in {@link KeyRotation} </li>
-     * <li>  places  the encrypted {@param message} into a {@link HCSMessagePayload}</li>
-     * <li>  hashes {@param message}  and puts hash into the {@link HCSMessagePayload}</li>
+     * <li>  places  the encrypted {@param message} into a {@link HCSMessagePayloadOld}</li>
+     * <li>  hashes {@param message}  and puts hash into the {@link HCSMessagePayloadOld}</li>
      * <li>  signs encrypted in (1) message using {@param privateKey}  and puts 
-     * signature into the {@link HCSMessagePayload}</li>
-     * <li>  and finally breaks the concatenated contents of {@link HCSMessagePayload}
+     * signature into the {@link HCSMessagePayloadOld}</li>
+     * <li>  and finally breaks the concatenated contents of {@link HCSMessagePayloadOld}
      *    into a list of {@link HCSMessagePart} </li>
      * </ol>
      * @param sharedSecret the secret used to decrypt
@@ -64,10 +64,10 @@ public class HCSMessage implements Serializable {
      * @param messageNo a unique identifier 
      * @param message the cleartext message
      * @param privateKey the key used to sign the message and to identify recipient
-     * @return the encrypted HCSMessage object containing a list of MessageParts
+     * @return the encrypted HCSMessageOld object containing a list of MessageParts
      */
-    public static HCSMessage prepareMessage(byte[] sharedSecret, int topic, int messageNo, String message, PrivateKey  privateKey){
-        return new HCSMessage(sharedSecret, topic, messageNo, message, privateKey);
+    public static HCSMessageOld prepareMessage(byte[] sharedSecret, int topic, int messageNo, String message, PrivateKey  privateKey){
+        return new HCSMessageOld(sharedSecret, topic, messageNo, message, privateKey);
     }
     
     /**
@@ -79,21 +79,21 @@ public class HCSMessage implements Serializable {
      * @param privateKey
      * @return 
      */
-    public static HCSMessage prepareCleartext(int topic, int messageNo, String message, PrivateKey  privateKey){
-        return new HCSMessage(null, topic, messageNo, message, privateKey);
+    public static HCSMessageOld prepareCleartext(int topic, int messageNo, String message, PrivateKey  privateKey){
+        return new HCSMessageOld(null, topic, messageNo, message, privateKey);
     }
     
     /**
-     * Constructs and decrypts an HCSMessage when all encrypted parts
-     * {@link HCSMessagePart } are available. The decrypted messages is accessible
-     * from the {@link HCSMessagePayload} object; access via {@link #this.payload.message}
+     * Constructs and decrypts an HCSMessageOld when all encrypted parts
+ {@link HCSMessagePart } are available. The decrypted messages is accessible
+     * from the {@link HCSMessagePayloadOld} object; access via {@link #this.payload.message}
      * Only essential fields of the object are initialised after construction.
      * @param sharedSecret
      * @param parts
-     * @return the decrypted HCSMessage where the cleartext is under {@link #this.payload.message}
+     * @return the decrypted HCSMessageOld where the cleartext is under {@link #this.payload.message}
      */
-    public static HCSMessage processMessage(byte[] sharedSecret,  List<HCSMessageChunk> parts ){
-        return new HCSMessage(sharedSecret, parts);
+    public static HCSMessageOld processMessage(byte[] sharedSecret,  List<HCSMessageChunkOld> parts ){
+        return new HCSMessageOld(sharedSecret, parts);
     }
     
     /**
@@ -103,8 +103,8 @@ public class HCSMessage implements Serializable {
      * @param parts
      * @return 
      */
-    public static HCSMessage processMessageSkipDecrypt(byte[] sharedSecret,  List<HCSMessageChunk> parts ){
-        return new HCSMessage(null, parts);
+    public static HCSMessageOld processMessageSkipDecrypt(byte[] sharedSecret,  List<HCSMessageChunkOld> parts ){
+        return new HCSMessageOld(null, parts);
     }
     
     
@@ -124,7 +124,7 @@ public class HCSMessage implements Serializable {
     
     
     //construct a message from encrypted parts solutionSDK.createMessage solutionSDK.decryptMessage
-    private HCSMessage(byte[] sharedSecret, List<HCSMessageChunk> parts){
+    private HCSMessageOld(byte[] sharedSecret, List<HCSMessageChunkOld> parts){
         Preconditions.checkArgument(
                 parts.size() > 0
                 , "There needs to be a list one part for a valid message"); 
@@ -148,7 +148,7 @@ public class HCSMessage implements Serializable {
                 , "Cannot construct message due to missing parts");
       
         this.receivedPartsSize = noOfParts;
-        this.parts = new HCSMessageChunk[this.noOfParts];
+        this.parts = new HCSMessageChunkOld[this.noOfParts];
         parts.forEach(p -> this.parts[p.partNo - 1] = p); // sort the parts
         StringBuilder b =  new StringBuilder();
         //solutionSDK.extractMessageContent - has not its own SDK call but is part of 
@@ -158,7 +158,7 @@ public class HCSMessage implements Serializable {
              );
         });
         
-        this.payload = new HCSMessagePayload(b.toString());
+        this.payload = new HCSMessagePayloadOld(b.toString());
         
         
         if (sharedSecret!=null){
@@ -179,7 +179,7 @@ public class HCSMessage implements Serializable {
 
        
             } catch (Exception ex) {
-                Logger.getLogger(HCSMessage.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(HCSMessageOld.class.getName()).log(Level.SEVERE, null, ex);
             } 
         
         } else {
@@ -192,11 +192,11 @@ public class HCSMessage implements Serializable {
     
     
     //solutionSDK.createMessage solutionSDK.encryptMessage solutionSDK.signMessage solutionSDK.hashMessage
-    private HCSMessage(byte[] sharedSecret, int topic, int messageNo, String message, PrivateKey  privateKey){
+    private HCSMessageOld(byte[] sharedSecret, int topic, int messageNo, String message, PrivateKey  privateKey){
         try {
             this.topic = topic;
             this.messageNo = messageNo;
-            this.payload = new HCSMessagePayload();
+            this.payload = new HCSMessagePayloadOld();
             this.payload.message = message;
        
             
@@ -221,38 +221,38 @@ public class HCSMessage implements Serializable {
             String embeddable = this.payload.getEmbeddable();
     
             this.noOfParts = (byte)((embeddable.length() / 79 ) + (embeddable.length() % 79 ==0?0:1));
-            this.parts = new HCSMessageChunk[this.noOfParts];
+            this.parts = new HCSMessageChunkOld[this.noOfParts];
 
             for (byte part = 0;  part < this.noOfParts; part++){
                 int beginIndex = part * 79;
                 int endIndex = beginIndex + 79;
 
                 String bodyPart = embeddable.substring(beginIndex, (endIndex>embeddable.length()?embeddable.length():endIndex));
-                parts[part] = (new HCSMessageChunk(topic, messageNo, (byte)(part+1) , this.noOfParts, bodyPart));
+                parts[part] = (new HCSMessageChunkOld(topic, messageNo, (byte)(part+1) , this.noOfParts, bodyPart));
             }
             this.receivedPartsSize = this.noOfParts;
             this.isComplete = true;
         } catch (Exception ex) {
-            Logger.getLogger(HCSMessage.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(HCSMessageOld.class.getName()).log(Level.SEVERE, null, ex);
         } 
     }
     
     
 
    //solutionSDK.createMessage - use this when you want add parts and decrypt later
-    public HCSMessage(int topic){
+    public HCSMessageOld(int topic){
         this.isComplete = false;
         this.topic = topic;
         this.receivedPartsSize = 0;
     }
     
-    public boolean addPart(HCSMessageChunk p ){
+    public boolean addPart(HCSMessageChunkOld p ){
         Preconditions.checkArgument(
                 p.topic == this.topic
                 , "Message is for a different topic");
         
         if(this.parts == null){
-            this.parts = new HCSMessageChunk[p.noOfParts];
+            this.parts = new HCSMessageChunkOld[p.noOfParts];
             this.messageNo = p.messageNo;
             this.noOfParts = p.noOfParts;
         }
@@ -275,7 +275,7 @@ public class HCSMessage implements Serializable {
             Arrays.asList(this.parts).forEach(o -> {
                 b.append(o.payload);
             });
-            this.payload = new HCSMessagePayload (b.toString());
+            this.payload = new HCSMessagePayloadOld (b.toString());
             return this.isComplete;
         } else {
             return this.isComplete;
@@ -288,7 +288,7 @@ public class HCSMessage implements Serializable {
         Arrays.asList(this.parts).forEach(o -> {
                 b.append(o.payload);
         });
-        this.payload = new HCSMessagePayload (b.toString());
+        this.payload = new HCSMessagePayloadOld (b.toString());
         try {
                 this.payload.message = StringUtils.byteArrayToString(
                         Cryptography.decrypt(
@@ -299,14 +299,14 @@ public class HCSMessage implements Serializable {
                         )
                 );
             } catch (Exception ex) {
-                //Logger.getLogger(HCSMessage.class.getName()).log(Level.SEVERE, null, ex);
+                //Logger.getLogger(HCSMessageOld.class.getName()).log(Level.SEVERE, null, ex);
                 return false;
             } 
         return true;
     }
     
     // Getters Setters
-    public List<HCSMessageChunk> getParts(){
+    public List<HCSMessageChunkOld> getParts(){
         Preconditions.checkState(isComplete, "The message is partial");
         
         return Arrays.asList(this.parts);
@@ -320,7 +320,7 @@ public class HCSMessage implements Serializable {
         return from;
     }
 
-    public HCSMessagePayload getPayload() {
+    public HCSMessagePayloadOld getPayload() {
         return payload;
     }
 
@@ -369,7 +369,7 @@ public class HCSMessage implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final HCSMessage other = (HCSMessage) obj;
+        final HCSMessageOld other = (HCSMessageOld) obj;
         if (this.receivedPartsSize != other.receivedPartsSize) {
             return false;
         }

@@ -14,7 +14,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class HCSMessageTest {
+public class HCSMessageOldTest {
     
     static byte[] sharedSecret;
     static byte[] publicKeyBytes;
@@ -24,7 +24,7 @@ public class HCSMessageTest {
 //    String cleartext = "Hear my cries Hear 234sdf! �$%&*)_+ my call Lend me your ears See my fall See my error Know my faults Time halts See my loss ";
     String cleartext = "Hear my cries Hear 234sdf! $%&*)_+ my call Lend me your ears See my fall See my error Know my faults Time halts See my loss ";
     
-    public HCSMessageTest() {
+    public HCSMessageOldTest() {
     }
 
     @BeforeAll
@@ -58,7 +58,7 @@ public class HCSMessageTest {
         /*
             Encrypt the clear text  message and test if payload meets requirements
         */
-        HCSMessage a = HCSMessage.prepareMessage(sharedSecret, 3, 4, this.cleartext, rsaKeyPair.getPrivate());
+        HCSMessageOld a = HCSMessageOld.prepareMessage(sharedSecret, 3, 4, this.cleartext, rsaKeyPair.getPrivate());
         
         // can we identify the signer while message encrypted?
         assertTrue(Signing.verify(a.payload.message, a.payload.signatureOfEncryptedMessage, rsaKeyPair.getPublic()));
@@ -69,7 +69,7 @@ public class HCSMessageTest {
             requirements are still met. 
         */
         
-        HCSMessage b = HCSMessage.processMessage(sharedSecret, Arrays.asList(a.parts));
+        HCSMessageOld b = HCSMessageOld.processMessage(sharedSecret, Arrays.asList(a.parts));
         
         // is the stored hash of the original message unaffected?
         assertArrayEquals(Hashing.sha(this.cleartext), a.payload.hashOfUnencryptedMessage);

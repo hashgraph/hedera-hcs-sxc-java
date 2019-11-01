@@ -16,7 +16,7 @@ import javax.annotation.Nonnull;
  * A message chunk is a part of a #{@link HCSMessage}
  * A list of such chunks is kept in the message object
  */
-public  class HCSMessageChunk implements Serializable{
+public  class HCSMessageChunkOld implements Serializable{
         //header
         public @Nonnull String header; 
         public @Nonnull int topic;
@@ -37,7 +37,7 @@ public  class HCSMessageChunk implements Serializable{
          * to construct an HCSMessage incrementally while parts become available.
          * @param serialized 
          */
-        public HCSMessageChunk(byte[] serialized) {
+        public HCSMessageChunkOld(byte[] serialized) {
             Preconditions.checkArgument(serialized.length < 100, "buffler length: %d too long", serialized.length); 
             ByteBuffer wrap = ByteBuffer.wrap(serialized);
             this.serialized = serialized;
@@ -64,7 +64,7 @@ public  class HCSMessageChunk implements Serializable{
          * @param payload
          * @throws UnsupportedEncodingException 
          */
-        HCSMessageChunk (int topic, int messageNo, byte chunkNo, byte totalChunks, String payload) throws UnsupportedEncodingException{
+        HCSMessageChunkOld (int topic, int messageNo, byte chunkNo, byte totalChunks, String payload) throws UnsupportedEncodingException{
             this.header = "HCS";
             this.topic  = topic;
             this.messageNo = messageNo;
@@ -99,7 +99,7 @@ public  class HCSMessageChunk implements Serializable{
             if (getClass() != obj.getClass()) {
                 return false;
             }
-            final HCSMessageChunk other = (HCSMessageChunk) obj;
+            final HCSMessageChunkOld other = (HCSMessageChunkOld) obj;
             if (this.topic != other.topic) {
                 return false;
             }

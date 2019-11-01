@@ -15,14 +15,14 @@ import java.util.Objects;
  * to HCSMessage. 
  * 
  */
-public class HCSMessagePayload implements Serializable {
+public class HCSMessagePayloadOld implements Serializable {
 
     static int headerSize = 32 + 256;
     public String message = null; // this it the message. it may be encrypted or decrypted.
     public byte[] hashOfUnencryptedMessage = null;
     public byte[] signatureOfEncryptedMessage = null;
 
-    public HCSMessagePayload() {
+    public HCSMessagePayloadOld() {
     }
 
     /**
@@ -30,7 +30,7 @@ public class HCSMessagePayload implements Serializable {
      * initialised after construction. 
      * @param embeddable 
      */
-    public HCSMessagePayload(String embeddable) {
+    public HCSMessagePayloadOld(String embeddable) {
         Preconditions.checkArgument(
                 embeddable.length() > headerSize,
                  "The embedable minimum size is not met");
@@ -71,7 +71,7 @@ public class HCSMessagePayload implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final HCSMessagePayload other = (HCSMessagePayload) obj;
+        final HCSMessagePayloadOld other = (HCSMessagePayloadOld) obj;
         if (!Objects.equals(this.message, other.message)) {
             return false;
         }

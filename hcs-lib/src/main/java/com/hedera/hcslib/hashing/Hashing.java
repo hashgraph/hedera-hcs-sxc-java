@@ -2,14 +2,11 @@ package com.hedera.hcslib.hashing;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import lombok.extern.log4j.Log4j2;
 
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+@Log4j2
 public class Hashing {
 
    //solutionSDK.hashMessage
@@ -21,7 +18,7 @@ public class Hashing {
                     plaintext.getBytes(StandardCharsets.ISO_8859_1));
             return encodedhash;
         } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(Hashing.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex);
         }
         return encodedhash;
     }

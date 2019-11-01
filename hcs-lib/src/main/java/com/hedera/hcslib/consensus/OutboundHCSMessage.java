@@ -21,6 +21,9 @@ import com.hedera.hcslib.proto.java.MessageId;
 import com.hedera.hcslib.proto.java.MessagePart;
 import java.util.Arrays;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 public final class OutboundHCSMessage {
     private boolean signMessages = false;
     private boolean encryptMessages = false;
@@ -155,11 +158,8 @@ public final class OutboundHCSMessage {
                 .setTopicId(this.topicIds.get(topicIndex))
                 .setTransactionId(transactionId)
                 .executeForReceipt();
-                System.out.println(
-                        "Receipt for outbound chunk "+ i + ", " + 
-                        receipt.getTopicSequenceNumber());
-            
-        }     
+            log.info(receipt.getTopicSequenceNumber());
+        }
         return true;
     }
 }

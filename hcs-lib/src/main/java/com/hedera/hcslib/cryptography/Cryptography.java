@@ -2,6 +2,8 @@ package com.hedera.hcslib.cryptography;
 
 import com.hedera.hcslib.utils.StringUtils;
 
+import lombok.extern.log4j.Log4j2;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
@@ -19,8 +21,6 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
 
 import javax.crypto.Cipher;
@@ -29,7 +29,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-
+@Log4j2
 public class Cryptography {
     
     /**
@@ -145,7 +145,7 @@ public class Cryptography {
             KeyFactory kf = KeyFactory.getInstance("RSA"); // or "EC" or whatever
             r =  kf.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
         } catch (InvalidKeySpecException | NoSuchAlgorithmException ex) {
-            Logger.getLogger(Cryptography.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex);
         }
         return r;
     }
@@ -162,7 +162,7 @@ public class Cryptography {
             KeyFactory kf = KeyFactory.getInstance("RSA"); // or "EC" or whatever
             r =  kf.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
         } catch (InvalidKeySpecException | NoSuchAlgorithmException ex) {
-            Logger.getLogger(Cryptography.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex);
         }
         return r;
     }

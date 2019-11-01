@@ -3,14 +3,15 @@ package com.hedera.hcslib.utils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 public class StringUtils {
     
 
@@ -31,7 +32,7 @@ public class StringUtils {
         try {
             b = new ObjectMapper().readValue(s, byte[].class);
         } catch (IOException ex) {
-            Logger.getLogger(StringUtils.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex);
         }
       return  b;        
     }
@@ -45,7 +46,7 @@ public class StringUtils {
         try {
             b = Hex.decodeHex(s.toCharArray());
         } catch (DecoderException ex) {
-            Logger.getLogger(StringUtils.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex);
         }
         return b;
     }

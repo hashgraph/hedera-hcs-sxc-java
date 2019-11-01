@@ -60,9 +60,20 @@
         <protoc.version>3.7.1</protoc.version>
         <protobuf-java.version>3.7.1</protobuf-java.version>
         <lombok.version>1.18.10</lombok.version>
+        <log4j.version>2.12.1</log4j.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+          <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+          <version>${log4j.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -112,7 +123,6 @@
           <version>${junit-jupiter.version}</version>
           <scope>test</scope>
       </dependency>
-
       <dependency>
           <groupId>com.google.protobuf</groupId>
           <artifactId>protobuf-java</artifactId>

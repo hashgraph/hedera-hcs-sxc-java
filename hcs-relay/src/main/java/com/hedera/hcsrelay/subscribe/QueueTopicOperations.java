@@ -9,8 +9,10 @@ import com.hedera.hcslib.messages.HCSRelayMessage;
 import com.hedera.hcsrelay.config.Config;
 import com.hedera.hcsrelay.config.Queue;
 import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages;
+
+import lombok.extern.log4j.Log4j2;
+
 import java.util.Hashtable;
-import java.util.logging.Logger;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
@@ -28,9 +30,8 @@ import javax.naming.NamingException;
  *
  * @author User
  */
+@Log4j2
 public class QueueTopicOperations {
-   
-    private static final Logger LOG = Logger.getLogger(QueueTopicOperations.class.getName());
    
     /**
      * Sets up jms topic.It blocks until the jms queue becomes available. 
@@ -68,7 +69,7 @@ public class QueueTopicOperations {
             ConnectionFactory cf = (ConnectionFactory) initialContext.lookup("TCPConnectionFactory");
 
             // Step 4. Create a JMS connection and wait until server available
-            System.out.println("Waiting for MQ Artemis to start ...");
+            log.info("Waiting for MQ Artemis to start ...");
             
             boolean scanning = true;
             do {
@@ -77,7 +78,7 @@ public class QueueTopicOperations {
                     scanning = false;
                 } catch (Exception ie) {
                     String tcpConnectionFactory = config.getConfig().getQueue().getTcpConnectionFactory();
-                    System.out.println("Is Artemis up? Setup your host file so that the host identified in'"+tcpConnectionFactory+"' points to 127.0.0.1 if running outside of docker");
+                    log.info("Is Artemis up? Setup your host file so that the host identified in'"+tcpConnectionFactory+"' points to 127.0.0.1 if running outside of docker");
                     Thread.sleep(6000);
                 }
                 
@@ -104,12 +105,12 @@ public class QueueTopicOperations {
             // Step 11. Send the text message to the topic
             messageProducer.send(message1);
 
-            System.out.println("Sent test queue message: " + message1.getText() + " from producer  hcsCatchAllTopics" );
+            log.info("Sent test queue message: " + message1.getText() + " from producer  hcsCatchAllTopics" );
 
             // Step 12. Consume the message from the durable subscription
             TextMessage messageReceived = (TextMessage) subscriber.receive();
 
-            System.out.println("Received message from queue from test subscriber. Message: " + messageReceived.getText());
+            log.info("Received message from queue from test subscriber. Message: " + messageReceived.getText());
             
             subscriber.close();
 
@@ -154,7 +155,7 @@ public class QueueTopicOperations {
             ConnectionFactory cf = (ConnectionFactory) initialContext.lookup("TCPConnectionFactory");
 
             // Step 4. Create a JMS connection and wait until server available
-            System.out.println("Waiting for MQ Artemis to start ...");
+            log.info("Waiting for MQ Artemis to start ...");
             
             boolean scanning = true;
             do {
@@ -163,7 +164,7 @@ public class QueueTopicOperations {
                     scanning = false;
                 } catch (Exception ie) {
                     String tcpConnectionFactory = config.getConfig().getQueue().getTcpConnectionFactory();
-                    System.out.println("Is Artemis up? Setup your host file so that the host identified in'"+tcpConnectionFactory+"' points to 127.0.0.1 if running outside of docker");
+                    log.info("Is Artemis up? Setup your host file so that the host identified in'"+tcpConnectionFactory+"' points to 127.0.0.1 if running outside of docker");
                     Thread.sleep(6000);
                 }
                 

@@ -3,11 +3,12 @@ package com.hedera.hcslib.callback;
 import com.hedera.hcslib.HCSLib;
 
 import com.hedera.hcslib.messages.HCSRelayMessage;
+
+import lombok.extern.log4j.Log4j2;
+
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -26,6 +27,7 @@ import org.apache.activemq.artemis.jms.client.ActiveMQTextMessage;
  * Implements callback registration and notification capabilities to support apps
  *
  */
+@Log4j2
 public final class OnHCSMessageCallback {
     public OnHCSMessageCallback (HCSLib hcsLib) {
       
@@ -76,14 +78,14 @@ public final class OnHCSMessageCallback {
 
                 //for synchronus receive do
                 //Message receive = subscriber.receive();
-                //System.out.print(((javax.jms.TextMessage)receive).getText());
+                //log.info(((javax.jms.TextMessage)receive).getText());
 
                 //for aync receive do
                 subscriber.setMessageListener(new MessageListener() {
                     @Override
                     public void onMessage(Message messageFromJMS) {
                         try {
-                            System.out.println("Message Received from JMS forward to app.java observers");
+                            log.info("Message Received from JMS forward to app.java observers");
                             // notify subscribed observer from App.java
                             if (messageFromJMS instanceof ActiveMQTextMessage) {
                                 OnHCSMessageCallback.this.notifyObservers(((ActiveMQTextMessage)messageFromJMS).getText());
@@ -94,7 +96,7 @@ public final class OnHCSMessageCallback {
                             }
                             messageFromJMS.acknowledge();
                         }catch (JMSException ex) {
-                            Logger.getLogger(OnHCSMessageCallback.class.getName()).log(Level.SEVERE, null, ex);
+                            log.error(ex);
                         }
                     }
                 });
@@ -111,17 +113,17 @@ public final class OnHCSMessageCallback {
                 //Thread.sleep(1000);
                 session.close();
             } catch (NamingException ex) {
-                Logger.getLogger(OnHCSMessageCallback.class.getName()).log(Level.SEVERE, null, ex);
+                log.error(ex);
             } catch (JMSException ex) {
-                Logger.getLogger(OnHCSMessageCallback.class.getName()).log(Level.SEVERE, null, ex);
+                log.error(ex);
             } catch (InterruptedException ex) {
-                Logger.getLogger(OnHCSMessageCallback.class.getName()).log(Level.SEVERE, null, ex);
+                log.error(ex);
             } finally {
                 if (connection != null) {
                     try {
                         connection.close();
                     } catch (JMSException ex) {
-                        Logger.getLogger(OnHCSMessageCallback.class.getName()).log(Level.SEVERE, null, ex);
+                        log.error(ex);
                     }
                 }
                 //broker.stop();

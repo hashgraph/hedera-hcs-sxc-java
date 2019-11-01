@@ -3,9 +3,10 @@ package com.hedera.hcsrelay.subscribe;
 import com.hedera.hashgraph.sdk.consensus.TopicId;
 import com.hedera.hcsrelay.config.Config;
 import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages.MirrorGetTopicMessagesResponse;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 public final class MirrorMessageHandler {
    
     
@@ -14,17 +15,17 @@ public final class MirrorMessageHandler {
             Config config = new Config();
             
             
-            System.out.println("Got message from mirror node");
-            System.out.println("  Topic number: " + topicId.getTopicNum());
-            System.out.println("  Consensus TimeStamp: " + messagesResponse.getConsensusTimestamp());
-            System.out.println("  Running Hash: " + messagesResponse.getRunningHash());
-            System.out.println("  Sequence: " + messagesResponse.getSequenceNumber());
-            System.out.println("  Message: "+ messagesResponse.getMessage().toStringUtf8());
+            log.info("Got message from mirror node");
+            log.info("  Topic number: " + topicId.getTopicNum());
+            log.info("  Consensus TimeStamp: " + messagesResponse.getConsensusTimestamp());
+            log.info("  Running Hash: " + messagesResponse.getRunningHash());
+            log.info("  Sequence: " + messagesResponse.getSequenceNumber());
+            log.info("  Message: "+ messagesResponse.getMessage().toStringUtf8());
             
             QueueTopicOperations.addMessage(config, messagesResponse, topicId);
             
         } catch (Exception ex) {
-            Logger.getLogger(MirrorMessageHandler.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex);
         }
         
         

@@ -16,7 +16,7 @@ import com.hedera.hashgraph.sdk.consensus.SubmitMessageTransaction;
 import com.hedera.hashgraph.sdk.consensus.TopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcslib.HCSLib;
-import com.hedera.hcslib.proto.java.CompleteMessage;
+import com.hedera.hcslib.proto.java.MessageEnvelope;
 import com.hedera.hcslib.proto.java.MessageId;
 import com.hedera.hcslib.proto.java.MessagePart;
 import java.util.Arrays;
@@ -84,7 +84,7 @@ public final class OutboundHCSMessage {
             
         }
         if (rotateKeys) {
-            int messageCount = 0; //TODO - keep track of messages app-wide, not just here.
+            int messageCount = 0; //TODO - keep track of messages app-wide, not just here. ( per topic )
             if (messageCount > rotationFrequency) {
             }
         }
@@ -100,7 +100,7 @@ public final class OutboundHCSMessage {
         // generate TXId for main and first message
         TransactionId transactionId = new TransactionId(this.operatorAccountId);
         
-        // create complete message (from app provided data) in protobuf (CompleteMessage)
+        // create complete message (from app provided data) in protobuf (MessageEnvelope)
             //-> TxId
             //-> Complete App Message (ByteArray) (bytes in protobuf -> ByteString in java)
 
@@ -115,15 +115,17 @@ public final class OutboundHCSMessage {
         
         byte[] originalMessage = message.getBytes();
         
-        CompleteMessage completeMessage = CompleteMessage
+        MessageEnvelope messageEnvelope = MessageEnvelope
                 .newBuilder()
-                .setCompleteMessageId(completeMessageId)
-                .setCompleteMessage(ByteString.copyFrom(originalMessage))
+                .setMessageEnvelopeId(completeMessageId)
+                .setMessageEnvelope(ByteString.copyFrom(originalMessage))
                 .build();
         
+        byte[] meByteArray = messageEnvelope.toByteArray();
+        final int meByteArrayLength = meByteArray.length;
         
         // convert above protobuf message to byte array
-        final int originalMessageSize = originalMessage.length;
+        //final int originalMessageSize = originalMessage.length;
         
         // break up byte array into 3500 bytes parts
         // protobuf message part objects (iterate) -> MessagePart
@@ -132,20 +134,20 @@ public final class OutboundHCSMessage {
         
         
         final int chunkSize = 3500; // the hcs tx limit is 4k - there are header bytes that will be added to that
+        int totalParts = (int) Math.ceil((double)meByteArrayLength / chunkSize);
+        for(int i=0; i < meByteArrayLength; i += chunkSize){
         
-        for(int i=0; i < originalMessageSize; i += chunkSize){
-        
-            byte[] originalMessageChunk = Arrays.copyOfRange(
+            byte[] meMessageChunk = Arrays.copyOfRange(
                     originalMessage,
                     i,
-                    Math.min(originalMessageSize, i + chunkSize)
+                    Math.min(meByteArrayLength, i + chunkSize)
             );
             
             MessagePart messagePart = MessagePart.newBuilder()
-                    .setCompleteMessageId(completeMessageId)
+                    .setMessageEnvelopeId(completeMessageId)
                     .setPartId(i)
-                    .setPartsTotal(originalMessageSize / chunkSize)
-                    .setMessagePart(ByteString.copyFrom(originalMessageChunk))
+                    .setPartsTotal(totalParts)
+                    .setMessagePart(ByteString.copyFrom(meMessageChunk))
                     .build();
             
             TransactionReceipt receipt = new SubmitMessageTransaction(client)
@@ -153,7 +155,9 @@ public final class OutboundHCSMessage {
                 .setTopicId(this.topicIds.get(topicIndex))
                 .setTransactionId(transactionId)
                 .executeForReceipt();
-                System.out.println(receipt.getTopicSequenceNumber());
+                System.out.println(
+                        "Receipt for outbound chunk "+ i + ", " + 
+                        receipt.getTopicSequenceNumber());
             
         }     
         return true;

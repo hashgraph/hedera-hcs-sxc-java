@@ -11,13 +11,10 @@ public final class MirrorTopicsSubscribers {
     public MirrorTopicsSubscribers(String nodeAddress, int nodePort, Config config) throws Exception {
         System.out.println("Relay topics to subscribe to from mirror and queue");
         boolean blockingSetupJmsTopic = QueueTopicOperations.blockingCreateJmsTopic(config);
+        System.out.println("Queue in relay is setup:" + blockingSetupJmsTopic);
         if (blockingSetupJmsTopic) {
             for (TopicId topic : config.getConfig().getTopicIds()) {
                 System.out.println("Processing topic num: " + topic.getTopicNum());
-                // create queue topic
-
-                System.out.println("Queue is setup for topic num " + topic.getTopicNum());
-
                 // subscribe to topic with mirror node
                 MirrorTopicSubscriber subscriber = new MirrorTopicSubscriber(nodeAddress, nodePort, topic);
                 Thread subscriberThread = new Thread(subscriber);

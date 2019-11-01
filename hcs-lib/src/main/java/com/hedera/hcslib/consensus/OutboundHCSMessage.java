@@ -1,5 +1,6 @@
 package com.hedera.hcslib.consensus;
 
+import com.google.protobuf.ByteString;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,10 @@ import com.hedera.hashgraph.sdk.consensus.SubmitMessageTransaction;
 import com.hedera.hashgraph.sdk.consensus.TopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcslib.HCSLib;
+import com.hedera.hcslib.proto.java.CompleteMessage;
+import com.hedera.hcslib.proto.java.MessageId;
+import com.hedera.hcslib.proto.java.MessagePart;
+import java.util.Arrays;
 
 public final class OutboundHCSMessage {
     private boolean signMessages = false;
@@ -61,7 +66,15 @@ public final class OutboundHCSMessage {
         this.ed25519PrivateKey = ed25519PrivateKey;
         return this;
     }
-    
+    /** Sends a single cleartext message
+     * 
+     * @param topicIndex the index reference in one of {@link #topicIds}
+     * @param message
+     * @return
+     * @throws HederaNetworkException
+     * @throws IllegalArgumentException
+     * @throws HederaException 
+     */
     public boolean sendMessage(int topicIndex, String message) throws HederaNetworkException, IllegalArgumentException, HederaException {
 
         if (signMessages) {
@@ -90,22 +103,59 @@ public final class OutboundHCSMessage {
         // create complete message (from app provided data) in protobuf (CompleteMessage)
             //-> TxId
             //-> Complete App Message (ByteArray) (bytes in protobuf -> ByteString in java)
-            
+
+        MessageId completeMessageId = MessageId.newBuilder()
+                .setFromAccountShardNum(transactionId.getAccountId().getShardNum())
+                .setFromAccountRealmNum(transactionId.getAccountId().getRealmNum())
+                .setFromAccountNum(transactionId.getAccountId().getAccountNum())
+                .setSeconds(transactionId.getValidStart().getEpochSecond())
+                .setNanos(transactionId.getValidStart().getNano())
+                .build();
+         
+        
+        byte[] originalMessage = message.getBytes();
+        
+        CompleteMessage completeMessage = CompleteMessage
+                .newBuilder()
+                .setCompleteMessageId(completeMessageId)
+                .setCompleteMessage(ByteString.copyFrom(originalMessage))
+                .build();
+        
+        
         // convert above protobuf message to byte array
+        final int originalMessageSize = originalMessage.length;
         
         // break up byte array into 3500 bytes parts
-        
         // protobuf message part objects (iterate) -> MessagePart
-            // include above part(s) into each
-            // -> (?) convert to byte array and send to JMS
+        // include above part(s) into each
+        // -> (?) convert to byte array and send to HH
         
-        TransactionReceipt receipt = new SubmitMessageTransaction(client)
-                .setMessage(message.getBytes())
+        
+        final int chunkSize = 3500; // the hcs tx limit is 4k - there are header bytes that will be added to that
+        
+        for(int i=0; i < originalMessageSize; i += chunkSize){
+        
+            byte[] originalMessageChunk = Arrays.copyOfRange(
+                    originalMessage,
+                    i,
+                    Math.min(originalMessageSize, i + chunkSize)
+            );
+            
+            MessagePart messagePart = MessagePart.newBuilder()
+                    .setCompleteMessageId(completeMessageId)
+                    .setPartId(i)
+                    .setPartsTotal(originalMessageSize / chunkSize)
+                    .setMessagePart(ByteString.copyFrom(originalMessageChunk))
+                    .build();
+            
+            TransactionReceipt receipt = new SubmitMessageTransaction(client)
+                .setMessage(messagePart.toByteArray())
                 .setTopicId(this.topicIds.get(topicIndex))
                 .setTransactionId(transactionId)
                 .executeForReceipt();
-        System.out.println(receipt.getTopicSequenceNumber());
-                
+                System.out.println(receipt.getTopicSequenceNumber());
+            
+        }     
         return true;
     }
 }

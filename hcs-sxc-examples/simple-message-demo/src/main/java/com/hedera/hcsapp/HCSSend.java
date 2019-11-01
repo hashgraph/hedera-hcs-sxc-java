@@ -1,5 +1,7 @@
 package com.hedera.hcsapp;
 
+import com.google.protobuf.ByteString;
+import com.google.protobuf.Message;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -7,6 +9,9 @@ import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hcslib.HCSLib;
 import com.hedera.hcslib.callback.OnHCSMessageCallback;
+import com.hedera.hcslib.consensus.OutboundHCSMessage;
+import com.hedera.hcslib.proto.java.CompleteMessage;
+import com.hedera.hcslib.proto.java.MessagePart;
 import java.time.LocalDateTime;
 
 /**
@@ -20,10 +25,12 @@ public final class HCSSend {
       // Simplest setup and send
         HCSLib hcsLib = new HCSLib();
         
-        // Outbound message (app->lib->hedera example)
         try {
-            Boolean success = new com.hedera.hcslib.consensus.OutboundHCSMessage(hcsLib)
-                .sendMessage(0, "HCSSend - "+LocalDateTime.now().toString());
+            Boolean success = 
+                    new OutboundHCSMessage(hcsLib)
+                   .overrideEncryptedMessages(false)
+                   .overrideMessageSignature(false)
+                   .sendMessage(0, "HCSSend - "+LocalDateTime.now().toString());
             if (success) {
                 System.out.println("Message sent to HH network");
             }

@@ -14,6 +14,7 @@ public final class MirrorTopicsSubscribers {
     public MirrorTopicsSubscribers(String nodeAddress, int nodePort, Config config) throws Exception {
         log.info("Relay topics to subscribe to from mirror and queue");
         boolean blockingSetupJmsTopic = QueueTopicOperations.blockingCreateJmsTopic(config);
+        System.out.println("Queue in relay is setup:" + blockingSetupJmsTopic);
         if (blockingSetupJmsTopic) {
             for (TopicId topic : config.getConfig().getTopicIds()) {
                 log.info("Processing topic num: " + topic.getTopicNum());

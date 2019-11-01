@@ -11,7 +11,7 @@ public final class YAMLConfig {
 
     private List<Node> nodes = new ArrayList<Node>();
     private AppNet appNet = new AppNet();
-    
+    private Queue queue = new Queue();
     public List<Node> getNodes() {
         return this.nodes;
     }
@@ -23,6 +23,12 @@ public final class YAMLConfig {
     }
     public void setAppNet(AppNet appNet) {
         this.appNet = appNet;
+    }
+    public Queue getQueue() {
+        return this.queue;
+    }
+    public void setQueue(Queue queue) {
+        this.queue = queue;
     }
     /** 
      * Returns a map of node details (AccountId and address)

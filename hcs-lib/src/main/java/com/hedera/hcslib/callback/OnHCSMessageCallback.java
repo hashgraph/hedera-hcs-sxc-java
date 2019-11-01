@@ -1,6 +1,6 @@
 package com.hedera.hcslib.callback;
 
-import com.hedera.hcslib.config.Config;
+import com.hedera.hcslib.HCSLib;
 
 import com.hedera.hcslib.messages.HCSRelayMessage;
 
@@ -29,23 +29,22 @@ import org.apache.activemq.artemis.jms.client.ActiveMQTextMessage;
  */
 @Log4j2
 public final class OnHCSMessageCallback {
-    
-    public OnHCSMessageCallback (Config config) {
+    public OnHCSMessageCallback (HCSLib hcsLib) {
+      
+        String jmsAddress = hcsLib.getJmsAddress();
        
         Runnable runnable =
             () -> { 
-            // use config from app to setup  mq
             InitialContext initialContext = null;
 
             javax.jms.Connection connection = null;
 
             try {
-                log.info("Starting hcs topic listener in hcs-lib");
-
+                System.out.println("Starting hcs topic listener in hcs-lib");
                 Hashtable<String, Object> props = new Hashtable<>();
                 props.put(Context.INITIAL_CONTEXT_FACTORY, "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory");
                 props.put("topic.topic/hcsTopic", "hcsCatchAllTopics");
-                props.put("connectionFactory.TCPConnectionFactory", "tcp://localhost:61616");
+                props.put("connectionFactory.TCPConnectionFactory", jmsAddress);
                 InitialContext ctx = new InitialContext(props);
                 ctx.lookup("TCPConnectionFactory");
 
@@ -62,7 +61,7 @@ public final class OnHCSMessageCallback {
                 connection = cf.createConnection();
 
                 // Step 5. Set the client-id on the connection
-                connection.setClientID("durable-client-hcs-lib");
+                connection.setClientID("operator-client-"+hcsLib.getOperatorAccountId().getAccountNum());
 
                 // Step 6. Start the connection
                 connection.start();
@@ -93,7 +92,7 @@ public final class OnHCSMessageCallback {
                             } else if (messageFromJMS instanceof ActiveMQObjectMessage) {
                                 
                                 HCSRelayMessage rlm = (HCSRelayMessage)((ActiveMQObjectMessage) messageFromJMS).getObject();
-                                OnHCSMessageCallback.this.notifyObservers("The object says topicNum = "+rlm.getTopicId().getTopicNum());
+                                OnHCSMessageCallback.this.notifyObservers("The object received from queue says: = "+rlm.getTopicMessagesResponse().getMessage().toString());
                             }
                             messageFromJMS.acknowledge();
                         }catch (JMSException ex) {
@@ -154,13 +153,5 @@ public final class OnHCSMessageCallback {
     }
     
   
-    
-    /**
-     * For test purposes for now
-     */
-    //TODO: Remove this
-    //public void triggerCallBack() {
-    //    notifyObservers("hi there");
-   //}
-    
+
 }

@@ -1,14 +1,18 @@
 package com.hedera.hcslib.callback;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcslib.HCSLib;
 
 import com.hedera.hcslib.messages.HCSRelayMessage;
+import com.hedera.hcslib.proto.java.MessagePart;
 
 import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -92,11 +96,17 @@ public final class OnHCSMessageCallback {
                             } else if (messageFromJMS instanceof ActiveMQObjectMessage) {
                                 
                                 HCSRelayMessage rlm = (HCSRelayMessage)((ActiveMQObjectMessage) messageFromJMS).getObject();
-                                OnHCSMessageCallback.this.notifyObservers("The object received from queue says: = "+rlm.getTopicMessagesResponse().getMessage().toString());
+                                
+                                MessagePart messagePart = MessagePart.parseFrom(rlm.getTopicMessagesResponse().getMessage());
+                                
+                                
+                                OnHCSMessageCallback.this.notifyObservers("The object received from queue says: = "+  messagePart.getMessagePart().toStringUtf8());
                             }
                             messageFromJMS.acknowledge();
                         }catch (JMSException ex) {
                             log.error(ex);
+                        } catch (InvalidProtocolBufferException ex) {
+                            Logger.getLogger(OnHCSMessageCallback.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                 });

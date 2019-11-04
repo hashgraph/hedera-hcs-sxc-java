@@ -16,9 +16,11 @@ import com.hedera.hashgraph.sdk.consensus.SubmitMessageTransaction;
 import com.hedera.hashgraph.sdk.consensus.TopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcslib.HCSLib;
+import com.hedera.hcslib.proto.java.AccountID;
 import com.hedera.hcslib.proto.java.MessageEnvelope;
-import com.hedera.hcslib.proto.java.MessageId;
 import com.hedera.hcslib.proto.java.MessagePart;
+import com.hedera.hcslib.proto.java.Timestamp;
+import com.hedera.hcslib.proto.java.TransactionID;
 import java.util.Arrays;
 
 import lombok.extern.log4j.Log4j2;
@@ -107,20 +109,27 @@ public final class OutboundHCSMessage {
             //-> TxId
             //-> Complete App Message (ByteArray) (bytes in protobuf -> ByteString in java)
 
-        MessageId completeMessageId = MessageId.newBuilder()
-                .setFromAccountShardNum(transactionId.getAccountId().getShardNum())
-                .setFromAccountRealmNum(transactionId.getAccountId().getRealmNum())
-                .setFromAccountNum(transactionId.getAccountId().getAccountNum())
-                .setSeconds(transactionId.getValidStart().getEpochSecond())
-                .setNanos(transactionId.getValidStart().getNano())
-                .build();
+    
+        
+        TransactionID transactionID = TransactionID.newBuilder()
+                .setAccountID(AccountID.newBuilder()
+                        .setShardNum(transactionId.getAccountId().getShardNum())
+                        .setRealmNum(transactionId.getAccountId().getRealmNum())
+                        .setAccountNum(transactionId.getAccountId().getAccountNum())
+                        .build()
+                )
+                .setTransactionValidStart( Timestamp.newBuilder()
+                        .setSeconds(transactionId.getValidStart().getEpochSecond())
+                        .setNanos(transactionId.getValidStart().getNano())
+                        .build()
+                ).build();
          
         
         byte[] originalMessage = message.getBytes();
         
         MessageEnvelope messageEnvelope = MessageEnvelope
                 .newBuilder()
-                .setMessageEnvelopeId(completeMessageId)
+                .setMessageEnvelopeId(transactionID)
                 .setMessageEnvelope(ByteString.copyFrom(originalMessage))
                 .build();
         
@@ -147,7 +156,7 @@ public final class OutboundHCSMessage {
             );
             
             MessagePart messagePart = MessagePart.newBuilder()
-                    .setMessageEnvelopeId(completeMessageId)
+                    .setMessageEnvelopeId(transactionID)
                     .setPartId(partId)
                     .setPartsTotal(totalParts)
                     .setMessagePart(ByteString.copyFrom(meMessageChunk))

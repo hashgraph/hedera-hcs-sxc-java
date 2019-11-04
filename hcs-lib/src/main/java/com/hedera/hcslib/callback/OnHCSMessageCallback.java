@@ -1,16 +1,24 @@
 package com.hedera.hcslib.callback;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcslib.HCSLib;
 
 import com.hedera.hcslib.messages.HCSRelayMessage;
+import com.hedera.hcslib.proto.java.MessageEnvelope;
+import com.hedera.hcslib.proto.java.MessageId;
 import com.hedera.hcslib.proto.java.MessagePart;
+import com.hedera.hcslib.utils.ByteUtil;
 
 import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.jms.ConnectionFactory;
@@ -25,6 +33,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import org.apache.activemq.artemis.jms.client.ActiveMQObjectMessage;
 import org.apache.activemq.artemis.jms.client.ActiveMQTextMessage;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * 
@@ -33,12 +42,16 @@ import org.apache.activemq.artemis.jms.client.ActiveMQTextMessage;
  */
 @Log4j2
 public final class OnHCSMessageCallback {
+    
+    Map<MessageId, Set<MessagePart>> partialMessages = new HashMap<>();
+    
     public OnHCSMessageCallback (HCSLib hcsLib) {
       
+        
         String jmsAddress = hcsLib.getJmsAddress();
        
-        Runnable runnable =
-            () -> { 
+        Runnable runnable;
+        runnable = () -> { 
             InitialContext initialContext = null;
 
             javax.jms.Connection connection = null;
@@ -93,16 +106,45 @@ public final class OnHCSMessageCallback {
                             // notify subscribed observer from App.java
                             if (messageFromJMS instanceof ActiveMQTextMessage) {
                                 OnHCSMessageCallback.this.notifyObservers(((ActiveMQTextMessage)messageFromJMS).getText());
+                                messageFromJMS.acknowledge();
                             } else if (messageFromJMS instanceof ActiveMQObjectMessage) {
                                 
                                 HCSRelayMessage rlm = (HCSRelayMessage)((ActiveMQObjectMessage) messageFromJMS).getObject();
                                 
                                 MessagePart messagePart = MessagePart.parseFrom(rlm.getTopicMessagesResponse().getMessage());
                                 
+                                MessageId messageEnvelopeId = messagePart.getMessageEnvelopeId();
                                 
-                                OnHCSMessageCallback.this.notifyObservers("The object received from queue says: = "+  messagePart.getMessagePart().toStringUtf8());
+                                Set<MessagePart> set = partialMessages.get(messageEnvelopeId);
+                                if (set == null){
+                                    Set t = new TreeSet<>();
+                                    t.add(messagePart);
+                                    partialMessages.put(messageEnvelopeId,t);
+                                } else {
+                                    set.add(messagePart);
+                                    if (set.size() == messagePart.getPartsTotal()) {
+                                        
+                                        ByteString merged = set.stream().sorted( (p1,p2)-> 
+                                                Integer.compare(p1.getPartId(),  p2.getPartId())
+                                        )
+                                                .map(p -> p.getMessagePart())
+                                                .reduce((b1,b2)->ByteUtil.merge(b1,b2)).get();
+                                        
+                                        
+                                        MessageEnvelope messageEnvelope = MessageEnvelope.parseFrom(merged);
+                                     
+                                        OnHCSMessageCallback.this.notifyObservers("The object received from queue says: = "+  messageEnvelope.getMessageEnvelope().toStringUtf8());
+                                        messageFromJMS.acknowledge();
+                                        
+                                    }  else {
+                                        partialMessages.put(messageEnvelopeId, set);
+                                    }
+                                }
+                                
+                                
+                             
                             }
-                            messageFromJMS.acknowledge();
+                            
                         }catch (JMSException ex) {
                             log.error(ex);
                         } catch (InvalidProtocolBufferException ex) {
@@ -110,13 +152,13 @@ public final class OnHCSMessageCallback {
                         }
                     }
                 });
-
-               Object lock = new Object();
-               synchronized (lock) {
-                   lock.wait();
-               }
-
-
+                
+                Object lock = new Object();
+                synchronized (lock) {
+                    lock.wait();
+                }
+                
+                
                 //consumer.setMessageListener(
                 //        new AckMessageListener(true));
 

@@ -1,5 +1,6 @@
 package com.hedera.hcslib.utils;
 
+import com.google.protobuf.ByteString;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -18,5 +19,15 @@ public final class ByteUtil {
             log.debug("Failed to merge");
         }
         return outputStream.toByteArray( );
+    }
+    
+    public static ByteString merge(ByteString ... byteStrings){
+        byte[] a = null;
+       
+            for(ByteString s: byteStrings ){
+                merge(a,s.toByteArray());
+            }
+        
+        return ByteString.copyFrom(a);
     }
  }

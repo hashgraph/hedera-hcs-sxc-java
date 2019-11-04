@@ -1,7 +1,5 @@
 package com.hedera.hcsapp;
 
-import com.google.protobuf.ByteString;
-import com.google.protobuf.Message;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -10,8 +8,6 @@ import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hcslib.HCSLib;
 import com.hedera.hcslib.callback.OnHCSMessageCallback;
 import com.hedera.hcslib.consensus.OutboundHCSMessage;
-import com.hedera.hcslib.proto.java.MessageEnvelope;
-import com.hedera.hcslib.proto.java.MessagePart;
 import java.time.LocalDateTime;
 
 /**

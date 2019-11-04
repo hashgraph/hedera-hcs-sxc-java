@@ -6,8 +6,8 @@ import com.hedera.hcslib.HCSLib;
 
 import com.hedera.hcslib.messages.HCSRelayMessage;
 import com.hedera.hcslib.proto.java.MessageEnvelope;
-import com.hedera.hcslib.proto.java.MessageId;
 import com.hedera.hcslib.proto.java.MessagePart;
+import com.hedera.hcslib.proto.java.TransactionID;
 import com.hedera.hcslib.utils.ByteUtil;
 
 import lombok.extern.log4j.Log4j2;
@@ -45,7 +45,7 @@ import org.apache.commons.lang3.tuple.Pair;
 @Log4j2
 public final class OnHCSMessageCallback {
     
-    Map<MessageId, List<MessagePart>> partialMessages = new HashMap<>();
+    Map<TransactionID, List<MessagePart>> partialMessages = new HashMap<>();
     
     public OnHCSMessageCallback (HCSLib hcsLib) {
       
@@ -112,7 +112,7 @@ public final class OnHCSMessageCallback {
                             } else if (messageFromJMS instanceof ActiveMQObjectMessage) {
                                 HCSRelayMessage rlm = (HCSRelayMessage)((ActiveMQObjectMessage) messageFromJMS).getObject();
                                 MessagePart messagePart = MessagePart.parseFrom(rlm.getTopicMessagesResponse().getMessage());
-                                MessageId messageEnvelopeId = messagePart.getMessageEnvelopeId();
+                                TransactionID messageEnvelopeId = messagePart.getMessageEnvelopeId();
                                 //look up db to find parts received already
                                 List<MessagePart> partsList = partialMessages.get(messageEnvelopeId);
                                 // if first time seen

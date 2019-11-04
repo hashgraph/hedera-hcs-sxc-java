@@ -138,17 +138,17 @@ public final class OutboundHCSMessage {
         
         final int chunkSize = 3500; // the hcs tx limit is 4k - there are header bytes that will be added to that
         int totalParts = (int) Math.ceil((double)meByteArrayLength / chunkSize);
-        for(int i=0; i < meByteArrayLength; i += chunkSize){
+        for(int i=0 , partId = 1; i < meByteArrayLength; i += chunkSize, partId++){
         
             byte[] meMessageChunk = Arrays.copyOfRange(
-                    originalMessage,
+                    meByteArray,
                     i,
                     Math.min(meByteArrayLength, i + chunkSize)
             );
             
             MessagePart messagePart = MessagePart.newBuilder()
                     .setMessageEnvelopeId(completeMessageId)
-                    .setPartId(i)
+                    .setPartId(partId)
                     .setPartsTotal(totalParts)
                     .setMessagePart(ByteString.copyFrom(meMessageChunk))
                     .build();

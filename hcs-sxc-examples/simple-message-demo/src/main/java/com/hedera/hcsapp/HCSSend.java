@@ -87,7 +87,7 @@ public final class HCSSend {
 ////        
 ////        // More complex outbound message (app->lib->hedera example) with overrides
 ////        try {
-////            Boolean success = new com.hedera.hcslib.consensus.OutboundHCSMessage(hcsLib2)
+////            Boolean success = new com.hedera.hc slib.consensus.OutboundHCSMessage(hcsLib2)
 ////                .overrideEncryptedMessages(true)
 ////                .overrideKeyRotation(true, 10)
 ////                .overrideMessageSignature(false)

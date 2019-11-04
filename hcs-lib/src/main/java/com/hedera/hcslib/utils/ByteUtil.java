@@ -22,10 +22,10 @@ public final class ByteUtil {
     }
     
     public static ByteString merge(ByteString ... byteStrings){
-        byte[] a = null;
+        byte[] a = new byte[0];
        
             for(ByteString s: byteStrings ){
-                merge(a,s.toByteArray());
+                a = merge(a,s.toByteArray());
             }
         
         return ByteString.copyFrom(a);

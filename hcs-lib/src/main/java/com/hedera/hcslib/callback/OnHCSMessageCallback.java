@@ -113,11 +113,15 @@ public final class OnHCSMessageCallback {
                             } else if (messageFromJMS instanceof ActiveMQObjectMessage) {
                                 HCSRelayMessage rlm = (HCSRelayMessage)((ActiveMQObjectMessage) messageFromJMS).getObject();
                                 ByteString message = rlm.getTopicMessagesResponse().getMessage();
-                                Optional<MessageEnvelope> messageEnvelopeOptional = pushUntilCompleteMessage(message, partialMessages);
+                                MessagePart messagePart = MessagePart.parseFrom(message);
+                                
+                                Optional<MessageEnvelope> messageEnvelopeOptional = 
+                                        pushUntilCompleteMessage(messagePart, partialMessages);
                                 if (messageEnvelopeOptional.isPresent()){
                                     OnHCSMessageCallback.this.notifyObservers("The object received from queue is a sngle part and  says: = "+  messageEnvelopeOptional.get().getMessageEnvelope().toStringUtf8());
                                     messageFromJMS.acknowledge();
                                 }
+                            
                             }
                             
                         } catch (JMSException ex) {
@@ -180,8 +184,18 @@ public final class OnHCSMessageCallback {
         observers.forEach(listener -> listener.onMessage(message));
     }
     
-    public static  Optional<MessageEnvelope> pushUntilCompleteMessage(ByteString message, Map<TransactionID, List<MessagePart>>  partialMessages) throws JMSException, InvalidProtocolBufferException {
-            MessagePart messagePart = MessagePart.parseFrom(message);
+    /**
+     * Adds messageParts / chunks into memory {@param partialMessages}  and returns
+     * a fully combined / assembled MessageEnvleope if all parts are present
+     * @param messagePart a chunked message received from the queue
+     * @param partialMessages the memory. The map is side-effected with each 
+     * function invocation. 
+     * @return a fully combined / assembled MessageEnvleope if all parts present, 
+     * nothing otherwise.
+     * @throws InvalidProtocolBufferException 
+     */
+    public static  Optional<MessageEnvelope> pushUntilCompleteMessage(MessagePart messagePart, Map<TransactionID, List<MessagePart>>  partialMessages) throws InvalidProtocolBufferException {
+            
             TransactionID messageEnvelopeId = messagePart.getMessageEnvelopeId();
             //look up db to find parts received already
             List<MessagePart> partsList = partialMessages.get(messageEnvelopeId);
@@ -192,7 +206,7 @@ public final class OnHCSMessageCallback {
                     MessageEnvelope messageEnvelope = MessageEnvelope.parseFrom(messagePart.getMessagePart());
                     return  Optional.of( messageEnvelope);
 
-                } else { // it's the first of a multipart message
+                } else { // it's the first of a multipart message - order does not matter
                     List l = new ArrayList<>();
                     l.add(messagePart);
                     partialMessages.put(messageEnvelopeId,l);

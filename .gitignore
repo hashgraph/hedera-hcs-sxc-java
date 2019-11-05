@@ -44,3 +44,6 @@ hcs-lib/bin
 hcs-sxc-examples/simple-message-demo/.settings
 hcs-sxc-examples/simple-message-demo/.project
 hcs-sxc-examples/.settings
+/hcs-lib/nbproject/
+/hcs-lib/nb-configuration.xml
+nb-configuration.xml

@@ -46,7 +46,7 @@ import org.apache.commons.lang3.tuple.Pair;
 @Log4j2
 public final class OnHCSMessageCallback {
     
-    Map<TransactionID, List<MessagePart>> partialMessages = new HashMap<>();
+    
     
     public OnHCSMessageCallback (HCSLib hcsLib) {
       

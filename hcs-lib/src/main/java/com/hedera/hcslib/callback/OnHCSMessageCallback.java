@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -111,54 +112,22 @@ public final class OnHCSMessageCallback {
                                 messageFromJMS.acknowledge();
                             } else if (messageFromJMS instanceof ActiveMQObjectMessage) {
                                 HCSRelayMessage rlm = (HCSRelayMessage)((ActiveMQObjectMessage) messageFromJMS).getObject();
-                                MessagePart messagePart = MessagePart.parseFrom(rlm.getTopicMessagesResponse().getMessage());
-                                TransactionID messageEnvelopeId = messagePart.getMessageEnvelopeId();
-                                //look up db to find parts received already
-                                List<MessagePart> partsList = partialMessages.get(messageEnvelopeId);
-                                // if first time seen
-                                if (partsList == null){
-                                    // if it's a single part message return it to app
-                                    if(messagePart.getPartsTotal() == 1){
-                                        MessageEnvelope messageEnvelope = MessageEnvelope.parseFrom(messagePart.getMessagePart());
-                                        OnHCSMessageCallback.this.notifyObservers("The object received from queue is a sngle part and  says: = "+  messageEnvelope.getMessageEnvelope().toStringUtf8());
-                                        messageFromJMS.acknowledge();
-                                    } else { // it's the first of a multipart message
-                                         List l = new ArrayList<>();
-                                         l.add(messagePart);
-                                         partialMessages.put(messageEnvelopeId,l);
-                                    }
-                                    
-                                } else { // there are some parts received already
-                                    partsList.add(messagePart);
-                                    // if all parts received
-                                    if (partsList.size() == messagePart.getPartsTotal()) {
-                                        // sort by part id
-                                        partsList.sort(Comparator.comparingInt(MessagePart::getPartId));
-                                        // merge down
-                                        ByteString merged = 
-                                                partsList.stream()
-                                                .map(MessagePart::getMessagePart)
-                                                .reduce(ByteUtil::merge).get();
-                                        // construct envelope from merged array. TODO: if fail
-                                        MessageEnvelope messageEnvelope = MessageEnvelope.parseFrom(merged);
-                                        OnHCSMessageCallback.this.notifyObservers("The object received from queue says: = "+  messageEnvelope.getMessageEnvelope().toStringUtf8());
-                                        messageFromJMS.acknowledge();
-                                        partialMessages.remove(messageEnvelopeId);
-                                        
-                                    }  else { // not all parts received yet
-                                        partialMessages.put(messageEnvelopeId, partsList);
-                                    }
+                                ByteString message = rlm.getTopicMessagesResponse().getMessage();
+                                Optional<MessageEnvelope> messageEnvelopeOptional = pushUntilCompleteMessage(message, partialMessages);
+                                if (messageEnvelopeOptional.isPresent()){
+                                    OnHCSMessageCallback.this.notifyObservers("The object received from queue is a sngle part and  says: = "+  messageEnvelopeOptional.get().getMessageEnvelope().toStringUtf8());
+                                    messageFromJMS.acknowledge();
                                 }
-                             
                             }
                             
-                        }catch (JMSException ex) {
+                        } catch (JMSException ex) {
                             log.error(ex);
                         } catch (InvalidProtocolBufferException ex) {
                             Logger.getLogger(OnHCSMessageCallback.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
-                });
+
+                  });
                 
                 Object lock = new Object();
                 synchronized (lock) {
@@ -211,6 +180,47 @@ public final class OnHCSMessageCallback {
         observers.forEach(listener -> listener.onMessage(message));
     }
     
+    public static  Optional<MessageEnvelope> pushUntilCompleteMessage(ByteString message, Map<TransactionID, List<MessagePart>>  partialMessages) throws JMSException, InvalidProtocolBufferException {
+            MessagePart messagePart = MessagePart.parseFrom(message);
+            TransactionID messageEnvelopeId = messagePart.getMessageEnvelopeId();
+            //look up db to find parts received already
+            List<MessagePart> partsList = partialMessages.get(messageEnvelopeId);
+            // if first time seen
+            if (partsList == null){
+                // if it's a single part message return it to app
+                if(messagePart.getPartsTotal() == 1){
+                    MessageEnvelope messageEnvelope = MessageEnvelope.parseFrom(messagePart.getMessagePart());
+                    return  Optional.of( messageEnvelope);
+
+                } else { // it's the first of a multipart message
+                    List l = new ArrayList<>();
+                    l.add(messagePart);
+                    partialMessages.put(messageEnvelopeId,l);
+                }
+
+            } else { // there are some parts received already
+                partsList.add(messagePart);
+                // if all parts received
+                if (partsList.size() == messagePart.getPartsTotal()) {
+                    // sort by part id
+                    partsList.sort(Comparator.comparingInt(MessagePart::getPartId));
+                    // merge down
+                    ByteString merged =
+                            partsList.stream()
+                                    .map(MessagePart::getMessagePart)
+                                    .reduce(ByteUtil::merge).get();
+                    // construct envelope from merged array. TODO: if fail
+                    MessageEnvelope messageEnvelope = MessageEnvelope.parseFrom(merged);
+                    partialMessages.remove(messageEnvelopeId);
+                    return  Optional.of(messageEnvelope);
+                }  else { // not all parts received yet
+                    partialMessages.put(messageEnvelopeId, partsList);
+                }
+
+            }
+            return Optional.empty();
+        }
+      
   
 
 }

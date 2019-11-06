@@ -102,16 +102,41 @@ public final class OutboundHCSMessage {
             }
         }
 
-        // sends a message to HCS
+
+        // generate TXId for main and first message
+        TransactionId transactionId = new TransactionId(this.operatorAccountId);
+
+        //break up
+        List<MessagePart> parts = chunk(transactionId, message);
+        // send each part to the network
+        
         Client client = new Client(this.nodeMap);
         client.setOperator(
                 this.operatorAccountId,
                  this.ed25519PrivateKey
         );
         client.setMaxTransactionFee(100_000_000L);
+        
+        for (MessagePart messagePart : parts) {
+            TransactionReceipt receipt = new SubmitMessageTransaction(client)
+                .setMessage(messagePart.toByteArray())
+                .setTopicId(this.topicIds.get(topicIndex))
+                .setTransactionId(transactionId) 
+                .executeForReceipt();
+            log.info("status is {} "
+                    + "sequence no is {}"
+                    ,receipt.getStatus()
+                    ,receipt.getTopicSequenceNumber()
+            );
+        }
+        
+        return true;
+    }
 
-        // generate TXId for main and first message
-        TransactionId transactionId = new TransactionId(this.operatorAccountId);
+    public static  List<MessagePart> chunk(TransactionId transactionId,  String message) {
+        
+        
+        
 
         TransactionID transactionID = TransactionID.newBuilder()
                 .setAccountID(AccountID.newBuilder()
@@ -133,26 +158,10 @@ public final class OutboundHCSMessage {
                 .setMessageEnvelopeId(transactionID)
                 .setMessageEnvelope(ByteString.copyFrom(originalMessage))
                 .build();
-
-        //break up
-        List<MessagePart> parts = chunk(messageEnvelope);
-        // send each part to the network
-        for (MessagePart messagePart : parts) {
-            TransactionReceipt receipt = new SubmitMessageTransaction(client)
-                .setMessage(messagePart.toByteArray())
-                .setTopicId(this.topicIds.get(topicIndex))
-                .setTransactionId(transactionId)
-                .executeForReceipt();
-            log.info(receipt.getTopicSequenceNumber());
-        }
         
-        return true;
-    }
-
-    public static  List<MessagePart> chunk(MessageEnvelope messageEnvelope) {
         List<MessagePart> parts = new ArrayList<>();
         
-        TransactionID transactionID = messageEnvelope.getMessageEnvelopeId();
+        //TransactionID transactionID = messageEnvelope.getMessageEnvelopeId();
         byte[] meByteArray = messageEnvelope.toByteArray();
         final int meByteArrayLength = meByteArray.length;
         // break up byte array into 3500 bytes parts

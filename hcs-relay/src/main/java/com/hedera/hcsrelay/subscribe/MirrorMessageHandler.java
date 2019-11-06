@@ -20,6 +20,8 @@ public final class MirrorMessageHandler {
             log.info("  Consensus TimeStamp: " + messagesResponse.getConsensusTimestamp());
             log.info("  Running Hash: " + messagesResponse.getRunningHash());
             log.info("  Sequence: " + messagesResponse.getSequenceNumber());
+            //log.info("  Sequence: " + messagesResponse.;
+            
             log.info("  Message: "+ messagesResponse.getMessage().toStringUtf8());
             
             QueueTopicOperations.addMessage(config, messagesResponse, topicId);

@@ -9,11 +9,8 @@ import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages.MirrorGetTopicMes
 
 public interface LibMessagePersistence {
     void storeMessage(MessagePersistenceLevel level, MessageEnvelope.Builder messagesResponse);
-
-    public List<MessagePart> get(TransactionID messageEnvelopeId);
-
-    public void put(TransactionID messageEnvelopeId, List l);
-
-    public void remove(TransactionID messageEnvelopeId);
+    public List<MessagePart> getParts(TransactionID messageEnvelopeId);
+    public void putParts(TransactionID messageEnvelopeId, List<MessagePart> l);
+    public void removeParts(TransactionID messageEnvelopeId);
     
 }

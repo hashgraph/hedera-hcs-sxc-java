@@ -35,6 +35,7 @@ import javax.jms.TopicSubscriber;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import lombok.NoArgsConstructor;
 import org.apache.activemq.artemis.jms.client.ActiveMQObjectMessage;
 import org.apache.activemq.artemis.jms.client.ActiveMQTextMessage;
 import org.apache.commons.lang3.tuple.Pair;
@@ -49,8 +50,10 @@ public final class OnHCSMessageCallback {
     
     //TODO: Inject classloader code
     //LibMessagePersistence persistence;
-    //remove
-    JavaInMemoryPersistenceMoveMeOutOfLib persistence;
+    
+
+    //TODo remove and reintroduce with class scan + init
+    LibMessagePersistence persistence = new JavaInMemoryPersistenceMoveMeOutOfLib();
     
     
     public OnHCSMessageCallback (HCSLib hcsLib) {
@@ -123,7 +126,7 @@ public final class OnHCSMessageCallback {
                                 Optional<MessageEnvelope> messageEnvelopeOptional = 
                                         pushUntilCompleteMessage(messagePart, persistence);
                                 if (messageEnvelopeOptional.isPresent()){
-                                    OnHCSMessageCallback.this.notifyObservers("The object received from queue is a sngle part and  says: = "+  messageEnvelopeOptional.get().getMessageEnvelope().toStringUtf8());
+                                    OnHCSMessageCallback.this.notifyObservers("The object received queue is complete = "+  messageEnvelopeOptional.get().getMessageEnvelope().toStringUtf8());
                                     messageFromJMS.acknowledge();
                                 }
                             
@@ -203,7 +206,7 @@ public final class OnHCSMessageCallback {
             
             TransactionID messageEnvelopeId = messagePart.getMessageEnvelopeId();
             //look up db to find parts received already
-            List<MessagePart> partsList = persistence.get(messageEnvelopeId);
+            List<MessagePart> partsList = persistence.getParts(messageEnvelopeId);
             // if first time seen
             if (partsList == null){
                 // if it's a single part message return it to app
@@ -214,7 +217,7 @@ public final class OnHCSMessageCallback {
                 } else { // it's the first of a multipart message - order does not matter
                     List l = new ArrayList<>();
                     l.add(messagePart);
-                    persistence.put(messageEnvelopeId,l);
+                    persistence.putParts(messageEnvelopeId,l);
                 }
 
             } else { // there are some parts received already
@@ -230,10 +233,10 @@ public final class OnHCSMessageCallback {
                                     .reduce(ByteUtil::merge).get();
                     // construct envelope from merged array. TODO: if fail
                     MessageEnvelope messageEnvelope = MessageEnvelope.parseFrom(merged);
-                    persistence.remove(messageEnvelopeId);
+                    persistence.removeParts(messageEnvelopeId);
                     return  Optional.of(messageEnvelope);
                 }  else { // not all parts received yet
-                    persistence.put(messageEnvelopeId, partsList);
+                    persistence.putParts(messageEnvelopeId, partsList);
                 }
 
             }

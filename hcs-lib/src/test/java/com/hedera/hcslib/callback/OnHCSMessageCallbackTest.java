@@ -19,6 +19,7 @@ public class OnHCSMessageCallbackTest {
 
     @Test
     public void pushUntilCompleteMessageSinglePartMessage() {
+        fail();
         //OnHCSMessageCallback.pushUntilCompleteMessage(messagePart, partialMessages)
     }
     

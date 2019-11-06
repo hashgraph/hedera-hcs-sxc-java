@@ -12,7 +12,11 @@ import java.util.Map;
 public class JavaInMemoryPersistenceMoveMeOutOfLib 
         implements LibMessagePersistence{
 
-    Map<TransactionID, List<MessagePart>> partialMessages = new HashMap<>();
+    private Map<TransactionID, List<MessagePart>> partialMessages;
+    
+    public JavaInMemoryPersistenceMoveMeOutOfLib(){
+        partialMessages  = new HashMap<>();
+    }
     
    
     
@@ -22,17 +26,17 @@ public class JavaInMemoryPersistenceMoveMeOutOfLib
     }
 
     @Override
-    public List<MessagePart> get(TransactionID messageEnvelopeId) {
+    public List<MessagePart> getParts(TransactionID messageEnvelopeId) {
         return this.partialMessages.get(messageEnvelopeId);
     }
 
     @Override
-    public void put(TransactionID messageEnvelopeId, List l) {
+    public void putParts(TransactionID messageEnvelopeId, List l) {
         this.partialMessages.put(messageEnvelopeId, l);
     }
 
     @Override
-    public void remove(TransactionID messageEnvelopeId) {
+    public void removeParts(TransactionID messageEnvelopeId) {
         this.partialMessages.remove(messageEnvelopeId);
     }
     

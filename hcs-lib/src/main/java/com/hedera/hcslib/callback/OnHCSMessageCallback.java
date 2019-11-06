@@ -3,6 +3,7 @@ package com.hedera.hcslib.callback;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcslib.HCSLib;
+import com.hedera.hcslib.interfaces.LibMessagePersistence;
 
 import com.hedera.hcslib.messages.HCSRelayMessage;
 import com.hedera.hcslib.proto.java.MessageEnvelope;
@@ -46,6 +47,10 @@ import org.apache.commons.lang3.tuple.Pair;
 @Log4j2
 public final class OnHCSMessageCallback {
     
+    //TODO: Inject classloader code
+    //LibMessagePersistence persistence;
+    //remove
+    JavaInMemoryPersistenceMoveMeOutOfLib persistence;
     
     
     public OnHCSMessageCallback (HCSLib hcsLib) {
@@ -116,7 +121,7 @@ public final class OnHCSMessageCallback {
                                 MessagePart messagePart = MessagePart.parseFrom(message);
                                 
                                 Optional<MessageEnvelope> messageEnvelopeOptional = 
-                                        pushUntilCompleteMessage(messagePart, partialMessages);
+                                        pushUntilCompleteMessage(messagePart, persistence);
                                 if (messageEnvelopeOptional.isPresent()){
                                     OnHCSMessageCallback.this.notifyObservers("The object received from queue is a sngle part and  says: = "+  messageEnvelopeOptional.get().getMessageEnvelope().toStringUtf8());
                                     messageFromJMS.acknowledge();
@@ -188,17 +193,17 @@ public final class OnHCSMessageCallback {
      * Adds messageParts / chunks into memory {@param partialMessages}  and returns
      * a fully combined / assembled MessageEnvleope if all parts are present
      * @param messagePart a chunked message received from the queue
-     * @param partialMessages the memory. The map is side-effected with each 
+     * @param persistence the memory. The object is side-effected with each 
      * function invocation. 
      * @return a fully combined / assembled MessageEnvleope if all parts present, 
      * nothing otherwise.
      * @throws InvalidProtocolBufferException 
      */
-    public static  Optional<MessageEnvelope> pushUntilCompleteMessage(MessagePart messagePart, Map<TransactionID, List<MessagePart>>  partialMessages) throws InvalidProtocolBufferException {
+    public static  Optional<MessageEnvelope> pushUntilCompleteMessage(MessagePart messagePart, LibMessagePersistence persistence) throws InvalidProtocolBufferException {
             
             TransactionID messageEnvelopeId = messagePart.getMessageEnvelopeId();
             //look up db to find parts received already
-            List<MessagePart> partsList = partialMessages.get(messageEnvelopeId);
+            List<MessagePart> partsList = persistence.get(messageEnvelopeId);
             // if first time seen
             if (partsList == null){
                 // if it's a single part message return it to app
@@ -209,7 +214,7 @@ public final class OnHCSMessageCallback {
                 } else { // it's the first of a multipart message - order does not matter
                     List l = new ArrayList<>();
                     l.add(messagePart);
-                    partialMessages.put(messageEnvelopeId,l);
+                    persistence.put(messageEnvelopeId,l);
                 }
 
             } else { // there are some parts received already
@@ -225,10 +230,10 @@ public final class OnHCSMessageCallback {
                                     .reduce(ByteUtil::merge).get();
                     // construct envelope from merged array. TODO: if fail
                     MessageEnvelope messageEnvelope = MessageEnvelope.parseFrom(merged);
-                    partialMessages.remove(messageEnvelopeId);
+                    persistence.remove(messageEnvelopeId);
                     return  Optional.of(messageEnvelope);
                 }  else { // not all parts received yet
-                    partialMessages.put(messageEnvelopeId, partsList);
+                    persistence.put(messageEnvelopeId, partsList);
                 }
 
             }

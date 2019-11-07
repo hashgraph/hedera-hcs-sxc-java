@@ -61,6 +61,8 @@
         <protobuf-java.version>3.7.1</protobuf-java.version>
         <lombok.version>1.18.10</lombok.version>
         <log4j.version>2.12.1</log4j.version>
+        <surefire.version>2.22.0</surefire.version>
+        <failsafe.version>2.22.0</failsafe.version>
     </properties>
 
     <dependencies>
@@ -101,6 +103,7 @@
           <artifactId>jackson-databind</artifactId>
           <version>${jackson-databind.version}</version>
       </dependency>
+      
       <dependency>
           <groupId>org.apache.commons</groupId>
           <artifactId>commons-lang3</artifactId>
@@ -143,11 +146,7 @@
             <artifactId>snakeyaml</artifactId>
             <version>${snakeyaml.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.hedera.hashgraph</groupId>
-            <artifactId>sdk</artifactId>
-            <version>${hedera-sdk.version}</version>
-        </dependency>
+
     </dependencies>
   <build>
     <resources>
@@ -211,7 +210,17 @@
               <processStartTag>‌</processStartTag>
               <sectionDelimiter>​</sectionDelimiter>
           </configuration>
-      </plugin>
+        </plugin>
+       <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>${surefire.version}</version>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>${failsafe.version}</version>
+        </plugin>
     </plugins>
   </build>
     <modules>

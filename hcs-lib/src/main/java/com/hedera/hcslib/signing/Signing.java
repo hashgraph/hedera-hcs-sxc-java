@@ -29,7 +29,7 @@ public class Signing {
         try {
             Signature publicSignature = Signature.getInstance("SHA256withRSA");
             publicSignature.initVerify(publicKey);
-            publicSignature.update(plainText.getBytes(StandardCharsets.ISO_8859_1));
+            publicSignature.update(plainText.getBytes(StandardCharsets.UTF_8));
             b = publicSignature.verify(signature);
         } catch (InvalidKeyException | SignatureException | NoSuchAlgorithmException ex) {
             log.error(ex);

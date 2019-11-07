@@ -16,11 +16,11 @@ public class StringUtils {
     
 
     public static String byteArrayToString(byte[] byteArray){
-        return new String(byteArray, StandardCharsets.ISO_8859_1);
+        return new String(byteArray, StandardCharsets.UTF_8);
     }
     
     public static  byte[] stringToByteArray(String s){
-       return s.getBytes(StandardCharsets.ISO_8859_1);
+       return s.getBytes(StandardCharsets.UTF_8);
     }
      
     public static String byteArrayToPrintableArrayString(byte[] byteArray){

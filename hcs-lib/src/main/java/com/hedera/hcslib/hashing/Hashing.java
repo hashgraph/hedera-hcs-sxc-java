@@ -15,7 +15,7 @@ public class Hashing {
        try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             encodedhash = digest.digest(
-                    plaintext.getBytes(StandardCharsets.ISO_8859_1));
+                    plaintext.getBytes(StandardCharsets.UTF_8));
             return encodedhash;
         } catch (NoSuchAlgorithmException ex) {
             log.error(ex);

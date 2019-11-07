@@ -21,12 +21,12 @@ public final class Config {
         InputStream inputStream = this.getClass()
                 .getClassLoader()
                 .getResourceAsStream("config.yaml");
-
+        
         File configFile = new File("./config.yaml");
         if (configFile.exists()) {
             // config file exists outside of jar, use it
             inputStream = new FileInputStream(configFile.getCanonicalPath());
-        }
+        } 
         yamlConfig = yaml.load(inputStream);
     }
     public YAMLConfig getConfig() {

@@ -22,11 +22,9 @@ public class ConfigTest extends AbstractConfigTest {
                 ,() -> assertTopicId(0, 0, 10, yamlConfig.getTopicIds().get(0))
                 ,() -> assertTopicId(0, 0, 11, yamlConfig.getTopicIds().get(1))
 
-                ,() -> assertEquals("initialContextFactory", queue.getInitialContextFactory())
-                ,() -> assertEquals("topic", queue.getTopic())
-                ,() -> assertEquals("vmConnectionFactory", queue.getVmConnectionFactory())
-                ,() -> assertEquals("tcpConnectionFactory", queue.getTcpConnectionFactory())
-                ,() -> assertEquals("JGroupsConnectionFactory", queue.getJGroupsConnectionFactory())
+                ,() -> assertEquals("org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory", queue.getInitialContextFactory()) 
+
+                ,() -> assertEquals("tcp://hcsqueue:61616", queue.getTcpConnectionFactory())
              );
     }
 }

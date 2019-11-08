@@ -53,7 +53,7 @@ public final class OnHCSMessageCallback {
     
 
     //TODo remove and reintroduce with class scan + init
-    LibMessagePersistence persistence = new JavaInMemoryPersistenceMoveMeOutOfLib();
+    LibMessagePersistence persistence;// = new PersistMessages();
     
     
     public OnHCSMessageCallback (HCSLib hcsLib) {

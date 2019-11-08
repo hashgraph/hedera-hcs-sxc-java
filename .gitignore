@@ -44,6 +44,11 @@ hcs-lib/bin
 hcs-sxc-examples/simple-message-demo/.settings
 hcs-sxc-examples/simple-message-demo/.project
 hcs-sxc-examples/.settings
+hcs-sxc-plugins/.settings/org.eclipse.core.resources.prefs
 /hcs-lib/nbproject/
 /hcs-lib/nb-configuration.xml
 nb-configuration.xml
+org.eclipse.jdt.core.prefs
+.settings
+/hcs-sxc-proto/.settings
+/hcs-sxc-plugins/lib-persistence-in-memory/.settings

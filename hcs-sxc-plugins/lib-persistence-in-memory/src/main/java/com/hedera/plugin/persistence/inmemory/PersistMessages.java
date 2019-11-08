@@ -1,4 +1,4 @@
-package com.hedera.hcslib.callback;
+package com.hedera.plugin.persistence.inmemory;
 
 import com.hedera.hcslib.interfaces.LibMessagePersistence;
 import com.hedera.hcslib.interfaces.MessagePersistenceLevel;
@@ -9,12 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class JavaInMemoryPersistenceMoveMeOutOfLib 
+public class PersistMessages 
         implements LibMessagePersistence{
 
     private Map<TransactionID, List<MessagePart>> partialMessages;
     
-    public JavaInMemoryPersistenceMoveMeOutOfLib(){
+    public PersistMessages(){
         partialMessages  = new HashMap<>();
     }
     

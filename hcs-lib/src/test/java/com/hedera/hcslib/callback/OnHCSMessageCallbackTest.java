@@ -29,7 +29,7 @@ public class OnHCSMessageCallbackTest {
         //Optional<Module> findModule = ModuleLayer.boot().findModule("abcde");
         //findModule.get().getResourceAsStream("xyz");
         txId = new TransactionId(new AccountId(1234L));
-        persistence = new PersistMessages(); // TODO use classloader;
+        persistence = new PersistMessages(); 
     }
     
     @Test

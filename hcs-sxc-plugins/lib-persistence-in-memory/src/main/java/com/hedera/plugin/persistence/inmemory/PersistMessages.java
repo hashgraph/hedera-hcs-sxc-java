@@ -18,8 +18,6 @@ public class PersistMessages
         partialMessages  = new HashMap<>();
     }
     
-   
-    
     @Override
     public void storeMessage(MessagePersistenceLevel level, MessageEnvelope.Builder messagesResponse) {
     

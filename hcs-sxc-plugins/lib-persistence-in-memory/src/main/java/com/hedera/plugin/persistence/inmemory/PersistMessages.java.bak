@@ -1,0 +1,79 @@
+package com.hedera.plugin.persistence.inmemory;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.hedera.hashgraph.sdk.proto.Timestamp;
+import com.hedera.hcslib.interfaces.LibMessagePersistence;
+import com.hedera.hcslib.interfaces.MessagePersistenceLevel;
+import com.hedera.hcslib.proto.java.MessageId;
+import com.hedera.hcslib.proto.java.MessagePart;
+import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages.MirrorGetTopicMessagesResponse;
+import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages.MirrorGetTopicMessagesResponse.Builder;
+
+public final class PersistMessages implements LibMessagePersistence {
+
+    private static Map<Long, MirrorGetTopicMessagesResponse.Builder> fullMessages = new HashMap<Long, MirrorGetTopicMessagesResponse.Builder>();
+    private static Long SCALAR = 1_000_000_000L;
+    @Override
+    public void storeMessage(MessagePersistenceLevel level, MirrorGetTopicMessagesResponse.Builder messagesResponse) {
+        boolean logMessage = true;
+        
+//      log.info("Persist Message - logging level is " + level.toString());
+
+      switch (level) {
+          case NONE:
+              logMessage = false;
+              break;
+          case FULL:
+//              log.info("Timestamp : " + messagesResponse.getConsensusTimestamp());
+//              log.info("Message : " + messagesResponse.getMessage().toStringUtf8());
+//              log.info("Running Hash : " + messagesResponse.getRunningHash().toStringUtf8());
+//              log.info("Sequence : " + messagesResponse.getSequenceNumber());
+          case MESSAGE_AND_PARTS:
+//              log.info("Timestamp : " + messagesResponse.getConsensusTimestamp());
+//              log.info("Message : " + messagesResponse.getMessage().toStringUtf8());
+//              log.info("Running Hash : " + messagesResponse.getRunningHash().toStringUtf8());
+//              log.info("Sequence : " + messagesResponse.getSequenceNumber());
+          case MESSAGE_ONLY:
+//              log.info("Message : " + messagesResponse.getMessage().toStringUtf8());
+      }
+      if (logMessage) {
+          // keep this in memory
+          fullMessages.put(timeStampToNanos(messagesResponse.getConsensusTimestamp()), messagesResponse);
+          System.out.println(":Logging " + messagesResponse.getMessage().toStringUtf8());
+      } else {
+//          log.info("Not logging - logging level is NONE");
+      }
+        
+    }
+
+    @Override
+    public Builder getMessage(long consensusSeconds, long consensusNanos) {
+        // TODO Auto-generated method stub
+        return fullMessages.get(secondsAndNanosToNanos(consensusSeconds, consensusNanos));
+    }
+    @Override
+    public void storeMessagePart(MessagePart messagePart) {
+        // TODO Auto-generated method stub
+        System.out.println("StoreMessagePart");
+    }
+    @Override
+    public List<MessagePart> getMessageParts(MessageId completeMessageId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    public void test(String test) {
+        System.out.println(test);
+    }
+
+    private long timeStampToNanos(Timestamp timestamp) {
+        return timestamp.getSeconds() * SCALAR + timestamp.getNanos();
+    }
+    private long secondsAndNanosToNanos(Long seconds, long nanos) {
+        return seconds * SCALAR + nanos;
+    }
+
+}

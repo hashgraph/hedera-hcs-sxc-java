@@ -10,6 +10,10 @@ import com.hedera.hcslib.proto.java.MessageEnvelope;
 import com.hedera.hcslib.proto.java.MessagePart;
 import com.hedera.hcslib.proto.java.TransactionID;
 import com.hedera.hcslib.utils.ByteUtil;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfo;
+import io.github.classgraph.ClassInfoList;
+import io.github.classgraph.ScanResult;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -48,25 +52,25 @@ import org.apache.commons.lang3.tuple.Pair;
 @Log4j2
 public final class OnHCSMessageCallback {
     
-    //TODO: Inject classloader code
-    //LibMessagePersistence persistence;
-    
-
-    //TODo remove and reintroduce with class scan + init
-    LibMessagePersistence persistence = new JavaInMemoryPersistenceMoveMeOutOfLib();
+ 
+    LibMessagePersistence persistence;
     
     
-    public OnHCSMessageCallback (HCSLib hcsLib) {
-      
+    public OnHCSMessageCallback (HCSLib hcsLib) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        // load persistence implementation at runtime
+        try (ScanResult result = new ClassGraph().enableAllInfo()
+                .whitelistPackages("com.hedera.plugin.persistence.inmemory")
+                .scan()) {
+            ClassInfoList list = result.getAllClasses();
+            persistence = (LibMessagePersistence)list.get(0).loadClass().newInstance();
+        }
+        
         
         String jmsAddress = hcsLib.getJmsAddress();
-       
         Runnable runnable;
         runnable = () -> { 
             InitialContext initialContext = null;
-
             javax.jms.Connection connection = null;
-
             try {
                 System.out.println("Starting hcs topic listener in hcs-lib");
                 Hashtable<String, Object> props = new Hashtable<>();
@@ -129,7 +133,6 @@ public final class OnHCSMessageCallback {
                                     OnHCSMessageCallback.this.notifyObservers("The object received queue is complete = "+  messageEnvelopeOptional.get().getMessageEnvelope().toStringUtf8());
                                     messageFromJMS.acknowledge();
                                 }
-                            
                             }
                             
                         } catch (JMSException ex) {
@@ -242,7 +245,4 @@ public final class OnHCSMessageCallback {
             }
             return Optional.empty();
         }
-      
-  
-
 }

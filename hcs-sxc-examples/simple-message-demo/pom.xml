@@ -18,12 +18,18 @@
     <name>simple-message-demo</name>
 
     <dependencies>
-            <dependency>
+        <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-lib</artifactId>
             <version>${hcslib.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.hedera</groupId>
+            <artifactId>lib-persistence-in-memory</artifactId>
+            <version>${hcslib.version}</version>
+        </dependency>
     </dependencies>
+    
 
     <build>
         <plugins>

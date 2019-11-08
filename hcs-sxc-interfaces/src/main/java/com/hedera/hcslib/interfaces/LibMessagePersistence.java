@@ -1,5 +1,6 @@
 package com.hedera.hcslib.interfaces;
 
+import com.hedera.hcslib.interfaces.MessagePersistenceLevel;
 import com.hedera.hcslib.proto.java.MessageEnvelope;
 import java.util.List;
 

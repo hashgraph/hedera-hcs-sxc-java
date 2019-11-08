@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
-    <artifactId>hcs-sxc</artifactId>
     <groupId>com.hedera</groupId>
+    <artifactId>hcs-sxc</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>hcs-lib-interfaces</artifactId>
+  <artifactId>hcs-sxc-plugins</artifactId>
+  <packaging>pom</packaging>
 
-  <name>hcs-lib-interfaces</name>
-  <description>HCS Library Interfaces</description>
+  <name>hcs-sxc-plugins</name>
+  <description>Plugins for the HCS SXC Library</description>
 
-</project>
+  <modules>
+    <module>lib-persistence-in-memory</module>
+  </modules>
+    
+ </project>

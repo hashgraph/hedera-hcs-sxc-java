@@ -1,6 +1,3 @@
-/*
- *  Copyirght hash-hash.info
- */
 package com.hedera.hcsrelay.subscribe;
 
 import com.hedera.hashgraph.sdk.consensus.TopicId;
@@ -53,7 +50,7 @@ public class QueueTopicOperations {
             
             Hashtable<String, Object> props = new Hashtable<>();
             props.put(Context.INITIAL_CONTEXT_FACTORY, queueConfig.getInitialContextFactory());
-            props.put("topic.topic/hcsTopic",  "hcsCatchAllTopics");
+            props.put("topic.topic/hcsTopic",  queueConfig.getTopic());
             
             props.put("connectionFactory.TCPConnectionFactory", queueConfig.getTcpConnectionFactory());
             InitialContext ctx = new InitialContext(props);
@@ -77,7 +74,7 @@ public class QueueTopicOperations {
                     connection = cf.createConnection();
                     scanning = false;
                 } catch (Exception ie) {
-                    String tcpConnectionFactory = config.getConfig().getQueue().getTcpConnectionFactory();
+                    String tcpConnectionFactory = queueConfig.getTcpConnectionFactory();
                     log.info("Is Artemis up? Setup your host file so that the host identified in'"+tcpConnectionFactory+"' points to 127.0.0.1 if running outside of docker");
                     Thread.sleep(6000);
                 }
@@ -105,7 +102,7 @@ public class QueueTopicOperations {
             // Step 11. Send the text message to the topic
             messageProducer.send(message1);
 
-            log.info("Sent test queue message: " + message1.getText() + " from producer  hcsCatchAllTopics" );
+            log.info("Sent test queue message: " + message1.getText() + " from producer hcsCatchAllTopics" );
 
             // Step 12. Consume the message from the durable subscription
             TextMessage messageReceived = (TextMessage) subscriber.receive();
@@ -141,7 +138,7 @@ public class QueueTopicOperations {
             Queue queueConfig = config.getConfig().getQueue();
             Hashtable<String, Object> props = new Hashtable<>();
             props.put(Context.INITIAL_CONTEXT_FACTORY, queueConfig.getInitialContextFactory());
-            props.put("topic.topic/hcsTopic",  "hcsCatchAllTopics");
+            props.put("topic.topic/hcsTopic",  queueConfig.getTopic());
             props.put("connectionFactory.TCPConnectionFactory", queueConfig.getTcpConnectionFactory());
             InitialContext ctx = new InitialContext(props);
             ctx.lookup("TCPConnectionFactory");
@@ -195,11 +192,9 @@ public class QueueTopicOperations {
                             .build()
             );
             ObjectMessage objectMessage = session.createObjectMessage(relayMessage);
-            
            
             // Step 11. Send the text message to the topic
             messageProducer.send(objectMessage);
-
         
             r = true;
             
@@ -213,11 +208,5 @@ public class QueueTopicOperations {
                 initialContext.close();
             }
         }
-    
-    
-    
     }
-   
-    
-    
 }

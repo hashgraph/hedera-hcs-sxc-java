@@ -8,6 +8,8 @@ appNet:
 queue:
   - tcpConnectionFactory: "tcp://hcsqueue:61616"
 
+HCSTransactionFee: 100000000
+
 nodes:
   - address: 35.222.103.151:50211
     account: 0.0.3

@@ -21,6 +21,7 @@ public class ConfigTest extends AbstractConfigTest {
     private static AppNet appNet;
     private static List<Node> nodeList;
     private static Map<AccountId, String> nodeMap;
+    private static long hcsTransactionFee;
 
     @BeforeEach
     public void init() throws FileNotFoundException, IOException {
@@ -29,6 +30,7 @@ public class ConfigTest extends AbstractConfigTest {
         appNet = yamlConfig.getAppNet();
         nodeList = yamlConfig.getNodes();
         nodeMap = yamlConfig.getNodesMap();
+        hcsTransactionFee = yamlConfig.getHCSTransactionFee();
     }
 
     @Test
@@ -50,7 +52,8 @@ public class ConfigTest extends AbstractConfigTest {
                  () -> assertEquals("0.0.4", nodeList.get(1).getAccount()),
                  () -> assertEquals(2, nodeMap.size()),
                  () -> assertEquals("0.testnet.hedera.com:50211", nodeMap.get(AccountId.fromString("0.0.3"))),
-                 () -> assertEquals("1.testnet.hedera.com:50211", nodeMap.get(AccountId.fromString("0.0.4")))
+                 () -> assertEquals("1.testnet.hedera.com:50211", nodeMap.get(AccountId.fromString("0.0.4"))),
+                 () -> assertEquals(100000000, hcsTransactionFee)
         );
     }
 }

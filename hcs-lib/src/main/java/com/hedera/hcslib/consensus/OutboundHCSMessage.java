@@ -16,6 +16,7 @@ import com.hedera.hashgraph.sdk.consensus.SubmitMessageTransaction;
 import com.hedera.hashgraph.sdk.consensus.TopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcslib.HCSLib;
+import com.hedera.hcslib.config.Config;
 import com.hedera.hcslib.proto.java.AccountID;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
 import com.hedera.hcslib.proto.java.ApplicationMessageChunk;
@@ -36,6 +37,7 @@ public final class OutboundHCSMessage {
     private AccountId operatorAccountId = new AccountId(0, 0, 0);
     private Ed25519PrivateKey ed25519PrivateKey;
     private List<TopicId> topicIds = new ArrayList<TopicId>();
+    private long hcsTransactionFee = 0L;
 
     public OutboundHCSMessage(HCSLib hcsLib) {
         this.signMessages = hcsLib.getSignMessages();
@@ -45,6 +47,7 @@ public final class OutboundHCSMessage {
         this.operatorAccountId = hcsLib.getOperatorAccountId();
         this.ed25519PrivateKey = hcsLib.getEd25519PrivateKey();
         this.topicIds = hcsLib.getTopicIds();
+        this.hcsTransactionFee = hcsLib.getHCSTransactionFee();
     }
 
     public OutboundHCSMessage overrideMessageSignature(boolean signMessages) {
@@ -114,8 +117,8 @@ public final class OutboundHCSMessage {
                 this.operatorAccountId,
                  this.ed25519PrivateKey
         );
-        //TODO: Make this configurable
-        client.setMaxTransactionFee(100_000_000L);
+
+        client.setMaxTransactionFee(this.hcsTransactionFee);
         
         for (ApplicationMessageChunk messageChunk : parts) {
             TransactionReceipt receipt = new SubmitMessageTransaction(client)

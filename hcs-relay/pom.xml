@@ -17,45 +17,53 @@
     <description>HCS Relay</description>
 
     <dependencies>
-            <dependency>
+        <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-lib</artifactId>
             <version>${hcslib.version}</version>
         </dependency>
     </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>com.google.cloud.tools</groupId>
-                <artifactId>jib-maven-plugin</artifactId>
-                <version>${jib.version}</version>
-                <configuration>
-                    <from>
-                        <image>gcr.io/distroless/java:11</image>
-                    </from>
-                    <to>
-                        <image>hederahashgraph/hcs-relay</image>
-                        <tags>
-                            <tag>${project.version}</tag>
-                        </tags>
-                    </to>
-                    <extraDirectories>
-                        <paths>
-                            <path>src/main/resources</path>
-                        </paths>
-                    </extraDirectories>
-                    <mainClass>com.hedera.hcsrelay.Launch</mainClass>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>dockerBuild</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
+    <profiles>
+        <!-- profile which adds the possibility to build docker images Call 
+            "mvn clean install -Pdocker" to invoke this additional plugin in the maven 
+            build -->
+        <profile>
+            <id>docker</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <version>${jib.version}</version>
+                        <configuration>
+                            <from>
+                                <image>gcr.io/distroless/java:11</image>
+                            </from>
+                            <to>
+                                <image>hederahashgraph/hcs-relay:latest</image>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                </tags>
+                            </to>
+                            <extraDirectories>
+                                <paths>
+                                    <path>src/main/resources</path>
+                                </paths>
+                            </extraDirectories>
+                            <mainClass>com.hedera.hcsrelay.Launch</mainClass>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>dockerBuild</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    
 </project>

@@ -26,7 +26,7 @@ services:
     hcs-relay:
         depends_on:
             - hcsqueue
-        image: hederahashgraph/hcs-relay
+        image: hederahashgraph/hcs-relay:latest
         restart: on-failure
         networks: [backing-services]
 

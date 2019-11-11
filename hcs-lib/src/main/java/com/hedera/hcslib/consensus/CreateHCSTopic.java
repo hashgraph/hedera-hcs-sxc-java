@@ -1,5 +1,7 @@
 package com.hedera.hcslib.consensus;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +14,7 @@ import com.hedera.hashgraph.sdk.consensus.CreateTopicTransaction;
 import com.hedera.hashgraph.sdk.consensus.TopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcslib.HCSLib;
+import com.hedera.hcslib.config.Config;
 
 public final class CreateHCSTopic {
     private Map<AccountId, String> nodeMap = new HashMap<AccountId, String>();
@@ -43,15 +46,18 @@ public final class CreateHCSTopic {
      * @throws HederaNetworkException
      * @throws IllegalArgumentException
      * @throws HederaException
+     * @throws IOException 
+     * @throws FileNotFoundException 
      */
-    public TopicId execute() throws HederaNetworkException, IllegalArgumentException, HederaException {
+    public TopicId execute() throws HederaNetworkException, IllegalArgumentException, HederaException, FileNotFoundException, IOException {
 
+        Config config = new Config();
         Client client = new Client(this.nodeMap);
         client.setOperator(
             this.operatorAccountId
             ,this.ed25519PrivateKey
         );
-        client.setMaxTransactionFee(100_000_000L);
+        client.setMaxTransactionFee(config.getConfig().getHCSTransactionFee());
 
         TransactionReceipt receipt = new CreateTopicTransaction(client)
                 .executeForReceipt();

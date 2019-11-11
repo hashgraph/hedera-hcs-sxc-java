@@ -22,6 +22,7 @@ public class ConfigTest extends AbstractConfigTest {
     private static List<Node> nodeList;
     private static Map<AccountId, String> nodeMap;
     private static long hcsTransactionFee;
+    private static Queue queue;
 
     @BeforeEach
     public void init() throws FileNotFoundException, IOException {
@@ -31,6 +32,7 @@ public class ConfigTest extends AbstractConfigTest {
         nodeList = yamlConfig.getNodes();
         nodeMap = yamlConfig.getNodesMap();
         hcsTransactionFee = yamlConfig.getHCSTransactionFee();
+        queue = yamlConfig.getQueue();
     }
 
     @Test
@@ -53,7 +55,12 @@ public class ConfigTest extends AbstractConfigTest {
                  () -> assertEquals(2, nodeMap.size()),
                  () -> assertEquals("0.testnet.hedera.com:50211", nodeMap.get(AccountId.fromString("0.0.3"))),
                  () -> assertEquals("1.testnet.hedera.com:50211", nodeMap.get(AccountId.fromString("0.0.4"))),
-                 () -> assertEquals(100000000, hcsTransactionFee)
+                 () -> assertEquals(100000000, hcsTransactionFee),
+                 () -> assertEquals("tcpConnectionFactory", queue.getTcpConnectionFactory()),
+                 () -> assertEquals("initialContextFactory", queue.getInitialContextFactory()),
+                 () -> assertEquals("topic", queue.getTopic()),
+                 () -> assertEquals("vmConnectionFactory", queue.getVmConnectionFactory()),
+                 () -> assertEquals("JGroupsConnectionFactory", queue.getJGroupsConnectionFactory())
         );
     }
 }

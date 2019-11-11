@@ -17,8 +17,8 @@ import com.hedera.hashgraph.sdk.consensus.TopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcslib.HCSLib;
 import com.hedera.hcslib.proto.java.AccountID;
-import com.hedera.hcslib.proto.java.MessageEnvelope;
-import com.hedera.hcslib.proto.java.MessagePart;
+import com.hedera.hcslib.proto.java.ApplicationMessage;
+import com.hedera.hcslib.proto.java.ApplicationMessageChunk;
 import com.hedera.hcslib.proto.java.Timestamp;
 import com.hedera.hcslib.proto.java.TransactionID;
 import java.util.Arrays;
@@ -102,12 +102,11 @@ public final class OutboundHCSMessage {
             }
         }
 
-
         // generate TXId for main and first message
         TransactionId transactionId = new TransactionId(this.operatorAccountId);
 
         //break up
-        List<MessagePart> parts = chunk(transactionId, message);
+        List<ApplicationMessageChunk> parts = chunk(transactionId, message);
         // send each part to the network
         
         Client client = new Client(this.nodeMap);
@@ -115,11 +114,12 @@ public final class OutboundHCSMessage {
                 this.operatorAccountId,
                  this.ed25519PrivateKey
         );
+        //TODO: Make this configurable
         client.setMaxTransactionFee(100_000_000L);
         
-        for (MessagePart messagePart : parts) {
+        for (ApplicationMessageChunk messageChunk : parts) {
             TransactionReceipt receipt = new SubmitMessageTransaction(client)
-                .setMessage(messagePart.toByteArray())
+                .setMessage(messageChunk.toByteArray())
                 .setTopicId(this.topicIds.get(topicIndex))
                 .setTransactionId(transactionId) 
                 .executeForReceipt();
@@ -133,10 +133,7 @@ public final class OutboundHCSMessage {
         return true;
     }
 
-    public static  List<MessagePart> chunk(TransactionId transactionId,  String message) {
-        
-        
-        
+    public static  List<ApplicationMessageChunk> chunk(TransactionId transactionId,  String message) {
 
         TransactionID transactionID = TransactionID.newBuilder()
                 .setAccountID(AccountID.newBuilder()
@@ -153,37 +150,37 @@ public final class OutboundHCSMessage {
 
         byte[] originalMessage = message.getBytes();
 
-        MessageEnvelope messageEnvelope = MessageEnvelope
+        ApplicationMessage applicationMessage = ApplicationMessage
                 .newBuilder()
-                .setMessageEnvelopeId(transactionID)
-                .setMessageEnvelope(ByteString.copyFrom(originalMessage))
+                .setApplicationMessageId(transactionID)
+                .setBusinessProcessMessage(ByteString.copyFrom(originalMessage))
                 .build();
         
-        List<MessagePart> parts = new ArrayList<>();
+        List<ApplicationMessageChunk> parts = new ArrayList<>();
         
         //TransactionID transactionID = messageEnvelope.getMessageEnvelopeId();
-        byte[] meByteArray = messageEnvelope.toByteArray();
-        final int meByteArrayLength = meByteArray.length;
+        byte[] amByteArray = applicationMessage.toByteArray();
+        final int amByteArrayLength = amByteArray.length;
         // break up byte array into 3500 bytes parts
         final int chunkSize = 3500; // the hcs tx limit is 4k - there are header bytes that will be added to that
-        int totalParts = (int) Math.ceil((double) meByteArrayLength / chunkSize);
+        int totalParts = (int) Math.ceil((double) amByteArrayLength / chunkSize);
         // chunk and send to network
-        for (int i = 0, partId = 1; i < meByteArrayLength; i += chunkSize, partId++) {
+        for (int i = 0, partId = 1; i < amByteArrayLength; i += chunkSize, partId++) {
             
-            byte[] meMessageChunk = Arrays.copyOfRange(
-                    meByteArray,
+            byte[] amMessageChunk = Arrays.copyOfRange(
+                    amByteArray,
                     i,
-                    Math.min(meByteArrayLength, i + chunkSize)
+                    Math.min(amByteArrayLength, i + chunkSize)
             );
 
-            MessagePart messagePart = MessagePart.newBuilder()
-                    .setMessageEnvelopeId(transactionID)
-                    .setPartId(partId)
-                    .setPartsTotal(totalParts)
-                    .setMessagePart(ByteString.copyFrom(meMessageChunk))
+            ApplicationMessageChunk applicationMessageChunk = ApplicationMessageChunk.newBuilder()
+                    .setApplicationMessageId(transactionID)
+                    .setChunkIndex(partId)
+                    .setChunksCount(totalParts)
+                    .setMessageChunk(ByteString.copyFrom(amMessageChunk))
                     .build();
             
-            parts.add(messagePart);
+            parts.add(applicationMessageChunk);
         }
         return parts;
     }

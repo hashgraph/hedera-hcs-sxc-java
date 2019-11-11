@@ -11,7 +11,6 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.hedera</groupId>
     <artifactId>simple-message-demo</artifactId>
     <packaging>jar</packaging>
 
@@ -31,9 +30,9 @@
     </dependencies>
 
     <profiles>
-        <!-- profile which adds the possibility to build docker images 
-            Call "mvn clean install -Pdocker" to invoke this additional plugin in the maven build 
-        -->
+        <!-- profile which adds the possibility to build docker images Call 
+            "mvn clean install -Pdocker" to invoke this additional plugin in the maven 
+            build -->
         <profile>
             <id>docker</id>
             <build>
@@ -69,5 +68,4 @@
             </build>
         </profile>
     </profiles>
-
 </project>

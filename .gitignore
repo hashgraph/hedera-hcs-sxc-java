@@ -52,3 +52,6 @@ org.eclipse.jdt.core.prefs
 .settings
 /hcs-sxc-proto/.settings
 /hcs-sxc-plugins/lib-persistence-in-memory/.settings
+!/hcs-lib/src/test/resources/config.yaml
+!/hcs-lib/src/test/resources/.env
+!/hcs-relay/src/test/resources/config.yaml

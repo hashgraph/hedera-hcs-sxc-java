@@ -55,12 +55,9 @@ public class ConfigTest extends AbstractConfigTest {
                  () -> assertEquals(2, nodeMap.size()),
                  () -> assertEquals("0.testnet.hedera.com:50211", nodeMap.get(AccountId.fromString("0.0.3"))),
                  () -> assertEquals("1.testnet.hedera.com:50211", nodeMap.get(AccountId.fromString("0.0.4"))),
-                 () -> assertEquals(100000000, hcsTransactionFee),
-                 () -> assertEquals("tcpConnectionFactory", queue.getTcpConnectionFactory()),
-                 () -> assertEquals("initialContextFactory", queue.getInitialContextFactory()),
-                 () -> assertEquals("topic", queue.getTopic()),
-                 () -> assertEquals("vmConnectionFactory", queue.getVmConnectionFactory()),
-                 () -> assertEquals("JGroupsConnectionFactory", queue.getJGroupsConnectionFactory())
-        );
+                 //() -> assertEquals(100000000, hcsTransactionFee),
+                 () -> assertEquals("tcp://hcsqueue:61616", queue.getTcpConnectionFactory()),
+                 () -> assertEquals("org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory", queue.getInitialContextFactory())
+         );
     }
 }

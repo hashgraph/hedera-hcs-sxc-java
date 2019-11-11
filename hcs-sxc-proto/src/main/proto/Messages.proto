@@ -5,7 +5,6 @@ package proto;
 option java_package = "com.hedera.hcslib.proto.java";
 option java_multiple_files = true;
 
-
 message AccountID {
     int64 shardNum = 1; //The shard number (nonnegative)
     int64 realmNum = 2; //The realm number (nonnegative)
@@ -22,30 +21,18 @@ message Timestamp {
     int32 nanos = 2; // Number of nanoseconds since the start of the last second
 }
 
-/*
-message MessageId {
-    // The following uniquely identifies a message (made up of several parts) sent to HCS and should be common to all parts
-    // of this message. You may use the transactionID of the first message part sent to HCS to populate this data for example
-
-    int64 fromAccountShardNum = 1; // The shard number of the account generating the HCS transaction
-    int64 fromAccountRealmNum = 2; // The realm number of the account generating the HCS transaction
-    int64 fromAccountNum = 3;  // The account number of the account generating the HCS transaction
-
-    int64 seconds = 4; // The number of complete seconds since the start of epoch
-    int64 nanos = 5;  // The number of nanoseconds since the start of the last second
-}
-*/
 // a complete message containing data provided by an app to the library
-
-message MessageEnvelope {
-    TransactionID  messageEnvelopeId = 1;
-    bytes messageEnvelope = 2;
+message ApplicationMessage {
+    TransactionID applicationMessageId = 1;
+    bytes businessProcessMessage = 2;
+    bytes businessProcessHash = 3;
+    bytes businessProcessSignature = 4;
 }
 
 // parts of a complete message
-message MessagePart {
-    TransactionID  messageEnvelopeId = 1;
-    int32 partsTotal = 2; // The total number of parts to make up a complete message
-    int32 partId = 3; // This message part index
-    bytes messagePart = 4; // The message part
+message ApplicationMessageChunk {
+    TransactionID applicationMessageId = 1;
+    int32 chunksCount = 2; // The total number of parts to make up a complete message
+    int32 chunkIndex = 3; // This message part index
+    bytes messageChunk = 4; // The message part
 }

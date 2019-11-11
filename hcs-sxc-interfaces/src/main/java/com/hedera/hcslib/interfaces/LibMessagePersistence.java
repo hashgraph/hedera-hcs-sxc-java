@@ -1,17 +1,15 @@
 package com.hedera.hcslib.interfaces;
 
 import com.hedera.hcslib.interfaces.MessagePersistenceLevel;
-import com.hedera.hcslib.proto.java.MessageEnvelope;
-import java.util.List;
+import com.hedera.hcslib.proto.java.ApplicationMessage;
+import com.hedera.hcslib.proto.java.ApplicationMessageChunk;
 
-import com.hedera.hcslib.proto.java.MessagePart;
+import java.util.List;
 import com.hedera.hcslib.proto.java.TransactionID;
-import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages.MirrorGetTopicMessagesResponse;
 
 public interface LibMessagePersistence {
-    void storeMessage(MessagePersistenceLevel level, MessageEnvelope.Builder messagesResponse);
-    public List<MessagePart> getParts(TransactionID messageEnvelopeId);
-    public void putParts(TransactionID messageEnvelopeId, List<MessagePart> l);
-    public void removeParts(TransactionID messageEnvelopeId);
-    
+    void storeMessage(MessagePersistenceLevel level, ApplicationMessage.Builder messagesResponse);
+    public List<ApplicationMessageChunk> getParts(TransactionID applicationMessageId);
+    public void putChunks(TransactionID applicationMessageId, List<ApplicationMessageChunk> l);
+    public void removeChunks(TransactionID messageEnvelopeId);
 }

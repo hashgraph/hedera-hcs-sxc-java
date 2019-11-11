@@ -11,7 +11,6 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.hedera</groupId>
     <artifactId>simple-message-demo</artifactId>
     <packaging>jar</packaging>
 
@@ -29,37 +28,44 @@
             <version>${hcslib.version}</version>
         </dependency>
     </dependencies>
-    
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>com.google.cloud.tools</groupId>
-                <artifactId>jib-maven-plugin</artifactId>
-                <version>${jib.version}</version>
-                <configuration>
-                    <to>
-                        <image>hederahashgraph/hcs-app</image>
-                        <tags>
-                            <tag>${project.version}</tag>
-                        </tags>
-                    </to>
-                    <extraDirectories>
-                        <paths>
-                            <path>src/main/resources</path>
-                        </paths>
-                    </extraDirectories>
-                    <mainClass>com.hedera.simple-message-demo.HCSLibCallBackSetup</mainClass>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>dockerBuild</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+    <profiles>
+        <!-- profile which adds the possibility to build docker images Call 
+            "mvn clean install -Pdocker" to invoke this additional plugin in the maven 
+            build -->
+        <profile>
+            <id>docker</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <version>${jib.version}</version>
+                        <configuration>
+                            <to>
+                                <image>hederahashgraph/hcs-app:latest</image>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                </tags>
+                            </to>
+                            <extraDirectories>
+                                <paths>
+                                    <path>src/main/resources</path>
+                                </paths>
+                            </extraDirectories>
+                            <mainClass>com.hedera.simple-message-demo.HCSLibCallBackSetup</mainClass>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>dockerBuild</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

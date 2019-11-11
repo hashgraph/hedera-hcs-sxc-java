@@ -23,7 +23,8 @@ public final class HCSLib {
     private AccountId operatorAccountId = new AccountId(0, 0, 0); 
     private Ed25519PrivateKey ed25519PrivateKey;
     private List<TopicId> topicIds = new ArrayList<TopicId>();
-    private String jmsAddress  =  "";
+    private String jmsAddress = "";
+    private long hcsTransactionFee = 0;
     
     public HCSLib() throws FileNotFoundException, IOException {
         Config config = new Config();
@@ -37,6 +38,7 @@ public final class HCSLib {
         this.ed25519PrivateKey = environment.getOperatorKey();
         this.topicIds = config.getConfig().getAppNet().getTopicIds();
         this.jmsAddress = config.getConfig().getQueue().getTcpConnectionFactory();
+        this.hcsTransactionFee = config.getConfig().getHCSTransactionFee();
     }
     public HCSLib withMessageSignature(boolean signMessages) {
         this.signMessages = signMessages;
@@ -98,6 +100,9 @@ public final class HCSLib {
 
     public String getJmsAddress() {
         return jmsAddress;
+    }
+    public long getHCSTransactionFee() {
+        return this.hcsTransactionFee;
     }
     
     

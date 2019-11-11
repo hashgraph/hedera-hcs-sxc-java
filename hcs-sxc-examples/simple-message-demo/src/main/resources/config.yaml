@@ -7,8 +7,13 @@ appNet:
     - topic: 0.0.1004
 
 queue:
+  initialContextFactory: "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
+  topic: "hcsCatchAllTopics"
+  vmConnectionFactory: "vm://0"
   tcpConnectionFactory: "tcp://hcsqueue:61616"
-
+  JGroupsConnectionFactory: "jgroups://mychannelid?file=test-jgroups-file_ping.xml"
+    
+HCSTransactionFee: 100000000
 
 nodes:
   - address: 35.222.103.151:50211

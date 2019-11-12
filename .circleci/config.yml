@@ -33,15 +33,12 @@ jobs:
           name: Running git pull on hcs java sdk
           command: cd sdk; git clone -b HCS https://github.com/mike-burrage-hedera/hedera-sdk-java.git
       - run:
-          name: ls
-          command: cd sdk; ls
-      - run:
-          name: ls
-          command: cd sdk/hedera-sdk-java; ls
-      - run:
           name: Running maven (install - skipping tests)
           command: cd sdk/hedera-sdk-java; mvn install -DskipTests
 #HCS lib
+      - run:
+          name: ls lib
+          command: ls -a
       - run:
           name: Running maven (validate, compile, test, package)
           command: ./mvnw package

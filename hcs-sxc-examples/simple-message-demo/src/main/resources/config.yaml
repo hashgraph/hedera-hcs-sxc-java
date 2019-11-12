@@ -5,13 +5,10 @@ appNet:
   rotateKeyFrequency: 0
   topics:
     - topic: 0.0.1004
+  persistenceLevel: "FULL"
 
 queue:
-  initialContextFactory: "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
-  topic: "hcsCatchAllTopics"
-  vmConnectionFactory: "vm://0"
   tcpConnectionFactory: "tcp://hcsqueue:61616"
-  JGroupsConnectionFactory: "jgroups://mychannelid?file=test-jgroups-file_ping.xml"
     
 HCSTransactionFee: 100000000
 

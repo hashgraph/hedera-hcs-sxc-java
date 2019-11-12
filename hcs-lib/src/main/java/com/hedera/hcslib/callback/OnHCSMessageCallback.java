@@ -208,6 +208,10 @@ public final class OnHCSMessageCallback {
             // if it's a single part message return it to app
             if(messageChunk.getChunksCount() == 1){
                 ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(messageChunk.getMessageChunk());
+                List l = new ArrayList<>();
+                l.add(messageChunk);
+                persistence.putChunks(applicationMessageId,l);
+                persistence.removeChunks(applicationMessageId); // config will decide whether to keep
                 return  Optional.of( applicationMessage);
             } else { // it's the first of a multipart message - order does not matter
                 List l = new ArrayList<>();

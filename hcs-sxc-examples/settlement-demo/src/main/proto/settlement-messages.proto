@@ -5,6 +5,21 @@ package proto;
 //option java_package = "com.hedera...";
 option java_multiple_files = true;
 
+// Represents a Hedera account ID
+// Copied from hedera-hcs-sxc
+message AccountID {
+    int64 shardNum = 1; // The shard number (nonnegative)
+    int64 realmNum = 2; // The realm number (nonnegative)
+    int64 accountNum = 3; // A nonnegative account number unique within its realm
+}
+
+// Represents a Hedera transaction ID
+// Copied from hedera-hcs-sxc
+message TransactionID {
+    Timestamp transactionValidStart = 1; // The transaction is invalid if consensusTimestamp < transactionID.transactionStartValid
+    AccountID accountID = 2; //The Account ID that paid for this transaction
+}
+
 // Represents an exact date and time. This is the same data structure as the protobuf Timestamp.proto
 // See the comments in https://github.com/google/protobuf/blob/master/src/google/protobuf/timestamp.proto)
 message Timestamp {
@@ -31,15 +46,15 @@ message Money {
     int32 nanos = 3;
 }
 
-// Represents an amount charged/owed from one party to another for a specified service
-// Send from the payer to the recipient
-message ChargeBPM{
+// Represents a credit from one party to another for a specified service
+// Sent from the payer to the recipient
+message CreditBPM{
 
     // Identity of the payer
     bytes payerPublicKey = 1;
 
     // Identity of the recipient
-    bytes recipentPublicKey = 2;
+    bytes recipientPublicKey = 2;
     
     // Business-specific [external] reference to identify the service being paid for
     bytes serviceRef = 3;
@@ -53,22 +68,22 @@ message ChargeBPM{
 
 }
 
-// Represents acknowledgement of a charge and explicit agreement that the details are correct
-// Send from the recipient to the payer
-message ChargeAckBPM{
+// Represents acknowledgement of a credit and agreement that the details are correct
+// Sent from the recipient to the payer
+message CreditAckBPM{
 
-    // Charge message being acknowledged
-    ChargeBPM charge = 1;
+    // Credit message being acknowledged
+    CreditBPM credit = 1;
 
-    // Reference to the TransactionID of the `charge` message being acknowledged
-    TransactionID chargeMessageId = 2;
+    // Reference to the TransactionID of the `credit` message being acknowledged
+    TransactionID creditMessageId = 2;
 }
 
-// Represents a proposal to settle outstanding charges between two parties.
-// There may be numerous charge in either direction between those two parties.
+// Represents a proposal to settle outstanding balance between two parties.
+// There may be numerous credits in both directions between parties.
 // Using "Party A" and "Party B" as examples:
-//    - Party A sums all charges it owes to Party B ==> SumAtoB
-//    - Party A sums all charges owed to it by Party B ==> SumBtoA
+//    - Party A sums all credits it owes to Party B ==> SumAtoB
+//    - Party A sums all credits owed to it by Party B ==> SumBtoA
 //    - Party A subtracts SumBtoA from SumAtoB ==> netOwedAtoB
 //    - Party A can only propose settlement with Party B if netOwedAtoB is greater than zero
 //    - `payerPublicKey` would hold the public key of Party A
@@ -86,8 +101,8 @@ message SettleProposeBPM {
     // Optional supplementary notes or text
     bytes memo = 3;
 
-    // Reference to each TransactionID of the `chargeAck` messages included in the proposed settlement
-    repeated TransactionID chargeAckMessageId = 4;
+    // Reference to each TransactionID of the `creditAck` messages included in the proposed settlement
+    repeated TransactionID creditAckMessageId = 4;
 
     // Total amount owed from payer to recipient
     // `netValue` must be greater than zero
@@ -304,8 +319,8 @@ message SettlementBPM {
 
     // The specific settlement message
     oneof data {
-        ChargeInitBPM charge = 3;
-        ChargeAckBPM chargeAck = 4;
+        CreditBPM credit = 3;
+        CreditAckBPM creditAck = 4;
         SettleProposeBPM settlePropose = 5;
         SettleProposeAckBPM settleProposeAck = 6;
         SettleInitBPM settleInit = 7;

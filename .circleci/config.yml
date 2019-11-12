@@ -41,7 +41,7 @@ jobs:
           command: ls -a
       - run:
           name: Running maven (validate, compile, test, package)
-          command: ./mvnw package
+          command: mvn package
       - save_cache:
           key: maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
           paths:

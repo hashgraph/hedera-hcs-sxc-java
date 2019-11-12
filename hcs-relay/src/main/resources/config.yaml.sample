@@ -4,8 +4,8 @@ topics:
 
 queue:
   initialContextFactory: "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
-  topic: "hcsCatchAllTopics"
-  vmConnectionFactory: "vm://0"
+#  topic: "hcsCatchAllTopics"
+#  vmConnectionFactory: "vm://0"
   tcpConnectionFactory: "tcp://hcsqueue:61616"
-  JGroupsConnectionFactory: "jgroups://mychannelid?file=test-jgroups-file_ping.xml"
+#  JGroupsConnectionFactory: "jgroups://mychannelid?file=test-jgroups-file_ping.xml"
     

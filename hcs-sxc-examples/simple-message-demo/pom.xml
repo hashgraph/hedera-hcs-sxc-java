@@ -42,8 +42,11 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <version>${jib.version}</version>
                         <configuration>
+                            <from>
+                                <image>adoptopenjdk/openjdk10:jdk-10.0.2.13-alpine</image>
+                            </from>
                             <to>
-                                <image>hederahashgraph/hcs-app:latest</image>
+                                <image>hederahashgraph/simple-message-demo:latest</image>
                                 <tags>
                                     <tag>${project.version}</tag>
                                 </tags>
@@ -51,9 +54,11 @@
                             <extraDirectories>
                                 <paths>
                                     <path>src/main/resources</path>
+                                    <path>.</path>
+                                    <path>../hcs-sxc-plugins/lib-persistence-in-memory/target</path>
                                 </paths>
                             </extraDirectories>
-                            <mainClass>com.hedera.simple-message-demo.HCSLibCallBackSetup</mainClass>
+                            <mainClass>com.hedera.simple-message-demo.App</mainClass>
                         </configuration>
                         <executions>
                             <execution>

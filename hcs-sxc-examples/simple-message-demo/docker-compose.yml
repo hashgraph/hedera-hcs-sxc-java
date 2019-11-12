@@ -31,24 +31,19 @@ services:
         networks: [backing-services]
 
            
-    # player2:
-    #   image:
-    #   restart: always
-    #   environment:
-    #     - APPID=1
-    #   tty: true
-    #   ports:
-    #     - 8080:8081
-   
-       
-    # player2:
-    #   image:
-    #   restart: always
-    #   environment:
-    #     - APPID=1
-    #   tty: true
-    #   ports:
-    #     - 8080:8081
+    player1:
+      image: hederahashgraph/simple-message-demo:latest
+      restart: always
+      environment:
+        - APPID=0
+      tty: true
+
+    player2:
+      image: hederahashgraph/simple-message-demo:latest
+      restart: always
+      environment:
+        - APPID=1
+      tty: true
 
 volumes:
   activemq-data: {}

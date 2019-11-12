@@ -202,26 +202,18 @@ public final class OnHCSMessageCallback {
         TransactionID applicationMessageId = messageChunk.getApplicationMessageId();
         //look up db to find parts received already
         List<ApplicationMessageChunk> chunkList = persistence.getParts(applicationMessageId);
-        //TODO: Should always persist even if a single message
-        // if first time seen
-        if (chunkList == null) {
-            // if it's a single part message return it to app
-            if(messageChunk.getChunksCount() == 1){
-                ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(messageChunk.getMessageChunk());
-                List l = new ArrayList<>();
-                l.add(messageChunk);
-                persistence.putChunks(applicationMessageId,l);
-                persistence.removeChunks(applicationMessageId); // config will decide whether to keep
-                return  Optional.of( applicationMessage);
-            } else { // it's the first of a multipart message - order does not matter
-                List l = new ArrayList<>();
-                l.add(messageChunk);
-                persistence.putChunks(applicationMessageId,l);
-            }
-        } else { // there are some parts received already
+        if(chunkList==null){
+            chunkList = new ArrayList();
             chunkList.add(messageChunk);
-            // if all parts received
-            if (chunkList.size() == messageChunk.getChunksCount()) {
+        } else {
+            chunkList.add(messageChunk);
+        }
+        persistence.putChunks(applicationMessageId, chunkList);
+        
+        if(messageChunk.getChunksCount() == 1){
+                ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(messageChunk.getMessageChunk());
+                return  Optional.of( applicationMessage);
+        } else if (chunkList.size() == messageChunk.getChunksCount()) { // all parts received
                 // sort by part id
                 chunkList.sort(Comparator.comparingInt(ApplicationMessageChunk::getChunkIndex));
                 // merge down
@@ -231,12 +223,9 @@ public final class OnHCSMessageCallback {
                                 .reduce(ByteUtil::merge).get();
                 // construct envelope from merged array. TODO: if fail
                 ApplicationMessage messageEnvelope = ApplicationMessage.parseFrom(merged);
-                persistence.removeChunks(applicationMessageId);
                 return  Optional.of(messageEnvelope);
-            }  else { // not all parts received yet
-                persistence.putChunks(applicationMessageId, chunkList);
-            }
+        } else { // not all parts received yet
+            return Optional.empty(); 
         }
-        return Optional.empty();
     }
 }

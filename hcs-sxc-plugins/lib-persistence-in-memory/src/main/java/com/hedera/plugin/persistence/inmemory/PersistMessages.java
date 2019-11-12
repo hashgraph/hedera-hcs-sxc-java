@@ -37,21 +37,27 @@ public class PersistMessages
 
     @Override
     public void putChunks(TransactionID applicationMessageId, List l) {
-        this.partialMessages.put(applicationMessageId, l);
-        switch (persistenceLevel) {
+        
+         switch (persistenceLevel) {
             case FULL:
-                break;
+            case MESSAGE_AND_PARTS:
+            case MESSAGE_ONLY:
+            case NONE:
+            default: this.partialMessages.put(applicationMessageId, l);            
         }
+       
     }
 
     @Override
     public void removeChunks(TransactionID applicationMessageId) {
-        this.partialMessages.remove(applicationMessageId);
         switch (persistenceLevel) {
+            case FULL:
+            case MESSAGE_AND_PARTS:
+            case MESSAGE_ONLY:
             case NONE:
-                break;
-        }
+            default: this.partialMessages.remove(applicationMessageId);
         
+        }
     }
     
 

@@ -124,7 +124,7 @@ public final class OutboundHCSMessage {
             TransactionReceipt receipt = new SubmitMessageTransaction(client)
                 .setMessage(messageChunk.toByteArray())
                 .setTopicId(this.topicIds.get(topicIndex))
-                .setTransactionId(transactionId) 
+                .setTransactionId(transactionId)
                 .executeForReceipt();
             log.info("status is {} "
                     + "sequence no is {}"

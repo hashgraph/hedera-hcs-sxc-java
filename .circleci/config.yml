@@ -16,6 +16,13 @@ jobs:
           # Customize the JVM maximum heap limit
           MAVEN_OPTS: -Xmx3200m
     steps:
+      - checkout #HCS Lib
+      - restore_cache:
+          keys:
+            - maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
+            - maven-v1-{{ .Branch }}
+            - maven-v1-
+#HCS java SDK
       - run:
           name: create directory for hcs java sdk
           command: mkdir sdk
@@ -34,13 +41,7 @@ jobs:
       - run:
           name: Running maven (install - skipping tests)
           command: cd sdk/hedera-sdk-java; mvn install -DskipTests
-#HCS Lib starts here
-      - checkout
-      - restore_cache:
-          keys:
-            - maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
-            - maven-v1-{{ .Branch }}
-            - maven-v1-
+#HCS lib
       - run:
           name: Running maven (validate, compile, test, package)
           command: ./mvnw package

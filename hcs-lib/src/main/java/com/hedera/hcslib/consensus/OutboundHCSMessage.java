@@ -126,11 +126,15 @@ public final class OutboundHCSMessage {
                 .setTopicId(this.topicIds.get(topicIndex))
                 .setTransactionId(transactionId)
                 .executeForReceipt();
+            
+            /*
             log.info("status is {} "
                     + "sequence no is {}"
                     ,receipt.getStatus()
                     ,receipt.getTopicSequenceNumber()
             );
+            */
+            
         }
         
         return true;

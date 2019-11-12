@@ -48,7 +48,7 @@ public final class OnHCSMessageCallback {
 
     public OnHCSMessageCallback (HCSLib hcsLib) throws Exception {
         // load persistence implementation at runtime
-        Class<?> persistenceClass = Plugins.find("com.hedera.plugin.persistence", "LibMessagePersistence", true);
+        Class<?> persistenceClass = Plugins.find("com.hedera.plugin.persistence.*", "com.hedera.hcslib.interfaces.LibMessagePersistence", true);
         persistence = (LibMessagePersistence)persistenceClass.newInstance();
 
         String jmsAddress = hcsLib.getJmsAddress();
@@ -57,7 +57,6 @@ public final class OnHCSMessageCallback {
             InitialContext initialContext = null;
             javax.jms.Connection connection = null;
             try {
-                System.out.println("Starting hcs topic listener in hcs-lib");
                 Hashtable<String, Object> props = new Hashtable<>();
                 props.put(Context.INITIAL_CONTEXT_FACTORY, "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory");
                 props.put("topic.topic/hcsTopic", "hcsCatchAllTopics");
@@ -101,7 +100,7 @@ public final class OnHCSMessageCallback {
                     @Override
                     public void onMessage(Message messageFromJMS) {
                         try {
-                            log.info("Message Received from JMS forward to app.java observers");
+                            //log.info("Message Received from JMS forward to app.java observers");
                             // notify subscribed observer from App.java
                             if (messageFromJMS instanceof ActiveMQTextMessage) {
                                 OnHCSMessageCallback.this.notifyObservers(((ActiveMQTextMessage)messageFromJMS).getText());
@@ -116,7 +115,7 @@ public final class OnHCSMessageCallback {
                                 Optional<ApplicationMessage> messageEnvelopeOptional = 
                                         pushUntilCompleteMessage(messagePart, persistence);
                                 if (messageEnvelopeOptional.isPresent()){
-                                    OnHCSMessageCallback.this.notifyObservers("The object received queue is complete = "+  messageEnvelopeOptional.get().getBusinessProcessMessage().toStringUtf8());
+                                    OnHCSMessageCallback.this.notifyObservers( messageEnvelopeOptional.get().getBusinessProcessMessage().toStringUtf8());
                                     messageFromJMS.acknowledge();
                                 }
                             }

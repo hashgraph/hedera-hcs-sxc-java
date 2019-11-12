@@ -20,14 +20,11 @@ jobs:
           name: create directory for hcs java sdk
           command: mkdir hedera-sdk-java
       - run:
-          name: cd
-          command: cd hedera-sdk-java
-      - run:
           name: git init
-          command: git init
+          command: cd hedera-sdk-java; git init
       - run:
           name: Running git pull on hcs java sdk
-          command: git clone -b HCS https://github.com/mike-burrage-hedera/hedera-sdk-java.git
+          command: cd hedera-sdk-java; git clone -b HCS https://github.com/mike-burrage-hedera/hedera-sdk-java.git
       - run:
           name: Running maven (install - skipping tests)
           command: cd hedera-sdk-java; mvn install -DskipTests

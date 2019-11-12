@@ -31,10 +31,10 @@ jobs:
           command: git clone -b HCS https://github.com/mike-burrage-hedera/hedera-sdk-java.git
       - run:
           name: compiling hcs java sdk
-          command: cd hedera-sdk-java
+          command: cd hedera-sdk-java; ls
       - run:
           name: Running maven (install - skipping tests)
-          command: mvn install -DskipTests
+          command: cd hedera-sdk-java; mvn install -DskipTests
   build_hcs_lib:
     docker:
       - image: adoptopenjdk:11-jdk-hotspot

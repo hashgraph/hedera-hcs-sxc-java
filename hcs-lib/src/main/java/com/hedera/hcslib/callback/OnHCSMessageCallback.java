@@ -48,7 +48,7 @@ public final class OnHCSMessageCallback {
 
     public OnHCSMessageCallback (HCSLib hcsLib) throws Exception {
         // load persistence implementation at runtime
-        Class<?> persistenceClass = Plugins.find("com.hedera.plugin.persistence", "LibMessagePersistence", true);
+        Class<?> persistenceClass = Plugins.find("com.hedera.plugin.persistence.*", "com.hedera.hcslib.interfaces.LibMessagePersistence", true);
         persistence = (LibMessagePersistence)persistenceClass.newInstance();
 
         String jmsAddress = hcsLib.getJmsAddress();

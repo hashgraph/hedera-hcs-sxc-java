@@ -7,10 +7,9 @@ workflows:
   version: 2
   main:
     jobs:
-      - build_hcs_sdk
-      # - build_hcs_lib
+      - build_hcs_lib
 jobs:
-  build_hcs_sdk:
+  build_hcs_lib:
     docker:
       - image: maven:latest #adoptopenjdk:11-jdk-hotspot
         environment:
@@ -30,18 +29,9 @@ jobs:
           name: Running git pull on hcs java sdk
           command: git clone -b HCS https://github.com/mike-burrage-hedera/hedera-sdk-java.git
       - run:
-          name: compiling hcs java sdk
-          command: cd hedera-sdk-java; ls
-      - run:
           name: Running maven (install - skipping tests)
           command: cd hedera-sdk-java; mvn install -DskipTests
-  build_hcs_lib:
-    docker:
-      - image: adoptopenjdk:11-jdk-hotspot
-        environment:
-          # Customize the JVM maximum heap limit
-          MAVEN_OPTS: -Xmx3200m
-    steps:
+#HCS Lib starts here
       - checkout
       - restore_cache:
           keys:

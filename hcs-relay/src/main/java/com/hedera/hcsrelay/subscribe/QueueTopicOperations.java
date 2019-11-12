@@ -94,22 +94,22 @@ public class QueueTopicOperations {
             MessageProducer messageProducer = session.createProducer(topic);
 
             // Step 9. Create the subscription and the first test subscriber (he is removed at the end of the test).
-             TopicSubscriber subscriber = session.createDurableSubscriber(topic, "text-subscriber-topic-hcsCatchAllTopics");
+            // TopicSubscriber subscriber = session.createDurableSubscriber(topic, "text-subscriber-topic-hcsCatchAllTopics");
 
             // Step 10. Create a text message
-            TextMessage message1 = session.createTextMessage("Test queue message on topic hcsCatchAllTopics" );
+            //TextMessage message1 = session.createTextMessage("Test queue message on topic hcsCatchAllTopics" );
 
             // Step 11. Send the text message to the topic
-            messageProducer.send(message1);
+            //messageProducer.send(message1);
 
-            log.info("Sent test queue message: " + message1.getText() + " from producer hcsCatchAllTopics" );
+            //log.info("Sent test queue message: " + message1.getText() + " from producer hcsCatchAllTopics" );
 
             // Step 12. Consume the message from the durable subscription
-            TextMessage messageReceived = (TextMessage) subscriber.receive();
+            //TextMessage messageReceived = (TextMessage) subscriber.receive();
 
-            log.info("Received message from queue from test subscriber. Message: " + messageReceived.getText());
+            //log.info("Received message from queue from test subscriber. Message: " + messageReceived.getText());
             
-            subscriber.close();
+            //subscriber.close();
 
             // Step 13. Delete the durable subscription
             session.unsubscribe("text-subscriber-topic-hcsCatchAllTopics");
@@ -152,7 +152,7 @@ public class QueueTopicOperations {
             ConnectionFactory cf = (ConnectionFactory) initialContext.lookup("TCPConnectionFactory");
 
             // Step 4. Create a JMS connection and wait until server available
-            log.info("Waiting for MQ Artemis to start ...");
+            //log.info("Waiting for MQ Artemis to start ...");
             
             boolean scanning = true;
             do {

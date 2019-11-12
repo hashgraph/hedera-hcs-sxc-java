@@ -50,7 +50,7 @@ public class QueueTopicOperations {
             
             Hashtable<String, Object> props = new Hashtable<>();
             props.put(Context.INITIAL_CONTEXT_FACTORY, queueConfig.getInitialContextFactory());
-            //props.put("topic.topic/hcsTopic",  queueConfig.getTopic());
+            props.put("topic.topic/hcsTopic",  "hcsCatchAllTopics");
             
             props.put("connectionFactory.TCPConnectionFactory", queueConfig.getTcpConnectionFactory());
             InitialContext ctx = new InitialContext(props);
@@ -112,7 +112,7 @@ public class QueueTopicOperations {
             //subscriber.close();
 
             // Step 13. Delete the durable subscription
-            session.unsubscribe("text-subscriber-topic-hcsCatchAllTopics");
+            //session.unsubscribe("text-subscriber-topic-hcsCatchAllTopics");
             r = true;
             
         } catch (Exception e) {

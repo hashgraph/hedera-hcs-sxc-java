@@ -7,14 +7,11 @@ import com.hedera.hcslib.interfaces.LibMessagePersistence;
 import com.hedera.hcslib.interfaces.MessagePersistenceLevel;
 
 import com.hedera.hcslib.messages.HCSRelayMessage;
+import com.hedera.hcslib.plugins.Plugins;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
 import com.hedera.hcslib.proto.java.ApplicationMessageChunk;
 import com.hedera.hcslib.proto.java.TransactionID;
 import com.hedera.hcslib.utils.ByteUtil;
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ClassInfoList;
-import io.github.classgraph.ScanResult;
-
 import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
@@ -47,18 +44,13 @@ public final class OnHCSMessageCallback {
     
  
     LibMessagePersistence persistence;
-    
-    
-    public OnHCSMessageCallback (HCSLib hcsLib) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+    private final List<HCSCallBackInterface> observers = new ArrayList<>();
+
+    public OnHCSMessageCallback (HCSLib hcsLib) throws Exception {
         // load persistence implementation at runtime
-        try (ScanResult result = new ClassGraph().enableAllInfo()
-                .whitelistPackages("com.hedera.plugin.persistence.inmemory")
-                .scan()) {
-            ClassInfoList list = result.getAllClasses();
-            persistence = (LibMessagePersistence)list.get(0).loadClass().newInstance();
-        }
-        
-        
+        Class<?> persistenceClass = Plugins.find("com.hedera.plugin.persistence", "LibMessagePersistence", true);
+        persistence = (LibMessagePersistence)persistenceClass.newInstance();
+
         String jmsAddress = hcsLib.getJmsAddress();
         Runnable runnable;
         runnable = () -> { 
@@ -73,39 +65,38 @@ public final class OnHCSMessageCallback {
                 InitialContext ctx = new InitialContext(props);
                 ctx.lookup("TCPConnectionFactory");
 
-                // Step 1. Create an initial context to perform the JNDI lookup.
+                // Create an initial context to perform the JNDI lookup.
                 initialContext = ctx;
 
-                // Step 2. Look-up the JMS topic
+                // Look-up the JMS topic
                 Topic topic = (Topic) initialContext.lookup("topic/hcsTopic");
 
-                // Step 3. Look-up the JMS connection factory
+                // Look-up the JMS connection factory
                 ConnectionFactory cf = (ConnectionFactory) initialContext.lookup("TCPConnectionFactory");
 
-                // Step 4. Create a JMS connection
+                // Create a JMS connection
                 connection = cf.createConnection();
 
-                // Step 5. Set the client-id on the connection
+                // Set the client-id on the connection
                 connection.setClientID("operator-client-"+hcsLib.getOperatorAccountId().getAccountNum());
 
-                // Step 6. Start the connection
+                // Start the connection
                 connection.start();
 
-                // Step 7. Create a JMS session
+                // Create a JMS session
                 Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-                // Step 8. Create a JMS message producer
+                // Create a JMS message producer
                 //MessageProducer messageProducer = session.createProducer(topic);
 
-                // Step 9. Create the subscription and the subscriber.
-
+                // Create the subscription and the subscriber.
                 TopicSubscriber subscriber = session.createDurableSubscriber(topic, "subscriber-hcsCatchAllTopics-in-lib");
 
-                //for synchronus receive do
+                //for synchronous receive do
                 //Message receive = subscriber.receive();
                 //log.info(((javax.jms.TextMessage)receive).getText());
 
-                //for aync receive do
+                //for async receive do
                 subscriber.setMessageListener(new MessageListener() {
                     @Override
                     public void onMessage(Message messageFromJMS) {
@@ -117,7 +108,7 @@ public final class OnHCSMessageCallback {
                                 messageFromJMS.acknowledge();
                             } else if (messageFromJMS instanceof ActiveMQObjectMessage) {
                                 HCSRelayMessage rlm = (HCSRelayMessage)((ActiveMQObjectMessage) messageFromJMS).getObject();
-                                 persistence.storeMessage(MessagePersistenceLevel.NONE, rlm.getTopicMessagesResponse().toBuilder());
+                                persistence.storeMessage(MessagePersistenceLevel.NONE, rlm.getTopicMessagesResponse().toBuilder());
                                    
                                 ByteString message = rlm.getTopicMessagesResponse().getMessage();
                                 ApplicationMessageChunk messagePart = ApplicationMessageChunk.parseFrom(message);
@@ -171,10 +162,6 @@ public final class OnHCSMessageCallback {
         thread.start();
     }
     
-    
-    
-    private final List<HCSCallBackInterface> observers = new ArrayList<>();
-
     /**
      * Adds an observer to the list of observers
      * @param listener

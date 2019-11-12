@@ -1,0 +1,25 @@
+appNet:
+  signMessages: true
+  encryptMessages: true
+  rotateKeys: true
+  rotateKeyFrequency: 1
+  topics:
+    - topic: 0.0.10
+    - topic: 0.0.11
+
+queue:
+  initialContextFactory: "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
+  tcpConnectionFactory: "tcp://hcsqueue:61616"
+  
+
+nodes:
+  - address: 0.testnet.hedera.com:50211
+    account: 0.0.3
+  - address: 1.testnet.hedera.com:50211
+    account: 0.0.4
+#  - address: 2.testnet.hedera.com:50211
+#    account: 0.0.5
+#  - address: 3.testnet.hedera.com:50211
+#    account: 0.0.6
+    
+    

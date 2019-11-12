@@ -26,7 +26,7 @@ hs_err_pid*
 *.classpath
 config.yaml
 .project
-.settings/org.eclipse.m2e.core.prefs
+.settings
 
 hcs-relay/target
 hcs-relay/bin
@@ -49,6 +49,6 @@ hcs-sxc-plugins/.settings/org.eclipse.core.resources.prefs
 /hcs-lib/nb-configuration.xml
 nb-configuration.xml
 org.eclipse.jdt.core.prefs
-.settings
 /hcs-sxc-proto/.settings
 /hcs-sxc-plugins/lib-persistence-in-memory/.settings
+/hcs-sxc-examples/settlement-demo/target

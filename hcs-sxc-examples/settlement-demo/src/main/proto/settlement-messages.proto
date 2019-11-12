@@ -1,0 +1,323 @@
+syntax = "proto3";
+
+package proto;
+
+//option java_package = "com.hedera...";
+option java_multiple_files = true;
+
+// Represents an exact date and time. This is the same data structure as the protobuf Timestamp.proto
+// See the comments in https://github.com/google/protobuf/blob/master/src/google/protobuf/timestamp.proto)
+message Timestamp {
+    int64 seconds = 1; // Number of complete seconds since the start of the epoch
+    int32 nanos = 2; // Number of nanoseconds since the start of the last second
+}
+
+// Represents an amount of money with its currency type.
+// Copied from https://github.com/googleapis/googleapis/blob/master/google/type/money.proto
+message Money {
+    // The 3-letter currency code defined in ISO 4217.
+    string currency_code = 1;
+
+    // The whole units of the amount.
+    // For example if `currencyCode` is `"USD"`, then 1 unit is one US dollar.
+    int64 units = 2;
+
+    // Number of nano (10^-9) units of the amount.
+    // The value must be between -999,999,999 and +999,999,999 inclusive.
+    // If `units` is positive, `nanos` must be positive or zero.
+    // If `units` is zero, `nanos` can be positive, zero, or negative.
+    // If `units` is negative, `nanos` must be negative or zero.
+    // For example $-1.75 is represented as `units`=-1 and `nanos`=-750,000,000.
+    int32 nanos = 3;
+}
+
+// Represents an amount charged/owed from one party to another for a specified service
+// Send from the payer to the recipient
+message ChargeBPM{
+
+    // Identity of the payer
+    bytes payerPublicKey = 1;
+
+    // Identity of the recipient
+    bytes recipentPublicKey = 2;
+    
+    // Business-specific [external] reference to identify the service being paid for
+    bytes serviceRef = 3;
+    
+    // Amount owed by the payer to the receiver for the specified service
+    // `value` must be positive
+    Money value = 4;
+    
+    // Optional supplementary notes or text
+    bytes memo = 5;
+
+}
+
+// Represents acknowledgement of a charge and explicit agreement that the details are correct
+// Send from the recipient to the payer
+message ChargeAckBPM{
+
+    // Charge message being acknowledged
+    ChargeBPM charge = 1;
+
+    // Reference to the TransactionID of the `charge` message being acknowledged
+    TransactionID chargeMessageId = 2;
+}
+
+// Represents a proposal to settle outstanding charges between two parties.
+// There may be numerous charge in either direction between those two parties.
+// Using "Party A" and "Party B" as examples:
+//    - Party A sums all charges it owes to Party B ==> SumAtoB
+//    - Party A sums all charges owed to it by Party B ==> SumBtoA
+//    - Party A subtracts SumBtoA from SumAtoB ==> netOwedAtoB
+//    - Party A can only propose settlement with Party B if netOwedAtoB is greater than zero
+//    - `payerPublicKey` would hold the public key of Party A
+//    - `recipentPublicKey` would hold the public key of Party B
+//    - `netValue` would contain netOwedAtoB
+// Sent from the payer to the recipient (payer determined based upon net "debt" calculations)
+message SettleProposeBPM {
+
+    // Identity of the payer
+    bytes payerPublicKey = 1;
+
+    // Identity of the recipient
+    bytes recipentPublicKey = 2;
+    
+    // Optional supplementary notes or text
+    bytes memo = 3;
+
+    // Reference to each TransactionID of the `chargeAck` messages included in the proposed settlement
+    repeated TransactionID chargeAckMessageId = 4;
+
+    // Total amount owed from payer to recipient
+    // `netValue` must be greater than zero
+    Money netValue = 5;
+}
+
+// Represents acknowledgement of a proposal to settle and explicit agreement that the details are correct
+// Sent from the recipient to the payer
+message SettleProposeAckBPM {
+
+    // SettlePropose message being acknowledged
+    SettleProposeBPM settlePropose = 1;
+
+    // Reference to the TransactionID of the `settlePropose` message being acknowledged
+    TransactionID settleProposeMessageId = 2;
+}
+
+// Represents intent to begin settlement through a third party payment channel
+// Sent from the payer to the recipient
+message SettleInitBPM {
+
+    // Identity of the payer
+    bytes payerPublicKey = 1;
+
+    // Identity of the recipient
+    bytes recipentPublicKey = 2;
+    
+    // Identity of the payment channel
+    bytes paymentChannelPublicKey = 3;
+    
+    // Optional supplementary notes or text
+    bytes memo = 4;
+
+    // Total amount that the payment channel will transfer from the bank account of the payer to the bank account of the recipient
+    Money netValue = 5;
+
+    // Reference to the TransactionID of the `settleProposeAck` message within which settlement was agreed
+    TransactionID settleProposeAckMessageId = 6;
+}
+
+// Represents acknowledgement of the intent to settle through a third party payment channel
+// Sent from the recipient to the payer
+message SettleInitAckBPM {
+
+    // SettleInit message being acknowledged
+    SettleInitBPM settleInit = 1;
+
+    // Reference to the TransactionID of the `settleInit` message being acknowledged
+    TransactionID settleInitMessageId = 2;
+}
+
+// Represents a payment mandate instructing a payment channel to transfer the specified amount
+// from the payer's bank account to the recipient's bank account.
+// Sent from the payer to the payment channel
+message PaymentInitBPM {
+
+    // Identity of the payer
+    bytes payerPublicKey = 1;
+
+    // Identity of the recipient
+    bytes recipentPublicKey = 2;
+    
+    // Optional account details of the payer's bank account
+    // The payment channel may already have this information 
+    bytes payerAccountDetails = 3;
+
+    // Optional account details of the recipient's bank account
+    // The payment channel may already have this information 
+    bytes recipentAccountDetails = 4;
+    
+    // Optional supplementary notes or text
+    bytes memo = 5;
+
+    // Total amount that the payment channel will transfer from the bank account of the payer to the bank account of the recipient
+    Money netValue = 6;
+}
+
+// Represents the payment channel's acknowledgement of receipt of the payment mandate from the payer
+// Sent from the payment channel to the payer
+message PaymentInitAckBPM {
+    
+    // PaymentInit message being acknowledged
+    PaymentInitBPM paymentInit = 1;
+
+    // Reference to the TransactionID of the `paymentInit` message being acknowledged
+    TransactionID paymentInitMessageId = 2;
+}
+
+// Represents confirmation that a settlement payment has been completed by the payment channel
+// Sent from the payment channel to the payer
+message PaymentSentBPM {
+    
+    // Identity of the payer
+    bytes payerPublicKey = 1;
+
+    // Identity of the recipient
+    bytes recipentPublicKey = 2;
+    
+    // Optional account details of the payer's bank account
+    bytes payerAccountDetails = 3;
+
+    // Optional account details of the recipient's bank account
+    bytes recipentAccountDetails = 4;
+    
+    // Optional supplementary notes or text
+    bytes memo = 5;
+
+    // Total amount that the payment channel transferred from the bank account of the payer to the bank account of the recipient
+    Money netValue = 6;
+
+    // Reference to the TransactionID of the `paymentInitAck` also sent by the payment channel
+    TransactionID paymentInitMessageAckId = 7;
+
+    // Optional Date and time that the funds were transferred from the payer's bank account
+    Timestamp transferStart = 8;
+
+    // Optional Date and time that the funds will be available in the recipient's bank account
+    Timestamp transferComplete = 9;
+
+    // Optional [external] Payment Reference
+    bytes paymentReference = 10;
+
+}
+
+// Represents the payer's acknowledgement that the payment channel has completed the transfer
+// Sent from the payer to the payment channel
+message PaymentSentAckBPM {
+    
+    // PaymentSent message being acknowledged
+    PaymentSentBPM paymentSent = 1;
+
+    // Reference to the TransactionID of the `paymentSent` also sent by the payment channel
+    TransactionID paymentInitMessageAckId = 2;
+}
+
+// Represents communication of the completed settlement payment to the recipient
+// Sent from the payer to the recipient
+message SettlePaidBPM {
+
+    // Identity of the payer
+    bytes payerPublicKey = 1;
+
+    // Identity of the recipient
+    bytes recipentPublicKey = 2;
+    
+    // Optional supplementary notes or text
+    bytes memo = 3;
+
+    // Total amount that the payment channel will transfer from the bank account of the payer to the bank account of the recipient
+    Money netValue = 4;
+
+    // Reference to the TransactionID of the `settleProposeAck` message that has now been paid
+    TransactionID settleProposeAckMessageId = 6;
+
+    // Optional [external] Payment Reference
+    bytes paymentReference = 7;
+}
+
+// Represents the recipient's acknowledgement of the completed settlement payment.
+// Does not represent agreement that the settlement has been received.
+// Sent from the recipient to the payer
+message SettlePaidAckBPM {
+    
+    // SettlePaid message being acknowledged
+    SettlePaidBPM settlePaid = 1;
+
+    // Reference to the TransactionID of the `settlePaid` message being acknowledged
+    TransactionID settlePaidMessageId = 2;
+}
+
+// Represents confirmation that the settlement amount has been transferred to the receipient's account
+// This message is sent once the recipient has verified the transfer of value - it is effectively a receipt
+// Sent from the recipient to the payer
+message SettleCompleteBPM {
+    
+    // Identity of the payer
+    bytes payerPublicKey = 1;
+
+    // Identity of the recipient
+    bytes recipentPublicKey = 2;
+    
+    // Optional supplementary notes or text
+    bytes memo = 3;
+
+    // Total amount that has been paid into the recipient's bank account
+    Money netValue = 4;
+
+    // Reference to the TransactionID of the `settleProposeAck` message that has now been paid
+    TransactionID settleProposeAckMessageId = 6;
+
+    // Optional [external] Payment Reference
+    bytes paymentReference = 7;
+}
+
+// Represents the payer's acknowledgement that the recipient confirms settlement completion
+// Sent from the payer to the recipient
+message SettleCompleteAckBPM {
+    
+    // SettleComplete message being acknowledged
+    SettleCompleteBPM settlePaid = 1;
+
+    // Reference to the TransactionID of the `settlePaid` message being acknowledged
+    TransactionID settleCompleteMessageId = 2;
+}
+
+// Represents a Settlement-specific Business Process Message
+// The message within will be encapsulated within an ApplicationMessage
+// See: https://github.com/hashgraph/hedera-hcs-sxc/blob/master/hcs-sxc-proto/src/main/proto/Messages.proto
+// Note that TransactionID values (in messages above) will contain ApplicationMessage applicationMessageIds
+message SettlementBPM {
+
+    // The context or business-process instance ID with which this message is associated
+    int64 threadId = 2;
+
+    // The specific settlement message
+    oneof data {
+        ChargeInitBPM charge = 3;
+        ChargeAckBPM chargeAck = 4;
+        SettleProposeBPM settlePropose = 5;
+        SettleProposeAckBPM settleProposeAck = 6;
+        SettleInitBPM settleInit = 7;
+        SettleInitAckBPM settleInitAck = 8;
+        PaymentInitBPM paymentInit = 9;
+        PaymentInitAckBPM paymentInitAck = 10;
+        PaymentSentBPM paymentSent = 11;
+        PaymentSentAckBPM paymentSentAck = 12;
+        SettlePaidBPM settlePayment = 13;
+        SettlePaidAckBPM settlePaymentAck = 14;
+        SettleCompleteBPM settleComplete = 15;
+        SettleCompleteAckBPM settleCompleteAck = 16;
+    }
+}
+

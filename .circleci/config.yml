@@ -34,7 +34,7 @@ jobs:
           command: cd hedera-sdk-java
       - run:
           name: Running maven (install - skipping tests)
-          command: ./mvn install -DskipTests
+          command: mvn install -DskipTests
   build_hcs_lib:
     docker:
       - image: adoptopenjdk:11-jdk-hotspot

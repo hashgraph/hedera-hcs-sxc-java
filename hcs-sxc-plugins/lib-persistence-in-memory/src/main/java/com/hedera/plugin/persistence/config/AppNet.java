@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.hedera.hashgraph.sdk.consensus.TopicId;
+import com.hedera.hcslib.interfaces.MessagePersistenceLevel;
 
 public final class AppNet {
     private boolean signMessages = false;
     private boolean encryptMessages = false;
     private boolean rotateKeys = false;
     private int rotateKeyFrequency = 0;
+    private MessagePersistenceLevel persistenceLevel = MessagePersistenceLevel.NONE;
     private List<Topic> topics = new ArrayList<Topic>();
 
     public boolean getSignMessages() {
@@ -54,4 +56,15 @@ public final class AppNet {
         }
         
         return topicIds;
-    }}
+    }
+
+    public MessagePersistenceLevel getPersistenceLevel() {
+        return persistenceLevel;
+    }
+
+    public void setPersistenceLevel(MessagePersistenceLevel persistenceLevel) {
+        this.persistenceLevel = persistenceLevel;
+    }
+
+    
+}

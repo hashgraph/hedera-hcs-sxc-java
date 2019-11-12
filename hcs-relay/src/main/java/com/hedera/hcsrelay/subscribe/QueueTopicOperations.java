@@ -138,7 +138,7 @@ public class QueueTopicOperations {
             Queue queueConfig = config.getConfig().getQueue();
             Hashtable<String, Object> props = new Hashtable<>();
             props.put(Context.INITIAL_CONTEXT_FACTORY, queueConfig.getInitialContextFactory());
-            //props.put("topic.topic/hcsTopic",  queueConfig.getTopic());
+            props.put("topic.topic/hcsTopic",  "hcsCatchAllTopics");
             props.put("connectionFactory.TCPConnectionFactory", queueConfig.getTcpConnectionFactory());
             InitialContext ctx = new InitialContext(props);
             ctx.lookup("TCPConnectionFactory");

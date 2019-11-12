@@ -5,6 +5,7 @@ import com.hedera.hcslib.interfaces.MessagePersistenceLevel;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
 import com.hedera.hcslib.proto.java.ApplicationMessageChunk;
 import com.hedera.hcslib.proto.java.TransactionID;
+import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages;
 import com.hedera.plugin.persistence.config.Config;
 import java.io.IOException;
 import java.util.HashMap;
@@ -26,10 +27,39 @@ public class PersistMessages
     }
     
     @Override
-    public void storeMessage(MessagePersistenceLevel level, ApplicationMessage.Builder applicationMessage) {
-    
-    }
+    public void storeMessage(
+            MessagePersistenceLevel level, // Override config
+            MirrorGetTopicMessages.MirrorGetTopicMessagesResponse.Builder applicationMessage) {
+        boolean logMessage = true;
+        
+//      log.info("Persist Message - logging level is " + level.toString());
 
+      switch (level) {
+          case NONE:
+              logMessage = false;
+              break;
+          case FULL:
+//              log.info("Timestamp : " + messagesResponse.getConsensusTimestamp());
+//              log.info("Message : " + messagesResponse.getMessage().toStringUtf8());
+//=              log.info("Running Hash : " + messagesResponse.getRunningHash().toStringUtf8());
+//              log.info("Sequence : " + messagesResponse.getSequenceNumber());
+          case MESSAGE_AND_PARTS:
+//              log.info("Timestamp : " + messagesResponse.getConsensusTimestamp());
+//              log.info("Message : " + messagesResponse.getMessage().toStringUtf8());
+//              log.info("Running Hash : " + messagesResponse.getRunningHash().toStringUtf8());
+//              log.info("Sequence : " + messagesResponse.getSequenceNumber());
+          case MESSAGE_ONLY:
+//              log.info("Message : " + messagesResponse.getMessage().toStringUtf8());
+      }
+//      if (logMessage) {
+//          // keep this in memory
+//          fullMessages.put(timeStampToNanos(messagesResponse.getConsensusTimestamp()), messagesResponse);
+//          System.out.println(":Logging " + messagesResponse.getMessage().toStringUtf8());
+//      } else {
+//          log.info("Not logging - logging level is NONE");
+    }
+        
+ 
     @Override
     public List<ApplicationMessageChunk> getParts(TransactionID applicationMessageId) {
         return this.partialMessages.get(applicationMessageId);

@@ -5,9 +5,11 @@ appNet:
   rotateKeyFrequency: 0
   topics:
     - topic: 0.0.1004
-queue:
-  - tcpConnectionFactory: "tcp://hcsqueue:61616"
+  persistenceLevel: "FULL"
 
+queue:
+  tcpConnectionFactory: "tcp://hcsqueue:61616"
+    
 HCSTransactionFee: 100000000
 
 nodes:

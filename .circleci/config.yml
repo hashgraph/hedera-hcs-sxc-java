@@ -17,11 +17,11 @@ jobs:
           MAVEN_OPTS: -Xmx3200m
     steps:
       - checkout #HCS Lib
-      - restore_cache:
-          keys:
-            - maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
-            - maven-v1-{{ .Branch }}
-            - maven-v1-
+      # - restore_cache:
+      #     keys:
+      #       - maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
+      #       - maven-v1-{{ .Branch }}
+      #       - maven-v1-
 #HCS java SDK
       - run:
           name: create directory for hcs java sdk
@@ -39,9 +39,9 @@ jobs:
       - run:
           name: Running maven (validate, compile, test, package)
           command: mvn package
-      - save_cache:
-          key: maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
-          paths:
-            - ~/.m2
+      # - save_cache:
+      #     key: maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
+      #     paths:
+      #       - ~/.m2
       - store_test_results:
           path: target/surefire-reports

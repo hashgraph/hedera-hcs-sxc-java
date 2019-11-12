@@ -18,16 +18,22 @@ jobs:
     steps:
       - run:
           name: create directory for hcs java sdk
-          command: mkdir hedera-sdk-java
+          command: mkdir sdk
       - run:
           name: git init
-          command: cd hedera-sdk-java; git init
+          command: cd sdk; git init
       - run:
           name: Running git pull on hcs java sdk
-          command: cd hedera-sdk-java; git clone -b HCS https://github.com/mike-burrage-hedera/hedera-sdk-java.git
+          command: cd sdk; git clone -b HCS https://github.com/mike-burrage-hedera/hedera-sdk-java.git
+      - run:
+          name: ls
+          command: cd sdk; ls
+      - run:
+          name: ls
+          command: cd sdk/hedera-sdk-java; ls
       - run:
           name: Running maven (install - skipping tests)
-          command: cd hedera-sdk-java; mvn install -DskipTests
+          command: cd sdk/hedera-sdk-java; mvn install -DskipTests
 #HCS Lib starts here
       - checkout
       - restore_cache:

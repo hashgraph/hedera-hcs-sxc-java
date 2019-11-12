@@ -19,6 +19,15 @@ jobs:
 
     steps:
       - run:
+          name: create directory for hcs java sdk
+          command: mkdir hedera-sdk-java
+      - run:
+          name: cd
+          command: cd hedera-sdk-java
+      - run:
+          name: git init
+          command: git init
+      - run:
           name: Running git pull on hcs java sdk
           command: git pull origin HCS git@github.com:mike-burrage-hedera/hedera-sdk-java.git
       - run:

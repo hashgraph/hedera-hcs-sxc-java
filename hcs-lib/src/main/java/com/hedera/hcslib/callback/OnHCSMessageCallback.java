@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcslib.HCSLib;
 import com.hedera.hcslib.interfaces.LibMessagePersistence;
+import com.hedera.hcslib.interfaces.MessagePersistenceLevel;
 
 import com.hedera.hcslib.messages.HCSRelayMessage;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
@@ -116,6 +117,8 @@ public final class OnHCSMessageCallback {
                                 messageFromJMS.acknowledge();
                             } else if (messageFromJMS instanceof ActiveMQObjectMessage) {
                                 HCSRelayMessage rlm = (HCSRelayMessage)((ActiveMQObjectMessage) messageFromJMS).getObject();
+                                 persistence.storeMessage(MessagePersistenceLevel.NONE, rlm.getTopicMessagesResponse().toBuilder());
+                                   
                                 ByteString message = rlm.getTopicMessagesResponse().getMessage();
                                 ApplicationMessageChunk messagePart = ApplicationMessageChunk.parseFrom(message);
                                 

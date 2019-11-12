@@ -18,5 +18,6 @@
 
     <modules>
       <module>simple-message-demo</module>
+      <module>settlement-demo</module>
     </modules>
 </project>

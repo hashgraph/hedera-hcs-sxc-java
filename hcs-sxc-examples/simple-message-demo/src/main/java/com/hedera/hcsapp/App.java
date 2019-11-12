@@ -21,22 +21,23 @@ public final class App {
         int topicIndex = 0; // refers to the first topic ID in the config.yaml
         
         // Simplest setup and send
-//        HCSLib hcsLib = new HCSLib();
-//        Config config = new Config();
-//        Dotenv dotEnv = Dotenv.configure().ignoreIfMissing().load();
+        Config config = new Config();
+        Dotenv dotEnv = Dotenv.configure().ignoreIfMissing().load();
 
-//        int appId = Integer.parseInt(dotEnv.get("APPID"));
-//
-//        System.out.println("****************************************");
-//        System.out.println("** Welcome to a simple HCS demo");
-//        System.out.println("** I am app: " + config.getConfig().getAppClients().get(appId).getClientName());
-//        System.out.println("****************************************");
-//        
-//        // create a callback object to receive the message
-//        OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsLib);
-//        onHCSMessageCallback.addObserver(message -> {
-//            System.out.println("Received : "+ message);
-//        });
+        int appId = Integer.parseInt(dotEnv.get("APPID"));
+
+        HCSLib hcsLib = new HCSLib(appId);
+
+        System.out.println("****************************************");
+        System.out.println("** Welcome to a simple HCS demo");
+        System.out.println("** I am app: " + config.getConfig().getAppClients().get(appId).getClientName());
+        System.out.println("****************************************");
+        
+        // create a callback object to receive the message
+        OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsLib);
+        onHCSMessageCallback.addObserver(message -> {
+            System.out.println("Received : "+ message);
+        });
 
         while (true) {
             
@@ -50,19 +51,19 @@ public final class App {
                 System.exit(0);
             }
             
-//            Boolean messageSuccess;
-//            try {
-//                messageSuccess = new OutboundHCSMessage(hcsLib)
-//                        .overrideEncryptedMessages(false)
-//                        .overrideMessageSignature(false)
-//                        .sendMessage(topicIndex, userInput);
-//
-//                if (messageSuccess) {
-//                    System.out.println("Message sent successfully.");
-//                }
-//            } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
-//                e.printStackTrace();
-//            }
+            Boolean messageSuccess;
+            try {
+                messageSuccess = new OutboundHCSMessage(hcsLib)
+                        .overrideEncryptedMessages(false)
+                        .overrideMessageSignature(false)
+                        .sendMessage(topicIndex, userInput);
+
+                if (messageSuccess) {
+                    System.out.println("Message sent successfully.");
+                }
+            } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
+                e.printStackTrace();
+            }
         }            
     }
 }

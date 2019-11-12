@@ -45,7 +45,7 @@
                             <from>
                                 <image>adoptopenjdk/openjdk10:jdk-10.0.2.13-alpine</image>
                             </from>
-                            <to>
+                             <to>
                                 <image>hederahashgraph/simple-message-demo:latest</image>
                                 <tags>
                                     <tag>${project.version}</tag>
@@ -55,7 +55,7 @@
                                 <paths>
                                     <path>src/main/resources</path>
                                     <path>.</path>
-                                    <path>../hcs-sxc-plugins/lib-persistence-in-memory/target</path>
+                                    <path>../../hcs-sxc-plugins/lib-persistence-in-memory/target</path>
                                 </paths>
                             </extraDirectories>
                             <mainClass>com.hedera.simple-message-demo.App</mainClass>

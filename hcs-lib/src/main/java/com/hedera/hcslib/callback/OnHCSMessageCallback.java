@@ -51,56 +51,50 @@ public final class OnHCSMessageCallback {
         Class<?> persistenceClass = Plugins.find("com.hedera.plugin.persistence.*", "com.hedera.hcslib.interfaces.LibMessagePersistence", true);
         persistence = (LibMessagePersistence)persistenceClass.newInstance();
 
-        String jmsAddress = hcsLib.getJmsAddress();
+        String contextFactory = hcsLib.getInitialContextFactory();
+        String tcpConnectionFactory = hcsLib.getTCPConnectionFactory();
         Runnable runnable;
         runnable = () -> { 
             InitialContext initialContext = null;
             javax.jms.Connection connection = null;
             try {
+                
                 Hashtable<String, Object> props = new Hashtable<>();
-                props.put(Context.INITIAL_CONTEXT_FACTORY, "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory");
+                props.put(Context.INITIAL_CONTEXT_FACTORY, contextFactory);
                 props.put("topic.topic/hcsTopic", "hcsCatchAllTopics");
-                props.put("connectionFactory.TCPConnectionFactory", jmsAddress);
-                InitialContext ctx = new InitialContext(props);
+                props.put("connectionFactory.TCPConnectionFactory", tcpConnectionFactory);
+                InitialContext ctx = null;
+                while (ctx == null) {
+                    try {
+                        ctx = new InitialContext(props);
+                    }
+                    catch (NamingException ex) {
+                        System.out.println("Error connecting to queue, retrying in 3s");
+                        Thread.sleep(3000);
+                    }
+                } 
                 ctx.lookup("TCPConnectionFactory");
 
-                // Create an initial context to perform the JNDI lookup.
                 initialContext = ctx;
 
-                // Look-up the JMS topic
                 Topic topic = (Topic) initialContext.lookup("topic/hcsTopic");
 
-                // Look-up the JMS connection factory
                 ConnectionFactory cf = (ConnectionFactory) initialContext.lookup("TCPConnectionFactory");
 
-                // Create a JMS connection
                 connection = cf.createConnection();
 
-                // Set the client-id on the connection
-                connection.setClientID("operator-client-"+hcsLib.getOperatorAccountId().getAccountNum());
+                connection.setClientID("operator-client-" + hcsLib.getApplicationId());
 
-                // Start the connection
                 connection.start();
 
-                // Create a JMS session
                 Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-                // Create a JMS message producer
-                //MessageProducer messageProducer = session.createProducer(topic);
-
-                // Create the subscription and the subscriber.
                 TopicSubscriber subscriber = session.createDurableSubscriber(topic, "subscriber-hcsCatchAllTopics-in-lib");
 
-                //for synchronous receive do
-                //Message receive = subscriber.receive();
-                //log.info(((javax.jms.TextMessage)receive).getText());
-
-                //for async receive do
                 subscriber.setMessageListener(new MessageListener() {
                     @Override
                     public void onMessage(Message messageFromJMS) {
                         try {
-                            //log.info("Message Received from JMS forward to app.java observers");
                             // notify subscribed observer from App.java
                             if (messageFromJMS instanceof ActiveMQTextMessage) {
                                 OnHCSMessageCallback.this.notifyObservers(((ActiveMQTextMessage)messageFromJMS).getText());
@@ -134,11 +128,6 @@ public final class OnHCSMessageCallback {
                     lock.wait();
                 }
                 
-                
-                //consumer.setMessageListener(
-                //        new AckMessageListener(true));
-
-                //Thread.sleep(1000);
                 session.close();
             } catch (NamingException ex) {
                 log.error(ex);
@@ -154,7 +143,6 @@ public final class OnHCSMessageCallback {
                         log.error(ex);
                     }
                 }
-                //broker.stop();
             }
         };
         Thread thread = new Thread(runnable);

@@ -1,4 +1,4 @@
-package com.hedera.hcsapp;
+package com.hedera.hcsapp.appconfig;
 
 import java.util.ArrayList;
 import java.util.List;

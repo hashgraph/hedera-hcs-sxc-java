@@ -1,4 +1,4 @@
-package com.hedera.hcsapp;
+package com.hedera.hcsapp.appconfig;
 
 public class AppClient {
     private String clientName = "";

@@ -1,4 +1,4 @@
-package com.hedera.hcsapp;
+package com.hedera.hcsapp.appconfig;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,10 +12,10 @@ import org.yaml.snakeyaml.constructor.Constructor;
  * Manages configuration
  */
 
-public final class Config {
+public final class AppConfig {
     private AppYAML yamlConfig = new AppYAML();
     
-    public Config() throws FileNotFoundException, IOException {
+    public AppConfig() throws FileNotFoundException, IOException {
         Yaml yaml = new Yaml(new Constructor(AppYAML.class));
         
         InputStream inputStream = this.getClass()

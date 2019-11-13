@@ -22,12 +22,47 @@
             <artifactId>hcs-lib</artifactId>
             <version>${hcslib.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.hedera</groupId>
-            <artifactId>lib-persistence-in-memory</artifactId>
-            <version>${hcslib.version}</version>
-        </dependency>
+        <!-- <dependency> <groupId>com.hedera</groupId> <artifactId>lib-persistence-in-memory</artifactId> 
+            <version>${hcslib.version}</version> </dependency> -->
     </dependencies>
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven-dependency-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>com.hedera.hcsapp.App</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
         <!-- profile which adds the possibility to build docker images Call 
@@ -45,7 +80,7 @@
                             <from>
                                 <image>adoptopenjdk/openjdk10:jdk-10.0.2.13-alpine</image>
                             </from>
-                             <to>
+                            <to>
                                 <image>hederahashgraph/simple-message-demo:latest</image>
                                 <tags>
                                     <tag>${project.version}</tag>

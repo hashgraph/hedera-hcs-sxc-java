@@ -18,19 +18,24 @@ public final class App {
     
     public static void main(String[] args) throws Exception {
         
+        long appId = 0;
+        
+        if (args.length == 0) {
+            System.out.println("Missing application ID argument");
+            System.exit(0);
+        } else {
+            appId = Long.parseLong(args[0]);
+        }
         int topicIndex = 0; // refers to the first topic ID in the config.yaml
         
         // Simplest setup and send
         Config config = new Config();
         Dotenv dotEnv = Dotenv.configure().ignoreIfMissing().load();
-
-        int appId = Integer.parseInt(dotEnv.get("APP_ID"));
-
         HCSLib hcsLib = new HCSLib(appId);
 
         System.out.println("****************************************");
         System.out.println("** Welcome to a simple HCS demo");
-        System.out.println("** I am app: " + config.getConfig().getAppClients().get(appId).getClientName());
+        System.out.println("** I am app: " + config.getConfig().getAppClients().get((int) appId).getClientName());
         System.out.println("****************************************");
         
         // create a callback object to receive the message

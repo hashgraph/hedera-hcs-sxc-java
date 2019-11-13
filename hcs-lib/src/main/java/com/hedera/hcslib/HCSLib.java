@@ -26,9 +26,13 @@ public final class HCSLib {
     private String tcpConnectionFactory = "";
     private String initialContextFactory = "";
     private long hcsTransactionFee = 0;
-    private int applicationId = 0;
-    
-    public HCSLib(int applicationId) throws FileNotFoundException, IOException {
+    private long applicationId = 0;
+    /**
+     * Constructor for HCS Lib
+     * @param applicationId - unique value per app instance using the library, if the app generates this value and stops/starts,
+     * it must reuse the same applicationId to ensure consistent message delivery
+     */
+    public HCSLib(long applicationId) throws FileNotFoundException, IOException {
         Config config = new Config();
         Environment environment = new Environment();
         
@@ -106,7 +110,7 @@ public final class HCSLib {
     public long getHCSTransactionFee() {
         return this.hcsTransactionFee;
     }
-    public int getApplicationId() {
+    public long getApplicationId() {
         return this.applicationId;
     }
 }

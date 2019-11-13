@@ -8,7 +8,7 @@ appNet:
   persistenceLevel: "FULL"
 
 queue:
-  tcpConnectionFactory: "tcp://hcsqueue:61616"
+  tcpConnectionFactory: "tcp://localhost:61616"
   initialContextFactory: "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
     
 HCSTransactionFee: 100000000

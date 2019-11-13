@@ -63,16 +63,8 @@ public final class OnHCSMessageCallback {
                 props.put(Context.INITIAL_CONTEXT_FACTORY, contextFactory);
                 props.put("topic.topic/hcsTopic", "hcsCatchAllTopics");
                 props.put("connectionFactory.TCPConnectionFactory", tcpConnectionFactory);
-                InitialContext ctx = null;
-                while (ctx == null) {
-                    try {
-                        ctx = new InitialContext(props);
-                    }
-                    catch (NamingException ex) {
-                        System.out.println("Error connecting to queue, retrying in 3s");
-                        Thread.sleep(3000);
-                    }
-                } 
+                InitialContext ctx = new InitialContext(props);
+                
                 ctx.lookup("TCPConnectionFactory");
 
                 initialContext = ctx;

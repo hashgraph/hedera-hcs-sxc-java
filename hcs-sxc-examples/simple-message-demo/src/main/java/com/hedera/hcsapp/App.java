@@ -24,7 +24,7 @@ public final class App {
         Config config = new Config();
         Dotenv dotEnv = Dotenv.configure().ignoreIfMissing().load();
 
-        int appId = Integer.parseInt(dotEnv.get("APPID"));
+        int appId = Integer.parseInt(dotEnv.get("APP_ID"));
 
         HCSLib hcsLib = new HCSLib(appId);
 

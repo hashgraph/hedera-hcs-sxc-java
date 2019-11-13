@@ -8,7 +8,8 @@ appNet:
   persistenceLevel: "FULL"
 
 queue:
-  tcpConnectionFactory: "tcp://hcsqueue:61616"
+  tcpConnectionFactory: "tcp://localhost:61616"
+  initialContextFactory: "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
     
 HCSTransactionFee: 100000000
 
@@ -22,5 +23,3 @@ nodes:
 #    account: 0.0.5
 #  - address: 3.testnet.hedera.com:50211
 #    account: 0.0.6
-    
-    

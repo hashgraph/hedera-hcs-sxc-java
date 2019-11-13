@@ -2,10 +2,7 @@ package com.hedera.hcslib.config;
 
 public final class Queue {
     private String initialContextFactory = "";
-    private String topic = "";
-    private String vmConnectionFactory = "";
     private String tcpConnectionFactory = "";
-    private String JGroupsConnectionFactory = "";
     
     public String getInitialContextFactory() {
         return this.initialContextFactory;

@@ -11,15 +11,10 @@ public final class Queue {
     public void setInitialContextFactory(String contextFactory) {
         this.initialContextFactory = contextFactory;
     }
-
-
     public String getTcpConnectionFactory() {
         return this.tcpConnectionFactory;
     }
     public void setTcpConnectionFactory(String tcpConnectionFactory) {
         this.tcpConnectionFactory = tcpConnectionFactory;
     }
-
-    
-    
 }

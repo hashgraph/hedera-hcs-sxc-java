@@ -25,30 +25,31 @@ services:
       ]
     hcs-relay:
         depends_on:
-            - hcsqueue
+          - hcsqueue
         image: hederahashgraph/hcs-relay:latest
         restart: on-failure
         networks: [backing-services]
 
            
-    # player2:
-    #   image:
-    #   restart: always
-    #   environment:
-    #     - APPID=1
-    #   tty: true
-    #   ports:
-    #     - 8080:8081
-   
-       
-    # player2:
-    #   image:
-    #   restart: always
-    #   environment:
-    #     - APPID=1
-    #   tty: true
-    #   ports:
-    #     - 8080:8081
+    player1:
+      depends_on:
+        - hcsqueue
+      image: hederahashgraph/simple-message-demo:latest
+      restart: always
+      environment:
+        - APPID=0
+      tty: true
+      networks: [backing-services]
+
+    player2:
+      depends_on:
+        - hcsqueue
+      image: hederahashgraph/simple-message-demo:latest
+      restart: always
+      environment:
+        - APPID=1
+      tty: true
+      networks: [backing-services]
 
 volumes:
   activemq-data: {}

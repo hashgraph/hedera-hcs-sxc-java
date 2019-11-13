@@ -51,6 +51,8 @@ public final class App {
 
             System.out.println("Input a message to send to other parties:");
             String userInput = scan.nextLine();
+
+            scan.close();
             
             if (userInput.equals("exit")) {
                 System.exit(0);

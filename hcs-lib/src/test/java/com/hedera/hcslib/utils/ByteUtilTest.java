@@ -57,7 +57,6 @@ public class ByteUtilTest {
         ByteString bRandom1 =  ByteString.copyFrom(random1.getBytes());
         ByteString bRandom2 =  ByteString.copyFrom(random2.getBytes());
         
-        ByteString[] byteStrings = null;
         ByteString expResult = bRandom1.concat(bRandom2);
         ByteString result = ByteUtil.merge(bRandom1, bRandom2);
         assertEquals(expResult, result);

@@ -82,10 +82,10 @@ In terminal
 docker-compose up
 ```
 
-open up to three additional terminal windows
+open an additional terminal window
 
 ```shell
-cd hcs-sxc/
+cd hcs-sxc
 cd hedera-hcs-sxc
 cd hcs-sxc-examples/simple-message-demo
 cp .env.sample .env
@@ -101,10 +101,24 @@ APP_ID=0
 ```
 
 ```
-./runapp x
+./runapp 0
 ```
 
-where x is 0, 1 or 2, one value per terminal window
+then in two additional terminal windows
+
+```shell
+cd hcs-sxc
+cd hedera-hcs-sxc
+cd hcs-sxc-examples/simple-message-demo
+./runapp 1
+```
+
+```shell
+cd hcs-sxc
+cd hedera-hcs-sxc
+cd hcs-sxc-examples/simple-message-demo
+./runapp 2
+```
 
 ### Windows
 
@@ -178,14 +192,40 @@ mvnw clean install -Pdocker
 docker-compose up
 ```
 
-open up to three additional terminal windows
+open an additional terminal window
 
 ```shell
-cd hcs-sxc/
+cd hcs-sxc
 cd hedera-hcs-sxc
-cd hcs-sxc-examples/simple-message-demo
-runapp x
+cd hcs-sxc-examples\simple-message-demo
+copy .env.sample .env
+edit .env
 ```
 
-where x is 0, 1 or 2, one value per terminal window
+sample .env file
 
+```
+OPERATOR_KEY=your privake key (302e020100....)
+OPERATOR_ID=0.0.2
+APP_ID=0
+```
+
+```
+runapp 0
+```
+
+then in two additional terminal windows
+
+```shell
+cd hcs-sxc
+cd hedera-hcs-sxc
+cd hcs-sxc-examples\simple-message-demo
+runapp 1
+```
+
+```shell
+cd hcs-sxc
+cd hedera-hcs-sxc
+cd hcs-sxc-examples\simple-message-demo
+runapp 2
+```

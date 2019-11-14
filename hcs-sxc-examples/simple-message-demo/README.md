@@ -19,7 +19,7 @@ git init
 git clone https://github.com/hashgraph/hedera-hcs-sxc.git
 cd hedera-hcs-sxc
 cp hcs-relay/src/main/resources/config.yaml.sample hcs-relay/src/main/resources/config.yaml
-nano cp hcs-relay/src/main/resources/config.yaml
+nano hcs-relay/src/main/resources/config.yaml
 ```
 
 sample config.yaml
@@ -93,7 +93,7 @@ git init
 git clone https://github.com/hashgraph/hedera-hcs-sxc.git
 cd hedera-hcs-sxc
 copy hcs-relay\src\main\resources\config.yaml.sample hcs-relay\src\main\resources\config.yaml
-edit cp hcs-relay\src\main\resources\config.yaml
+edit hcs-relay\src\main\resources\config.yaml
 ```
 
 sample config.yaml

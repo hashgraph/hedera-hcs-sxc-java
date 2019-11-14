@@ -1,14 +1,18 @@
 <html>
     <head>
         <!-- Required styles for MDC Web -->
+        <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
         <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <style>
+            :root {--mdc-theme-primary: rgb(69, 90, 100)}
             body {
                 display: flex;
                 height: 100vh;
                 padding: 0px;
                 margin: 0px;
+                background-color: #fafafa;
             }
 
             .mdc-drawer-app-content {
@@ -29,57 +33,228 @@
             .mdc-top-app-bar {
                 z-index: 7;
             }
+            .mdc-drawer{
+                background-color: #fafafa;
+            }
         </style>
     </head>
     <body>
-        <header class="mdc-top-app-bar app-bar" id="app-bar">
+        <header class="mdc-top-app-bar app-bar mdc-top-app-bar--fixed" id="app-bar">     
             <div class="mdc-top-app-bar__row">
                 <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-                    <a href="#" class="demo-menu material-icons mdc-top-app-bar__navigation-icon">menu</a>
-                    <span class="mdc-top-app-bar__title">HCS - SCX</span>
+                    <button href="#" class="demo-menu   mdc-icon-button material-icons  mdc-top-app-bar__navigation-icon">menu</button>
+                    <span class="mdc-top-app-bar__title">HCS - Settlement Demo</span>
                 </section>
-            </div>
+                <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end">
+                    <button class="mdc-icon-button material-icons mdc-top-app-bar__action-item--unbounded" aria-label="Download">file_download</button>
+                    <button class="mdc-icon-button material-icons mdc-top-app-bar__action-item--unbounded" aria-label="Print this page">print</button>
+                    <button class="mdc-icon-button material-icons mdc-top-app-bar__action-item--unbounded" aria-label="Bookmark this page">bookmark</button>
+                </section>
+            </div>           
         </header>
         <aside class="mdc-drawer mdc-drawer--dismissible mdc-top-app-bar--fixed-adjust">
             <div class="mdc-drawer__content">
-                <div class="mdc-list">
+                <header class="mdc-top-app-bar  mdc-top-app-bar--fixed mdc-theme--primary
+                        " 
+                        style="background-color: #fafafa;
+                        border-bottom: 1px solid rgba(0,0,0,.12);
+                        "
+                        id="app-bar-of-main-content">     
+                    <div class="mdc-top-app-bar__row">
+                        <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+                            <span class="mdc-top-app-bar__title
+                                  mdc-typography--body1
+                                  "
+                                  style="padding: 0px"
+
+                                  >App ID: 1</span>
+                        </section>
+
+                    </div>           
+                </header>
+                <div class="mdc-list  mdc-top-app-bar--fixed-adjust">
+
+                    <a class="mdc-list-item" href="#">
+                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">home</i>
+                        <span class="mdc-list-item__text">Overview</span>
+                    </a>
                     <a class="mdc-list-item mdc-list-item--activated" href="#" aria-current="page">
-                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">inbox</i>
-                        <span class="mdc-list-item__text">Inbox</span>
+                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">money</i>
+                        <span class="mdc-list-item__text">Credits and Debits</span>
                     </a>
-                    <a class="mdc-list-item" href="#">
-                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">send</i>
-                        <span class="mdc-list-item__text">Outgoing</span>
+                    <a class="mdc-list-item " href="#" aria-current="page">
+                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">verified_user</i>
+                        <span class="mdc-list-item__text">Settlements</span>
                     </a>
-                    <a class="mdc-list-item" href="#">
-                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">drafts</i>
-                        <span class="mdc-list-item__text">Drafts</span>
+                    <a class="mdc-list-item" href="#" aria-current="page">
+                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">group</i>
+                        <span class="mdc-list-item__text">Addresses</span>
                     </a>
+                    <a class="mdc-list-item" href="#" aria-current="page">
+                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">remove_red_eye</i>
+                        <span class="mdc-list-item__text">Audit</span>
+                    </a>
+                    <div role="separator" class="mdc-list-divider"></div>
+                    <a class="mdc-list-item" href="#" aria-current="page">
+                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">account_box</i>
+                        <span class="mdc-list-item__text">Account</span>
+                    </a>
+
+
                 </div>
             </div>
         </aside>
 
         <div class="mdc-drawer-app-content mdc-top-app-bar--fixed-adjust">
             <main class="main-content" id="main-content">
-                App Content
+
+                <header class="mdc-top-app-bar  mdc-top-app-bar--fixed 
+                        mdc-theme--primary
+                        " 
+                        style="background: white; box-shadow: 0 4px 4px -2px gray;"
+                        id="app-bar-of-main-content">     
+                    <div class="mdc-top-app-bar__row">
+                        <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+                            <b class="mdc-top-app-bar__title ">
+                                Outstanding Credits and Debits
+                            </b>
+                        </section>
+
+                    </div>           
+                </header>
+
+                <div class="mdc-top-app-bar--fixed-adjust
+                     mdc-typography--body2
+                     "
+                     style='margin: 32px;'
+                     >
+
+
+                    With the Hedera Consensus Service you can develop applications like stock markets, audit logs, stable coins, or new network services that require high throughput and decentralized trust. This is made possible by having direct access to the native speed, security, and fair ordering guarantees of the hashgraph consensus algorithm, with the full trust of the Hedera ledger.
+                    Consensus without compromise
+                    Build natively
+                    Create applications that are as fast as native services, because they take advantage of the native speed of the hashgraph consensus algorithm.
+                    Amplify trust
+                    Bring the full trust of the Hedera ledger to private networks, even if the members of the private network aren't trusted: the trusted nodes in Hedera amplify the trust of the private network.
+                    Guarantee order
+                    The Consensus Service uses hashgraph to put transactions into a consensus order, with fair timestamps, along with state proofs that guarantee it is correct.
+                    Consensus Service API and network features
+                    Topic Management
+
+                    Topics make it simple to organize transactions, so each application only receives the messages it needs.
+                    Consensus Order
+
+                    Messages are put into consensus order and given a timestamp by the Hedera network, with cryptographic proofs, so they are as trustworthy as the full Hedera network.
+                    Audit log
+
+                    Messages are cryptographically tied together with a running hash to provide an auditable, tamper-proof log of history.
+                    Scalable transactions
+
+                    Message processing and storage are kept outside the Hedera network. This allows higher speed and scalability.
+                    Low Fees
+
+                    The high speed and good scaling ensure low, micropayment fees on par with Hedera Cryptocurrency.
+                    Historical Data
+
+                    The Hedera Consensus Service ensures speed and security are kept on the ledger while storage is kept off-ledger. Choose to keep everything, nothing, or anything in between.
+                    “There are a number of challenges in using traditional ordering services for decentralized applications. By exposing this capability, Hedera is making a meaningful contribution to furthering the capabilities of distributed networks.”
+
+                    Bryan Gross, Principal Product Manager
+                    IBM Blockchain Platform
+                    Log the truth
+
+                    Even if an application runs on a network that is not well trusted, that trust can be amplified by relying on the trusted Hedera ledger for the consensus ordering and timestamps. Track an item through a supply chain, provide a transparent bidding system, or process transactions, with auditable logs of the history. 
+
+                           With the Hedera Consensus Service you can develop applications like stock markets, audit logs, stable coins, or new network services that require high throughput and decentralized trust. This is made possible by having direct access to the native speed, security, and fair ordering guarantees of the hashgraph consensus algorithm, with the full trust of the Hedera ledger.
+                    Consensus without compromise
+                    Build natively
+                    Create applications that are as fast as native services, because they take advantage of the native speed of the hashgraph consensus algorithm.
+                    Amplify trust
+                    Bring the full trust of the Hedera ledger to private networks, even if the members of the private network aren't trusted: the trusted nodes in Hedera amplify the trust of the private network.
+                    Guarantee order
+                    The Consensus Service uses hashgraph to put transactions into a consensus order, with fair timestamps, along with state proofs that guarantee it is correct.
+                    Consensus Service API and network features
+                    Topic Management
+
+                    Topics make it simple to organize transactions, so each application only receives the messages it needs.
+                    Consensus Order
+
+                    Messages are put into consensus order and given a timestamp by the Hedera network, with cryptographic proofs, so they are as trustworthy as the full Hedera network.
+                    Audit log
+
+                    Messages are cryptographically tied together with a running hash to provide an auditable, tamper-proof log of history.
+                    Scalable transactions
+
+                    Message processing and storage are kept outside the Hedera network. This allows higher speed and scalability.
+                    Low Fees
+
+                    The high speed and good scaling ensure low, micropayment fees on par with Hedera Cryptocurrency.
+                    Historical Data
+
+                    The Hedera Consensus Service ensures speed and security are kept on the ledger while storage is kept off-ledger. Choose to keep everything, nothing, or anything in between.
+                    “There are a number of challenges in using traditional ordering services for decentralized applications. By exposing this capability, Hedera is making a meaningful contribution to furthering the capabilities of distributed networks.”
+
+                    Bryan Gross, Principal Product Manager
+                    IBM Blockchain Platform
+                    Log the truth
+
+                    Even if an application runs on a network that is not well trusted, that trust can be amplified by relying on the trusted Hedera ledger for the consensus ordering and timestamps. Track an item through a supply chain, provide a transparent bidding system, or process transactions, with auditable logs of the history. 
+       With the Hedera Consensus Service you can develop applications like stock markets, audit logs, stable coins, or new network services that require high throughput and decentralized trust. This is made possible by having direct access to the native speed, security, and fair ordering guarantees of the hashgraph consensus algorithm, with the full trust of the Hedera ledger.
+                    Consensus without compromise
+                    Build natively
+                    Create applications that are as fast as native services, because they take advantage of the native speed of the hashgraph consensus algorithm.
+                    Amplify trust
+                    Bring the full trust of the Hedera ledger to private networks, even if the members of the private network aren't trusted: the trusted nodes in Hedera amplify the trust of the private network.
+                    Guarantee order
+                    The Consensus Service uses hashgraph to put transactions into a consensus order, with fair timestamps, along with state proofs that guarantee it is correct.
+                    Consensus Service API and network features
+                    Topic Management
+
+                    Topics make it simple to organize transactions, so each application only receives the messages it needs.
+                    Consensus Order
+
+                    Messages are put into consensus order and given a timestamp by the Hedera network, with cryptographic proofs, so they are as trustworthy as the full Hedera network.
+                    Audit log
+
+                    Messages are cryptographically tied together with a running hash to provide an auditable, tamper-proof log of history.
+                    Scalable transactions
+
+                    Message processing and storage are kept outside the Hedera network. This allows higher speed and scalability.
+                    Low Fees
+
+                    The high speed and good scaling ensure low, micropayment fees on par with Hedera Cryptocurrency.
+                    Historical Data
+
+                    The Hedera Consensus Service ensures speed and security are kept on the ledger while storage is kept off-ledger. Choose to keep everything, nothing, or anything in between.
+                    “There are a number of challenges in using traditional ordering services for decentralized applications. By exposing this capability, Hedera is making a meaningful contribution to furthering the capabilities of distributed networks.”
+
+                    Bryan Gross, Principal Product Manager
+                    IBM Blockchain Platform
+                    Log the truth
+
+                    Even if an application runs on a network that is not well trusted, that trust can be amplified by relying on the trusted Hedera ledger for the consensus ordering and timestamps. Track an item through a supply chain, provide a transparent bidding system, or process transactions, with auditable logs of the history. 
+
+                    
+                    
+                </div>
+
             </main>
         </div>
 
 
-
-        <!-- Required MDC Web JavaScript library -->
         <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
-        <!-- Instantiate single textfield component rendered in the document -->
         <script>
-            //mdc.textField.MDCTextField.attachTo(document.querySelector('.mdc-text-field'));
             drawer = mdc.drawer.MDCDrawer.attachTo(document.querySelector('.mdc-drawer'));
+            drawer.open = true;
+            list = mdc.list.MDCList.attachTo(document.querySelector('.mdc-list'));
 
             topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
-
             topAppBar.setScrollTarget(document.getElementById('main-content'));
             topAppBar.listen('MDCTopAppBar:nav', () => {
                 drawer.open = !drawer.open;
             });
+
+            //list.wrapFocus = true;
 
         </script>
     </body>

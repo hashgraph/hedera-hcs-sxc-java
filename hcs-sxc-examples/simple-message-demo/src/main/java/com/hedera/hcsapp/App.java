@@ -44,17 +44,16 @@ public final class App {
             System.out.println("Received : "+ message);
         });
 
+        Scanner scan = new Scanner(System.in);
         while (true) {
             
             // wait for user input
-            Scanner scan = new Scanner(System.in);
-
             System.out.println("Input a message to send to other parties:");
             String userInput = scan.nextLine();
             
-            scan.close();
             
             if (userInput.equals("exit")) {
+                scan.close();
                 System.exit(0);
             }
             

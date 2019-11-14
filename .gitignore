@@ -53,3 +53,5 @@ org.eclipse.jdt.core.prefs
 /hcs-sxc-plugins/lib-persistence-in-memory/.settings
 /hcs-sxc-examples/settlement-demo/target
 /hcs-sxc-examples/simple-message-demo/runapp-nik.sh
+/hcs-sxc-examples/settlement-demo/h2data
+

@@ -4,7 +4,9 @@ Simple demo to showcase HCS-SXC, this shows how up to three separate app instanc
 
 ## Pre-requisites
 
-Have docker and docker-compose installed.
+- docker and docker-compose installed
+- docker is running
+- maven installed
 
 ## Build and run
 
@@ -13,13 +15,22 @@ Have docker and docker-compose installed.
 In terminal
 
 ```shell
+mkdir java-sdk
+cd java-sdk
+git init
+git clone -b HCS https://github.com/mike-burrage-hedera/hedera-sdk-java
+cd hedera-sdk-java
+mvn install -DskipTests
+
+cd ../..
+
 mkdir hcs-sxc
 cd hcs-sxc
 git init
 git clone https://github.com/hashgraph/hedera-hcs-sxc.git
 cd hedera-hcs-sxc
 cp hcs-relay/src/main/resources/config.yaml.sample hcs-relay/src/main/resources/config.yaml
-nano cp hcs-relay/src/main/resources/config.yaml
+nano hcs-relay/src/main/resources/config.yaml
 ```
 
 sample config.yaml
@@ -71,29 +82,65 @@ In terminal
 docker-compose up
 ```
 
-open up to three additional terminal windows
+open an additional terminal window
 
 ```shell
-cd hcs-sxc/
+cd hcs-sxc
 cd hedera-hcs-sxc
 cd hcs-sxc-examples/simple-message-demo
-./runapp x
+cp .env.sample .env
+nano .env
 ```
 
-where x is 0, 1 or 2, one value per terminal window
+sample .env file
+
+```
+OPERATOR_KEY=your privake key (302e020100....)
+OPERATOR_ID=0.0.2
+APP_ID=0
+```
+
+```
+./runapp.sh 0
+```
+
+then in two additional terminal windows
+
+```shell
+cd hcs-sxc
+cd hedera-hcs-sxc
+cd hcs-sxc-examples/simple-message-demo
+./runapp.sh 1
+```
+
+```shell
+cd hcs-sxc
+cd hedera-hcs-sxc
+cd hcs-sxc-examples/simple-message-demo
+./runapp.sh 2
+```
 
 ### Windows
 
 In command line
 
 ```shell
+mkdir java-sdk
+cd java-sdk
+git init
+git clone -b HCS https://github.com/mike-burrage-hedera/hedera-sdk-java
+cd hedera-sdk-java
+mvn install -DskipTests
+
+cd ..\..
+
 mkdir hcs-sxc
 cd hcs-sxc
 git init
 git clone https://github.com/hashgraph/hedera-hcs-sxc.git
 cd hedera-hcs-sxc
 copy hcs-relay\src\main\resources\config.yaml.sample hcs-relay\src\main\resources\config.yaml
-edit cp hcs-relay\src\main\resources\config.yaml
+edit hcs-relay\src\main\resources\config.yaml
 ```
 
 sample config.yaml
@@ -145,14 +192,40 @@ mvnw clean install -Pdocker
 docker-compose up
 ```
 
-open up to three additional terminal windows
+open an additional terminal window
 
 ```shell
-cd hcs-sxc/
+cd hcs-sxc
 cd hedera-hcs-sxc
-cd hcs-sxc-examples/simple-message-demo
-runapp x
+cd hcs-sxc-examples\simple-message-demo
+copy .env.sample .env
+edit .env
 ```
 
-where x is 0, 1 or 2, one value per terminal window
+sample .env file
 
+```
+OPERATOR_KEY=your privake key (302e020100....)
+OPERATOR_ID=0.0.2
+APP_ID=0
+```
+
+```
+runapp 0
+```
+
+then in two additional terminal windows
+
+```shell
+cd hcs-sxc
+cd hedera-hcs-sxc
+cd hcs-sxc-examples\simple-message-demo
+runapp 1
+```
+
+```shell
+cd hcs-sxc
+cd hedera-hcs-sxc
+cd hcs-sxc-examples\simple-message-demo
+runapp 2
+```

@@ -101,7 +101,7 @@ APP_ID=0
 ```
 
 ```
-./runapp 0
+./runapp.sh 0
 ```
 
 then in two additional terminal windows
@@ -110,14 +110,14 @@ then in two additional terminal windows
 cd hcs-sxc
 cd hedera-hcs-sxc
 cd hcs-sxc-examples/simple-message-demo
-./runapp 1
+./runapp.sh 1
 ```
 
 ```shell
 cd hcs-sxc
 cd hedera-hcs-sxc
 cd hcs-sxc-examples/simple-message-demo
-./runapp 2
+./runapp.sh 2
 ```
 
 ### Windows

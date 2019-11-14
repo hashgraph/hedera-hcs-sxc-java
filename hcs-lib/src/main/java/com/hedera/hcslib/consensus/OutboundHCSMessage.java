@@ -86,12 +86,11 @@ public final class OutboundHCSMessage {
      *
      * @param topicIndex the index reference in one of {@link #topicIds}
      * @param message
-     * @return
      * @throws HederaNetworkException
      * @throws IllegalArgumentException
      * @throws HederaException
      */
-    public boolean sendMessage(int topicIndex, String message) throws HederaNetworkException, IllegalArgumentException, HederaException {
+    public void sendMessage(int topicIndex, String message) throws HederaNetworkException, IllegalArgumentException, HederaException {
 
         if (signMessages) {
 
@@ -136,8 +135,6 @@ public final class OutboundHCSMessage {
             */
             
         }
-        
-        return true;
     }
 
     public static  List<ApplicationMessageChunk> chunk(TransactionId transactionId,  String message) {

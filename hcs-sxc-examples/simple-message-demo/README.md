@@ -5,6 +5,7 @@ Simple demo to showcase HCS-SXC, this shows how up to three separate app instanc
 ## Pre-requisites
 
 - docker and docker-compose installed
+- docker is running
 - maven installed
 
 ## Build and run
@@ -87,6 +88,19 @@ open up to three additional terminal windows
 cd hcs-sxc/
 cd hedera-hcs-sxc
 cd hcs-sxc-examples/simple-message-demo
+cp .env.sample .env
+nano .env
+```
+
+sample .env file
+
+```
+OPERATOR_KEY=your privake key (302e020100....)
+OPERATOR_ID=0.0.2
+APP_ID=0
+```
+
+```
 ./runapp x
 ```
 

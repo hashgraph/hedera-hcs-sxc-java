@@ -4,7 +4,8 @@ Simple demo to showcase HCS-SXC, this shows how up to three separate app instanc
 
 ## Pre-requisites
 
-Have docker and docker-compose installed.
+- docker and docker-compose installed
+- maven installed
 
 ## Build and run
 
@@ -13,6 +14,15 @@ Have docker and docker-compose installed.
 In terminal
 
 ```shell
+mkdir java-sdk
+cd java-sdk
+git init
+git clone -b HCS https://github.com/mike-burrage-hedera/hedera-sdk-java
+cd hedera-sdk-java
+mvn install -DskipTests
+
+cd ../..
+
 mkdir hcs-sxc
 cd hcs-sxc
 git init
@@ -87,6 +97,15 @@ where x is 0, 1 or 2, one value per terminal window
 In command line
 
 ```shell
+mkdir java-sdk
+cd java-sdk
+git init
+git clone -b HCS https://github.com/mike-burrage-hedera/hedera-sdk-java
+cd hedera-sdk-java
+mvn install -DskipTests
+
+cd ..\..
+
 mkdir hcs-sxc
 cd hcs-sxc
 git init

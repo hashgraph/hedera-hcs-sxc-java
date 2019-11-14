@@ -3,14 +3,19 @@ package com.hedera.hcsapp;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hcsapp.appconfig.AppConfig;
+import com.hedera.hcsapp.repository.CreditRepository;
 import com.hedera.hcslib.HCSLib;
 import com.hedera.hcslib.callback.OnHCSMessageCallback;
 import com.hedera.hcslib.consensus.OutboundHCSMessage;
+import com.hedera.hcsapp.entities.Credit;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Scanner;
+
+import javax.annotation.Resource;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -20,6 +25,9 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class Application {
+
+    @Resource
+    CreditRepository creditRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -52,6 +60,8 @@ public class Application {
             System.out.println("** Welcome to a simple HCS demo");
             System.out.println("** I am app: " + config.getConfig().getAppClients().get((int) appId).getClientName());
             System.out.println("****************************************");
+            
+            System.out.println(creditRepository.count());
             
             // create a callback object to receive the message
 //            OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsLib);

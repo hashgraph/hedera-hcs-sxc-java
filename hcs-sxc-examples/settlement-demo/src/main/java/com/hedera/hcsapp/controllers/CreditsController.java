@@ -14,6 +14,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.log4j.Log4j2;
 import proto.CreditBPM;
 import proto.Money;
+import proto.SettlementBPM;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -93,12 +94,15 @@ public class CreditsController {
                 .setServiceRef(newCredit.getServiceRef())
                 .setValue(value)
                 .build();
+        SettlementBPM settlementBPM = SettlementBPM.newBuilder()
+                .setCredit(creditBPM)
+                .build();
         
         try {
             new OutboundHCSMessage(hcsLib)
                   .overrideEncryptedMessages(false)
                   .overrideMessageSignature(false)
-                  .sendMessage(topicIndex, creditBPM.toString());
+                  .sendMessage(topicIndex, settlementBPM.toString());
 
             log.info("Message sent successfully.");
             newCredit = creditRepository.save(newCredit);

@@ -51,7 +51,8 @@
                 font-size:16px;
                 border-bottom:1px solid #e0e0e0;
                 box-shadow:0 0 2px rgba(0,0,0,0.12),0 2px 4px rgba(0,0,0,0.24);
-                display:flex; }
+                display:flex; 
+            }
 
             details div.content{
                 padding:0px 24px 24px 24px;
@@ -127,7 +128,7 @@
                 position: absolute;
                 top: calc(50% - 12px);
                 bottom: 0;
-                right: 15px;
+                
                 width: 6%;
             }  
 
@@ -241,37 +242,39 @@
                     <div id="paneltemplate" class="panel" style="visibility: visible;">
                         <details>
                             <summary>
-                                <div style="display: flex">
-                                    <div style="color:#018786; padding: 0px; flex-grow: 1">
-                                        From: <subs class="from">?</subs>
-
+                              
+                                <div class="message-container" style="margin-left:55px; margin-right: 16px;">
+                                    <div style="display: flex">
+                                        <span class="mdc-typography--headline6" style="flex-grow:1">
+                                            Bob
+                                        </span>
+                                        <button  class="mdc-button mdc-button--raised">
+                                            new credit
+                                        </button>
+                                        <button  class="mdc-button mdc-button--outlined">
+                                            settle now
+                                        </button>
                                     </div>
-                                    <div style="color:lightgray; padding: 0px;">
-                                        T: <subs class="threadNo">?</subs> - 
-                                    </div>
-                                    <div style="color:lightgray; padding: 0px; ">
-                                        <subs class="time">?</subs>
-
-                                    </div>
-                                </div>
-                                <div class="message-container" style="padding-right:16px;">
-                                    <button  class="mdc-button mdc-button--raised">
-                                        new credit
-                                    </butto>
-                                    
-                                    <subs class="message">?yay
-                                    
-                                    </subs>
                                 </div>
 
                             </summary>
                             <div class="content"
                                  style="overflow-x: scroll"
                                  >
-                                <table class="mdc-data-table__table" aria-label="Dessert calories">
+                                <div class="mdc-data-table">
+                                    <table class="mdc-data-table__table" aria-label="Dessert calories">
                                     <thead>
                                         <tr class="mdc-data-table__header-row">
-                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Dessert</th>
+                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">ThreadID</th>
+                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Creditor</th>
+                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Debtor</th>
+                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Reference</th>
+                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Amount</th>
+                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Date</th>
+                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Time</th>
+                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Status</th>
+                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Actions</th>
+                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Notes</th>
                                             <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col">Carbs (g)</th>
                                             <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col">Protein (g)</th>
                                             <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Comments</th>
@@ -298,6 +301,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                                </div>
                             </div>
                         </details>
                     </div>

@@ -117,6 +117,12 @@
             summary::-webkit-details-marker {
                 display: none;
             }
+
+            summary {
+                list-style-type: none;
+                list-style-image: none;
+
+            }
             summary::after {
                 content: "expand_more";
                 font-family: 'Material Icons';
@@ -154,20 +160,20 @@
                 width:600px;
                 bottom: 0px;
                 height:300px;
-                 
+
             }
-            
+
             .mdc-drawer--bottom.mdc-drawer--open{
-       
+
             }
             .mdc-drawer--bottom.mdc-drawer--animate{
                 transform: translateX(0) translateY(100%    );
             }
             .mdc-drawer--bottom.mdc-drawer--opening{
                 transform: none;
-           
+
                 transform: translate(0,0px);
-                
+
                 transition-duration: 250ms;
             }
             .mdc-drawer--bottom.mdc-drawer--closing{
@@ -193,11 +199,11 @@
                 </section>
             </div>           
         </header>
-        
-        
-        
-       
-        
+
+
+
+
+
         <aside id="left-drawer" class="mdc-drawer mdc-drawer--dismissible   mdc-top-app-bar--fixed-adjust">
             <div class="mdc-drawer__content">
                 <header class="mdc-top-app-bar  mdc-top-app-bar--fixed mdc-theme--primary
@@ -252,8 +258,8 @@
         </aside>
         <div class="mdc-drawer-app-content mdc-top-app-bar--fixed-adjust">
             <main class="main-content" id="main-content">
-                
-                
+
+
 
                 <header class="mdc-top-app-bar  mdc-top-app-bar--fixed 
                         mdc-theme--primary
@@ -284,7 +290,9 @@
                                         <span class="mdc-typography--headline6" style="flex-grow:1">
                                             Bob
                                         </span>
-                                        <button  class="mdc-button mdc-button--unelevated">
+                                        <button 
+                                            onclick="openNewCreditDrawer()"
+                                            class="mdc-button mdc-button--unelevated">
                                             new credit
                                         </button>
                                         <button  class="mdc-button mdc-button--outlined">
@@ -438,44 +446,58 @@
                                 </div>
                             </div>
                         </details>
-                        
+
                     </div>
 
                 </div>
-                
+
 
             </main>
 
 
         </div>
 
-             <aside id="bottom-drawer" class="mdc-drawer  mdc-drawer--bottom   mdc-drawer--modal">
+        <aside id="bottom-drawer" class="mdc-drawer  mdc-drawer--bottom   mdc-drawer--modal">
             <div class="mdc-drawer__content">
-              <nav class="mdc-list">
-                <a class="mdc-list-item mdc-list-item--activated" href="#" aria-current="page">
-                  <i class="material-icons mdc-list-item__graphic" aria-hidden="true">inbox</i>
-                  <span class="mdc-list-item__text">Inbox</span>
-                </a>
-                <a class="mdc-list-item" href="#">
-                  <i class="material-icons mdc-list-item__graphic" aria-hidden="true">send</i>
-                  <span class="mdc-list-item__text">Outgoing</span>
-                </a>
-                <a class="mdc-list-item" href="#">
-                  <i class="material-icons mdc-list-item__graphic" aria-hidden="true">drafts</i>
-                  <span class="mdc-list-item__text">Drafts</span>
-                </a>
-              </nav>
+                <div class="mdc-typography--header2">
+                    New credit
+                </div>
+                <nav class="mdc-list">
+                    <a class="mdc-list-item mdc-list-item--activated" href="#" aria-current="page">
+                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">inbox</i>
+                        <span class="mdc-list-item__text">Inbox</span>
+                    </a>
+                    <a class="mdc-list-item" href="#">
+                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">send</i>
+                        <span class="mdc-list-item__text">Outgoing</span>
+                    </a>
+                    <a class="mdc-list-item" href="#">
+                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">drafts</i>
+                        <span class="mdc-list-item__text">Drafts</span>
+                    </a>
+                </nav>
             </div>
-          </aside><div class="mdc-drawer-scrim"></div>
-       
+        </aside><div class="mdc-drawer-scrim"></div>
 
- 
+
+
 
         <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
         <script>
             leftDrawer = mdc.drawer.MDCDrawer.attachTo(document.getElementById('left-drawer'));
             leftDrawer.open = true;
-            list = mdc.list.MDCList.attachTo(document.querySelector('.mdc-list'));
+            //list = mdc.list.MDCList.attachTo(document.querySelector('.mdc-list'));
+
+            buttons = document.querySelectorAll('.mdc-button');
+            for (i = 0; i < buttons.length; i++) {
+                buttons[i].innerHTML = "<span class='mdc-button__ripple'></span>" + buttons[i].innerHTML;
+
+                //buttons[i].stopPropagation();
+                //buttons[i].preventDefault();
+                //ripple = new mdc.ripple.MDCRipple(buttons[i]);
+
+            }
+
 
             topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
             topAppBar.setScrollTarget(document.getElementById('main-content'));
@@ -485,11 +507,20 @@
             dataTable = new mdc.dataTable.MDCDataTable(document.querySelector('.mdc-data-table'));
 
             bottomDrawer = mdc.drawer.MDCDrawer.attachTo(document.getElementById('bottom-drawer'));
-            bottomDrawer.open = true;
-            leftDrawer.open = false;
+            //bottomDrawer.open = true;
+            //leftDrawer.open = false;
 
             //list.wrapFocus = true;
 
+        </script>
+        <script>
+            function openNewCreditDrawer(e) {
+                event.preventDefault();
+                bottomDrawer.open = true;
+                //leftDrawer.open = false;
+
+                return false;
+            }
         </script>
     </body>
 </html>

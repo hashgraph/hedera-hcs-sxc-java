@@ -12,6 +12,8 @@ queue:
   tcpConnectionFactory: "tcp://hcsqueue:61616"
   
 
+HCSTransactionFee: 100000000
+
 nodes:
   - address: 0.testnet.hedera.com:50211
     account: 0.0.3
@@ -21,5 +23,4 @@ nodes:
 #    account: 0.0.5
 #  - address: 3.testnet.hedera.com:50211
 #    account: 0.0.6
-    
     

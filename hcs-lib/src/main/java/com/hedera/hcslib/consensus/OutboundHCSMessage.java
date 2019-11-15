@@ -16,7 +16,6 @@ import com.hedera.hashgraph.sdk.consensus.SubmitMessageTransaction;
 import com.hedera.hashgraph.sdk.consensus.TopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcslib.HCSLib;
-import com.hedera.hcslib.config.Config;
 import com.hedera.hcslib.proto.java.AccountID;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
 import com.hedera.hcslib.proto.java.ApplicationMessageChunk;

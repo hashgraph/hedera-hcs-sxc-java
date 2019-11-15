@@ -84,8 +84,6 @@ public class QueueTopicOperations {
 
             MessageProducer messageProducer = session.createProducer(topic);
 
-
-
             r = true;
             
         } catch (Exception e) {
@@ -105,7 +103,6 @@ public class QueueTopicOperations {
         long topicNum = topicId.getTopicNum();
         Connection connection = null;
         InitialContext initialContext = null;
-        boolean r = false;
         
         try {
             Queue queueConfig = config.getConfig().getQueue();
@@ -155,8 +152,6 @@ public class QueueTopicOperations {
            
             messageProducer.send(objectMessage);
         
-            r = true;
-            
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

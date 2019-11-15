@@ -172,7 +172,7 @@ public final class OnHCSMessageCallback {
         //look up db to find parts received already
         List<ApplicationMessageChunk> chunkList = persistence.getParts(applicationMessageId);
         if(chunkList==null){
-            chunkList = new ArrayList();
+            chunkList = new ArrayList<ApplicationMessageChunk>();
             chunkList.add(messageChunk);
         } else {
             chunkList.add(messageChunk);

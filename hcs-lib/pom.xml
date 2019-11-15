@@ -8,7 +8,7 @@
     <parent>
         <groupId>com.hedera</groupId>
         <artifactId>hcs-sxc</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>hcs-lib</artifactId>
@@ -32,7 +32,7 @@
             <groupId>com.hedera</groupId>
             <scope>test</scope>
             <artifactId>lib-persistence-in-memory</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.3-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

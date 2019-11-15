@@ -52,3 +52,4 @@ org.eclipse.jdt.core.prefs
 /hcs-sxc-proto/.settings
 /hcs-sxc-plugins/lib-persistence-in-memory/.settings
 /hcs-sxc-examples/settlement-demo/target
+hcs-sxc-examples/settlement-demo/h2data/settlement-demo.mv.db

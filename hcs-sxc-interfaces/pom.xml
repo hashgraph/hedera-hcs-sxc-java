@@ -8,7 +8,7 @@
     <parent>
         <artifactId>hcs-sxc</artifactId>
         <groupId>com.hedera</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>hcs-sxc-interfaces</artifactId>

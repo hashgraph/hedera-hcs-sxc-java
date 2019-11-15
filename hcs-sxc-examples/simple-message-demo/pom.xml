@@ -22,8 +22,6 @@
             <artifactId>hcs-lib</artifactId>
             <version>${hcslib.version}</version>
         </dependency>
-        <!-- <dependency> <groupId>com.hedera</groupId> <artifactId>lib-persistence-in-memory</artifactId> 
-            <version>${hcslib.version}</version> </dependency> -->
     </dependencies>
     <build>
         <sourceDirectory>src</sourceDirectory>
@@ -65,8 +63,8 @@
     </build>
 
     <profiles>
-        <!-- profile which adds the possibility to build docker images Call 
-            "mvn clean install -Pdocker" to invoke this additional plugin in the maven 
+        <!-- profile which adds the possibility to build docker images Call
+            "mvn clean install -Pdocker" to invoke this additional plugin in the maven
             build -->
         <profile>
             <id>docker</id>

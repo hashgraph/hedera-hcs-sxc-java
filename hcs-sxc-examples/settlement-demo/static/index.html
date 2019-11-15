@@ -44,7 +44,7 @@
             div.panel{
 
                 margin: auto;
-                margin-top: calc(5% - 0px);
+                margin-top: calc(2% - 0px);
             }
             details{
                 background:#fff;
@@ -128,7 +128,7 @@
                 position: absolute;
                 top: calc(50% - 12px);
                 bottom: 0;
-                
+
                 width: 6%;
             }  
 
@@ -145,7 +145,37 @@
                 padding:16px 4px;
             }
 
+
             /* end collapsible menu*/
+
+            /* bottom drawers */
+            .mdc-drawer--bottom{
+                left:calc(50% - 300px);
+                width:600px;
+                bottom: 0px;
+                height:300px;
+                 
+            }
+            
+            .mdc-drawer--bottom.mdc-drawer--open{
+       
+            }
+            .mdc-drawer--bottom.mdc-drawer--animate{
+                transform: translateX(0) translateY(100%    );
+            }
+            .mdc-drawer--bottom.mdc-drawer--opening{
+                transform: none;
+           
+                transform: translate(0,0px);
+                
+                transition-duration: 250ms;
+            }
+            .mdc-drawer--bottom.mdc-drawer--closing{
+                transform: translateY(100%);
+                transition-duration: 250ms;
+            }
+
+
 
         </style>
     </head>
@@ -163,7 +193,12 @@
                 </section>
             </div>           
         </header>
-        <aside class="mdc-drawer mdc-drawer--dismissible   mdc-top-app-bar--fixed-adjust">
+        
+        
+        
+       
+        
+        <aside id="left-drawer" class="mdc-drawer mdc-drawer--dismissible   mdc-top-app-bar--fixed-adjust">
             <div class="mdc-drawer__content">
                 <header class="mdc-top-app-bar  mdc-top-app-bar--fixed mdc-theme--primary
                         " 
@@ -176,7 +211,7 @@
                             <span class="mdc-top-app-bar__title
                                   mdc-typography--body1
                                   "
-                                  style="padding: 0px"
+                                  style="padding: 8px"
 
                                   >Alice - AppID 1</span>
                         </section>
@@ -215,9 +250,10 @@
                 </div>
             </div>
         </aside>
-
         <div class="mdc-drawer-app-content mdc-top-app-bar--fixed-adjust">
             <main class="main-content" id="main-content">
+                
+                
 
                 <header class="mdc-top-app-bar  mdc-top-app-bar--fixed 
                         mdc-theme--primary
@@ -235,20 +271,20 @@
                 </header>
 
                 <div class="mdc-top-app-bar--fixed-adjust mdc-typography--body2"
-                     style='margin: 0px 32px;'
+                     style='margin: 16px 32px;'
                      >
 
 
                     <div id="paneltemplate" class="panel" style="visibility: visible;">
                         <details>
                             <summary>
-                              
+
                                 <div class="message-container" style="margin-left:55px; margin-right: 16px;">
                                     <div style="display: flex">
                                         <span class="mdc-typography--headline6" style="flex-grow:1">
                                             Bob
                                         </span>
-                                        <button  class="mdc-button mdc-button--raised">
+                                        <button  class="mdc-button mdc-button--unelevated">
                                             new credit
                                         </button>
                                         <button  class="mdc-button mdc-button--outlined">
@@ -261,72 +297,196 @@
                             <div class="content"
                                  style="overflow-x: scroll"
                                  >
-                                <div class="mdc-data-table">
+                                <div class="mdc-data-table" style="width:100%">
                                     <table class="mdc-data-table__table" aria-label="Dessert calories">
-                                    <thead>
-                                        <tr class="mdc-data-table__header-row">
-                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">ThreadID</th>
-                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Creditor</th>
-                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Debtor</th>
-                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Reference</th>
-                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Amount</th>
-                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Date</th>
-                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Time</th>
-                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Status</th>
-                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Actions</th>
-                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Notes</th>
-                                            <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col">Carbs (g)</th>
-                                            <th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col">Protein (g)</th>
-                                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Comments</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="mdc-data-table__content">
-                                        <tr class="mdc-data-table__row">
-                                            <td class="mdc-data-table__cell">Frozen yogurt</td>
-                                            <td class="mdc-data-table__cell mdc-data-table__cell--numeric">24</td>
-                                            <td class="mdc-data-table__cell mdc-data-table__cell--numeric">4.0</td>
-                                            <td class="mdc-data-table__cell">Super tasty</td>
-                                        </tr>
-                                        <tr class="mdc-data-table__row">
-                                            <td class="mdc-data-table__cell">Ice cream sandwich</td>
-                                            <td class="mdc-data-table__cell mdc-data-table__cell--numeric">37</td>
-                                            <td class="mdc-data-table__cell mdc-data-table__cell--numeric">4.33333333333</td>
-                                            <td class="mdc-data-table__cell">I like ice cream more</td>
-                                        </tr>
-                                        <tr class="mdc-data-table__row">
-                                            <td class="mdc-data-table__cell">Eclair</td>
-                                            <td class="mdc-data-table__cell mdc-data-table__cell--numeric">24</td>
-                                            <td class="mdc-data-table__cell mdc-data-table__cell--numeric">6.0</td>
-                                            <td class="mdc-data-table__cell">New filing flavor</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                        <thead>
+                                            <tr class="mdc-data-table__header-row">
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">ThreadID</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Creditor</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Debtor</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Reference</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Amount</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Date</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Time</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Status</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Actions</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Notes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="mdc-data-table__content">
+                                            <tr class="mdc-data-table__row">
+                                                <td class="mdc-data-table__cell">665</td>
+                                                <td class="mdc-data-table__cell">Alice</td>
+                                                <td class="mdc-data-table__cell">Bob</td>
+                                                <td class="mdc-data-table__cell">A77U312</td>
+                                                <td class="mdc-data-table__cell">$120</td>
+                                                <td class="mdc-data-table__cell">13 Nov</td>
+                                                <td class="mdc-data-table__cell">09:31</td>
+                                                <td class="mdc-data-table__cell">Pending</td>
+                                                <td class="mdc-data-table__cell"></td>
+                                                <td class="mdc-data-table__cell">1 x XYZ Service</td>
+                                            </tr>
+                                            <tr class="mdc-data-table__row">
+                                                <td class="mdc-data-table__cell">663</td>
+                                                <td class="mdc-data-table__cell">Alice</td>
+                                                <td class="mdc-data-table__cell">Bob</td>
+                                                <td class="mdc-data-table__cell">A77U311</td>
+                                                <td class="mdc-data-table__cell">$120</td>
+                                                <td class="mdc-data-table__cell">13 Nov</td>
+                                                <td class="mdc-data-table__cell">09:12</td>
+                                                <td class="mdc-data-table__cell">Confirmed</td>
+                                                <td class="mdc-data-table__cell"></td>
+                                                <td class="mdc-data-table__cell">1 x XYZ Service</td>
+                                            </tr>
+                                            <tr class="mdc-data-table__row">
+                                                <td class="mdc-data-table__cell">667</td>
+                                                <td class="mdc-data-table__cell">Bob</td>
+                                                <td class="mdc-data-table__cell">Alice</td>
+                                                <td class="mdc-data-table__cell">R080112</td>
+                                                <td class="mdc-data-table__cell">$80</td>
+                                                <td class="mdc-data-table__cell">13 Nov</td>
+                                                <td class="mdc-data-table__cell">09:11</td>
+                                                <td class="mdc-data-table__cell">Unconfirmed</td>
+                                                <td class="mdc-data-table__cell"><button class="mdc-button  mdc-button--outlined ">confirm</button></td>
+                                                <td class="mdc-data-table__cell">2 x ABC Service</td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </details>
                     </div>
+                    <div id="paneltemplate2" class="panel" style="visibility: visible;">
+                        <details>
+                            <summary>
 
+                                <div class="message-container" style="margin-left:55px; margin-right: 16px;">
+                                    <div style="display: flex">
+                                        <span class="mdc-typography--headline6" style="flex-grow:1">
+                                            Carlos
+                                        </span>
+                                        <button  class="mdc-button mdc-button--unelevated">
+                                            new credit
+                                        </button>
+                                        <button  class="mdc-button mdc-button--outlined">
+                                            settle now
+                                        </button>
+                                    </div>
+                                </div>
 
+                            </summary>
+                            <div class="content"
+                                 style="overflow-x: scroll"
+                                 >
+                                <div class="mdc-data-table" style="width:100%">
+                                    <table class="mdc-data-table__table" aria-label="Dessert calories">
+                                        <thead>
+                                            <tr class="mdc-data-table__header-row">
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">ThreadID</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Creditor</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Debtor</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Reference</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Amount</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Date</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Time</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Status</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Actions</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Notes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="mdc-data-table__content">
+                                            <tr class="mdc-data-table__row">
+                                                <td class="mdc-data-table__cell">665</td>
+                                                <td class="mdc-data-table__cell">Alice</td>
+                                                <td class="mdc-data-table__cell">Carlos</td>
+                                                <td class="mdc-data-table__cell">A77U312</td>
+                                                <td class="mdc-data-table__cell">$120</td>
+                                                <td class="mdc-data-table__cell">13 Nov</td>
+                                                <td class="mdc-data-table__cell">09:31</td>
+                                                <td class="mdc-data-table__cell">Pending</td>
+                                                <td class="mdc-data-table__cell"></td>
+                                                <td class="mdc-data-table__cell">1 x XYZ Service</td>
+                                            </tr>
+                                            <tr class="mdc-data-table__row">
+                                                <td class="mdc-data-table__cell">663</td>
+                                                <td class="mdc-data-table__cell">Alice</td>
+                                                <td class="mdc-data-table__cell">Carlos</td>
+                                                <td class="mdc-data-table__cell">A77U311</td>
+                                                <td class="mdc-data-table__cell">$120</td>
+                                                <td class="mdc-data-table__cell">13 Nov</td>
+                                                <td class="mdc-data-table__cell">09:12</td>
+                                                <td class="mdc-data-table__cell">Confirmed</td>
+                                                <td class="mdc-data-table__cell"></td>
+                                                <td class="mdc-data-table__cell">1 x XYZ Service</td>
+                                            </tr>
+                                            <tr class="mdc-data-table__row">
+                                                <td class="mdc-data-table__cell">667</td>
+                                                <td class="mdc-data-table__cell">Carlos</td>
+                                                <td class="mdc-data-table__cell">Alice</td>
+                                                <td class="mdc-data-table__cell">R080112</td>
+                                                <td class="mdc-data-table__cell">$80</td>
+                                                <td class="mdc-data-table__cell">13 Nov</td>
+                                                <td class="mdc-data-table__cell">09:11</td>
+                                                <td class="mdc-data-table__cell">Unconfirmed</td>
+                                                <td class="mdc-data-table__cell"><button class="mdc-button  mdc-button--outlined ">confirm</button></td>
+                                                <td class="mdc-data-table__cell">2 x ABC Service</td>
+                                            </tr>
 
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </details>
+                        
+                    </div>
 
                 </div>
+                
 
             </main>
+
+
         </div>
 
+             <aside id="bottom-drawer" class="mdc-drawer  mdc-drawer--bottom   mdc-drawer--modal">
+            <div class="mdc-drawer__content">
+              <nav class="mdc-list">
+                <a class="mdc-list-item mdc-list-item--activated" href="#" aria-current="page">
+                  <i class="material-icons mdc-list-item__graphic" aria-hidden="true">inbox</i>
+                  <span class="mdc-list-item__text">Inbox</span>
+                </a>
+                <a class="mdc-list-item" href="#">
+                  <i class="material-icons mdc-list-item__graphic" aria-hidden="true">send</i>
+                  <span class="mdc-list-item__text">Outgoing</span>
+                </a>
+                <a class="mdc-list-item" href="#">
+                  <i class="material-icons mdc-list-item__graphic" aria-hidden="true">drafts</i>
+                  <span class="mdc-list-item__text">Drafts</span>
+                </a>
+              </nav>
+            </div>
+          </aside><div class="mdc-drawer-scrim"></div>
+       
+
+ 
 
         <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
         <script>
-            drawer = mdc.drawer.MDCDrawer.attachTo(document.querySelector('.mdc-drawer'));
-            drawer.open = true;
+            leftDrawer = mdc.drawer.MDCDrawer.attachTo(document.getElementById('left-drawer'));
+            leftDrawer.open = true;
             list = mdc.list.MDCList.attachTo(document.querySelector('.mdc-list'));
 
             topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
             topAppBar.setScrollTarget(document.getElementById('main-content'));
             topAppBar.listen('MDCTopAppBar:nav', () => {
-                drawer.open = !drawer.open;
+                leftDrawer.open = !leftDrawer.open;
             });
             dataTable = new mdc.dataTable.MDCDataTable(document.querySelector('.mdc-data-table'));
+
+            bottomDrawer = mdc.drawer.MDCDrawer.attachTo(document.getElementById('bottom-drawer'));
+            bottomDrawer.open = true;
+            leftDrawer.open = false;
 
             //list.wrapFocus = true;
 

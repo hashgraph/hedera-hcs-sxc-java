@@ -545,12 +545,13 @@
 
             buttons = document.querySelectorAll('.mdc-button');
             for (i = 0; i < buttons.length; i++) {
-                buttons[i].innerHTML = "<span class='mdc-line-ripple'></span>" + buttons[i].innerHTML;
+                buttons[i].innerHTML = "<span class='mdc-button__ripple'></span>" + buttons[i].innerHTML;
+                button = new mdc.ripple.MDCRipple(buttons[i]);
             }
 
             textFields = document.querySelectorAll('.mdc-text-field');
             for (i = 0; i < textFields.length; i++) {
-                textFields[i].innerHTML = "<span class='mdc-button__ripple'></span>" + textFields[i].innerHTML;
+                textFields[i].innerHTML = "<span class='mdc-line-ripple'></span>" + textFields[i].innerHTML;
                 textField = new mdc.textField.MDCTextField(textFields[i]);
             }
             

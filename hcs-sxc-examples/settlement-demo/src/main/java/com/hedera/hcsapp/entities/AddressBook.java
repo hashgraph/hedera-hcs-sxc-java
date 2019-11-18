@@ -12,7 +12,7 @@ import lombok.Data;
 public final class AddressBook {
 
     @Id
-    private String publicKey;
     private String name;
+    private String publicKey;
     private String roles;
 }

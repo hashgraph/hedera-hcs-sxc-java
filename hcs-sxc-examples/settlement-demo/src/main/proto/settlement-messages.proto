@@ -51,10 +51,10 @@ message Money {
 message CreditBPM{
 
     // Identity of the payer
-    string payerPublicKey = 1;
+    string payerName = 1;
 
     // Identity of the recipient
-    string recipientPublicKey = 2;
+    string recipientName = 2;
     
     // Business-specific [external] reference to identify the service being paid for
     string serviceRef = 3;
@@ -64,7 +64,7 @@ message CreditBPM{
     Money value = 4;
     
     // Optional supplementary notes or text
-    string memo = 5;
+    string additionalNotes = 5;
 
 }
 
@@ -86,20 +86,20 @@ message CreditAckBPM{
 //    - Party A sums all credits owed to it by Party B ==> SumBtoA
 //    - Party A subtracts SumBtoA from SumAtoB ==> netOwedAtoB
 //    - Party A can only propose settlement with Party B if netOwedAtoB is greater than zero
-//    - `payerPublicKey` would hold the public key of Party A
-//    - `recipentPublicKey` would hold the public key of Party B
+//    - `payerName` would hold the name of Party A
+//    - `recipentName` would hold the name of Party B
 //    - `netValue` would contain netOwedAtoB
 // Sent from the payer to the recipient (payer determined based upon net "debt" calculations)
 message SettleProposeBPM {
 
     // Identity of the payer
-    string payerPublicKey = 1;
+    string payerName = 1;
 
     // Identity of the recipient
-    string recipentPublicKey = 2;
+    string recipentName = 2;
     
     // Optional supplementary notes or text
-    string memo = 3;
+    string additionalNotes = 3;
 
     // Reference to each TransactionID of the `creditAck` messages included in the proposed settlement
     repeated TransactionID creditAckMessageId = 4;
@@ -125,16 +125,16 @@ message SettleProposeAckBPM {
 message SettleInitBPM {
 
     // Identity of the payer
-    string payerPublicKey = 1;
+    string payerName = 1;
 
     // Identity of the recipient
-    string recipentPublicKey = 2;
+    string recipentName = 2;
     
     // Identity of the payment channel
-    string paymentChannelPublicKey = 3;
+    string paymentChannelName = 3;
     
     // Optional supplementary notes or text
-    string memo = 4;
+    string additionalNotes = 4;
 
     // Total amount that the payment channel will transfer from the bank account of the payer to the bank account of the recipient
     Money netValue = 5;
@@ -160,10 +160,10 @@ message SettleInitAckBPM {
 message PaymentInitBPM {
 
     // Identity of the payer
-    string payerPublicKey = 1;
+    string payerName = 1;
 
     // Identity of the recipient
-    string recipentPublicKey = 2;
+    string recipentName = 2;
     
     // Optional account details of the payer's bank account
     // The payment channel may already have this information 
@@ -174,7 +174,7 @@ message PaymentInitBPM {
     string recipentAccountDetails = 4;
     
     // Optional supplementary notes or text
-    string memo = 5;
+    string additionalNotes = 5;
 
     // Total amount that the payment channel will transfer from the bank account of the payer to the bank account of the recipient
     Money netValue = 6;
@@ -196,10 +196,10 @@ message PaymentInitAckBPM {
 message PaymentSentBPM {
     
     // Identity of the payer
-    string payerPublicKey = 1;
+    string payerName = 1;
 
     // Identity of the recipient
-    string recipentPublicKey = 2;
+    string recipentName = 2;
     
     // Optional account details of the payer's bank account
     string payerAccountDetails = 3;
@@ -208,7 +208,7 @@ message PaymentSentBPM {
     string recipentAccountDetails = 4;
     
     // Optional supplementary notes or text
-    string memo = 5;
+    string additionalNotes = 5;
 
     // Total amount that the payment channel transferred from the bank account of the payer to the bank account of the recipient
     Money netValue = 6;
@@ -243,13 +243,13 @@ message PaymentSentAckBPM {
 message SettlePaidBPM {
 
     // Identity of the payer
-    string payerPublicKey = 1;
+    string payerName = 1;
 
     // Identity of the recipient
-    string recipentPublicKey = 2;
+    string recipentName = 2;
     
     // Optional supplementary notes or text
-    string memo = 3;
+    string additionalNotes = 3;
 
     // Total amount that the payment channel will transfer from the bank account of the payer to the bank account of the recipient
     Money netValue = 4;
@@ -279,13 +279,13 @@ message SettlePaidAckBPM {
 message SettleCompleteBPM {
     
     // Identity of the payer
-    string payerPublicKey = 1;
+    string payerName = 1;
 
     // Identity of the recipient
-    string recipentPublicKey = 2;
+    string recipentName = 2;
     
     // Optional supplementary notes or text
-    string memo = 3;
+    string additionalNotes = 3;
 
     // Total amount that has been paid into the recipient's bank account
     Money netValue = 4;

@@ -26,18 +26,18 @@ public class AddressBookController {
     public List<AddressBook> addressbookBuyerSeller() throws FileNotFoundException, IOException {
         AppData appData = new AppData();
         log.debug("/addressbook/buyerorseller");
-        return addressBookRepository.findAllBuyersSellersButMe(appData.getPublicKey(),"BUYER,SELLER");
+        return addressBookRepository.findAllBuyersSellersButMe(appData.getUserName(),"BUYER,SELLER");
     }
     @GetMapping(value = "/addressbook", produces = "application/json")
     public List<AddressBook> addressbookAll() throws FileNotFoundException, IOException {
         AppData appData = new AppData();
         log.debug("/addressbook");
-        return addressBookRepository.findAllUsersButMe(appData.getPublicKey());
+        return addressBookRepository.findAllUsersButMe(appData.getUserName());
     }
     @GetMapping(value = "/addressbook/me", produces = "application/json")
     public AddressBook addressbookMe() throws FileNotFoundException, IOException {
         AppData appData = new AppData();
         log.debug("/addressbook");
-        return addressBookRepository.findById(appData.getPublicKey()).get();
+        return addressBookRepository.findById(appData.getUserName()).get();
     }
 }

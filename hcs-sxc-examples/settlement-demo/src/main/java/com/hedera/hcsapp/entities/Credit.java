@@ -21,4 +21,6 @@ public final class Credit {
     private String currency;
     private String memo;
     private String status;
+    private String createdDate;
+    private String createdTime;
 }

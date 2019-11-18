@@ -125,7 +125,7 @@
                         <version>${jib.version}</version>
                         <configuration>
                             <to>
-                                <image>hederahashgraph/hcs-app:latest</image>
+                                <image>hederahashgraph/settlement-demo:latest</image>
                                 <tags>
                                     <tag>${project.version}</tag>
                                 </tags>

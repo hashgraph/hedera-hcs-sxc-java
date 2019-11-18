@@ -10,6 +10,8 @@ import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.Hashtable;
+import java.util.concurrent.TimeUnit;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
@@ -71,7 +73,7 @@ public class QueueTopicOperations {
                 } catch (Exception ie) {
                     String tcpConnectionFactory = queueConfig.getTcpConnectionFactory();
                     log.info("Is Artemis up? Setup your host file so that the host identified in'"+tcpConnectionFactory+"' points to 127.0.0.1 if running outside of docker");
-                    Thread.sleep(6000);
+                    TimeUnit.SECONDS.sleep(6000);
                 }
                 
             } while (scanning);
@@ -127,7 +129,7 @@ public class QueueTopicOperations {
                 } catch (Exception ie) {
                     String tcpConnectionFactory = config.getConfig().getQueue().getTcpConnectionFactory();
                     log.info("Is Artemis up? Setup your host file so that the host identified in'"+tcpConnectionFactory+"' points to 127.0.0.1 if running outside of docker");
-                    Thread.sleep(6000);
+                    TimeUnit.SECONDS.sleep(6000);
                 }
                 
             } while (scanning);

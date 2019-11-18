@@ -1,5 +1,8 @@
 package com.hedera.hcsapp;
 
+import com.hedera.hcsapp.appconfig.AppClient;
+import com.hedera.hcsapp.entities.AddressBook;
+import com.hedera.hcsapp.repository.AddressBookRepository;
 import com.hedera.hcsapp.repository.CreditRepository;
 import javax.annotation.Resource;
 
@@ -13,7 +16,7 @@ import org.springframework.context.annotation.Bean;
 public class Application {
 
     @Resource
-    CreditRepository creditRepository;
+    AddressBookRepository addressBookRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -30,7 +33,16 @@ public class Application {
 //            for (String beanName : beanNames) {
 //                System.out.println(beanName);
 //            }
-//
+            AppData appData = new AppData();
+            
+            // populate the address book
+            for (AppClient appClient : appData.getAppClients()) {
+                AddressBook addressBook = new AddressBook();
+                addressBook.setName(appClient.getClientName());
+                addressBook.setPublicKey(appClient.getClientKey());
+                addressBook.setRoles(appClient.getRoles());
+                addressBookRepository.save(addressBook);
+            }
         };
     }    
 }       

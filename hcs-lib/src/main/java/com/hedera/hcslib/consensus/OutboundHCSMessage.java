@@ -89,7 +89,7 @@ public final class OutboundHCSMessage {
      * @throws IllegalArgumentException
      * @throws HederaException
      */
-    public void sendMessage(int topicIndex, String message) throws HederaNetworkException, IllegalArgumentException, HederaException {
+    public TransactionId sendMessage(int topicIndex, String message) throws HederaNetworkException, IllegalArgumentException, HederaException {
 
         if (signMessages) {
 
@@ -104,10 +104,10 @@ public final class OutboundHCSMessage {
         }
 
         // generate TXId for main and first message
-        TransactionId transactionId = new TransactionId(this.operatorAccountId);
+        TransactionId firstTransactionId = new TransactionId(this.operatorAccountId);
 
         //break up
-        List<ApplicationMessageChunk> parts = chunk(transactionId, message);
+        List<ApplicationMessageChunk> parts = chunk(firstTransactionId, message);
         // send each part to the network
         
         Client client = new Client(this.nodeMap);
@@ -118,6 +118,7 @@ public final class OutboundHCSMessage {
 
         client.setMaxTransactionFee(this.hcsTransactionFee);
         
+        TransactionId transactionId = firstTransactionId;
         for (ApplicationMessageChunk messageChunk : parts) {
             TransactionReceipt receipt = new SubmitMessageTransaction(client)
                 .setMessage(messageChunk.toByteArray())
@@ -125,6 +126,7 @@ public final class OutboundHCSMessage {
                 .setTransactionId(transactionId)
                 .executeForReceipt();
             
+            transactionId = new TransactionId(this.operatorAccountId);
             /*
             log.info("status is {} "
                     + "sequence no is {}"
@@ -134,6 +136,8 @@ public final class OutboundHCSMessage {
             */
             
         }
+        
+        return firstTransactionId;
     }
 
     public static  List<ApplicationMessageChunk> chunk(TransactionId transactionId,  String message) {

@@ -10,6 +10,7 @@ import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.Enums;
 import com.hedera.hcsapp.Utils;
 import com.hedera.hcsapp.appconfig.AppConfig;
+import com.hedera.hcsapp.entities.AddressBook;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.repository.AddressBookRepository;
 import com.hedera.hcsapp.repository.CreditRepository;

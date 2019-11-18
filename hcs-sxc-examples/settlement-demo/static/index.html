@@ -470,46 +470,7 @@
 
 
         <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
-        <script>
-            /* Visual effects for components. This script does not apply an client long. */
-           
-            leftDrawer = mdc.drawer.MDCDrawer.attachTo(document.getElementById('left-drawer'));
-            leftDrawer.open = true;
-            //list = mdc.list.MDCList.attachTo(document.querySelector('.mdc-list'));
-
-            buttons = document.querySelectorAll('.mdc-button');
-            for (i = 0; i < buttons.length; i++) {
-                buttons[i].innerHTML = "<span class='mdc-button__ripple'></span>" + buttons[i].innerHTML;
-                d_button = new mdc.ripple.MDCRipple(buttons[i]);
-            }
-
-            textFields = document.querySelectorAll('.mdc-text-field');
-            for (i = 0; i < textFields.length; i++) {
-                //textFields[i].insertAdjacentHTML("afterend",'<div class="mdc-text-field-helper-line"><div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">helpme</div></div>');
-                textFields[i].innerHTML = "<span class='mdc-line-ripple'></span>" + textFields[i].innerHTML;
-                d_textFieldHelperText = new mdc.textField.MDCTextFieldHelperText(textFields[i].parentElement.querySelector('.mdc-text-field-helper-text'));
-                d_textField = new mdc.textField.MDCTextField(textFields[i]);
-            }
-            
-            textFieldIcons = document.querySelectorAll('.mdc-text-field-icon');
-            for (i = 0; i < textFieldIcons.length; i++) {
-                d_textFieldIcon = new mdc.textFieldIcon.MDCTextFieldIcon(textFieldIcons[i]);
-            }
-            
-            topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
-            topAppBar.setScrollTarget(document.getElementById('main-content'));
-            topAppBar.listen('MDCTopAppBar:nav', () => {
-                leftDrawer.open = !leftDrawer.open;
-            });
-            //dataTable = new mdc.dataTable.MDCDataTable(document.querySelector('.mdc-data-table'));
-
-            newCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('new-credit-dialog'));
-            //bottomDrawer.open = true;
-            //leftDrawer.open = false;
-
-            //list.wrapFocus = true;
-
-        </script>
+        
         
         <script>
             /*Init new credits and debits*/
@@ -554,6 +515,8 @@
         
         <script>
             /* Functions for the new credit dialog. */
+            newCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('new-credit-dialog'));
+            
             
             function openNewCreditDialog(recipient) {
                 event.preventDefault();
@@ -584,6 +547,47 @@
                 }      
             }
             
+        </script>
+        
+        
+        <script>
+            /* Visual effects for components. This script does not apply an client long. */
+           
+            leftDrawer = mdc.drawer.MDCDrawer.attachTo(document.getElementById('left-drawer'));
+            leftDrawer.open = true;
+            //list = mdc.list.MDCList.attachTo(document.querySelector('.mdc-list'));
+
+            buttons = document.querySelectorAll('.mdc-button');
+            for (i = 0; i < buttons.length; i++) {
+                buttons[i].innerHTML = "<span class='mdc-button__ripple'></span>" + buttons[i].innerHTML;
+                d_button = new mdc.ripple.MDCRipple(buttons[i]);
+            }
+
+            textFields = document.querySelectorAll('.mdc-text-field');
+            for (i = 0; i < textFields.length; i++) {
+                //textFields[i].insertAdjacentHTML("afterend",'<div class="mdc-text-field-helper-line"><div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">helpme</div></div>');
+                textFields[i].innerHTML = "<span class='mdc-line-ripple'></span>" + textFields[i].innerHTML;
+                d_textFieldHelperText = new mdc.textField.MDCTextFieldHelperText(textFields[i].parentElement.querySelector('.mdc-text-field-helper-text'));
+                d_textField = new mdc.textField.MDCTextField(textFields[i]);
+            }
+            
+            textFieldIcons = document.querySelectorAll('.mdc-text-field-icon');
+            for (i = 0; i < textFieldIcons.length; i++) {
+                d_textFieldIcon = new mdc.textFieldIcon.MDCTextFieldIcon(textFieldIcons[i]);
+            }
+            
+            topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
+            topAppBar.setScrollTarget(document.getElementById('main-content'));
+            topAppBar.listen('MDCTopAppBar:nav', () => {
+                leftDrawer.open = !leftDrawer.open;
+            });
+            //dataTable = new mdc.dataTable.MDCDataTable(document.querySelector('.mdc-data-table'));
+
+            //bottomDrawer.open = true;
+            //leftDrawer.open = false;
+
+            //list.wrapFocus = true;
+
         </script>
     </body>
 </html>

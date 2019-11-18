@@ -1,5 +1,9 @@
-<html>
-    <head>
+<!DOCTYPE html>
+<html lang="en"><head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+        <meta name="theme-color" content="#000000">
+
         <!-- Required styles for MDC Web -->
         <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
 
@@ -156,12 +160,22 @@
 
             /* bottom drawers */
             .mdc-drawer--bottom{
-                left:calc(50% - 300px);
-                width:600px;
+                left:calc(50% - 50%);
+                width:100%;
                 bottom: 0px;
                 height:300px;
 
             }
+            @media only screen and (min-width: 768px) {
+                .mdc-drawer--bottom{
+                    left:calc(50% - 300px);
+                    width:600px;
+                    bottom: 0px;
+                    height:300px;
+
+                }
+            }
+
 
             .mdc-drawer--bottom.mdc-drawer--open{
 
@@ -181,6 +195,9 @@
                 transition-duration: 250ms;
             }
 
+            .mdc-text-field__input--full-width {
+               width: 100%;
+            }
 
 
         </style>
@@ -457,27 +474,65 @@
 
         </div>
 
-        <aside id="bottom-drawer" class="mdc-drawer  mdc-drawer--bottom   mdc-drawer--modal">
-            <div class="mdc-drawer__content">
-                <div class="mdc-typography--header2">
-                    New credit
+        <div id="new-credit-dialog" 
+            class="mdc-dialog"
+             role="alertdialog"
+             aria-modal="true"
+             aria-labelledby="my-dialog-title"
+             aria-describedby="my-dialog-content">
+            <div class="mdc-dialog__container">
+
+
+                <div class="mdc-dialog__surface" >
+                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
+                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
+                    -->New Credit<!--
+                    --></h2>
+                    <div class="mdc-dialog__content" id="my-dialog-content" >
+                        Create a new credit for <hh-var>?</hh-var> 
+                        
+                        <div style="display:fex; flex-direction: column">
+                            <div class="mdc-text-field">
+                                <input type="text" id="my-text-field" class="mdc-text-field__input mdc-text-field__input--full-width
+                                       ">
+                                <label class="mdc-floating-label" for="my-text-field">
+                                    Recipient
+                                </label>
+                            </div>   
+                            <div class="mdc-text-field">
+                                <input type="text" id="my-text-field" class="mdc-text-field__input mdc-text-field__input--full-width">
+                                <label class="mdc-floating-label" for="my-text-field">
+                                    Service Reference
+                                </label>
+                            </div>   
+                            <div class="mdc-text-field">
+                                <input type="text" id="my-text-field" class="mdc-text-field__input mdc-text-field__input--full-width">
+                                <label class="mdc-floating-label" for="my-text-field">
+                                    Amount
+                                </label>
+                            </div>   
+                            <div class="mdc-text-field">
+                                <input type="text" id="my-text-field" class="mdc-text-field__input">
+                                <label class="mdc-floating-label" for="my-text-field">
+                                    Notes
+                                </label>
+                            </div>  
+                        </div>
+                    </div>
+                    
+            
+                    <footer class="mdc-dialog__actions">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="no">
+                            <span class="mdc-button__label">No</span>
+                        </button>
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="yes">
+                            <span class="mdc-button__label">Yes</span>
+                        </button>
+                    </footer>
                 </div>
-                <nav class="mdc-list">
-                    <a class="mdc-list-item mdc-list-item--activated" href="#" aria-current="page">
-                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">inbox</i>
-                        <span class="mdc-list-item__text">Inbox</span>
-                    </a>
-                    <a class="mdc-list-item" href="#">
-                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">send</i>
-                        <span class="mdc-list-item__text">Outgoing</span>
-                    </a>
-                    <a class="mdc-list-item" href="#">
-                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">drafts</i>
-                        <span class="mdc-list-item__text">Drafts</span>
-                    </a>
-                </nav>
+
             </div>
-        </aside><div class="mdc-drawer-scrim"></div>
+        </div><div class="mdc-dialog-scrim"></div>
 
 
 
@@ -490,15 +545,15 @@
 
             buttons = document.querySelectorAll('.mdc-button');
             for (i = 0; i < buttons.length; i++) {
-                buttons[i].innerHTML = "<span class='mdc-button__ripple'></span>" + buttons[i].innerHTML;
-
-                //buttons[i].stopPropagation();
-                //buttons[i].preventDefault();
-                //ripple = new mdc.ripple.MDCRipple(buttons[i]);
-
+                buttons[i].innerHTML = "<span class='mdc-line-ripple'></span>" + buttons[i].innerHTML;
             }
 
-
+            textFields = document.querySelectorAll('.mdc-text-field');
+            for (i = 0; i < textFields.length; i++) {
+                textFields[i].innerHTML = "<span class='mdc-button__ripple'></span>" + textFields[i].innerHTML;
+                textField = new mdc.textField.MDCTextField(textFields[i]);
+            }
+            
             topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
             topAppBar.setScrollTarget(document.getElementById('main-content'));
             topAppBar.listen('MDCTopAppBar:nav', () => {
@@ -506,7 +561,7 @@
             });
             dataTable = new mdc.dataTable.MDCDataTable(document.querySelector('.mdc-data-table'));
 
-            bottomDrawer = mdc.drawer.MDCDrawer.attachTo(document.getElementById('bottom-drawer'));
+            newCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('new-credit-dialog'));
             //bottomDrawer.open = true;
             //leftDrawer.open = false;
 
@@ -516,7 +571,7 @@
         <script>
             function openNewCreditDrawer(e) {
                 event.preventDefault();
-                bottomDrawer.open = true;
+                newCreditDialog.open();
                 //leftDrawer.open = false;
 
                 return false;

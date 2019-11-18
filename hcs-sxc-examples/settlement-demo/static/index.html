@@ -478,6 +478,7 @@
         </div>
 
         <div id="new-credit-dialog" 
+           
             class="mdc-dialog"
              role="alertdialog"
              aria-modal="true"
@@ -503,7 +504,9 @@
                                     <label class="mdc-floating-label" for="my-text-field">
                                         Recipient 
                                     </label>
-                                </div>   
+                                </div>
+                                
+                                
                                 <div class="mdc-text-field mdc-text-field--full-width">
                                     <input type="text" id="new-credit-service-reference" 
                                            required minlength=8
@@ -512,6 +515,13 @@
                                         Service Reference
                                     </label>
                                 </div>   
+                                <div class="mdc-text-field-helper-line">
+                                    <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
+                                        Field is required and must be at least 8 characters long
+                                    </div>
+                                </div>
+                                
+                                
                                 <div class="mdc-text-field  mdc-text-field--with-leading-icon  mdc-text-field--full-width">
                                     <i class="material-icons mdc-text-field__icon">money</i>
                                     <input type="number" 
@@ -521,6 +531,12 @@
                                         Amount
                                     </label>
                                 </div>   
+                                
+                                <div class="mdc-text-field-helper-line">
+                                    <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
+                                        Field is required and must be a number without decimals
+                                    </div>
+                                </div>
                                 <div class="mdc-text-field mdc-text-field--full-width">
                                     <input type="text"
                                            required minlength=8
@@ -528,17 +544,26 @@
                                     <label class="mdc-floating-label" for="new-credit-additional-notes">
                                         Additional Notes
                                     </label>
-                                </div>  
+                                </div>
+                                
+                                <div class="mdc-text-field-helper-line">
+                                    <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
+                                        Field is required and must be at least 8 characters long
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </div>
                     
             
                     <footer class="mdc-dialog__actions" style="padding:24px">
-                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="no">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
                             <span class="mdc-button__label">Cancel</span>
                         </button>
-                        <button type="button" class="mdc-button mdc-button--raised  mdc-dialog__button" data-mdc-dialog-action="Send Now">
+                        <button type="button" 
+                                onclick="sendNewCreditDialog()"
+                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
+>
                             <span class="mdc-button__label">Send Now</span>
                         </button>
                     </footer>
@@ -566,7 +591,9 @@
 
             textFields = document.querySelectorAll('.mdc-text-field');
             for (i = 0; i < textFields.length; i++) {
+                //textFields[i].insertAdjacentHTML("afterend",'<div class="mdc-text-field-helper-line"><div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">helpme</div></div>');
                 textFields[i].innerHTML = "<span class='mdc-line-ripple'></span>" + textFields[i].innerHTML;
+                d_textFieldHelperText = new mdc.textField.MDCTextFieldHelperText(textFields[i].parentElement.querySelector('.mdc-text-field-helper-text'));
                 d_textField = new mdc.textField.MDCTextField(textFields[i]);
             }
             
@@ -590,20 +617,32 @@
 
         </script>
         <script>
+            /* Functions for the new credit dialog. */
+            
             function openNewCreditDialog(recipient) {
                 event.preventDefault();
                 $newCreditDialog = document.getElementById('new-credit-dialog');
-           
-                $newCreditDialog.querySelector("#new-credit-dialog-form").reset();
-                $newCreditDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){e.value='';});
-         
+                /*Clear styles and values to reuse fields*/
+                $newCreditDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
+                    e.parentElement.classList.remove('mdc-text-field--invalid');
+                    e.value='';}
+                );
+                
                 $newCreditDialog.querySelector("#new-credit-recipient").value = recipient;
-         
                 newCreditDialog.open();
-                //leftDrawer.open = false;
-
                 return false;
             }
+            
+            function sendNewCreditDialog(){
+                $newCreditDialog = document.getElementById('new-credit-dialog');
+                isFormValid = $newCreditDialog.querySelectorAll(".mdc-text-field--invalid").length === 0;
+               
+                if(isFormValid){
+                     newCreditDialog.close();
+                }
+               
+            }
+            
         </script>
     </body>
 </html>

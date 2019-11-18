@@ -235,7 +235,7 @@
                                   mdc-typography--body1
                                   "
                                   style="padding: 8px"
-                                  >Alice - AppID 1</span>
+                                  >Alice - AppID 0</span>
                         </section>
 
                     </div>           
@@ -312,6 +312,7 @@
                                         </span>
                                         <button 
                                             id="new-credit-button"
+                                            role="open-new-credit-button-dialog"
                                             class="mdc-button mdc-button--unelevated">
                                             new credit
                                         </button>
@@ -536,11 +537,17 @@
             /*Init new credits and debits*/
             addressBook = [{"publicKey":"302a300506032b657003210009724535fe4ea8f536a2c278d5aceb36f969281115093299a02a6172808470c9","name":"Bob","roles":"BUYER,SELLER"},{"publicKey":"302a300506032b6570032100832601520d346c051bc0c7aea4b9e566b0881f59d394e371293b3fc812cbfb36","name":"Carlos","roles":"BUYER,SELLER"},{"publicKey":"302a300506032b6570032100611824b08eb56cce4b84b9bf785bdea3a9429a52084dd7fdd39dc7ce3857a3cb","name":"Diana","roles":"BUYER,SELLER"},{"publicKey":"302a300506032b65700321008ec74de357c85ee343002ea48d4f5db6b43e595e0e717c971fdfbc9a3bc2dab2","name":"Erica","roles":"BUYER,SELLER"}];
             bobCredits = [{"transactionId":"0.0.1234-1111-11","threadId":1,"payerName":"Alice","recipientName":"Bob","reference":"service ref 1","amount":1,"currency":"USD","additionalNotes":"memo 1","status":"CREDIT_PENDING","createdDate":"7, Nov","createdTime":"10:00"},{"transactionId":"0.0.1234-2222-22","threadId":2,"payerName":"Bob","recipientName":"Alice","reference":"service ref 2","amount":2,"currency":"EUR","additionalNotes":"memo 2","status":"CREDIT_PENDING","createdDate":"8, Nov","createdTime":"11:00"},{"transactionId":"0.0.2-1574089337-280860000","threadId":3,"payerName":"Alice","recipientName":"Bob","reference":"service ref 3","amount":3,"currency":"USD","additionalNotes":"memo 3","status":"CREDIT_PENDING","createdDate":"18 Nov","createdTime":"15:02"}];
-            for(address in addressBook){
+            for(i=0; i<addressBook.length;i++){
                 var panelTemplate = document.getElementById("credit-and-debit-panel");
                 var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
-                clonedPanelTemplate.getElementById("credits-and-debits-user").innerHTML=addressBook[address].name;
-        
+                var userName = addressBook[i].name;
+                clonedPanelTemplate.getElementById("credits-and-debits-user").innerHTML = userName;
+                clonedPanelTemplate.getElementById("new-credit-button").addEventListener("click",(function(passName){
+                   return function(){openNewCreditDialog(passName);};
+                })(userName));
+                
+                clonedPanelTemplate.getElementById("new-credit-table-rows");
+                
                 document.getElementById("credit-and-debit-panel-holder").appendChild(clonedPanelTemplate);
                 
         }

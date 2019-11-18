@@ -10,7 +10,6 @@ import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.Enums;
 import com.hedera.hcsapp.Utils;
 import com.hedera.hcsapp.appconfig.AppConfig;
-import com.hedera.hcsapp.entities.AddressBook;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.repository.AddressBookRepository;
 import com.hedera.hcsapp.repository.CreditRepository;
@@ -65,26 +64,30 @@ public class CreditsController {
             Credit credit = new Credit();
             credit.setTransactionId("0.0.1234-1111-11");
             credit.setThreadId(1);
-            credit.setPayerPublicKey("302a300506032b6570032100cc8aa257dfac5c0881e462d8e25218ec4be10887cc2fe98d22493077134a1069");
-            credit.setRecipientPublicKey("302a300506032b657003210009724535fe4ea8f536a2c278d5aceb36f969281115093299a02a6172808470c9");
+            credit.setPayerName("Alice");
+            credit.setRecipientName(user);
             credit.setAmount(1);
             credit.setCurrency("USD");
-            credit.setMemo("memo 1");
-            credit.setServiceRef("service ref 1");
+            credit.setAdditionalNotes("memo 1");
+            credit.setReference("service ref 1");
             credit.setStatus(Enums.state.CREDIT_PENDING.name());
+            credit.setCreatedDate("7, Nov");
+            credit.setCreatedTime("10:00");
             
             creditRepository.save(credit);
             
             credit = new Credit();
             credit.setTransactionId("0.0.1234-2222-22");
             credit.setThreadId(2);
-            credit.setPayerPublicKey("302a300506032b657003210009724535fe4ea8f536a2c278d5aceb36f969281115093299a02a6172808470c9");
-            credit.setRecipientPublicKey("302a300506032b6570032100cc8aa257dfac5c0881e462d8e25218ec4be10887cc2fe98d22493077134a1069");
+            credit.setPayerName(user);
+            credit.setRecipientName("Alice");
             credit.setAmount(2);
             credit.setCurrency("EUR");
-            credit.setMemo("memo 2");
-            credit.setServiceRef("service ref 2");
+            credit.setAdditionalNotes("memo 2");
+            credit.setReference("service ref 2");
             credit.setStatus(Enums.state.CREDIT_PENDING.name());
+            credit.setCreatedDate("8, Nov");
+            credit.setCreatedTime("11:00");
             
             creditRepository.save(credit);
         }
@@ -96,11 +99,7 @@ public class CreditsController {
         if (user == null) {
             creditList = (List<Credit>) creditRepository.findAll(); 
         } else {
-            // find the public key for this user
-            AddressBook addressBook = addressBookRepository.findUserByName(user);
-            if (addressBook != null) {
-                creditList = creditRepository.findAllCreditsForKeys(appData.getPublicKey(), addressBook.getPublicKey());
-            }
+            creditList = creditRepository.findAllCreditsForKeys(appData.getUserName(), user);
         }
         
         return creditList;
@@ -113,10 +112,10 @@ public class CreditsController {
                 .setUnits(newCredit.getAmount())
                 .build();
         CreditBPM creditBPM = CreditBPM.newBuilder()
-                .setMemo(newCredit.getMemo())
-                .setPayerPublicKey(newCredit.getPayerPublicKey())
-                .setRecipientPublicKey(newCredit.getRecipientPublicKey())
-                .setServiceRef(newCredit.getServiceRef())
+                .setAdditionalNotes(newCredit.getAdditionalNotes())
+                .setPayerName(newCredit.getPayerName())
+                .setRecipientName(newCredit.getRecipientName())
+                .setServiceRef(newCredit.getReference())
                 .setValue(value)
                 .build();
         SettlementBPM settlementBPM = SettlementBPM.newBuilder()

@@ -6,7 +6,6 @@
 
         <!-- Required styles for MDC Web -->
         <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
-
         <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <style>
@@ -236,7 +235,6 @@
                                   mdc-typography--body1
                                   "
                                   style="padding: 8px"
-
                                   >Alice - AppID 1</span>
                         </section>
 
@@ -297,7 +295,6 @@
                 <div class="mdc-top-app-bar--fixed-adjust mdc-typography--body2"
                      style='margin: 16px 32px;'
                      >
-
 
                     <div id="paneltemplate" class="panel" style="visibility: visible;">
                         <details>
@@ -383,6 +380,7 @@
                             </div>
                         </details>
                     </div>
+                    
                     <div id="paneltemplate2" class="panel" style="visibility: visible;">
                         <details>
                             <summary>
@@ -471,9 +469,7 @@
 
                 </div>
 
-
             </main>
-
 
         </div>
 
@@ -573,8 +569,6 @@
         </div><div class="mdc-dialog-scrim"></div>
 
 
-
-
         <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
         <script>
             /* Visual effects for components. This script does not apply an client long. */
@@ -616,6 +610,13 @@
             //list.wrapFocus = true;
 
         </script>
+        
+        <script>
+            /*Init new credits and debits*/
+            addressBook = [{"publicKey":"302a300506032b657003210009724535fe4ea8f536a2c278d5aceb36f969281115093299a02a6172808470c9","name":"Bob","roles":"BUYER,SELLER"},{"publicKey":"302a300506032b6570032100832601520d346c051bc0c7aea4b9e566b0881f59d394e371293b3fc812cbfb36","name":"Carlos","roles":"BUYER,SELLER"},{"publicKey":"302a300506032b6570032100611824b08eb56cce4b84b9bf785bdea3a9429a52084dd7fdd39dc7ce3857a3cb","name":"Diana","roles":"BUYER,SELLER"},{"publicKey":"302a300506032b65700321008ec74de357c85ee343002ea48d4f5db6b43e595e0e717c971fdfbc9a3bc2dab2","name":"Erica","roles":"BUYER,SELLER"}];
+            bobCredits = [{"transactionId":"0.0.2-1574081560-458041000","threadId":3,"payerPublicKey":"302a300506032b6570032100cc8aa257dfac5c0881e462d8e25218ec4be10887cc2fe98d22493077134a1069","recipientPublicKey":"302a300506032b657003210009724535fe4ea8f536a2c278d5aceb36f969281115093299a02a6172808470c9","serviceRef":"service ref 3","amount":3,"currency":"USD","memo":"memo 3","status":"CREDIT_PENDING","createdDate":"18 Nov","createdTime":"12:52"}];
+        </script>
+        
         <script>
             /* Functions for the new credit dialog. */
             
@@ -635,7 +636,16 @@
             
             function sendNewCreditDialog(){
                 $newCreditDialog = document.getElementById('new-credit-dialog');
+                
+                /* validate form */
+                $newCreditDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
+                    if (! e.checkValidity()){e.focus(); }
+                });
+                $newCreditDialog.querySelectorAll(".mdc-text-field--invalid").
+                isFormValid = true;
                 isFormValid = $newCreditDialog.querySelectorAll(".mdc-text-field--invalid").length === 0;
+               
+               
                
                 if(isFormValid){
                      newCreditDialog.close();

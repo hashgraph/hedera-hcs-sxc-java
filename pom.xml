@@ -8,7 +8,7 @@
     <groupId>com.hedera</groupId>
     <artifactId>hcs-sxc</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.3-SNAPSHOT</version>
 
     <name>hcs-sxc</name>
     <description>HCS Secure Comms Extension</description>
@@ -50,7 +50,7 @@
         <junit-jupiter.version>5.5.2</junit-jupiter.version>
         <jib.version>1.7.0</jib.version>
         <artemis-jms-client-all.version>2.10.1</artemis-jms-client-all.version>
-        <hcslib.version>0.0.1-SNAPSHOT</hcslib.version>
+        <hcslib.version>0.0.3-SNAPSHOT</hcslib.version>
         <java-dotenv.version>5.0.1</java-dotenv.version>
         <guava.version>28.1-jre</guava.version>
         <hamcrest-core.version>1.3</hamcrest-core.version>

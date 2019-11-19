@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.jms.ConnectionFactory;
@@ -73,7 +74,18 @@ public final class OnHCSMessageCallback {
 
                 ConnectionFactory cf = (ConnectionFactory) initialContext.lookup("TCPConnectionFactory");
 
-                connection = cf.createConnection();
+                boolean retry = true;
+                while (retry) {
+                    try {
+                        connection = cf.createConnection();
+                        retry = false;
+                        log.info("Connected to message queue");
+                    }
+                    catch (JMSException ex) {
+                        log.info("Unable to connect to message queue - sleeping 5s");
+                        TimeUnit.SECONDS.sleep(5);
+                    }
+                }
 
                 connection.setClientID("operator-client-" + hcsLib.getApplicationId());
 
@@ -172,7 +184,7 @@ public final class OnHCSMessageCallback {
         //look up db to find parts received already
         List<ApplicationMessageChunk> chunkList = persistence.getParts(applicationMessageId);
         if(chunkList==null){
-            chunkList = new ArrayList();
+            chunkList = new ArrayList<ApplicationMessageChunk>();
             chunkList.add(messageChunk);
         } else {
             chunkList.add(messageChunk);

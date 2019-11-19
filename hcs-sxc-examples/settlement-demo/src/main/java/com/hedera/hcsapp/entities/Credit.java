@@ -14,11 +14,13 @@ public final class Credit {
     @Id
     private String transactionId;
     private long threadId;
-    private String payerPublicKey;
-    private String recipientPublicKey;
-    private String serviceRef;
+    private String payerName;
+    private String recipientName;
+    private String reference;
     private long amount;
     private String currency;
-    private String memo;
+    private String additionalNotes;
     private String status;
+    private String createdDate;
+    private String createdTime;
 }

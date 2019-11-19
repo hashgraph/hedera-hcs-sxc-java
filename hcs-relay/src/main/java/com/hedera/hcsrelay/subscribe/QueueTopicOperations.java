@@ -73,7 +73,8 @@ public class QueueTopicOperations {
                 } catch (Exception ie) {
                     String tcpConnectionFactory = queueConfig.getTcpConnectionFactory();
                     log.info("Is Artemis up? Setup your host file so that the host identified in'"+tcpConnectionFactory+"' points to 127.0.0.1 if running outside of docker");
-                    TimeUnit.SECONDS.sleep(6000);
+                    log.info("Sleeping 6s before retry");
+                    TimeUnit.SECONDS.sleep(6);
                 }
                 
             } while (scanning);

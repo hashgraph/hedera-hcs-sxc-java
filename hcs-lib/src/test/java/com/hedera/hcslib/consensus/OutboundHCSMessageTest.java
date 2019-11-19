@@ -25,7 +25,7 @@ public class OutboundHCSMessageTest {
     
     @Test
     public void testSingleChunking() {
-        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(txId,"Single Chunk Message");
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(txId,"Single Chunk Message".getBytes());
         assertTrue(chunks.size() == 1);
         
     }
@@ -33,7 +33,7 @@ public class OutboundHCSMessageTest {
     @Test
     public void testMultiChunking() {
         String longString = RandomStringUtils.random(5000, true, true);
-        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(txId,longString);
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(txId,longString.getBytes());
         assertTrue(chunks.size() == 2);
     }
     

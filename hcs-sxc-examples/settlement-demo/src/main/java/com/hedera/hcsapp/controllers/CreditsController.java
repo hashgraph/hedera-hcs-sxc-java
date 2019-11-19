@@ -3,6 +3,7 @@ package com.hedera.hcsapp.controllers;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
+import com.google.protobuf.Message;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hashgraph.sdk.TransactionId;
@@ -19,12 +20,14 @@ import com.hedera.hcslib.consensus.OutboundHCSMessage;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.log4j.Log4j2;
+import proto.CreditAckBPM;
 import proto.CreditBPM;
 import proto.Money;
 import proto.SettlementBPM;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,26 +48,23 @@ public class CreditsController {
     @Autowired
     AddressBookRepository addressBookRepository;
 
-    private static AppConfig appConfig;
-    private Dotenv dotEnv = Dotenv.configure().ignoreIfMissing().load();
-    private static HCSLib hcsLib;
+    private static AppData appData;
     private static int topicIndex = 0; // refers to the first topic ID in the config.yaml
     
     public CreditsController() throws FileNotFoundException, IOException {
-        long appId = 0;
-        
-        appId = Long.parseLong(dotEnv.get("APP_ID"));
-        hcsLib = new HCSLib(appId);
-        appConfig = new AppConfig();
+        appData = new AppData();
     }
 
     @GetMapping(value = "/credits/{user}", produces = "application/json")
     public List<Credit> credits(@PathVariable String user) throws FileNotFoundException, IOException {
         if (creditRepository.count() == 0) {
+            Instant now = Instant.now();
+            String threadId = now.getEpochSecond() + "-" + now.getNano();
+
             // TODO remove this automatic data generation
             Credit credit = new Credit();
             credit.setTransactionId("0.0.1234-1111-11");
-            credit.setThreadId(1);
+            credit.setThreadId(threadId);
             credit.setPayerName("Alice");
             credit.setRecipientName(user);
             credit.setAmount(1);
@@ -77,9 +77,11 @@ public class CreditsController {
             
             creditRepository.save(credit);
             
+            now = Instant.now();
+            threadId = now.getEpochSecond() + "-" + now.getNano();
             credit = new Credit();
             credit.setTransactionId("0.0.1234-2222-22");
-            credit.setThreadId(2);
+            credit.setThreadId(threadId);
             credit.setPayerName(user);
             credit.setRecipientName("Alice");
             credit.setAmount(2);
@@ -105,8 +107,52 @@ public class CreditsController {
         
         return creditList;
     }
+    @PostMapping(value = "/credits/ack/{threadId}", produces = "application/json")
+    Credit creditAck(@PathVariable String threadId) {
+
+        Credit credit = creditRepository.findById(threadId).get();
+        
+        Money value = Money.newBuilder()
+                .setCurrencyCode(credit.getCurrency())
+                .setUnits(credit.getAmount())
+                .build();
+        CreditBPM creditBPM = CreditBPM.newBuilder()
+                .setAdditionalNotes(credit.getAdditionalNotes())
+                .setPayerName(credit.getPayerName())
+                .setRecipientName(credit.getRecipientName())
+                .setServiceRef(credit.getReference())
+                .setValue(value)
+                .setThreadId(threadId)
+                .build();
+        CreditAckBPM creditAckBPM = CreditAckBPM.newBuilder()
+                .setCredit(creditBPM)
+                .setThreadId(threadId)
+                .build();
+                
+        SettlementBPM settlementBPM = SettlementBPM.newBuilder()
+                .setCreditAck(creditAckBPM)
+                .build();
+        
+        try {
+            TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib())
+                  .overrideEncryptedMessages(false)
+                  .overrideMessageSignature(false)
+                  .sendMessage(topicIndex, settlementBPM.toByteArray());
+
+            log.info("Message sent successfully.");
+
+            return credit;
+        } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
+            // TODO Auto-generated catch block
+            log.error(e);
+            throw new ProcessingException(e);
+        }
+    }
     @PostMapping("/credits")
-    Credit newCredit(@RequestBody Credit newCredit) {
+    Credit creditNew(@RequestBody Credit newCredit) {
+
+        Instant now = Instant.now();
+        String threadId = now.getEpochSecond() + "-" + now.getNano();
         
         Money value = Money.newBuilder()
                 .setCurrencyCode(newCredit.getCurrency())
@@ -118,19 +164,21 @@ public class CreditsController {
                 .setRecipientName(newCredit.getRecipientName())
                 .setServiceRef(newCredit.getReference())
                 .setValue(value)
+                .setThreadId(threadId)
                 .build();
         SettlementBPM settlementBPM = SettlementBPM.newBuilder()
                 .setCredit(creditBPM)
                 .build();
         
         try {
-            TransactionId transactionId = new OutboundHCSMessage(hcsLib)
+            TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib())
                   .overrideEncryptedMessages(false)
                   .overrideMessageSignature(false)
-                  .sendMessage(topicIndex, settlementBPM.toString());
+                  .sendMessage(topicIndex, settlementBPM.toByteArray());
 
             log.info("Message sent successfully.");
 
+            newCredit.setThreadId(threadId);
             newCredit.setStatus(Enums.state.CREDIT_PENDING.name());
             long seconds = transactionId.getValidStart().getEpochSecond();
             int nanos = transactionId.getValidStart().getNano();

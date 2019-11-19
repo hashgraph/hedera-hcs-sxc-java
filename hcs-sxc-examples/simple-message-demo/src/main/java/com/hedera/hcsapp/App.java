@@ -64,7 +64,7 @@ public final class App {
                 new OutboundHCSMessage(hcsLib)
                     .overrideEncryptedMessages(false)
                     .overrideMessageSignature(false)
-                    .sendMessage(topicIndex, userInput);
+                    .sendMessage(topicIndex, userInput.getBytes());
 
                 System.out.println("Message sent successfully.");
             } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {

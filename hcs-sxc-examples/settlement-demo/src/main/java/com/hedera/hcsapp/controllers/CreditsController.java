@@ -53,7 +53,7 @@ public class CreditsController {
     public CreditsController() throws FileNotFoundException, IOException {
         long appId = 0;
         
-        appId = Long.parseLong(dotEnv.get("APPID"));
+        appId = Long.parseLong(dotEnv.get("APP_ID"));
         hcsLib = new HCSLib(appId);
         appConfig = new AppConfig();
     }

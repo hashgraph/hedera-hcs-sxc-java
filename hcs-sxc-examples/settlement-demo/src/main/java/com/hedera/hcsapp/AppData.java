@@ -23,7 +23,7 @@ public final class AppData {
         this.appConfig = new AppConfig();
         Dotenv dotEnv = Dotenv.configure().ignoreIfMissing().load();
 
-        this.appId = Long.parseLong(dotEnv.get("APPID"));
+        this.appId = Long.parseLong(dotEnv.get("APP_ID"));
         this.hcsLib = new HCSLib(appId);
         this.privateKey = dotEnv.get("PK");
         this.publicKey = appConfig.getConfig().getAppClients().get((int)appId).getClientKey();

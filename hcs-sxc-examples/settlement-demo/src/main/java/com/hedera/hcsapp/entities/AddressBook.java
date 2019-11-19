@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "address_book")
-public final class AddressBook {
+public class AddressBook {
 
     @Id
     private String name;

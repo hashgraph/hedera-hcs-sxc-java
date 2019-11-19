@@ -1,8 +1,8 @@
 DROP TABLE IF EXISTS credits;
 
 CREATE TABLE credits (
-    transaction_id VARCHAR2(100) PRIMARY KEY
-    ,thread_id BIGINT NOT NULL
+    thread_id VARCHAR(20) PRIMARY KEY
+    ,transaction_id VARCHAR(100) 
     ,payer_name VARCHAR(88) NOT NULL
     ,recipient_name VARCHAR(88) NOT NULL
     ,reference VARCHAR(50) DEFAULT NULL

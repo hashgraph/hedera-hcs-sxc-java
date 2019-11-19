@@ -89,7 +89,7 @@ public final class OutboundHCSMessage {
      * @throws IllegalArgumentException
      * @throws HederaException
      */
-    public TransactionId sendMessage(int topicIndex, String message) throws HederaNetworkException, IllegalArgumentException, HederaException {
+    public TransactionId sendMessage(int topicIndex, byte[] message) throws HederaNetworkException, IllegalArgumentException, HederaException {
 
         if (signMessages) {
 
@@ -140,7 +140,7 @@ public final class OutboundHCSMessage {
         return firstTransactionId;
     }
 
-    public static  List<ApplicationMessageChunk> chunk(TransactionId transactionId,  String message) {
+    public static  List<ApplicationMessageChunk> chunk(TransactionId transactionId,  byte[] message) {
 
         TransactionID transactionID = TransactionID.newBuilder()
                 .setAccountID(AccountID.newBuilder()
@@ -155,7 +155,7 @@ public final class OutboundHCSMessage {
                         .build()
                 ).build();
 
-        byte[] originalMessage = message.getBytes();
+        byte[] originalMessage = Arrays.copyOf(message, message.length);
 
         ApplicationMessage applicationMessage = ApplicationMessage
                 .newBuilder()

@@ -10,5 +10,5 @@ public interface HCSCallBackInterface  {
      * needs to be notified to the app
      * @param message the message to notify
      */
-    void onMessage(String message);
+    void onMessage(byte[] message);
 }

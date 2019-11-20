@@ -421,7 +421,7 @@
                                 
                                 <div class="mdc-text-field mdc-text-field--full-width">
                                     <input type="text" id="new-credit-service-reference" 
-                                           required minlength=8
+                                           required minlength=4
                                            class="mdc-text-field__input">
                                     <label class="mdc-floating-label" for="">
                                         Service Reference
@@ -429,7 +429,7 @@
                                 </div>   
                                 <div class="mdc-text-field-helper-line">
                                     <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
-                                        Field is required and must be at least 8 characters long
+                                        Field is required and must be at least 4 characters long
                                     </div>
                                 </div>
                                 
@@ -437,6 +437,7 @@
                                 <div class="mdc-text-field  mdc-text-field--with-leading-icon  mdc-text-field--full-width">
                                     <i class="material-icons mdc-text-field__icon">money</i>
                                     <input type="number" 
+                                           id="new-credit-amount"
                                            required
                                            id="my-text-field" class="mdc-text-field__input">
                                     <label class="mdc-floating-label" for="new-credit-amount">
@@ -451,7 +452,8 @@
                                 </div>
                                 <div class="mdc-text-field mdc-text-field--full-width">
                                     <input type="text"
-                                           required minlength=8
+                                           id="new-credit-additional-notes"
+                                           required minlength=4
                                            id="my-text-field" class="mdc-text-field__input">
                                     <label class="mdc-floating-label" for="new-credit-additional-notes">
                                         Additional Notes
@@ -460,7 +462,7 @@
                                 
                                 <div class="mdc-text-field-helper-line">
                                     <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
-                                        Field is required and must be at least 8 characters long
+                                        Field is required and must be at least 4 characters long
                                     </div>
                                 </div>
                             </form>
@@ -489,16 +491,18 @@
         
         
         <script>
+            thisuserName = "";
 
             let f = async (url) => {
                 let responseWhoami =  await fetch(url);
                 let whoami = await responseWhoami.json();
+                thisuserName =  whoami.name;
                 
                 document.getElementById("this-user").innerHTML=whoami.name;
                 document.getElementById("this-pk").innerHTML=whoami.publicKey;
                 document.getElementById("this-pk").title=whoami.publicKey;
                 
-                let responseAddressBook = await fetch('http://localhost:8080/addressbook/buyerseller/');
+                let responseAddressBook = await fetch('addressbook/buyerseller/');
                 let addressBook  = await responseAddressBook.json(); 
                 
                 for(i=0; i < addressBook.length; i++){
@@ -513,7 +517,7 @@
                     var tableBody = clonedPanelTemplate.getElementById("credit-table-body");
                     var tableBodyTemplate = clonedPanelTemplate.getElementById("credit-table-body-template");
                     
-                    var responseCredits = await fetch(`http://localhost:8080/credits/${userName}`);
+                    var responseCredits = await fetch(`credits/${userName}`);
                     var i_UserCredits = await responseCredits.json();
                     
                     for(z=0; z < i_UserCredits.length ; z++){
@@ -541,7 +545,7 @@
                   //styleDataTables();
                 
             };
-            f('http://localhost:8080/addressbook/me/');
+            f('addressbook/me/');
           
             
         </script>
@@ -567,7 +571,6 @@
             
             function sendNewCreditDialog(){
                 $newCreditDialog = document.getElementById('new-credit-dialog');
-                
                 /* validate form */
                 isFormValid = true;
                 ls = $newCreditDialog.querySelectorAll(".mdc-text-field input");
@@ -576,26 +579,30 @@
                  
                 }
                 if(isFormValid){
-                    
-                    postBody = {"payerName":"Alice","recipientName":"Bob","reference":"service ref 3","amount":3,"currency":"USD","additionalNotes":"memo 3"};
+                    postBody = `{
+                                  "payerName"       : "${thisuserName}" 
+                                , "recipientName"   : "${document.getElementById('new-credit-recipient').value}"
+                                , "reference"       : "${document.getElementById('new-credit-service-reference').value}"
+                                , "amount"          : ${document.getElementById('new-credit-amount').value}
+                                , "currency"        : "USD"
+                                , "additionalNotes" :"${document.getElementById('new-credit-additional-notes').value}"
+                                }`;
+            
                     fetch('http://localhost:8080/credits', {
-                        
                         method: 'post',
                         headers: {
                             'Accept': 'application/json',
                             'Content-Type': 'application/json'
-                          },
-                        body: JSON.stringify(postBody)
-                        
+                        },
+                        body: postBody
                     }).then(function(response) {
                         return response.json();
                     }).then(function(data) {
+                        
                         newCreditDialog.close();
                     }).catch(function(res){ 
                         console.log(res); 
                     });
-                    
-                    
                 }      
             }
             

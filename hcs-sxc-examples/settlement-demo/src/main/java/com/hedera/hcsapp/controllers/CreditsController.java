@@ -60,7 +60,7 @@ public class CreditsController {
 
     @GetMapping(value = "/credits/{user}", produces = "application/json")
     public List<Credit> credits(@PathVariable String user) throws FileNotFoundException, IOException {
-        if (creditRepository.count() == 0) {
+        if (creditRepository.findAllCreditsForKeys("Alice", user).isEmpty()) {
             // TODO remove this automatic data generation
             Credit credit = new Credit();
             credit.setTransactionId("0.0.1234-1111-11");
@@ -87,6 +87,21 @@ public class CreditsController {
             credit.setAdditionalNotes("memo 2");
             credit.setReference("service ref 2");
             credit.setStatus(Enums.state.CREDIT_PENDING.name());
+            credit.setCreatedDate("8, Nov");
+            credit.setCreatedTime("11:00");
+            
+            creditRepository.save(credit);
+            
+            credit = new Credit();
+            credit.setTransactionId("0.0.1234-2222-28");
+            credit.setThreadId(2);
+            credit.setPayerName(user);
+            credit.setRecipientName("Alice");
+            credit.setAmount(2);
+            credit.setCurrency("EUR");
+            credit.setAdditionalNotes("memo 2");
+            credit.setReference("service ref 2");
+            credit.setStatus(Enums.state.CREDIT_AWAIT_ACK.name());
             credit.setCreatedDate("8, Nov");
             credit.setCreatedTime("11:00");
             

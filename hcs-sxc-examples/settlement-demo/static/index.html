@@ -475,43 +475,54 @@
         <script>
             whoami = 'Alice';
             
-            /*Init new credits and debits*/
-            addressBook = [{"publicKey":"302a300506032b657003210009724535fe4ea8f536a2c278d5aceb36f969281115093299a02a6172808470c9","name":"Bob","roles":"BUYER,SELLER"},{"publicKey":"302a300506032b6570032100832601520d346c051bc0c7aea4b9e566b0881f59d394e371293b3fc812cbfb36","name":"Carlos","roles":"BUYER,SELLER"},{"publicKey":"302a300506032b6570032100611824b08eb56cce4b84b9bf785bdea3a9429a52084dd7fdd39dc7ce3857a3cb","name":"Diana","roles":"BUYER,SELLER"},{"publicKey":"302a300506032b65700321008ec74de357c85ee343002ea48d4f5db6b43e595e0e717c971fdfbc9a3bc2dab2","name":"Erica","roles":"BUYER,SELLER"}];
-            bobCredits = [{"transactionId":"0.0.1234-1111-11","threadId":1,"payerName":"Alice","recipientName":"Bob","reference":"service ref 1","amount":1,"currency":"USD","additionalNotes":"memo 1","status":"CREDIT_PENDING","createdDate":"7, Nov","createdTime":"10:00"},{"transactionId":"0.0.1234-2222-22","threadId":2,"payerName":"Bob","recipientName":"Alice","reference":"service ref 2","amount":2,"currency":"EUR","additionalNotes":"memo 2","status":"CREDIT_PENDING","createdDate":"8, Nov","createdTime":"11:00"},{"transactionId":"0.0.2-1574089337-280860000","threadId":3,"payerName":"Alice","recipientName":"Bob","reference":"service ref 3","amount":3,"currency":"USD","additionalNotes":"memo 3","status":"CREDIT_AWAIT_ACK","createdDate":"18 Nov","createdTime":"15:02"}];
-            
-            for(i=0; i < addressBook.length; i++){
-                var panelTemplate = document.getElementById("credit-and-debit-panel");
-                var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
-                var userName = addressBook[i].name;
-                clonedPanelTemplate.getElementById("credits-and-debits-user").innerHTML = userName;
-                clonedPanelTemplate.getElementById("new-credit-button").addEventListener("click",(function(passName){
-                   return function(){openNewCreditDialog(passName);};
-                })(userName));
+   
+            let f = async (url) => {
+                let responseAddressBook = await fetch(url);
+                let addressBook  = await responseAddressBook.json(); 
                 
-                var tableBody = clonedPanelTemplate.getElementById("credit-table-body");
-                var tableBodyTemplate = clonedPanelTemplate.getElementById("credit-table-body-template");
-               
-                for(z=0; z < bobCredits.length ; z++){
-                    clonedRow = tableBodyTemplate.content.cloneNode(true);
-                    clonedRow.getElementById("threadId").innerHTML = bobCredits[z].threadId;
-                    clonedRow.getElementById("creditor").innerHTML = bobCredits[z].recipientName;
-                    clonedRow.getElementById("debtor").innerHTML = bobCredits[z].payerName;
-                    clonedRow.getElementById("reference").innerHTML = bobCredits[z].reference;
-                    clonedRow.getElementById("amount").innerHTML = bobCredits[z].currency + ' '+ bobCredits[z].amount;
-                    clonedRow.getElementById("date").innerHTML = bobCredits[z].createdDate;
-                    clonedRow.getElementById("time").innerHTML = bobCredits[z].createdTime;
-                    clonedRow.getElementById("status").innerHTML = bobCredits[z].status;
-                    if(bobCredits[z].payerName === whoami &&  bobCredits[z].status === 'CREDIT_AWAIT_ACK'){
-                        clonedRow.getElementById("action").innerHTML="<button class='mdc-button mdc-button--outlined'>Confirm</button>";
-                    }
-                    clonedRow.getElementById("notes").innerHTML = bobCredits[z].additionalNotes;
-                    tableBody.appendChild(clonedRow);
-                }
+                for(i=0; i < addressBook.length; i++){
+                    var panelTemplate = document.getElementById("credit-and-debit-panel");
+                    var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
+                    var userName = addressBook[i].name;
+                    clonedPanelTemplate.getElementById("credits-and-debits-user").innerHTML = userName;
+                    clonedPanelTemplate.getElementById("new-credit-button").addEventListener("click",(function(passName){
+                       return function(){openNewCreditDialog(passName);};
+                    })(userName));
+
+                    var tableBody = clonedPanelTemplate.getElementById("credit-table-body");
+                    var tableBodyTemplate = clonedPanelTemplate.getElementById("credit-table-body-template");
+                    
+                    var responseCredits = await fetch(`http://localhost:8080/credits/${userName}`);
+                    var bobCredits = await responseCredits.json();
+                    
+                    for(z=0; z < bobCredits.length ; z++){
+                      clonedRow = tableBodyTemplate.content.cloneNode(true);
+                      clonedRow.getElementById("threadId").innerHTML = bobCredits[z].threadId;
+                      clonedRow.getElementById("creditor").innerHTML = bobCredits[z].recipientName;
+                      clonedRow.getElementById("debtor").innerHTML = bobCredits[z].payerName;
+                      clonedRow.getElementById("reference").innerHTML = bobCredits[z].reference;
+                      clonedRow.getElementById("amount").innerHTML = bobCredits[z].currency + ' '+ bobCredits[z].amount;
+                      clonedRow.getElementById("date").innerHTML = bobCredits[z].createdDate;
+                      clonedRow.getElementById("time").innerHTML = bobCredits[z].createdTime;
+                      clonedRow.getElementById("status").innerHTML = bobCredits[z].status;
+
+                      if(bobCredits[z].payerName === whoami &&  bobCredits[z].status === 'CREDIT_AWAIT_ACK'){
+                          clonedRow.getElementById("action").innerHTML="<button class='mdc-button mdc-button--outlined'>Confirm</button>";
+                      }
+
+                      clonedRow.getElementById("notes").innerHTML = bobCredits[z].additionalNotes;
+                      tableBody.appendChild(clonedRow);
+                  }     
+                             
+                     document.getElementById("credit-and-debit-panel-holder").appendChild(clonedPanelTemplate);
+  
+                  }         
                 
-                
-                document.getElementById("credit-and-debit-panel-holder").appendChild(clonedPanelTemplate);
-                
-        }
+            };
+            f('http://localhost:8080/addressbook/buyerseller/');
+          
+                  
+          
             
         </script>
         

@@ -409,8 +409,8 @@
                         <div style="display:fex; flex-direction: column">
                             <form id="new-credit-dialog-form">
                                 <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text" disabled id="new-credit-recipient"
-                                           value="{{newCreditRecipient}}"
+                                    <input type="text" disabled id="new-credit-payer"
+                                           value="{{newCreditPayer}}"
                                            required
                                            class="mdc-text-field__input ">
                                     <label class="mdc-floating-label" for="my-text-field">
@@ -564,7 +564,7 @@
                     e.value='';}
                 );
                 
-                $newCreditDialog.querySelector("#new-credit-recipient").value = recipient;
+                $newCreditDialog.querySelector("#new-credit-payer").value = recipient;
                 newCreditDialog.open();
                 return false;
             }
@@ -580,8 +580,8 @@
                 }
                 if(isFormValid){
                     postBody = `{
-                                  "payerName"       : "${thisuserName}" 
-                                , "recipientName"   : "${document.getElementById('new-credit-recipient').value}"
+                                  "recipientName"   : "${thisuserName}" 
+                                , "payerName"       : "${document.getElementById('new-credit-payer').value}"
                                 , "reference"       : "${document.getElementById('new-credit-service-reference').value}"
                                 , "amount"          : ${document.getElementById('new-credit-amount').value}
                                 , "currency"        : "USD"

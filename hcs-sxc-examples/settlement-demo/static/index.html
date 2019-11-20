@@ -200,11 +200,12 @@
             }
             
             .overflow-elipsis{
-               display: inline-block;
+                display: inline-block;
                 max-width: 100px;
                 padding: 16px;
                 overflow: hidden;
                 text-overflow: ellipsis;
+                white-space: nowrap;
             }
 
 
@@ -239,11 +240,18 @@
                         id="app-bar-of-main-content">     
                     <div class="mdc-top-app-bar__row">
                         <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-                            <span class="mdc-top-app-bar__title
+                            <span id="this-user"
+                                  class="mdc-top-app-bar__title
                                   mdc-typography--body1
                                   "
                                   style="padding: 8px"
-                                  >Alice - AppID 0</span>
+                                  >Alice</span>
+                            <span 
+                                id="this-pk"
+                                class="overflow-elipsis mdc-typography--body1"
+                                title="302fdsadfsafdsadfsadfsdfsadfsadfsadf">
+                                PK 302fdsadfsafdsadfsadfsdfsadfsadfsadf
+                            </span>
                         </section>
 
                     </div>           
@@ -481,11 +489,16 @@
         
         
         <script>
-            whoami = 'Alice';
-            
 
             let f = async (url) => {
-                let responseAddressBook = await fetch(url);
+                let responseWhoami =  await fetch(url);
+                let whoami = await responseWhoami.json();
+                
+                document.getElementById("this-user").innerHTML=whoami.name;
+                document.getElementById("this-pk").innerHTML=whoami.publicKey;
+                document.getElementById("this-pk").title=whoami.publicKey;
+                
+                let responseAddressBook = await fetch('http://localhost:8080/addressbook/buyerseller/');
                 let addressBook  = await responseAddressBook.json(); 
                 
                 for(i=0; i < addressBook.length; i++){
@@ -501,25 +514,23 @@
                     var tableBodyTemplate = clonedPanelTemplate.getElementById("credit-table-body-template");
                     
                     var responseCredits = await fetch(`http://localhost:8080/credits/${userName}`);
-                    var bobCredits = await responseCredits.json();
+                    var i_UserCredits = await responseCredits.json();
                     
-                    for(z=0; z < bobCredits.length ; z++){
+                    for(z=0; z < i_UserCredits.length ; z++){
                       clonedRow = tableBodyTemplate.content.cloneNode(true);
-                      clonedRow.getElementById("threadId").innerHTML = bobCredits[z].threadId;
-                            clonedRow.getElementById("threadId").title = bobCredits[z].threadId;
-                      clonedRow.getElementById("creditor").innerHTML = bobCredits[z].recipientName;
-                      clonedRow.getElementById("debtor").innerHTML = bobCredits[z].payerName;
-                      clonedRow.getElementById("reference").innerHTML = bobCredits[z].reference;
-                      clonedRow.getElementById("amount").innerHTML = bobCredits[z].currency + ' '+ bobCredits[z].amount;
-                      clonedRow.getElementById("date").innerHTML = bobCredits[z].createdDate;
-                      clonedRow.getElementById("time").innerHTML = bobCredits[z].createdTime;
-                      clonedRow.getElementById("status").innerHTML = bobCredits[z].status;
-
-                      if(bobCredits[z].payerName === whoami &&  bobCredits[z].status === 'CREDIT_AWAIT_ACK'){
+                      clonedRow.getElementById("threadId").innerHTML = i_UserCredits[z].threadId;
+                            clonedRow.getElementById("threadId").title = i_UserCredits[z].threadId;
+                      clonedRow.getElementById("creditor").innerHTML = i_UserCredits[z].recipientName;
+                      clonedRow.getElementById("debtor").innerHTML = i_UserCredits[z].payerName;
+                      clonedRow.getElementById("reference").innerHTML = i_UserCredits[z].reference;
+                      clonedRow.getElementById("amount").innerHTML = i_UserCredits[z].currency + ' '+ i_UserCredits[z].amount;
+                      clonedRow.getElementById("date").innerHTML = i_UserCredits[z].createdDate;
+                      clonedRow.getElementById("time").innerHTML = i_UserCredits[z].createdTime;
+                      clonedRow.getElementById("status").innerHTML = i_UserCredits[z].status;
+                      if(i_UserCredits[z].payerName === whoami.name &&  i_UserCredits[z].status === 'CREDIT_AWAIT_ACK'){
                           clonedRow.getElementById("action").innerHTML="<button class='mdc-button mdc-button--outlined'>Confirm</button>";
                       }
-
-                      clonedRow.getElementById("notes").innerHTML = bobCredits[z].additionalNotes;
+                      clonedRow.getElementById("notes").innerHTML = i_UserCredits[z].additionalNotes;
                       tableBody.appendChild(clonedRow);
                   }     
                              
@@ -530,7 +541,7 @@
                   //styleDataTables();
                 
             };
-            f('http://localhost:8080/addressbook/buyerseller/');
+            f('http://localhost:8080/addressbook/me/');
           
             
         </script>
@@ -622,9 +633,6 @@
                 }
             }
             
-
-         
-
         </script>
     </body>
 </html>

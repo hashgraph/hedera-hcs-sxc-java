@@ -12,8 +12,8 @@ import lombok.Data;
 public final class Credit {
 
     @Id
+    private String threadId;
     private String transactionId;
-    private long threadId;
     private String payerName;
     private String recipientName;
     private String reference;

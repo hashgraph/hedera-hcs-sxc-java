@@ -101,7 +101,7 @@ public final class OnHCSMessageCallback {
                         try {
                             // notify subscribed observer from App.java
                             if (messageFromJMS instanceof ActiveMQTextMessage) {
-                                OnHCSMessageCallback.this.notifyObservers(((ActiveMQTextMessage)messageFromJMS).getText());
+                                OnHCSMessageCallback.this.notifyObservers(((ActiveMQTextMessage)messageFromJMS).getText().getBytes());
                                 messageFromJMS.acknowledge();
                             } else if (messageFromJMS instanceof ActiveMQObjectMessage) {
                                 HCSRelayMessage rlm = (HCSRelayMessage)((ActiveMQObjectMessage) messageFromJMS).getObject();
@@ -113,7 +113,7 @@ public final class OnHCSMessageCallback {
                                 Optional<ApplicationMessage> messageEnvelopeOptional = 
                                         pushUntilCompleteMessage(messagePart, persistence);
                                 if (messageEnvelopeOptional.isPresent()){
-                                    OnHCSMessageCallback.this.notifyObservers( messageEnvelopeOptional.get().getBusinessProcessMessage().toStringUtf8());
+                                    OnHCSMessageCallback.this.notifyObservers( messageEnvelopeOptional.get().toByteArray());
                                     messageFromJMS.acknowledge();
                                 }
                             }
@@ -164,7 +164,7 @@ public final class OnHCSMessageCallback {
      * Notifies all observers with the supplied message
      * @param message
      */
-    void notifyObservers(String message){
+    void notifyObservers(byte[] message){
         observers.forEach(listener -> listener.onMessage(message));
     }
     

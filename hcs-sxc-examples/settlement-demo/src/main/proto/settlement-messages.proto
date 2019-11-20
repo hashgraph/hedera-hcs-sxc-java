@@ -15,10 +15,10 @@ message AccountID {
 
 // Represents a Hedera transaction ID
 // Copied from hedera-hcs-sxc
-message TransactionID {
-    Timestamp transactionValidStart = 1; // The transaction is invalid if consensusTimestamp < transactionID.transactionStartValid
-    AccountID accountID = 2; //The Account ID that paid for this transaction
-}
+//message TransactionID {
+//    Timestamp transactionValidStart = 1; // The transaction is invalid if consensusTimestamp < transactionID.transactionStartValid
+//    AccountID accountID = 2; //The Account ID that paid for this transaction
+//} 
 
 // Represents an exact date and time. This is the same data structure as the protobuf Timestamp.proto
 // See the comments in https://github.com/google/protobuf/blob/master/src/google/protobuf/timestamp.proto)
@@ -65,7 +65,9 @@ message CreditBPM{
     
     // Optional supplementary notes or text
     string additionalNotes = 5;
-
+    
+    // The context or business-process instance ID with which this message is associated
+    string threadId = 6;
 }
 
 // Represents acknowledgement of a credit and agreement that the details are correct
@@ -75,8 +77,12 @@ message CreditAckBPM{
     // Credit message being acknowledged
     CreditBPM credit = 1;
 
+    // The context or business-process instance ID with which this message is associated
+    string threadId = 2;
+
     // Reference to the TransactionID of the `credit` message being acknowledged
-    TransactionID creditMessageId = 2;
+//    TransactionID creditMessageId = 2;
+
 }
 
 // Represents a proposal to settle outstanding balance between two parties.
@@ -101,8 +107,11 @@ message SettleProposeBPM {
     // Optional supplementary notes or text
     string additionalNotes = 3;
 
+    // Reference to each threadId of the `creditAck` message included in the proposed settlement
+    repeated string threadId = 4;
+
     // Reference to each TransactionID of the `creditAck` messages included in the proposed settlement
-    repeated TransactionID creditAckMessageId = 4;
+//    repeated TransactionID creditAckMessageId = 4;
 
     // Total amount owed from payer to recipient
     // `netValue` must be greater than zero
@@ -116,8 +125,11 @@ message SettleProposeAckBPM {
     // SettlePropose message being acknowledged
     SettleProposeBPM settlePropose = 1;
 
+    // The context or business-process instance ID with which this message is associated
+    string threadId = 2;
+
     // Reference to the TransactionID of the `settlePropose` message being acknowledged
-    TransactionID settleProposeMessageId = 2;
+//    TransactionID settleProposeMessageId = 2;
 }
 
 // Represents intent to begin settlement through a third party payment channel
@@ -139,8 +151,11 @@ message SettleInitBPM {
     // Total amount that the payment channel will transfer from the bank account of the payer to the bank account of the recipient
     Money netValue = 5;
 
+    // The context or business-process instance ID with which this message is associated
+    string threadId = 6;
+
     // Reference to the TransactionID of the `settleProposeAck` message within which settlement was agreed
-    TransactionID settleProposeAckMessageId = 6;
+//    TransactionID settleProposeAckMessageId = 6;
 }
 
 // Represents acknowledgement of the intent to settle through a third party payment channel
@@ -150,8 +165,11 @@ message SettleInitAckBPM {
     // SettleInit message being acknowledged
     SettleInitBPM settleInit = 1;
 
+    // The context or business-process instance ID with which this message is associated
+    string threadId = 2;
+
     // Reference to the TransactionID of the `settleInit` message being acknowledged
-    TransactionID settleInitMessageId = 2;
+//    TransactionID settleInitMessageId = 2;
 }
 
 // Represents a payment mandate instructing a payment channel to transfer the specified amount
@@ -187,8 +205,11 @@ message PaymentInitAckBPM {
     // PaymentInit message being acknowledged
     PaymentInitBPM paymentInit = 1;
 
+    // The context or business-process instance ID with which this message is associated
+    string threadId = 2;
+
     // Reference to the TransactionID of the `paymentInit` message being acknowledged
-    TransactionID paymentInitMessageId = 2;
+//    TransactionID paymentInitMessageId = 2;
 }
 
 // Represents confirmation that a settlement payment has been completed by the payment channel
@@ -213,8 +234,11 @@ message PaymentSentBPM {
     // Total amount that the payment channel transferred from the bank account of the payer to the bank account of the recipient
     Money netValue = 6;
 
+    // The context or business-process instance ID with which this message is associated
+    string threadId = 7;
+
     // Reference to the TransactionID of the `paymentInitAck` also sent by the payment channel
-    TransactionID paymentInitMessageAckId = 7;
+//    TransactionID paymentInitMessageAckId = 7;
 
     // Optional Date and time that the funds were transferred from the payer's bank account
     Timestamp transferStart = 8;
@@ -234,8 +258,11 @@ message PaymentSentAckBPM {
     // PaymentSent message being acknowledged
     PaymentSentBPM paymentSent = 1;
 
+    // The context or business-process instance ID with which this message is associated
+    string threadId = 2;
+    
     // Reference to the TransactionID of the `paymentSent` also sent by the payment channel
-    TransactionID paymentInitMessageAckId = 2;
+//    TransactionID paymentInitMessageAckId = 2;
 }
 
 // Represents communication of the completed settlement payment to the recipient
@@ -254,8 +281,11 @@ message SettlePaidBPM {
     // Total amount that the payment channel will transfer from the bank account of the payer to the bank account of the recipient
     Money netValue = 4;
 
+    // The context or business-process instance ID with which this message is associated
+    string threadId = 5;
+
     // Reference to the TransactionID of the `settleProposeAck` message that has now been paid
-    TransactionID settleProposeAckMessageId = 6;
+//    TransactionID settleProposeAckMessageId = 6;
 
     // Optional [external] Payment Reference
     string paymentReference = 7;
@@ -269,8 +299,11 @@ message SettlePaidAckBPM {
     // SettlePaid message being acknowledged
     SettlePaidBPM settlePaid = 1;
 
+    // The context or business-process instance ID with which this message is associated
+    string threadId = 2;
+
     // Reference to the TransactionID of the `settlePaid` message being acknowledged
-    TransactionID settlePaidMessageId = 2;
+//    TransactionID settlePaidMessageId = 2;
 }
 
 // Represents confirmation that the settlement amount has been transferred to the receipient's account
@@ -290,8 +323,11 @@ message SettleCompleteBPM {
     // Total amount that has been paid into the recipient's bank account
     Money netValue = 4;
 
+    // The context or business-process instance ID with which this message is associated
+    string threadId = 6;
+
     // Reference to the TransactionID of the `settleProposeAck` message that has now been paid
-    TransactionID settleProposeAckMessageId = 6;
+//    TransactionID settleProposeAckMessageId = 6;
 
     // Optional [external] Payment Reference
     string paymentReference = 7;
@@ -304,8 +340,11 @@ message SettleCompleteAckBPM {
     // SettleComplete message being acknowledged
     SettleCompleteBPM settlePaid = 1;
 
+    // The context or business-process instance ID with which this message is associated
+    string threadId = 2;
+
     // Reference to the TransactionID of the `settlePaid` message being acknowledged
-    TransactionID settleCompleteMessageId = 2;
+//    TransactionID settleCompleteMessageId = 2;
 }
 
 // Represents a Settlement-specific Business Process Message
@@ -315,24 +354,24 @@ message SettleCompleteAckBPM {
 message SettlementBPM {
 
     // The context or business-process instance ID with which this message is associated
-    int64 threadId = 2;
+//    string threadId = 1;
 
     // The specific settlement message
     oneof data {
-        CreditBPM credit = 3;
-        CreditAckBPM creditAck = 4;
-        SettleProposeBPM settlePropose = 5;
-        SettleProposeAckBPM settleProposeAck = 6;
-        SettleInitBPM settleInit = 7;
-        SettleInitAckBPM settleInitAck = 8;
-        PaymentInitBPM paymentInit = 9;
-        PaymentInitAckBPM paymentInitAck = 10;
-        PaymentSentBPM paymentSent = 11;
-        PaymentSentAckBPM paymentSentAck = 12;
-        SettlePaidBPM settlePayment = 13;
-        SettlePaidAckBPM settlePaymentAck = 14;
-        SettleCompleteBPM settleComplete = 15;
-        SettleCompleteAckBPM settleCompleteAck = 16;
+        CreditBPM credit = 2;
+        CreditAckBPM creditAck = 3;
+        SettleProposeBPM settlePropose = 4;
+        SettleProposeAckBPM settleProposeAck = 5;
+        SettleInitBPM settleInit = 6;
+        SettleInitAckBPM settleInitAck = 7;
+        PaymentInitBPM paymentInit = 8;
+        PaymentInitAckBPM paymentInitAck = 9;
+        PaymentSentBPM paymentSent = 10;
+        PaymentSentAckBPM paymentSentAck = 11;
+        SettlePaidBPM settlePayment = 12;
+        SettlePaidAckBPM settlePaymentAck = 13;
+        SettleCompleteBPM settleComplete = 14;
+        SettleCompleteAckBPM settleCompleteAck = 15;
     }
 }
 

@@ -52,14 +52,16 @@ public class CreditsController {
     private static int topicIndex = 0; // refers to the first topic ID in the config.yaml
     
     public CreditsController() throws FileNotFoundException, IOException {
+
         appData = new AppData();
     }
 
     @GetMapping(value = "/credits/{user}", produces = "application/json")
     public List<Credit> credits(@PathVariable String user) throws FileNotFoundException, IOException {
-        if (creditRepository.count() == 0) {
+        if (creditRepository.findAllCreditsForKeys("Alice", user).isEmpty()) {
             Instant now = Instant.now();
             String threadId = now.getEpochSecond() + "-" + now.getNano();
+
 
             // TODO remove this automatic data generation
             Credit credit = new Credit();
@@ -91,6 +93,23 @@ public class CreditsController {
             credit.setStatus(Enums.state.CREDIT_PENDING.name());
             credit.setCreatedDate("8, Nov");
             credit.setCreatedTime("11:00");
+            
+            creditRepository.save(credit);
+            
+            now = Instant.now();
+            threadId = now.getEpochSecond() + "-" + now.getNano();
+            credit = new Credit();
+            credit.setTransactionId("0.0.1234-2222-28");
+            credit.setThreadId(threadId);
+            credit.setPayerName("Alice");
+            credit.setRecipientName(user);
+            credit.setAmount(3);
+            credit.setCurrency("EUR");
+            credit.setAdditionalNotes("memo 3");
+            credit.setReference("service ref 3");
+            credit.setStatus(Enums.state.CREDIT_AWAIT_ACK.name());
+            credit.setCreatedDate("8, Nov");
+            credit.setCreatedTime("11:10");
             
             creditRepository.save(credit);
         }
@@ -148,7 +167,7 @@ public class CreditsController {
             throw new ProcessingException(e);
         }
     }
-    @PostMapping("/credits")
+    @PostMapping(value="/credits", produces = "application/json", consumes = "application/json")
     Credit creditNew(@RequestBody Credit newCredit) {
 
         Instant now = Instant.now();

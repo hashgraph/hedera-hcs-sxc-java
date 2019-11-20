@@ -34,6 +34,7 @@ public class HCSIntegration {
     public HCSIntegration() throws Exception {
         
         long appId = 0;
+
         if (dotEnv.get("APP_ID").isEmpty()) {
             log.error("APPID environment variable is not set - exiting");
             System.exit(0);

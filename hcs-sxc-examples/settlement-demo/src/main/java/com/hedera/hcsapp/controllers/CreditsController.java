@@ -96,18 +96,20 @@ public class CreditsController {
             
             creditRepository.save(credit);
             
+            now = Instant.now();
+            threadId = now.getEpochSecond() + "-" + now.getNano();
             credit = new Credit();
             credit.setTransactionId("0.0.1234-2222-28");
             credit.setThreadId(threadId);
-            credit.setPayerName(user);
-            credit.setRecipientName("Alice");
-            credit.setAmount(2);
+            credit.setPayerName("Alice");
+            credit.setRecipientName(user);
+            credit.setAmount(3);
             credit.setCurrency("EUR");
-            credit.setAdditionalNotes("memo 2");
-            credit.setReference("service ref 2");
+            credit.setAdditionalNotes("memo 3");
+            credit.setReference("service ref 3");
             credit.setStatus(Enums.state.CREDIT_AWAIT_ACK.name());
             credit.setCreatedDate("8, Nov");
-            credit.setCreatedTime("11:00");
+            credit.setCreatedTime("11:10");
             
             creditRepository.save(credit);
         }

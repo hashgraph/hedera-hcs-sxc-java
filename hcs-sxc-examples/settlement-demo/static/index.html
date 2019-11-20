@@ -198,6 +198,14 @@
                width: 100%;
                margin: 8px auto;
             }
+            
+            .overflow-elipsis{
+               display: inline-block;
+                max-width: 100px;
+                padding: 16px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
 
 
         </style>
@@ -345,7 +353,7 @@
                                         <tbody id="credit-table-body" class="mdc-data-table__content">
                                             <template id="credit-table-body-template">
                                                 <tr class="mdc-data-table__row">
-                                                    <td id="threadId"  class="mdc-data-table__cell">665</td>
+                                                    <td id="threadId"       class="mdc-data-table__cell overflow-elipsis">665</td>
                                                     <td id="creditor"       class="mdc-data-table__cell">Alice</td>
                                                     <td id="debtor"         class="mdc-data-table__cell">Bob</td>
                                                     <td id="reference"      class="mdc-data-table__cell">A77U312</td>
@@ -498,6 +506,7 @@
                     for(z=0; z < bobCredits.length ; z++){
                       clonedRow = tableBodyTemplate.content.cloneNode(true);
                       clonedRow.getElementById("threadId").innerHTML = bobCredits[z].threadId;
+                            clonedRow.getElementById("threadId").title = bobCredits[z].threadId;
                       clonedRow.getElementById("creditor").innerHTML = bobCredits[z].recipientName;
                       clonedRow.getElementById("debtor").innerHTML = bobCredits[z].payerName;
                       clonedRow.getElementById("reference").innerHTML = bobCredits[z].reference;
@@ -515,8 +524,10 @@
                   }     
                              
                      document.getElementById("credit-and-debit-panel-holder").appendChild(clonedPanelTemplate);
-  
-                  }         
+                     
+                  }
+                  styleButtons();
+                  //styleDataTables();
                 
             };
             f('http://localhost:8080/addressbook/buyerseller/');
@@ -568,36 +579,51 @@
             leftDrawer.open = true;
             //list = mdc.list.MDCList.attachTo(document.querySelector('.mdc-list'));
 
-            buttons = document.querySelectorAll('.mdc-button');
-            for (i = 0; i < buttons.length; i++) {
-                buttons[i].innerHTML = "<span class='mdc-button__ripple'></span>" + buttons[i].innerHTML;
-                d_button = new mdc.ripple.MDCRipple(buttons[i]);
-            }
-
-            textFields = document.querySelectorAll('.mdc-text-field');
-            for (i = 0; i < textFields.length; i++) {
-                //textFields[i].insertAdjacentHTML("afterend",'<div class="mdc-text-field-helper-line"><div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">helpme</div></div>');
-                textFields[i].innerHTML = "<span class='mdc-line-ripple'></span>" + textFields[i].innerHTML;
-                d_textFieldHelperText = new mdc.textField.MDCTextFieldHelperText(textFields[i].parentElement.querySelector('.mdc-text-field-helper-text'));
-                d_textField = new mdc.textField.MDCTextField(textFields[i]);
-            }
-            
-            textFieldIcons = document.querySelectorAll('.mdc-text-field-icon');
-            for (i = 0; i < textFieldIcons.length; i++) {
-                d_textFieldIcon = new mdc.textFieldIcon.MDCTextFieldIcon(textFieldIcons[i]);
-            }
-            
             topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
             topAppBar.setScrollTarget(document.getElementById('main-content'));
             topAppBar.listen('MDCTopAppBar:nav', () => {
                 leftDrawer.open = !leftDrawer.open;
             });
-            //dataTable = new mdc.dataTable.MDCDataTable(document.querySelector('.mdc-data-table'));
 
-            //bottomDrawer.open = true;
-            //leftDrawer.open = false;
+            styleButtons();
+            styleTextFields();
 
-            //list.wrapFocus = true;
+
+            function styleButtons(){
+                buttons = document.querySelectorAll('.mdc-button');
+                for (i = 0; i < buttons.length; i++) {
+                    buttons[i].innerHTML = "<span class='mdc-button__ripple'></span>" + buttons[i].innerHTML;
+                    d_button = new mdc.ripple.MDCRipple(buttons[i]);
+                }
+            }
+
+            function styleTextFields(){
+                textFields = document.querySelectorAll('.mdc-text-field');
+                for (i = 0; i < textFields.length; i++) {
+                    //textFields[i].insertAdjacentHTML("afterend",'<div class="mdc-text-field-helper-line"><div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">helpme</div></div>');
+                    textFields[i].innerHTML = "<span class='mdc-line-ripple'></span>" + textFields[i].innerHTML;
+                    d_textFieldHelperText = new mdc.textField.MDCTextFieldHelperText(textFields[i].parentElement.querySelector('.mdc-text-field-helper-text'));
+                    d_textField = new mdc.textField.MDCTextField(textFields[i]);
+                }
+            }
+            
+            function styleTextFieldIcons(){
+                textFieldIcons = document.querySelectorAll('.mdc-text-field-icon');
+                for (i = 0; i < textFieldIcons.length; i++) {
+                    d_textFieldIcon = new mdc.textFieldIcon.MDCTextFieldIcon(textFieldIcons[i]);
+                }
+            }
+    
+            function styleDataTables(){
+                dataTables = document.querySelector('.mdc-data-table');
+                for (i = 0; i < dataTables.length; i++) {
+                    d_textFieldIcon = new mdc.textFieldIcon.MDCTextFieldIcon(textFieldIcons[i]);
+                    d_dataTable = new mdc.dataTable.MDCDataTable(dataTables[i]);
+                }
+            }
+            
+
+         
 
         </script>
     </body>

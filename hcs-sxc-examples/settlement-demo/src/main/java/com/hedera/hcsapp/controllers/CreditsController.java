@@ -167,7 +167,7 @@ public class CreditsController {
             throw new ProcessingException(e);
         }
     }
-    @PostMapping("/credits")
+    @PostMapping(value="/credits", produces = "application/json", consumes = "application/json")
     Credit creditNew(@RequestBody Credit newCredit) {
 
         Instant now = Instant.now();

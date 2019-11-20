@@ -576,7 +576,26 @@
                  
                 }
                 if(isFormValid){
-                     newCreditDialog.close();
+                    
+                    postBody = {"payerName":"Alice","recipientName":"Bob","reference":"service ref 3","amount":3,"currency":"USD","additionalNotes":"memo 3"};
+                    fetch('http://localhost:8080/credits', {
+                        
+                        method: 'post',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                          },
+                        body: JSON.stringify(postBody)
+                        
+                    }).then(function(response) {
+                        return response.json();
+                    }).then(function(data) {
+                        newCreditDialog.close();
+                    }).catch(function(res){ 
+                        console.log(res); 
+                    });
+                    
+                    
                 }      
             }
             

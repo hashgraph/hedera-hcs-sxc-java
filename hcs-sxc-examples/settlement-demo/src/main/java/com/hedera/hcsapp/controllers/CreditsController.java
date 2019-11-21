@@ -57,7 +57,7 @@ public class CreditsController {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
 
-        if (creditRepository.findAllCreditsForKeys("Alice", user).isEmpty()) {
+        if (creditRepository.findAllCreditsForUsers("Alice", user).isEmpty()) {
             Instant now = Instant.now();
             String threadId = now.getEpochSecond() + "-" + now.getNano();
 

@@ -291,8 +291,6 @@
         <div class="mdc-drawer-app-content mdc-top-app-bar--fixed-adjust">
             <main class="main-content" id="main-content">
 
-
-
                 <header class="mdc-top-app-bar  mdc-top-app-bar--fixed 
                         mdc-theme--primary
                         " 
@@ -487,12 +485,57 @@
         </div><div class="mdc-dialog-scrim"></div>
 
         
+        <div id="confirm-credit-dialog" 
+           
+            class="mdc-dialog"
+             role="alertdialog"
+             aria-modal="true"
+             aria-labelledby="my-dialog-title"
+             aria-describedby="my-dialog-content">
+            <div class="mdc-dialog__container">
+
+
+                <div class="mdc-dialog__surface" >
+                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
+                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
+                    -->Confirm Credit<!--
+                    --></h2>
+                    <div class="mdc-dialog__content" id="my-dialog-content" >
+                        Do you accept this credit?
+                    </div>
+                    <div class="mdc-text-field mdc-text-field--full-width">
+                                    <input type="text"
+                                           id="thread-id"
+                                           value="{{threadId}}"
+                                           disabled
+                                           class="mdc-text-field__input">
+                                    <label class="mdc-floating-label" for="thread-id">
+                                        ThreadId
+                                    </label>
+                    </div>
+                  
+                    <footer class="mdc-dialog__actions" style="padding:24px">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+                            <span class="mdc-button__label">Cancel</span>
+                        </button>
+                        <button type="button" 
+                                onclick="confirmCreditDialogSend()"
+                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
+                        >
+                            <span class="mdc-button__label">Confirm</span>
+                        </button>
+                    </footer>
+                </div>
+
+            </div>
+        </div><div class="mdc-dialog-scrim"></div>
+        
         <div id="snackbar" class="mdc-snackbar">
                 <div class="mdc-snackbar__surface">
                     <div class="mdc-snackbar__label"
                         role="status"
                         aria-live="polite">
-                   
+                       
                     </div>
                     <div class="mdc-snackbar__actions">
                         <button type="button" class="mdc-button mdc-snackbar__action">Ok</button>
@@ -553,7 +596,7 @@
                         newButton.innerHTML = "Confirm";
                         newButton.classList.add("mdc-button");
                         newButton.classList.add("mdc-button--outlined");
-                        newButton.addEventListener("click", function(){alert(threadId);});
+                        newButton.addEventListener("click", function(){openConfirmCreditDialog(threadId);});
                         clonedRow.getElementById("action").appendChild(newButton);
                       }
                       clonedRow.getElementById("notes").innerHTML = i_UserCredits[z].additionalNotes;
@@ -575,6 +618,7 @@
         <script>
             /* Functions for the new credit dialog. () */
             newCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('new-credit-dialog'));
+            confirmCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-credit-dialog'));
             
            
             function openNewCreditDialog(recipient) {
@@ -629,6 +673,36 @@
                         showSnackBarMessage(res);
                     });
                 }      
+            }
+            
+            function openConfirmCreditDialog(threadId) {
+                event.preventDefault();
+                $confirmCreditDialog = document.getElementById('confirm-credit-dialog');
+                $confirmCreditDialog.querySelector("#thread-id").value=threadId;
+                //  styleTextFields();
+                confirmCreditDialog.open();
+                return false;
+            }
+            
+            function confirmCreditDialogSend(){
+                $confirmCreditDialog = document.getElementById('confirm-credit-dialog');
+                threadId = $confirmCreditDialog.querySelector("#thread-id").value;
+                showSnackBarMessage("sending confirmation " + threadId + " ...");
+                confirmCreditDialog.close();
+                fetch('http://localhost:8080/credits/ack/'+threadId, {
+                        method: 'post',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    }).then(function(response) {
+                        return response.json();
+                    }).then(function(data) {
+                        showSnackBarMessage("confirmation sent");
+                       
+                    }).catch(function(res){
+                        showSnackBarMessage(res);
+                    });
             }
             
         </script>

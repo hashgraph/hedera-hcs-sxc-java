@@ -54,7 +54,7 @@
                 font-size:16px;
                 border-bottom:1px solid #e0e0e0;
                 box-shadow:0 0 2px rgba(0,0,0,0.12),0 2px 4px rgba(0,0,0,0.24);
-                display:flex; 
+                display:flex;
             }
 
             details div.content{
@@ -139,7 +139,7 @@
                 bottom: 0;
 
                 width: 6%;
-            }  
+            }
 
             .message {
                 overflow: hidden;
@@ -199,11 +199,20 @@
                margin: 8px auto;
             }
 
+            .overflow-elipsis{
+                display: inline-block;
+                max-width: 100px;
+                padding: 16px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
 
         </style>
     </head>
     <body>
-        <header class="mdc-top-app-bar app-bar mdc-top-app-bar--fixed" id="app-bar">     
+        <header class="mdc-top-app-bar app-bar mdc-top-app-bar--fixed" id="app-bar">
             <div class="mdc-top-app-bar__row">
                 <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
                     <button href="#" class="demo-menu   mdc-icon-button material-icons  mdc-top-app-bar__navigation-icon">menu</button>
@@ -214,7 +223,7 @@
                     <button class="mdc-icon-button material-icons mdc-top-app-bar__action-item--unbounded" aria-label="Print this page">print</button>
                     <button class="mdc-icon-button material-icons mdc-top-app-bar__action-item--unbounded" aria-label="Bookmark this page">bookmark</button>
                 </section>
-            </div>           
+            </div>
         </header>
 
 
@@ -224,21 +233,28 @@
         <aside id="left-drawer" class="mdc-drawer mdc-drawer--dismissible   mdc-top-app-bar--fixed-adjust">
             <div class="mdc-drawer__content">
                 <header class="mdc-top-app-bar  mdc-top-app-bar--fixed mdc-theme--primary
-                        " 
+                        "
                         style="background-color: #fafafa;
                         border-bottom: 1px solid rgba(0,0,0,.12);
                         "
-                        id="app-bar-of-main-content">     
+                        id="app-bar-of-main-content">
                     <div class="mdc-top-app-bar__row">
                         <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-                            <span class="mdc-top-app-bar__title
+                            <span id="this-user"
+                                  class="mdc-top-app-bar__title
                                   mdc-typography--body1
                                   "
                                   style="padding: 8px"
-                                  >Alice - AppID 0</span>
+                                  >Alice</span>
+                            <span
+                                id="this-pk"
+                                class="overflow-elipsis mdc-typography--body1"
+                                title="302fdsadfsafdsadfsadfsdfsadfsadfsadf">
+                                PK 302fdsadfsafdsadfsadfsdfsadfsadfsadf
+                            </span>
                         </section>
 
-                    </div>           
+                    </div>
                 </header>
                 <div class="mdc-list  mdc-top-app-bar--fixed-adjust">
 
@@ -277,11 +293,11 @@
 
 
 
-                <header class="mdc-top-app-bar  mdc-top-app-bar--fixed 
+                <header class="mdc-top-app-bar  mdc-top-app-bar--fixed
                         mdc-theme--primary
-                        " 
+                        "
                         style="background: white; box-shadow: 0 4px 4px -2px gray;"
-                        id="app-bar-of-main-content">     
+                        id="app-bar-of-main-content">
                     <div class="mdc-top-app-bar__row">
                         <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
                             <b class="mdc-top-app-bar__title ">
@@ -289,10 +305,10 @@
                             </b>
                         </section>
 
-                    </div>           
+                    </div>
                 </header>
 
-                <div 
+                <div
                     id="credit-and-debit-panel-holder"
                     class="mdc-top-app-bar--fixed-adjust mdc-typography--body2"
                      style='margin: 16px 32px;'
@@ -305,12 +321,12 @@
 
                                 <div class="message-container" style="margin-left:55px; margin-right: 16px;">
                                     <div style="display: flex">
-                                        <span 
+                                        <span
                                             id="credits-and-debits-user"
                                             class="mdc-typography--headline6" style="flex-grow:1">
                                             ?
                                         </span>
-                                        <button 
+                                        <button
                                             id="new-credit-button"
                                             role="open-new-credit-button-dialog"
                                             class="mdc-button mdc-button--unelevated">
@@ -345,7 +361,7 @@
                                         <tbody id="credit-table-body" class="mdc-data-table__content">
                                             <template id="credit-table-body-template">
                                                 <tr class="mdc-data-table__row">
-                                                    <td id="threadId"  class="mdc-data-table__cell">1574178052-768834000</td>
+                                                    <td id="threadId"       class="mdc-data-table__cell overflow-elipsis">665</td>
                                                     <td id="creditor"       class="mdc-data-table__cell">Alice</td>
                                                     <td id="debtor"         class="mdc-data-table__cell">Bob</td>
                                                     <td id="reference"      class="mdc-data-table__cell">A77U312</td>
@@ -365,16 +381,16 @@
                         </details>
                         </div>
                     </template>
-                   
-                   
+
+
                 </div>
 
             </main>
 
         </div>
 
-        <div id="new-credit-dialog" 
-           
+        <div id="new-credit-dialog"
+
             class="mdc-dialog"
              role="alertdialog"
              aria-modal="true"
@@ -389,7 +405,7 @@
                     -->New Credit<!--
                     --></h2>
                     <div class="mdc-dialog__content" id="my-dialog-content" >
-                        
+
                         <div style="display:fex; flex-direction: column">
                             <form id="new-credit-dialog-form">
                                 <div class="mdc-text-field mdc-text-field--full-width">
@@ -398,36 +414,37 @@
                                            required
                                            class="mdc-text-field__input ">
                                     <label class="mdc-floating-label" for="my-text-field">
-                                        Recipient 
+                                        Recipient
                                     </label>
                                 </div>
-                                
-                                
+
+
                                 <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text" id="new-credit-service-reference" 
-                                           required minlength=8
+                                    <input type="text" id="new-credit-service-reference"
+                                           required minlength=4
                                            class="mdc-text-field__input">
                                     <label class="mdc-floating-label" for="">
                                         Service Reference
                                     </label>
-                                </div>   
+                                </div>
                                 <div class="mdc-text-field-helper-line">
                                     <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
-                                        Field is required and must be at least 8 characters long
+                                        Field is required and must be at least 4 characters long
                                     </div>
                                 </div>
-                                
-                                
+
+
                                 <div class="mdc-text-field  mdc-text-field--with-leading-icon  mdc-text-field--full-width">
                                     <i class="material-icons mdc-text-field__icon">money</i>
-                                    <input type="number" 
+                                    <input type="number"
+                                           id="new-credit-amount"
                                            required
                                            id="my-text-field" class="mdc-text-field__input">
                                     <label class="mdc-floating-label" for="new-credit-amount">
                                         Amount
                                     </label>
-                                </div>   
-                                
+                                </div>
+
                                 <div class="mdc-text-field-helper-line">
                                     <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
                                         Field is required and must be a number without decimals
@@ -435,30 +452,31 @@
                                 </div>
                                 <div class="mdc-text-field mdc-text-field--full-width">
                                     <input type="text"
-                                           required minlength=8
+                                           id="new-credit-additional-notes"
+                                           required minlength=4
                                            id="my-text-field" class="mdc-text-field__input">
                                     <label class="mdc-floating-label" for="new-credit-additional-notes">
                                         Additional Notes
                                     </label>
                                 </div>
-                                
+
                                 <div class="mdc-text-field-helper-line">
                                     <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
-                                        Field is required and must be at least 8 characters long
+                                        Field is required and must be at least 4 characters long
                                     </div>
                                 </div>
                             </form>
                         </div>
                     </div>
-                    
-            
+
+
                     <footer class="mdc-dialog__actions" style="padding:24px">
                         <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
                             <span class="mdc-button__label">Cancel</span>
                         </button>
-                        <button type="button" 
+                        <button type="button"
                                 onclick="sendNewCreditDialog()"
-                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
+                                class="mdc-button mdc-button--raised  mdc-dialog__button"
 >
                             <span class="mdc-button__label">Send Now</span>
                         </button>
@@ -470,56 +488,73 @@
 
 
         <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
-        
-        
+
+
         <script>
-            whoami = 'Alice';
-            
-            /*Init new credits and debits*/
-            addressBook = [{"publicKey":"302a300506032b657003210009724535fe4ea8f536a2c278d5aceb36f969281115093299a02a6172808470c9","name":"Bob","roles":"BUYER,SELLER"},{"publicKey":"302a300506032b6570032100832601520d346c051bc0c7aea4b9e566b0881f59d394e371293b3fc812cbfb36","name":"Carlos","roles":"BUYER,SELLER"},{"publicKey":"302a300506032b6570032100611824b08eb56cce4b84b9bf785bdea3a9429a52084dd7fdd39dc7ce3857a3cb","name":"Diana","roles":"BUYER,SELLER"},{"publicKey":"302a300506032b65700321008ec74de357c85ee343002ea48d4f5db6b43e595e0e717c971fdfbc9a3bc2dab2","name":"Erica","roles":"BUYER,SELLER"}];
-            bobCredits = [{"transactionId":"0.0.1234-1111-11","threadId":1,"payerName":"Alice","recipientName":"Bob","reference":"service ref 1","amount":1,"currency":"USD","additionalNotes":"memo 1","status":"CREDIT_PENDING","createdDate":"7, Nov","createdTime":"10:00"},{"transactionId":"0.0.1234-2222-22","threadId":2,"payerName":"Bob","recipientName":"Alice","reference":"service ref 2","amount":2,"currency":"EUR","additionalNotes":"memo 2","status":"CREDIT_PENDING","createdDate":"8, Nov","createdTime":"11:00"},{"transactionId":"0.0.2-1574089337-280860000","threadId":3,"payerName":"Alice","recipientName":"Bob","reference":"service ref 3","amount":3,"currency":"USD","additionalNotes":"memo 3","status":"CREDIT_AWAIT_ACK","createdDate":"18 Nov","createdTime":"15:02"}];
-            
-            for(i=0; i < addressBook.length; i++){
-                var panelTemplate = document.getElementById("credit-and-debit-panel");
-                var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
-                var userName = addressBook[i].name;
-                clonedPanelTemplate.getElementById("credits-and-debits-user").innerHTML = userName;
-                clonedPanelTemplate.getElementById("new-credit-button").addEventListener("click",(function(passName){
-                   return function(){openNewCreditDialog(passName);};
-                })(userName));
-                
-                var tableBody = clonedPanelTemplate.getElementById("credit-table-body");
-                var tableBodyTemplate = clonedPanelTemplate.getElementById("credit-table-body-template");
-               
-                for(z=0; z < bobCredits.length ; z++){
-                    clonedRow = tableBodyTemplate.content.cloneNode(true);
-                    clonedRow.getElementById("threadId").innerHTML = bobCredits[z].threadId;
-                    clonedRow.getElementById("creditor").innerHTML = bobCredits[z].recipientName;
-                    clonedRow.getElementById("debtor").innerHTML = bobCredits[z].payerName;
-                    clonedRow.getElementById("reference").innerHTML = bobCredits[z].reference;
-                    clonedRow.getElementById("amount").innerHTML = bobCredits[z].currency + ' '+ bobCredits[z].amount;
-                    clonedRow.getElementById("date").innerHTML = bobCredits[z].createdDate;
-                    clonedRow.getElementById("time").innerHTML = bobCredits[z].createdTime;
-                    clonedRow.getElementById("status").innerHTML = bobCredits[z].status;
-                    if(bobCredits[z].payerName === whoami &&  bobCredits[z].status === 'CREDIT_AWAIT_ACK'){
-                        clonedRow.getElementById("action").innerHTML="<button class='mdc-button mdc-button--outlined'>Confirm</button>";
-                    }
-                    clonedRow.getElementById("notes").innerHTML = bobCredits[z].additionalNotes;
-                    tableBody.appendChild(clonedRow);
-                }
-                
-                
-                document.getElementById("credit-and-debit-panel-holder").appendChild(clonedPanelTemplate);
-                
-        }
-            
+            thisuserName = "";
+
+            let f = async (url) => {
+                let responseWhoami =  await fetch(url);
+                let whoami = await responseWhoami.json();
+                thisuserName =  whoami.name;
+
+                document.getElementById("this-user").innerHTML=whoami.name;
+                document.getElementById("this-pk").innerHTML=whoami.publicKey;
+                document.getElementById("this-pk").title=whoami.publicKey;
+
+                let responseAddressBook = await fetch('addressbook/buyerseller/');
+                let addressBook  = await responseAddressBook.json();
+
+                for(i=0; i < addressBook.length; i++){
+                    var panelTemplate = document.getElementById("credit-and-debit-panel");
+                    var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
+                    var userName = addressBook[i].name;
+                    clonedPanelTemplate.getElementById("credits-and-debits-user").innerHTML = userName;
+                    clonedPanelTemplate.getElementById("new-credit-button").addEventListener("click",(function(passName){
+                       return function(){openNewCreditDialog(passName);};
+                    })(userName));
+
+                    var tableBody = clonedPanelTemplate.getElementById("credit-table-body");
+                    var tableBodyTemplate = clonedPanelTemplate.getElementById("credit-table-body-template");
+
+                    var responseCredits = await fetch(`credits/${userName}`);
+                    var i_UserCredits = await responseCredits.json();
+
+                    for(z=0; z < i_UserCredits.length ; z++){
+                      clonedRow = tableBodyTemplate.content.cloneNode(true);
+                      clonedRow.getElementById("threadId").innerHTML = i_UserCredits[z].threadId;
+                            clonedRow.getElementById("threadId").title = i_UserCredits[z].threadId;
+                      clonedRow.getElementById("creditor").innerHTML = i_UserCredits[z].recipientName;
+                      clonedRow.getElementById("debtor").innerHTML = i_UserCredits[z].payerName;
+                      clonedRow.getElementById("reference").innerHTML = i_UserCredits[z].reference;
+                      clonedRow.getElementById("amount").innerHTML = i_UserCredits[z].currency + ' '+ i_UserCredits[z].amount;
+                      clonedRow.getElementById("date").innerHTML = i_UserCredits[z].createdDate;
+                      clonedRow.getElementById("time").innerHTML = i_UserCredits[z].createdTime;
+                      clonedRow.getElementById("status").innerHTML = i_UserCredits[z].status;
+                      if(i_UserCredits[z].payerName === whoami.name &&  i_UserCredits[z].status === 'CREDIT_AWAIT_ACK'){
+                          clonedRow.getElementById("action").innerHTML="<button class='mdc-button mdc-button--outlined'>Confirm</button>";
+                      }
+                      clonedRow.getElementById("notes").innerHTML = i_UserCredits[z].additionalNotes;
+                      tableBody.appendChild(clonedRow);
+                  }
+
+                     document.getElementById("credit-and-debit-panel-holder").appendChild(clonedPanelTemplate);
+
+                  }
+                  styleButtons();
+                  //styleDataTables();
+
+            };
+            f('addressbook/me/');
+
+
         </script>
-        
+
         <script>
             /* Functions for the new credit dialog. */
             newCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('new-credit-dialog'));
-            
-            
+
+
             function openNewCreditDialog(recipient) {
                 event.preventDefault();
                 $newCreditDialog = document.getElementById('new-credit-dialog');
@@ -528,67 +563,101 @@
                     e.parentElement.classList.remove('mdc-text-field--invalid');
                     e.value='';}
                 );
-                
+
                 $newCreditDialog.querySelector("#new-credit-recipient").value = recipient;
                 newCreditDialog.open();
                 return false;
             }
-            
+
             function sendNewCreditDialog(){
                 $newCreditDialog = document.getElementById('new-credit-dialog');
-                
                 /* validate form */
                 isFormValid = true;
                 ls = $newCreditDialog.querySelectorAll(".mdc-text-field input");
                 for (i=0; i< ls.length; i++ ){
                      if (! ls[i].checkValidity()){ls[i].focus();isFormValid=false;break;  }
-                 
+
                 }
                 if(isFormValid){
-                     newCreditDialog.close();
-                }      
+                    postBody = `{
+                                  "payerName"       : "${thisuserName}"
+                                , "recipientName"   : "${document.getElementById('new-credit-recipient').value}"
+                                , "reference"       : "${document.getElementById('new-credit-service-reference').value}"
+                                , "amount"          : ${document.getElementById('new-credit-amount').value}
+                                , "currency"        : "USD"
+                                , "additionalNotes" :"${document.getElementById('new-credit-additional-notes').value}"
+                                }`;
+
+                    fetch('http://localhost:8080/credits', {
+                        method: 'post',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: postBody
+                    }).then(function(response) {
+                        return response.json();
+                    }).then(function(data) {
+
+                        newCreditDialog.close();
+                    }).catch(function(res){
+                        console.log(res);
+                    });
+                }
             }
-            
+
         </script>
-        
-        
+
+
         <script>
             /* Visual effects for components. This script does not apply an client long. */
-           
+
             leftDrawer = mdc.drawer.MDCDrawer.attachTo(document.getElementById('left-drawer'));
             leftDrawer.open = true;
             //list = mdc.list.MDCList.attachTo(document.querySelector('.mdc-list'));
 
-            buttons = document.querySelectorAll('.mdc-button');
-            for (i = 0; i < buttons.length; i++) {
-                buttons[i].innerHTML = "<span class='mdc-button__ripple'></span>" + buttons[i].innerHTML;
-                d_button = new mdc.ripple.MDCRipple(buttons[i]);
-            }
-
-            textFields = document.querySelectorAll('.mdc-text-field');
-            for (i = 0; i < textFields.length; i++) {
-                //textFields[i].insertAdjacentHTML("afterend",'<div class="mdc-text-field-helper-line"><div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">helpme</div></div>');
-                textFields[i].innerHTML = "<span class='mdc-line-ripple'></span>" + textFields[i].innerHTML;
-                d_textFieldHelperText = new mdc.textField.MDCTextFieldHelperText(textFields[i].parentElement.querySelector('.mdc-text-field-helper-text'));
-                d_textField = new mdc.textField.MDCTextField(textFields[i]);
-            }
-            
-            textFieldIcons = document.querySelectorAll('.mdc-text-field-icon');
-            for (i = 0; i < textFieldIcons.length; i++) {
-                d_textFieldIcon = new mdc.textFieldIcon.MDCTextFieldIcon(textFieldIcons[i]);
-            }
-            
             topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
             topAppBar.setScrollTarget(document.getElementById('main-content'));
             topAppBar.listen('MDCTopAppBar:nav', () => {
                 leftDrawer.open = !leftDrawer.open;
             });
-            //dataTable = new mdc.dataTable.MDCDataTable(document.querySelector('.mdc-data-table'));
 
-            //bottomDrawer.open = true;
-            //leftDrawer.open = false;
+            styleButtons();
+            styleTextFields();
 
-            //list.wrapFocus = true;
+
+            function styleButtons(){
+                buttons = document.querySelectorAll('.mdc-button');
+                for (i = 0; i < buttons.length; i++) {
+                    buttons[i].innerHTML = "<span class='mdc-button__ripple'></span>" + buttons[i].innerHTML;
+                    d_button = new mdc.ripple.MDCRipple(buttons[i]);
+                }
+            }
+
+            function styleTextFields(){
+                textFields = document.querySelectorAll('.mdc-text-field');
+                for (i = 0; i < textFields.length; i++) {
+                    //textFields[i].insertAdjacentHTML("afterend",'<div class="mdc-text-field-helper-line"><div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">helpme</div></div>');
+                    textFields[i].innerHTML = "<span class='mdc-line-ripple'></span>" + textFields[i].innerHTML;
+                    d_textFieldHelperText = new mdc.textField.MDCTextFieldHelperText(textFields[i].parentElement.querySelector('.mdc-text-field-helper-text'));
+                    d_textField = new mdc.textField.MDCTextField(textFields[i]);
+                }
+            }
+
+            function styleTextFieldIcons(){
+                textFieldIcons = document.querySelectorAll('.mdc-text-field-icon');
+                for (i = 0; i < textFieldIcons.length; i++) {
+                    d_textFieldIcon = new mdc.textFieldIcon.MDCTextFieldIcon(textFieldIcons[i]);
+                }
+            }
+
+            function styleDataTables(){
+                dataTables = document.querySelector('.mdc-data-table');
+                for (i = 0; i < dataTables.length; i++) {
+                    d_textFieldIcon = new mdc.textFieldIcon.MDCTextFieldIcon(textFieldIcons[i]);
+                    d_dataTable = new mdc.dataTable.MDCDataTable(dataTables[i]);
+                }
+            }
 
         </script>
     </body>

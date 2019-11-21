@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Log4j2
 @RestController
 public class CreditsController {
-    
+
         @Autowired
     CreditRepository creditRepository;
     @Autowired
@@ -46,19 +46,21 @@ public class CreditsController {
 
     private static AppData appData;
     private static int topicIndex = 0; // refers to the first topic ID in the config.yaml
-    
+
     public CreditsController() throws FileNotFoundException, IOException {
+
         appData = new AppData();
     }
 
     @GetMapping(value = "/credits/{user}", produces = "application/json")
     public ResponseEntity<List<Credit>> credits(@PathVariable String user) throws FileNotFoundException, IOException {
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/json");    
-        
-        if (creditRepository.count() == 0) {
+        headers.add("Content-Type", "application/json");
+
+        if (creditRepository.findAllCreditsForKeys("Alice", user).isEmpty()) {
             Instant now = Instant.now();
             String threadId = now.getEpochSecond() + "-" + now.getNano();
+
 
             // TODO remove this automatic data generation
             Credit credit = new Credit();
@@ -73,9 +75,9 @@ public class CreditsController {
             credit.setStatus(Enums.state.CREDIT_PENDING.name());
             credit.setCreatedDate("7, Nov");
             credit.setCreatedTime("10:00");
-            
+
             creditRepository.save(credit);
-            
+
             now = Instant.now();
             threadId = now.getEpochSecond() + "-" + now.getNano();
             credit = new Credit();
@@ -90,40 +92,57 @@ public class CreditsController {
             credit.setStatus(Enums.state.CREDIT_PENDING.name());
             credit.setCreatedDate("8, Nov");
             credit.setCreatedTime("11:00");
-            
+
+            creditRepository.save(credit);
+
+            now = Instant.now();
+            threadId = now.getEpochSecond() + "-" + now.getNano();
+            credit = new Credit();
+            credit.setTransactionId("0.0.1234-2222-28");
+            credit.setThreadId(threadId);
+            credit.setPayerName("Alice");
+            credit.setRecipientName(user);
+            credit.setAmount(3);
+            credit.setCurrency("EUR");
+            credit.setAdditionalNotes("memo 3");
+            credit.setReference("service ref 3");
+            credit.setStatus(Enums.state.CREDIT_AWAIT_ACK.name());
+            credit.setCreatedDate("8, Nov");
+            credit.setCreatedTime("11:10");
+
             creditRepository.save(credit);
         }
-        
+
         AppData appData = new AppData();
         List<Credit> creditList = new ArrayList<Credit>();
-        
+
         if (user == null) {
-            creditList = (List<Credit>) creditRepository.findAll(); 
+            creditList = (List<Credit>) creditRepository.findAll();
         } else {
             creditList = creditRepository.findAllCreditsForUsers(appData.getUserName(), user);
         }
-        
+
         return new ResponseEntity<>(creditList, headers, HttpStatus.OK);
     }
 
     @PostMapping(value = "/credits/ack/{threadId}", produces = "application/json")
     public ResponseEntity<Credit> creditAck(@PathVariable String threadId) {
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/json");    
-        
+        headers.add("Content-Type", "application/json");
+
         Credit credit = creditRepository.findById(threadId).get();
 
         CreditBPM creditBPM = Utils.creditBPMFromCredit(credit);
-        
+
         CreditAckBPM creditAckBPM = CreditAckBPM.newBuilder()
                 .setCredit(creditBPM)
                 .setThreadId(threadId)
                 .build();
-                
+
         SettlementBPM settlementBPM = SettlementBPM.newBuilder()
                 .setCreditAck(creditAckBPM)
                 .build();
-        
+
         try {
             TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib())
                   .overrideEncryptedMessages(false)
@@ -139,11 +158,11 @@ public class CreditsController {
             return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
     @PostMapping(value = "/credits", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Credit> creditNew(@RequestBody CreditProposal creditCreate) {
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/json");    
+        headers.add("Content-Type", "application/json");
 
         Instant now = Instant.now();
         Long seconds = now.getEpochSecond();
@@ -167,7 +186,7 @@ public class CreditsController {
         SettlementBPM settlementBPM = SettlementBPM.newBuilder()
                 .setCredit(creditBPM)
                 .build();
-        
+
         try {
             TransactionId transactionId = new TransactionId(appData.getHCSLib().getOperatorAccountId());
 
@@ -195,7 +214,7 @@ public class CreditsController {
                   .sendMessage(topicIndex, settlementBPM.toByteArray());
 
             log.info("Message sent successfully.");
-            
+
             return new ResponseEntity<>(credit, headers, HttpStatus.OK);
         } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
             // TODO Auto-generated catch block

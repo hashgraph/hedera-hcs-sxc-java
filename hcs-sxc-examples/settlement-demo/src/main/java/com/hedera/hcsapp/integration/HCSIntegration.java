@@ -39,7 +39,7 @@ public class HCSIntegration {
 
     @Autowired
     SettlementItemRepository settlementItemRepository;
-    
+
     public HCSIntegration() throws Exception {
         appData = new AppData();
         // create a callback object to receive the message
@@ -48,16 +48,16 @@ public class HCSIntegration {
             processHCSMessage(hcsMessage);
         });
     }
-    
+
     public void processHCSMessage(HCSResponse hcsResponse) {
         try {
             ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(hcsResponse.getMessage());
-            
+
             SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessage.getBusinessProcessMessage().toByteArray());
             if (settlementBPM.hasCredit()) {
                 String priorState = Enums.state.CREDIT_PENDING.name();
                 String nextState = Enums.state.CREDIT_AWAIT_ACK.name();
-                
+
                 CreditBPM creditBPM = settlementBPM.getCredit();
                 String threadId = creditBPM.getThreadId();
                 // update the credit state
@@ -100,29 +100,29 @@ public class HCSIntegration {
                         }
                 );
             } else if (settlementBPM.hasPaymentInit()) {
-                
+
             } else if (settlementBPM.hasPaymentInitAck()) {
-                
+
             } else if (settlementBPM.hasPaymentSent()) {
-                
+
             } else if (settlementBPM.hasPaymentSentAck()) {
-                
+
             } else if (settlementBPM.hasSettleComplete()) {
-                
+
             } else if (settlementBPM.hasSettleCompleteAck()) {
-                
+
             } else if (settlementBPM.hasSettleInit()) {
-                
+
             } else if (settlementBPM.hasSettleInitAck()) {
-                
+
             } else if (settlementBPM.hasSettlePayment()) {
-                
+
             } else if (settlementBPM.hasSettlePaymentAck()) {
-                
+
             } else if (settlementBPM.hasSettlePropose()) {
                 String priorState = Enums.state.SETTLE_PROPOSE_PENDING.name();
                 String nextState = Enums.state.SETTLE_PROPOSE_AWAIT_ACK.name();
-                
+
                 SettleProposeBPM settleProposeBPM = settlementBPM.getSettlePropose();
                 String threadId = settleProposeBPM.getThreadId();
                 // update the settlement state
@@ -142,7 +142,7 @@ public class HCSIntegration {
                             settlement.setTransactionId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
                             settlementRepository.save(settlement);
                             log.info("Adding new settlement to Database: " + threadId);
-                            
+
                             for (String settleThreadId : settleProposeBPM.getThreadIdsList()) {
                                 SettlementItem settlementItem = new SettlementItem();
                                 settlementItem.setId(new SettlementItemId(settleThreadId, threadId));

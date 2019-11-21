@@ -548,7 +548,13 @@
                       clonedRow.getElementById("time").innerHTML = i_UserCredits[z].createdTime;
                       clonedRow.getElementById("status").innerHTML = i_UserCredits[z].status;
                       if(i_UserCredits[z].payerName === whoami.name &&  i_UserCredits[z].status === 'CREDIT_AWAIT_ACK'){
-                          clonedRow.getElementById("action").innerHTML="<button class='mdc-button mdc-button--outlined'>Confirm</button>";
+                        let threadId = i_UserCredits[z].threadId;
+                        newButton = document.createElement("button");
+                        newButton.innerHTML = "Confirm";
+                        newButton.classList.add("mdc-button");
+                        newButton.classList.add("mdc-button--outlined");
+                        newButton.addEventListener("click", function(){alert(threadId);});
+                        clonedRow.getElementById("action").appendChild(newButton);
                       }
                       clonedRow.getElementById("notes").innerHTML = i_UserCredits[z].additionalNotes;
                       tableBody.appendChild(clonedRow);
@@ -590,6 +596,7 @@
                 /* validate form */
                 isFormValid = true;
                 ls = $newCreditDialog.querySelectorAll(".mdc-text-field input");
+                
                 for (i=0; i< ls.length; i++ ){
                      if (! ls[i].checkValidity()){ls[i].focus();isFormValid=false;break;  }
                  
@@ -616,10 +623,10 @@
                     }).then(function(response) {
                         return response.json();
                     }).then(function(data) {
-                        showSnackBarMessage("New credit requenst is sent");
+                        showSnackBarMessage("New credit requenst sent");
                        
-                    }).catch(function(res){ 
-                        console.log(res); 
+                    }).catch(function(res){
+                        showSnackBarMessage(res);
                     });
                 }      
             }
@@ -650,7 +657,6 @@
             function showSnackBarMessage(message){
                 snackbarEl = document.getElementById("snackbar");
                 snackbar = new mdc.snackbar.MDCSnackbar(snackbarEl);
-                //document.querySelector(".mdc-snackbar__label").innerHTML=message;
                 snackbar.labelText = message;
                 snackbar.timeoutMs = 5000;
                 snackbar.open();

@@ -21,3 +21,23 @@ CREATE TABLE address_book (
     ,name VARCHAR(50) NOT NULL
     ,roles VARCHAR(100) NOT NULL
 );
+
+DROP TABLE IF EXISTS settlements;
+
+CREATE TABLE settlements (
+    thread_id VARCHAR(20) PRIMARY KEY
+    ,transaction_id VARCHAR(100) 
+    ,payer_name VARCHAR(88) NOT NULL
+    ,recipient_name VARCHAR(88) NOT NULL
+    ,additional_notes VARCHAR(100) DEFAULT NULL
+    ,net_value BIGINT NOT NULL
+    ,currency VARCHAR(3) NOT NULL
+    ,status VARCHAR(30) DEFAULT 'CREDIT_NEW'
+);
+
+DROP TABLE IF EXISTS settlement_items;
+
+CREATE TABLE settlement_items (
+    thread_id VARCHAR(20)
+    ,settled_thread_id VARCHAR(20) 
+);

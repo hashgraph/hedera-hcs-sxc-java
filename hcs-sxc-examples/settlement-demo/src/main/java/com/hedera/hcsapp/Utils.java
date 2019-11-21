@@ -5,6 +5,17 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
+import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hcsapp.entities.Credit;
+import com.hedera.hcsapp.entities.Settlement;
+import com.hedera.hcsapp.restclasses.SettlementProposal;
+import com.hedera.hcslib.proto.java.TransactionID;
+
+import proto.CreditBPM;
+import proto.Money;
+import proto.SettleProposeBPM;
+import proto.SettlementBPM;
+
 public final class Utils {
     public static String TimestampToDate(long seconds, int nanos) {
         
@@ -22,4 +33,70 @@ public final class Utils {
         String formattedDate = dateTime.format(formatter);
         return formattedDate;
     }
+    
+    public static String TransactionIdToString(TransactionID transactionId) {
+        String txId = "0.0." + transactionId.getAccountID().getAccountNum()
+                + "-" + transactionId.getTransactionValidStart().getSeconds()
+                + "-" + transactionId.getTransactionValidStart().getNanos();
+        return txId;
+    }
+    
+    public static String TransactionIdToString(TransactionId transactionId) {
+        String txId = "0.0." + transactionId.getAccountId().getAccountNum()
+                + "-" + transactionId.getValidStart().getEpochSecond()
+                + "-" + transactionId.getValidStart().getNano();
+        return txId;
+    }
+    
+    public static Credit creditFromCreditBPM(CreditBPM creditBPM) {
+        Credit credit = new Credit();
+        
+        credit.setAdditionalNotes(creditBPM.getAdditionalNotes());
+        credit.setPayerName(creditBPM.getPayerName());
+        credit.setRecipientName(creditBPM.getRecipientName());
+        credit.setReference(creditBPM.getServiceRef());
+        credit.setTransactionId(creditBPM.getTransactionId());
+        credit.setCreatedDate(creditBPM.getCreatedDate());
+        credit.setCreatedTime(creditBPM.getCreatedDate());
+        credit.setAmount(creditBPM.getValue().getUnits());
+        credit.setCurrency(creditBPM.getValue().getCurrencyCode());
+        credit.setThreadId(creditBPM.getThreadId());
+        
+        return credit;
+    }
+    
+    public static CreditBPM creditBPMFromCredit(Credit credit) {
+        Money value = Money.newBuilder()
+                .setCurrencyCode(credit.getCurrency())
+                .setUnits(credit.getAmount())
+                .build();
+
+        CreditBPM creditBPM = CreditBPM.newBuilder()
+                .setAdditionalNotes(credit.getAdditionalNotes())
+                .setPayerName(credit.getPayerName())
+                .setRecipientName(credit.getRecipientName())
+                .setServiceRef(credit.getReference())
+                .setTransactionId(credit.getTransactionId())
+                .setCreatedDate(credit.getCreatedDate())
+                .setCreatedTime(credit.getCreatedTime())
+                .setValue(value)
+                .setThreadId(credit.getThreadId())
+                .build();
+
+        return creditBPM;
+    }
+
+    public static Settlement settlementFromSettleProposeBPM(SettleProposeBPM settleProposeBPM) {
+        Settlement settlement = new Settlement();
+        
+        settlement.setAdditionalNotes(settleProposeBPM.getAdditionalNotes());
+        settlement.setCurrency(settleProposeBPM.getNetValue().getCurrencyCode());
+        settlement.setNetValue(settleProposeBPM.getNetValue().getUnits());
+        settlement.setPayerName(settleProposeBPM.getPayerName());
+        settlement.setRecipientName(settleProposeBPM.getRecipientName());
+        settlement.setThreadId(settleProposeBPM.getThreadId());
+        
+        return settlement;
+    }
+
 }

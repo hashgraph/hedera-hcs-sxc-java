@@ -605,7 +605,7 @@
                                 }`;
                     
                     newCreditDialog.close();
-                    showSnackBarMessage("... new credit being processed ...")
+                    showSnackBarMessage("sending new credit to HH Network ...");
                     fetch('http://localhost:8080/credits', {
                         method: 'post',
                         headers: {
@@ -616,7 +616,7 @@
                     }).then(function(response) {
                         return response.json();
                     }).then(function(data) {
-                        showSnackBarMessage("New credit created");
+                        showSnackBarMessage("New credit requenst is sent");
                        
                     }).catch(function(res){ 
                         console.log(res); 
@@ -645,7 +645,7 @@
             styleButtons();
             styleTextFields();
             styleTextFieldIcons();
-            showSnackBarMessage("doit");
+       
 
             function showSnackBarMessage(message){
                 snackbarEl = document.getElementById("snackbar");

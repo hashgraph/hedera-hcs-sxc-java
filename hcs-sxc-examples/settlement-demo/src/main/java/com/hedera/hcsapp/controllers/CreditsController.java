@@ -126,6 +126,7 @@ public class CreditsController {
         
         return creditList;
     }
+    
     @PostMapping(value = "/credits/ack/{threadId}", produces = "application/json")
     Credit creditAck(@PathVariable String threadId) {
 
@@ -167,7 +168,7 @@ public class CreditsController {
             throw new ProcessingException(e);
         }
     }
-    @PostMapping(value="/credits", produces = "application/json", consumes = "application/json")
+    @PostMapping("/credits")
     Credit creditNew(@RequestBody Credit newCredit) {
 
         Instant now = Instant.now();

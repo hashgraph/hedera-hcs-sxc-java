@@ -486,6 +486,22 @@
             </div>
         </div><div class="mdc-dialog-scrim"></div>
 
+        
+        <div id="snackbar" class="mdc-snackbar">
+                <div class="mdc-snackbar__surface">
+                    <div class="mdc-snackbar__label"
+                        role="status"
+                        aria-live="polite">
+                   
+                    </div>
+                    <div class="mdc-snackbar__actions">
+                        <button type="button" class="mdc-button mdc-snackbar__action">Ok</button>
+                    </div>
+                </div>
+        </div>
+       
+       
+        
 
         <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
         
@@ -587,7 +603,9 @@
                                 , "currency"        : "USD"
                                 , "additionalNotes" :"${document.getElementById('new-credit-additional-notes').value}"
                                 }`;
-            
+                    
+                    newCreditDialog.close();
+                    showSnackBarMessage("... new credit being processed ...")
                     fetch('http://localhost:8080/credits', {
                         method: 'post',
                         headers: {
@@ -598,8 +616,8 @@
                     }).then(function(response) {
                         return response.json();
                     }).then(function(data) {
-                        
-                        newCreditDialog.close();
+                        showSnackBarMessage("New credit created");
+                       
                     }).catch(function(res){ 
                         console.log(res); 
                     });
@@ -621,10 +639,23 @@
             topAppBar.listen('MDCTopAppBar:nav', () => {
                 leftDrawer.open = !leftDrawer.open;
             });
+            
+            
 
             styleButtons();
             styleTextFields();
+            styleTextFieldIcons();
+            showSnackBarMessage("doit");
 
+            function showSnackBarMessage(message){
+                snackbarEl = document.getElementById("snackbar");
+                snackbar = new mdc.snackbar.MDCSnackbar(snackbarEl);
+                //document.querySelector(".mdc-snackbar__label").innerHTML=message;
+                snackbar.labelText = message;
+                snackbar.timeoutMs = 5000;
+                snackbar.open();
+            
+            }
 
             function styleButtons(){
                 buttons = document.querySelectorAll('.mdc-button');

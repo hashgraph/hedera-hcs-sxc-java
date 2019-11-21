@@ -9,7 +9,9 @@ import com.hedera.hcsapp.appconfig.AppConfig;
 import com.hedera.hcslib.HCSLib;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public final class AppData {
     private HCSLib hcsLib;
     private int topicIndex = 0; // refers to the first topic ID in the config.yaml
@@ -22,6 +24,11 @@ public final class AppData {
     public AppData() throws FileNotFoundException, IOException {
         this.appConfig = new AppConfig();
         Dotenv dotEnv = Dotenv.configure().ignoreIfMissing().load();
+
+        if (dotEnv.get("APP_ID").isEmpty()) {
+            log.error("APPID environment variable is not set - exiting");
+            System.exit(0);
+        }
 
         this.appId = Long.parseLong(dotEnv.get("APP_ID"));
         this.hcsLib = new HCSLib(appId);

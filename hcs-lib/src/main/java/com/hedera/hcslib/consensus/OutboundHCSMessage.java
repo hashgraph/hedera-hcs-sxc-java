@@ -37,6 +37,7 @@ public final class OutboundHCSMessage {
     private Ed25519PrivateKey ed25519PrivateKey;
     private List<TopicId> topicIds = new ArrayList<TopicId>();
     private long hcsTransactionFee = 0L;
+    private TransactionId transactionId = null;
 
     public OutboundHCSMessage(HCSLib hcsLib) {
         this.signMessages = hcsLib.getSignMessages();
@@ -79,6 +80,11 @@ public final class OutboundHCSMessage {
         this.ed25519PrivateKey = ed25519PrivateKey;
         return this;
     }
+    
+    public OutboundHCSMessage withFirstTransactionId(TransactionId transactionId) {
+        this.transactionId = transactionId;
+        return this;
+    }
 
     /**
      * Sends a single cleartext message
@@ -103,8 +109,8 @@ public final class OutboundHCSMessage {
             }
         }
 
-        // generate TXId for main and first message
-        TransactionId firstTransactionId = new TransactionId(this.operatorAccountId);
+        // generate TXId for main and first message it not already set by caller
+        TransactionId firstTransactionId = (this.transactionId == null) ? new TransactionId(this.operatorAccountId) : this.transactionId;
 
         //break up
         List<ApplicationMessageChunk> parts = chunk(firstTransactionId, message);

@@ -68,6 +68,15 @@ message CreditBPM{
     
     // The context or business-process instance ID with which this message is associated
     string threadId = 6;
+
+    // The ID of the transaction that carried this message through HCS    
+    string transactionId = 7;
+    
+    // The date the credit was created
+    string createdDate = 8;
+    
+    // The time the credit was created
+    string createdTime = 9; 
 }
 
 // Represents acknowledgement of a credit and agreement that the details are correct
@@ -98,24 +107,27 @@ message CreditAckBPM{
 // Sent from the payer to the recipient (payer determined based upon net "debt" calculations)
 message SettleProposeBPM {
 
+    // The context or business-process instance ID with which this message is associated
+    string threadId = 1;
+    
     // Identity of the payer
-    string payerName = 1;
+    string payerName = 2;
 
     // Identity of the recipient
-    string recipentName = 2;
+    string recipientName = 3;
     
     // Optional supplementary notes or text
-    string additionalNotes = 3;
+    string additionalNotes = 4;
 
     // Reference to each threadId of the `creditAck` message included in the proposed settlement
-    repeated string threadId = 4;
+    repeated string threadIds = 5;
 
     // Reference to each TransactionID of the `creditAck` messages included in the proposed settlement
-//    repeated TransactionID creditAckMessageId = 4;
+//    repeated TransactionID creditAckMessageId = 6;
 
     // Total amount owed from payer to recipient
     // `netValue` must be greater than zero
-    Money netValue = 5;
+    Money netValue = 7;
 }
 
 // Represents acknowledgement of a proposal to settle and explicit agreement that the details are correct

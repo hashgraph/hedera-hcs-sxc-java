@@ -11,6 +11,6 @@ import com.hedera.hcsapp.entities.Credit;
 public interface CreditRepository extends CrudRepository<Credit, String> {
     
     @Query("SELECT c FROM Credit c WHERE (c.payerName = :currentUser AND c.recipientName = :searchUser) OR (c.payerName = :searchUser AND c.recipientName = :currentUser)")
-    List<Credit> findAllCreditsForKeys(@Param("currentUser") String currentUser, @Param("searchUser") String searchUser);
+    List<Credit> findAllCreditsForUsers(@Param("currentUser") String currentUser, @Param("searchUser") String searchUser);
 }
 

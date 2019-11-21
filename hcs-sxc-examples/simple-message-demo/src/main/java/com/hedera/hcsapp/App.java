@@ -40,8 +40,8 @@ public final class App {
         
         // create a callback object to receive the message
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsLib);
-        onHCSMessageCallback.addObserver(message -> {
-            System.out.println("Received : "+ message);
+        onHCSMessageCallback.addObserver(hcsResponse -> {
+            System.out.println("Received : "+ hcsResponse.getMessage());
         });
 
         Scanner scan = new Scanner(System.in);

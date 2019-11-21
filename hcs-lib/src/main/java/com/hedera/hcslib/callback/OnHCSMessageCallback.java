@@ -3,6 +3,7 @@ package com.hedera.hcslib.callback;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcslib.HCSLib;
+import com.hedera.hcslib.consensus.HCSResponse;
 import com.hedera.hcslib.interfaces.LibMessagePersistence;
 import com.hedera.hcslib.interfaces.MessagePersistenceLevel;
 
@@ -101,7 +102,7 @@ public final class OnHCSMessageCallback {
                         try {
                             // notify subscribed observer from App.java
                             if (messageFromJMS instanceof ActiveMQTextMessage) {
-                                OnHCSMessageCallback.this.notifyObservers(((ActiveMQTextMessage)messageFromJMS).getText().getBytes());
+                                OnHCSMessageCallback.this.notifyObservers(((ActiveMQTextMessage)messageFromJMS).getText().getBytes(), null);
                                 messageFromJMS.acknowledge();
                             } else if (messageFromJMS instanceof ActiveMQObjectMessage) {
                                 HCSRelayMessage rlm = (HCSRelayMessage)((ActiveMQObjectMessage) messageFromJMS).getObject();
@@ -113,7 +114,7 @@ public final class OnHCSMessageCallback {
                                 Optional<ApplicationMessage> messageEnvelopeOptional = 
                                         pushUntilCompleteMessage(messagePart, persistence);
                                 if (messageEnvelopeOptional.isPresent()){
-                                    OnHCSMessageCallback.this.notifyObservers( messageEnvelopeOptional.get().toByteArray());
+                                    OnHCSMessageCallback.this.notifyObservers( messageEnvelopeOptional.get().toByteArray(), messageEnvelopeOptional.get().getApplicationMessageId());
                                     messageFromJMS.acknowledge();
                                 }
                             }
@@ -164,8 +165,11 @@ public final class OnHCSMessageCallback {
      * Notifies all observers with the supplied message
      * @param message
      */
-    void notifyObservers(byte[] message){
-        observers.forEach(listener -> listener.onMessage(message));
+    void notifyObservers(byte[] message, TransactionID applicationMessageId) {
+        HCSResponse hcsResponse = new HCSResponse();
+        hcsResponse.setApplicationMessageId(applicationMessageId);
+        hcsResponse.setMessage(message);
+        observers.forEach(listener -> listener.onMessage(hcsResponse));
     }
     
     /**

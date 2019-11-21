@@ -5,6 +5,7 @@ import com.hedera.hcsapp.entities.AddressBook;
 import com.hedera.hcsapp.repository.AddressBookRepository;
 import com.hedera.hcsapp.repository.CreditRepository;
 import javax.annotation.Resource;
+import org.apache.coyote.http2.Http2Protocol;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -36,7 +37,7 @@ public class Application {
             AppData appData = new AppData();
             
             // populate the address book
-            for (AppClient appClient : appData.getAppClients()) {
+            for (AppClient appClient : appData.getAppClients()) {   
                 AddressBook addressBook = new AddressBook();
                 addressBook.setName(appClient.getClientName());
                 addressBook.setPublicKey(appClient.getClientKey());
@@ -45,4 +46,5 @@ public class Application {
             }
         };
     }    
+    
 }       

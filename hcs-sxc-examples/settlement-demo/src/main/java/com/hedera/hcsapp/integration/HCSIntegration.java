@@ -54,6 +54,7 @@ public class HCSIntegration {
             ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(hcsResponse.getMessage());
 
             SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessage.getBusinessProcessMessage().toByteArray());
+            // (CREDIT_PENDING , r ,threadId ,credit) => (CREDIT_AWAIT_ACK ,r ,threadId , credit[threadId].txId=r.MessageId)
             if (settlementBPM.hasCredit()) {
                 String priorState = Enums.state.CREDIT_PENDING.name();
                 String nextState = Enums.state.CREDIT_AWAIT_ACK.name();
@@ -79,6 +80,8 @@ public class HCSIntegration {
                             log.info("Adding new credit to Database: " + threadId);
                         }
                 );
+                
+            // (CREDIT_AWAIT_ACK , r , threadId ,credit) => (CREDIT_ACK , r , threadId , credit[threadId].status=CREDIT_ACK)
             } else if (settlementBPM.hasCreditAck()) {
                 String priorState = Enums.state.CREDIT_AWAIT_ACK.name();
                 String nextState = Enums.state.CREDIT_ACK.name();

@@ -109,7 +109,7 @@ public class CreditsController {
             credit.setStatus(Enums.state.CREDIT_AWAIT_ACK.name());
             credit.setCreatedDate("8, Nov");
             credit.setCreatedTime("11:10");
-
+   
             creditRepository.save(credit);
         }
 

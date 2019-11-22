@@ -161,6 +161,8 @@ public class HCSIntegration {
                                 settlement.setStatus(nextState);
                                 settlement.setTransactionId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
                                 settlementRepository.save(settlement);
+                                // update the credits too
+                                UpdateCreditState(threadId, nextState);
                                 notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
                             } else {
                                 log.error("Settlement status should be " + priorState + ", found : " + settlement.getStatus());
@@ -178,6 +180,9 @@ public class HCSIntegration {
                                 settlementItem.setId(new SettlementItemId(settleThreadId, threadId));
                                 settlementItemRepository.save(settlementItem);
                             }
+                            // update the credits too
+                            UpdateCreditState(threadId, nextState);
+
                             notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
                         }
                 );
@@ -193,6 +198,10 @@ public class HCSIntegration {
                             if (settlement.getStatus().equals(priorState)) {
                                 settlement.setStatus(nextState);
                                 settlementRepository.save(settlement);
+
+                                // update the credits too
+                                UpdateCreditState(threadId, nextState);
+
                                 notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
                             } else {
                                 log.error("Settlement status should be " + priorState + ", found : " + settlement.getStatus());
@@ -221,5 +230,18 @@ public class HCSIntegration {
             this.stompSession.send("/hcsapp/notifications",notificationMessage);
         }
 
+    }
+    
+    private void UpdateCreditState(String threadId, String newState) {
+        settlementItemRepository.findAllSettlementItems(threadId).forEach(
+                (settlementItem) -> {
+                    creditRepository.findById(settlementItem.getId().getSettledThreadId()).ifPresent(
+                            (credit) -> {
+                                credit.setStatus(newState);
+                                creditRepository.save(credit);
+                            }
+                    );
+                }
+        );
     }
 }

@@ -19,8 +19,8 @@ import com.hedera.hcslib.HCSLib;
 import com.hedera.hcslib.proto.java.AccountID;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
 import com.hedera.hcslib.proto.java.ApplicationMessageChunk;
+import com.hedera.hcslib.proto.java.ApplicationMessageId;
 import com.hedera.hcslib.proto.java.Timestamp;
-import com.hedera.hcslib.proto.java.TransactionID;
 import java.util.Arrays;
 
 import lombok.extern.log4j.Log4j2;
@@ -148,14 +148,14 @@ public final class OutboundHCSMessage {
 
     public static  List<ApplicationMessageChunk> chunk(TransactionId transactionId,  byte[] message) {
 
-        TransactionID transactionID = TransactionID.newBuilder()
+        ApplicationMessageId transactionID = ApplicationMessageId.newBuilder()
                 .setAccountID(AccountID.newBuilder()
                         .setShardNum(transactionId.getAccountId().getShardNum())
                         .setRealmNum(transactionId.getAccountId().getRealmNum())
                         .setAccountNum(transactionId.getAccountId().getAccountNum())
                         .build()
                 )
-                .setTransactionValidStart(Timestamp.newBuilder()
+                .setValidStart(Timestamp.newBuilder()
                         .setSeconds(transactionId.getValidStart().getEpochSecond())
                         .setNanos(transactionId.getValidStart().getNano())
                         .build()

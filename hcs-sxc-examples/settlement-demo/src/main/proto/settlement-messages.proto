@@ -13,10 +13,9 @@ message AccountID {
     int64 accountNum = 3; // A nonnegative account number unique within its realm
 }
 
-// Represents a Hedera transaction ID
-// Copied from hedera-hcs-sxc
-//message TransactionID {
-//    Timestamp transactionValidStart = 1; // The transaction is invalid if consensusTimestamp < transactionID.transactionStartValid
+// Represents an ApplicationMessageId
+//message ApplicationMessageId {
+//    Timestamp transactionValidStart = 1; 
 //    AccountID accountID = 2; //The Account ID that paid for this transaction
 //} 
 
@@ -90,7 +89,7 @@ message CreditAckBPM{
     string threadId = 2;
 
     // Reference to the TransactionID of the `credit` message being acknowledged
-//    TransactionID creditMessageId = 2;
+//    ApplicationMessageId creditMessageId = 2;
 
 }
 
@@ -122,8 +121,8 @@ message SettleProposeBPM {
     // Reference to each threadId of the `creditAck` message included in the proposed settlement
     repeated string threadIds = 5;
 
-    // Reference to each TransactionID of the `creditAck` messages included in the proposed settlement
-//    repeated TransactionID creditAckMessageId = 6;
+    // Reference to each ApplicationMessageId of the `creditAck` messages included in the proposed settlement
+//    repeated ApplicationMessageId creditAckMessageId = 6;
 
     // Total amount owed from payer to recipient
     // `netValue` must be greater than zero
@@ -140,8 +139,8 @@ message SettleProposeAckBPM {
     // The context or business-process instance ID with which this message is associated
     string threadId = 2;
 
-    // Reference to the TransactionID of the `settlePropose` message being acknowledged
-//    TransactionID settleProposeMessageId = 2;
+    // Reference to the ApplicationMessageId of the `settlePropose` message being acknowledged
+//    ApplicationMessageId settleProposeMessageId = 2;
 }
 
 // Represents intent to begin settlement through a third party payment channel
@@ -166,8 +165,8 @@ message SettleInitBPM {
     // The context or business-process instance ID with which this message is associated
     string threadId = 6;
 
-    // Reference to the TransactionID of the `settleProposeAck` message within which settlement was agreed
-//    TransactionID settleProposeAckMessageId = 6;
+    // Reference to the ApplicationMessageId of the `settleProposeAck` message within which settlement was agreed
+//    ApplicationMessageId settleProposeAckMessageId = 6;
 }
 
 // Represents acknowledgement of the intent to settle through a third party payment channel
@@ -180,8 +179,8 @@ message SettleInitAckBPM {
     // The context or business-process instance ID with which this message is associated
     string threadId = 2;
 
-    // Reference to the TransactionID of the `settleInit` message being acknowledged
-//    TransactionID settleInitMessageId = 2;
+    // Reference to the ApplicationMessageId of the `settleInit` message being acknowledged
+//    ApplicationMessageId settleInitMessageId = 2;
 }
 
 // Represents a payment mandate instructing a payment channel to transfer the specified amount
@@ -220,8 +219,8 @@ message PaymentInitAckBPM {
     // The context or business-process instance ID with which this message is associated
     string threadId = 2;
 
-    // Reference to the TransactionID of the `paymentInit` message being acknowledged
-//    TransactionID paymentInitMessageId = 2;
+    // Reference to the ApplicationMessageId of the `paymentInit` message being acknowledged
+//    ApplicationMessageId paymentInitMessageId = 2;
 }
 
 // Represents confirmation that a settlement payment has been completed by the payment channel
@@ -249,8 +248,8 @@ message PaymentSentBPM {
     // The context or business-process instance ID with which this message is associated
     string threadId = 7;
 
-    // Reference to the TransactionID of the `paymentInitAck` also sent by the payment channel
-//    TransactionID paymentInitMessageAckId = 7;
+    // Reference to the ApplicationMessageId of the `paymentInitAck` also sent by the payment channel
+//    ApplicationMessageId paymentInitMessageAckId = 7;
 
     // Optional Date and time that the funds were transferred from the payer's bank account
     Timestamp transferStart = 8;
@@ -273,8 +272,8 @@ message PaymentSentAckBPM {
     // The context or business-process instance ID with which this message is associated
     string threadId = 2;
     
-    // Reference to the TransactionID of the `paymentSent` also sent by the payment channel
-//    TransactionID paymentInitMessageAckId = 2;
+    // Reference to the ApplicationMessageId of the `paymentSent` also sent by the payment channel
+//    ApplicationMessageId paymentInitMessageAckId = 2;
 }
 
 // Represents communication of the completed settlement payment to the recipient
@@ -296,8 +295,8 @@ message SettlePaidBPM {
     // The context or business-process instance ID with which this message is associated
     string threadId = 5;
 
-    // Reference to the TransactionID of the `settleProposeAck` message that has now been paid
-//    TransactionID settleProposeAckMessageId = 6;
+    // Reference to the ApplicationMessageId of the `settleProposeAck` message that has now been paid
+//    ApplicationMessageId settleProposeAckMessageId = 6;
 
     // Optional [external] Payment Reference
     string paymentReference = 7;
@@ -314,8 +313,8 @@ message SettlePaidAckBPM {
     // The context or business-process instance ID with which this message is associated
     string threadId = 2;
 
-    // Reference to the TransactionID of the `settlePaid` message being acknowledged
-//    TransactionID settlePaidMessageId = 2;
+    // Reference to the ApplicationMessageId of the `settlePaid` message being acknowledged
+//    ApplicationMessageId settlePaidMessageId = 2;
 }
 
 // Represents confirmation that the settlement amount has been transferred to the receipient's account
@@ -338,8 +337,8 @@ message SettleCompleteBPM {
     // The context or business-process instance ID with which this message is associated
     string threadId = 6;
 
-    // Reference to the TransactionID of the `settleProposeAck` message that has now been paid
-//    TransactionID settleProposeAckMessageId = 6;
+    // Reference to the ApplicationMessageId of the `settleProposeAck` message that has now been paid
+//    ApplicationMessageId settleProposeAckMessageId = 6;
 
     // Optional [external] Payment Reference
     string paymentReference = 7;
@@ -355,14 +354,14 @@ message SettleCompleteAckBPM {
     // The context or business-process instance ID with which this message is associated
     string threadId = 2;
 
-    // Reference to the TransactionID of the `settlePaid` message being acknowledged
-//    TransactionID settleCompleteMessageId = 2;
+    // Reference to the ApplicationMessageId of the `settlePaid` message being acknowledged
+//    ApplicationMessageId settleCompleteMessageId = 2;
 }
 
 // Represents a Settlement-specific Business Process Message
 // The message within will be encapsulated within an ApplicationMessage
 // See: https://github.com/hashgraph/hedera-hcs-sxc/blob/master/hcs-sxc-proto/src/main/proto/Messages.proto
-// Note that TransactionID values (in messages above) will contain ApplicationMessage applicationMessageIds
+// Note that ApplicationMessageId values (in messages above) will contain ApplicationMessage applicationMessageIds
 message SettlementBPM {
 
     // The context or business-process instance ID with which this message is associated

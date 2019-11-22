@@ -1,7 +1,15 @@
 package com.hedera.hcsapp.integration;
 
+import java.util.concurrent.ExecutionException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.simp.stomp.StompSession;
+import org.springframework.messaging.simp.stomp.StompSessionHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.client.WebSocketClient;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.Enums;
@@ -10,14 +18,14 @@ import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.entities.Settlement;
 import com.hedera.hcsapp.entities.SettlementItem;
 import com.hedera.hcsapp.entities.SettlementItemId;
+import com.hedera.hcsapp.notifications.CustomStompSessionHandler;
+import com.hedera.hcsapp.notifications.NotificationMessage;
 import com.hedera.hcsapp.repository.CreditRepository;
 import com.hedera.hcsapp.repository.SettlementItemRepository;
 import com.hedera.hcsapp.repository.SettlementRepository;
 import com.hedera.hcslib.callback.OnHCSMessageCallback;
 import com.hedera.hcslib.consensus.HCSResponse;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
-import com.hedera.hcslib.proto.java.TransactionID;
-
 import lombok.extern.log4j.Log4j2;
 import proto.CreditAckBPM;
 import proto.CreditBPM;
@@ -29,19 +37,21 @@ import proto.SettlementBPM;
 @Component
 public class HCSIntegration {
 
-    private static AppData appData;
+    private AppData appData;
+    
+    @Autowired
+    private CreditRepository creditRepository;
 
     @Autowired
-    CreditRepository creditRepository;
+    private SettlementRepository settlementRepository;
 
     @Autowired
-    SettlementRepository settlementRepository;
-
-    @Autowired
-    SettlementItemRepository settlementItemRepository;
+    private SettlementItemRepository settlementItemRepository;
+    
+    private StompSession stompSession;
 
     public HCSIntegration() throws Exception {
-        appData = new AppData();
+        this.appData = new AppData();
         // create a callback object to receive the message
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(appData.getHCSLib());
         onHCSMessageCallback.addObserver(hcsMessage -> {
@@ -50,6 +60,19 @@ public class HCSIntegration {
     }
 
     public void processHCSMessage(HCSResponse hcsResponse) {
+        if (this.stompSession == null) {
+            WebSocketClient client = new StandardWebSocketClient();
+            WebSocketStompClient stompClient = new WebSocketStompClient(client);        
+            stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+            
+            StompSessionHandler sessionHandler = new CustomStompSessionHandler(); 
+            try {
+                this.stompSession = stompClient.connect("ws://localhost:8080/notifications", sessionHandler).get();
+            } catch (InterruptedException | ExecutionException e) {
+                log.error(e);
+            }
+        }
+
         try {
             ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(hcsResponse.getMessage());
 
@@ -67,6 +90,7 @@ public class HCSIntegration {
                                 credit.setStatus(nextState);
                                 credit.setTransactionId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
                                 creditRepository.save(credit);
+                                notify("credits", credit.getPayerName(), credit.getRecipientName(),threadId);
                             } else {
                                 log.error("Credit status should be " + priorState + ", found : " + credit.getStatus());
                             }
@@ -76,6 +100,7 @@ public class HCSIntegration {
                             credit.setStatus(nextState);
                             credit.setTransactionId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
                             creditRepository.save(credit);
+                            notify("credits", credit.getPayerName(), credit.getRecipientName(),threadId);
                             log.info("Adding new credit to Database: " + threadId);
                         }
                 );
@@ -91,6 +116,7 @@ public class HCSIntegration {
                             if (credit.getStatus().equals(priorState)) {
                                 credit.setStatus(nextState);
                                 creditRepository.save(credit);
+                                notify("credits", credit.getPayerName(), credit.getRecipientName(),threadId);
                             } else {
                                 log.error("Credit status should be " + priorState + ", found : " + credit.getStatus());
                             }
@@ -132,6 +158,7 @@ public class HCSIntegration {
                                 settlement.setStatus(nextState);
                                 settlement.setTransactionId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
                                 settlementRepository.save(settlement);
+                                notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
                             } else {
                                 log.error("Settlement status should be " + priorState + ", found : " + settlement.getStatus());
                             }
@@ -148,6 +175,7 @@ public class HCSIntegration {
                                 settlementItem.setId(new SettlementItemId(settleThreadId, threadId));
                                 settlementItemRepository.save(settlementItem);
                             }
+                            notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
                         }
                 );
             } else if (settlementBPM.hasSettleProposeAck()) {
@@ -162,6 +190,7 @@ public class HCSIntegration {
                             if (settlement.getStatus().equals(priorState)) {
                                 settlement.setStatus(nextState);
                                 settlementRepository.save(settlement);
+                                notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
                             } else {
                                 log.error("Settlement status should be " + priorState + ", found : " + settlement.getStatus());
                             }
@@ -176,5 +205,18 @@ public class HCSIntegration {
         } catch (Exception e) {
             log.error(e);
         }
+    }
+    
+    private void notify(String context, String payer, String recipient, String threadId) {
+        if (this.stompSession != null) {
+            NotificationMessage notificationMessage = new NotificationMessage();
+            notificationMessage.setContext(context);
+            notificationMessage.setPayer(payer);
+            notificationMessage.setRecipient(recipient);
+            notificationMessage.setThreadId(threadId);
+            
+            this.stompSession.send("/hcsapp/notifications",notificationMessage);
+        }
+
     }
 }

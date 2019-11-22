@@ -16,5 +16,7 @@ public final class SettlementProposal {
     private long netValue;
     private String currency;
     private String status;
+    private String createdDate;
+    private String createdTime;
     
 }

@@ -78,6 +78,9 @@ public class SettlementsController {
             settlementProposal.setThreadId(settlementfromDB.getThreadId());
             settlementProposal.setTransactionId(settlementfromDB.getTransactionId());
             settlementProposal.setStatus(settlementfromDB.getStatus());
+            settlementProposal.setCreatedDate(settlementfromDB.getCreatedDate());
+            settlementProposal.setCreatedTime(settlementfromDB.getCreatedTime());
+
             List<SettlementItem> settlementItemsFromDB = settlementItemRepository.findAllSettlementItems(settlementfromDB.getThreadId());
             List<String> threadIds = new ArrayList<String>();
             for (SettlementItem settlementItem : settlementItemsFromDB) {
@@ -101,7 +104,9 @@ public class SettlementsController {
         headers.add("Content-Type", "application/json");    
 
         Instant now = Instant.now();
-        String threadId = now.getEpochSecond() + "-" + now.getNano();
+        Long seconds = now.getEpochSecond();
+        int nanos = now.getNano();
+        String threadId = seconds + "-" + nanos;
         
         Money value = Money.newBuilder()
                 .setCurrencyCode(settleProposal.getCurrency())
@@ -135,6 +140,8 @@ public class SettlementsController {
             settlement.setStatus(Enums.state.SETTLE_PROPOSE_PENDING.name());
             settlement.setThreadId(threadId);
             settlement.setTransactionId(Utils.TransactionIdToString(transactionId));
+            settlement.setCreatedDate(Utils.TimestampToDate(seconds, nanos));
+            settlement.setCreatedTime(Utils.TimestampToTime(seconds, nanos));
 
             settlement = settlementRepository.save(settlement);
 
@@ -208,6 +215,8 @@ public class SettlementsController {
             settlementProposal.setThreadIds(threadIds);
             settlementProposal.setStatus(settlement.get().getStatus());
             settlementProposal.setTransactionId(settlement.get().getTransactionId());
+            settlementProposal.setCreatedDate(settlement.get().getCreatedDate());
+            settlementProposal.setCreatedTime(settlement.get().getCreatedTime());
             
             try {
                 TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib())

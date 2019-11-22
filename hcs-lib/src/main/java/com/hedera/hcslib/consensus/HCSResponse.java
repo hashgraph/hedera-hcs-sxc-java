@@ -1,15 +1,15 @@
 package com.hedera.hcslib.consensus;
 
-import com.hedera.hcslib.proto.java.TransactionID;
+import com.hedera.hcslib.proto.java.ApplicationMessageId;
 
 public class HCSResponse {
-    private TransactionID applicationMessageId;
+    private ApplicationMessageId applicationMessageId;
     private byte[] message;
     
-    public TransactionID getApplicationMessageId() {
+    public ApplicationMessageId getApplicationMessageId() {
         return this.applicationMessageId;
     }
-    public void setApplicationMessageId(TransactionID applicationMessageId) {
+    public void setApplicationMessageId(ApplicationMessageId applicationMessageId) {
         this.applicationMessageId = applicationMessageId;
     }
     public byte[] getMessage() {

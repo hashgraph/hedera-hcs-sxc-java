@@ -28,6 +28,16 @@
             <version>2.2.0.RELEASE</version>
         </dependency>
         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-messaging</artifactId>
+            <version>5.2.0.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-websocket</artifactId>
+            <version>5.2.0.RELEASE</version>
+        </dependency>
+        <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-lib</artifactId>
             <version>${hcslib.version}</version>
@@ -68,7 +78,6 @@
             <artifactId>lib-persistence-in-memory</artifactId>
             <version>${hcslib.version}</version>
         </dependency>
-        
     </dependencies>
 
     <build>

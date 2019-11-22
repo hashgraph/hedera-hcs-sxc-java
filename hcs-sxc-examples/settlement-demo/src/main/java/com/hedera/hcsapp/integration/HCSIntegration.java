@@ -17,6 +17,7 @@ import com.hedera.hcslib.callback.OnHCSMessageCallback;
 import com.hedera.hcslib.consensus.HCSResponse;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
 import com.hedera.hcslib.proto.java.TransactionID;
+import java.util.Optional;
 
 import lombok.extern.log4j.Log4j2;
 import proto.CreditAckBPM;
@@ -39,7 +40,7 @@ public class HCSIntegration {
 
     @Autowired
     SettlementItemRepository settlementItemRepository;
-
+  
     public HCSIntegration() throws Exception {
         appData = new AppData();
         // create a callback object to receive the message
@@ -48,7 +49,78 @@ public class HCSIntegration {
             processHCSMessage(hcsMessage);
         });
     }
+    
+    
+    //TODO: Deleteme
+    public enum SettlementState {
+        CREDIT_PENDING {
+            @Override
+            public SettlementState nextState(HCSResponse hcsResponse, CreditBPM creditBPM, String threadId, CreditRepository creditRepository){
+                Optional<Credit> findById = creditRepository.findById(threadId);
+                if (findById.isPresent()){
+                    Credit credit = findById.get();
+                    assert(credit.getStatus().equals(CREDIT_PENDING.name()));
+                    credit.setStatus(CREDIT_AWAIT_ACK.name());
+                    credit.setTransactionId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                    creditRepository.save(credit);
+                    return CREDIT_AWAIT_ACK;
+                } else {
+                    Credit credit = Utils.creditFromCreditBPM(creditBPM);
+                    credit.setStatus(CREDIT_AWAIT_ACK.name());
+                    credit.setTransactionId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                    creditRepository.save(credit);
+                    log.info("Adding new credit to Database: " + threadId);
+                    return CREDIT_AWAIT_ACK;
+                }
+            } 
+        },
+        CREDIT_AWAIT_ACK {
+            @Override
+            public SettlementState nextState(HCSResponse hcsResponse, CreditBPM creditBPM, String threadId, CreditRepository creditRepository){
+                Optional<Credit> findById = creditRepository.findById(threadId);
+                if (findById.isPresent()){
+                    Credit credit = findById.get();
+                    assert(credit.getStatus().equals(CREDIT_AWAIT_ACK.name()));
+                    credit.setStatus(CREDIT_ACK.name());
+                    creditRepository.save(credit);
+                    return CREDIT_ACK;
+                } else {
+                    return this; // no transition.
+                }
+            }
+        },
+        CREDIT_ACK {
+            @Override
+            public SettlementState nextState(HCSResponse hcsResponse, CreditBPM creditBPM, String threadId, CreditRepository creditRepository){
+                return this; // no transition
+            }
+        };
+        
+        abstract SettlementState nextState(HCSResponse hcsResponse, CreditBPM creditBPM, String threadId, CreditRepository creditRepository);
+           
+    }
 
+    //TODO: Deleteme
+    public void processHCSMessage2(HCSResponse hcsResponse) {
+        try {
+            ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(hcsResponse.getMessage());
+            SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessage.getBusinessProcessMessage().toByteArray());
+            CreditBPM creditBPM = settlementBPM.getCredit();
+            String threadId = creditBPM.getThreadId();
+            
+            if (settlementBPM.hasCredit()) {
+                SettlementState.CREDIT_PENDING.nextState(hcsResponse, creditBPM, threadId, creditRepository);
+            } else if (settlementBPM.hasCreditAck()) {
+                SettlementState.CREDIT_AWAIT_ACK.nextState(hcsResponse, creditBPM, threadId, creditRepository);
+            } else {
+                // more stuff
+            }
+        } catch (Exception e){
+            // 
+        }
+    }
+    
+    
     public void processHCSMessage(HCSResponse hcsResponse) {
         try {
             ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(hcsResponse.getMessage());

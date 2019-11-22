@@ -127,6 +127,12 @@ message SettleProposeBPM {
     // Total amount owed from payer to recipient
     // `netValue` must be greater than zero
     Money netValue = 7;
+
+    // The date the settlement was created
+    string createdDate = 8;
+    
+    // The time the settlement was created
+    string createdTime = 9; 
 }
 
 // Represents acknowledgement of a proposal to settle and explicit agreement that the details are correct

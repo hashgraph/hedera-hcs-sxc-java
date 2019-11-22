@@ -21,5 +21,4 @@ public final class SettlementProposal {
     private String createdDate;
     private String createdTime;
     private List<Credit> credits;
-    
 }

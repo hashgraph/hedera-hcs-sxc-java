@@ -28,6 +28,7 @@ import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.entities.Settlement;
 import com.hedera.hcsapp.entities.SettlementItem;
 import com.hedera.hcsapp.entities.SettlementItemId;
+import com.hedera.hcsapp.repository.CreditRepository;
 import com.hedera.hcsapp.repository.SettlementItemRepository;
 import com.hedera.hcsapp.repository.SettlementRepository;
 import com.hedera.hcsapp.restclasses.SettlementProposal;
@@ -52,6 +53,9 @@ public class SettlementsController {
     @Autowired
     SettlementRepository settlementRepository;
 
+    @Autowired
+    CreditRepository creditRepository;
+
     private static AppData appData;
     private static int topicIndex = 0; // refers to the first topic ID in the config.yaml
     
@@ -67,6 +71,7 @@ public class SettlementsController {
         headers.add("Content-Type", "application/json");    
 
         List<SettlementProposal> settlementsList = new ArrayList<SettlementProposal>();
+        List<Credit> creditList = new ArrayList<Credit>();
         List<Settlement> settlements = settlementRepository.findAllSettlementsForUsers(appData.getUserName(), user);
         for (Settlement settlementfromDB : settlements) {
             SettlementProposal settlementProposal = new SettlementProposal();
@@ -85,9 +90,15 @@ public class SettlementsController {
             List<String> threadIds = new ArrayList<String>();
             for (SettlementItem settlementItem : settlementItemsFromDB) {
                 threadIds.add(settlementItem.getId().getSettledThreadId());
+                creditRepository.findById(settlementItem.getId().getSettledThreadId()).ifPresent(
+                        (credit) -> {
+                            creditList.add(credit);        
+                        }
+                );
+                    
             }
             settlementProposal.setThreadIds(threadIds);
-            
+            settlementProposal.setCredits(creditList);
             settlementsList.add(settlementProposal);
         }
         if (settlementsList.size() != 0) {

@@ -647,8 +647,8 @@
                 }
                 if(isFormValid){
                     postBody = `{
-                                  "recipientName"   : "${document.getElementById('new-credit-payer').value}" 
-                                , "payerName"       : "${thisuserName}"
+                                  "recipientName"   : "${thisuserName}" 
+                                , "payerName"       : "${document.getElementById('new-credit-payer').value}"
                                 , "reference"       : "${document.getElementById('new-credit-service-reference').value}"
                                 , "amount"          : ${document.getElementById('new-credit-amount').value}
                                 , "currency"        : "USD"

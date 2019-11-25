@@ -4,7 +4,7 @@ import com.hedera.hcslib.interfaces.LibMessagePersistence;
 import com.hedera.hcslib.interfaces.MessagePersistenceLevel;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
 import com.hedera.hcslib.proto.java.ApplicationMessageChunk;
-import com.hedera.hcslib.proto.java.TransactionID;
+import com.hedera.hcslib.proto.java.ApplicationMessageId;
 import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages;
 import com.hedera.plugin.persistence.config.Config;
 import java.io.IOException;
@@ -17,7 +17,7 @@ public class PersistMessages
     
     
 
-    private Map<TransactionID, List<ApplicationMessageChunk>> partialMessages;
+    private Map<ApplicationMessageId, List<ApplicationMessageChunk>> partialMessages;
     private Config config = null;
     private MessagePersistenceLevel persistenceLevel = null;
     public PersistMessages() throws IOException{
@@ -61,12 +61,12 @@ public class PersistMessages
         
  
     @Override
-    public List<ApplicationMessageChunk> getParts(TransactionID applicationMessageId) {
+    public List<ApplicationMessageChunk> getParts(ApplicationMessageId applicationMessageId) {
         return this.partialMessages.get(applicationMessageId);
     }
 
     @Override
-    public void putChunks(TransactionID applicationMessageId, List l) {
+    public void putChunks(ApplicationMessageId applicationMessageId, List l) {
         
          switch (persistenceLevel) {
             case FULL:
@@ -79,7 +79,7 @@ public class PersistMessages
     }
 
     @Override
-    public void removeChunks(TransactionID applicationMessageId) {
+    public void removeChunks(ApplicationMessageId applicationMessageId) {
         switch (persistenceLevel) {
             case FULL:
             case MESSAGE_AND_PARTS:

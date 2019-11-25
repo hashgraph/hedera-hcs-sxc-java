@@ -8,6 +8,8 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
         <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        
+        
         <style>
             :root {--mdc-theme-primary: rgb(69, 90, 100)}
             body {
@@ -313,7 +315,7 @@
                      >
 
                     <template id="credit-and-debit-panel" >
-                        <div class="panel">
+                        <div id="{{username}}" class="panel">
                             <details>
                             <summary>
 
@@ -322,7 +324,7 @@
                                         <span 
                                             id="credits-and-debits-user"
                                             class="mdc-typography--headline6" style="flex-grow:1">
-                                            ?
+                                            {{username}}
                                         </span>
                                         <button 
                                             id="new-credit-button"
@@ -548,6 +550,9 @@
 
         <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
         
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+      
         
         <script>
             thisuserName = "";
@@ -565,52 +570,68 @@
                 let addressBook  = await responseAddressBook.json(); 
                 
                 for(i=0; i < addressBook.length; i++){
-                    var panelTemplate = document.getElementById("credit-and-debit-panel");
-                    var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
                     var userName = addressBook[i].name;
-                    clonedPanelTemplate.getElementById("credits-and-debits-user").innerHTML = userName;
-                    clonedPanelTemplate.getElementById("new-credit-button").addEventListener("click",(function(passName){
-                       return function(){openNewCreditDialog(passName);};
-                    })(userName));
-
-                    var tableBody = clonedPanelTemplate.getElementById("credit-table-body");
-                    var tableBodyTemplate = clonedPanelTemplate.getElementById("credit-table-body-template");
-                    
-                    var responseCredits = await fetch(`credits/${userName}`);
-                    var i_UserCredits = await responseCredits.json();
-                    
-                    for(z=0; z < i_UserCredits.length ; z++){
-                      clonedRow = tableBodyTemplate.content.cloneNode(true);
-                      clonedRow.getElementById("threadId").innerHTML = i_UserCredits[z].threadId;
-                            clonedRow.getElementById("threadId").title = i_UserCredits[z].threadId;
-                      clonedRow.getElementById("creditor").innerHTML = i_UserCredits[z].recipientName;
-                      clonedRow.getElementById("debtor").innerHTML = i_UserCredits[z].payerName;
-                      clonedRow.getElementById("reference").innerHTML = i_UserCredits[z].reference;
-                      clonedRow.getElementById("amount").innerHTML = i_UserCredits[z].currency + ' '+ i_UserCredits[z].amount;
-                      clonedRow.getElementById("date").innerHTML = i_UserCredits[z].createdDate;
-                      clonedRow.getElementById("time").innerHTML = i_UserCredits[z].createdTime;
-                      clonedRow.getElementById("status").innerHTML = i_UserCredits[z].status;
-                      if(i_UserCredits[z].payerName === whoami.name &&  i_UserCredits[z].status === 'CREDIT_AWAIT_ACK'){
-                        let threadId = i_UserCredits[z].threadId;
-                        newButton = document.createElement("button");
-                        newButton.innerHTML = "Confirm";
-                        newButton.classList.add("mdc-button");
-                        newButton.classList.add("mdc-button--outlined");
-                        newButton.addEventListener("click", function(){openConfirmCreditDialog(threadId);});
-                        clonedRow.getElementById("action").appendChild(newButton);
-                      }
-                      clonedRow.getElementById("notes").innerHTML = i_UserCredits[z].additionalNotes;
-                      tableBody.appendChild(clonedRow);
-                  }     
-                             
-                     document.getElementById("credit-and-debit-panel-holder").appendChild(clonedPanelTemplate);
+                    await renderPanel(userName, thisuserName);
                      
-                  }
-                  styleButtons();
-                  //styleDataTables();
-                
+                }
+                styleButtons();
+                //styleDataTables();
+
             };
             f('addressbook/me/');
+            
+            
+            async function  renderPanel(userName, thisuserName){
+                //if (document.getElementById(userName) === null) {
+                var panelTemplate = document.getElementById("credit-and-debit-panel");
+                var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
+                clonedPanelTemplate.querySelector(".panel").id=userName;    
+                clonedPanelTemplate.getElementById("credits-and-debits-user").innerHTML = userName;
+                clonedPanelTemplate.getElementById("new-credit-button").addEventListener("click",(function(passName){
+                   return function(){openNewCreditDialog(passName);};
+                })(userName));
+
+                //}
+                var tableBody = clonedPanelTemplate.getElementById("credit-table-body");
+                var tableBodyTemplate = clonedPanelTemplate.getElementById("credit-table-body-template");
+
+                var responseCredits = await fetch(`credits/${userName}`);
+                var i_UserCredits = await responseCredits.json();
+                
+                for(z=0; z < i_UserCredits.length ; z++){
+                  clonedRow = tableBodyTemplate.content.cloneNode(true);
+                  clonedRow.getElementById("threadId").innerHTML = i_UserCredits[z].threadId;
+                        clonedRow.getElementById("threadId").title = i_UserCredits[z].threadId;
+                  clonedRow.getElementById("creditor").innerHTML = i_UserCredits[z].recipientName;
+                  clonedRow.getElementById("debtor").innerHTML = i_UserCredits[z].payerName;
+                  clonedRow.getElementById("reference").innerHTML = i_UserCredits[z].reference;
+                  clonedRow.getElementById("amount").innerHTML = i_UserCredits[z].currency + ' '+ i_UserCredits[z].amount;
+                  clonedRow.getElementById("date").innerHTML = i_UserCredits[z].createdDate;
+                  clonedRow.getElementById("time").innerHTML = i_UserCredits[z].createdTime;
+                  clonedRow.getElementById("status").innerHTML = i_UserCredits[z].status;
+                  if(i_UserCredits[z].payerName === thisuserName &&  i_UserCredits[z].status === 'CREDIT_AWAIT_ACK'){
+                    let threadId = i_UserCredits[z].threadId;
+                    newButton = document.createElement("button");
+                    newButton.innerHTML = "Confirm";
+                    newButton.classList.add("mdc-button");
+                    newButton.classList.add("mdc-button--outlined");
+                    newButton.addEventListener("click", function(){openConfirmCreditDialog(threadId);});
+                    clonedRow.getElementById("action").appendChild(newButton);
+                  }
+                  clonedRow.getElementById("notes").innerHTML = i_UserCredits[z].additionalNotes;
+                  tableBody.appendChild(clonedRow);
+              }     
+              if (document.getElementById(userName) === null) {
+                  document.getElementById("credit-and-debit-panel-holder").appendChild(clonedPanelTemplate);
+              } else {
+                  existingPanel = document.getElementById(userName);
+                  clonedPanelTemplate.querySelector("details").setAttribute("open","true");
+                  existingPanel.replaceWith(clonedPanelTemplate);
+              }
+
+       
+            
+           }
           
             
         </script>
@@ -770,6 +791,24 @@
                 }
             }
             
+        </script>
+        
+        <script>
+            var socket = new SockJS('/notifications');
+                stompClient = Stomp.over(socket);  
+                stompClient.connect({}, function(frame) {
+                  
+                    console.log('Connected: ' + frame);
+                    stompClient.subscribe('/notifications/messages', function(messageOutput) {
+                        onStompMessage(JSON.parse(messageOutput.body));
+                    });
+            });
+            
+            async function onStompMessage(messageOutput) {
+                notifyUi = messageOutput.context;
+                await renderPanel(messageOutput.payer, messageOutput.recipient);
+                showSnackBarMessage(messageOutput.threadId + " updated");
+            }
         </script>
     </body>
 </html>

@@ -11,7 +11,7 @@ import com.hedera.hcslib.messages.HCSRelayMessage;
 import com.hedera.hcslib.plugins.Plugins;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
 import com.hedera.hcslib.proto.java.ApplicationMessageChunk;
-import com.hedera.hcslib.proto.java.TransactionID;
+import com.hedera.hcslib.proto.java.ApplicationMessageId;
 import com.hedera.hcslib.utils.ByteUtil;
 import lombok.extern.log4j.Log4j2;
 
@@ -165,7 +165,7 @@ public final class OnHCSMessageCallback {
      * Notifies all observers with the supplied message
      * @param message
      */
-    void notifyObservers(byte[] message, TransactionID applicationMessageId) {
+    void notifyObservers(byte[] message, ApplicationMessageId applicationMessageId) {
         HCSResponse hcsResponse = new HCSResponse();
         hcsResponse.setApplicationMessageId(applicationMessageId);
         hcsResponse.setMessage(message);
@@ -184,7 +184,7 @@ public final class OnHCSMessageCallback {
      */
     public static  Optional<ApplicationMessage> pushUntilCompleteMessage(ApplicationMessageChunk messageChunk, LibMessagePersistence persistence) throws InvalidProtocolBufferException {
             
-        TransactionID applicationMessageId = messageChunk.getApplicationMessageId();
+        ApplicationMessageId applicationMessageId = messageChunk.getApplicationMessageId();
         //look up db to find parts received already
         List<ApplicationMessageChunk> chunkList = persistence.getParts(applicationMessageId);
         if(chunkList==null){

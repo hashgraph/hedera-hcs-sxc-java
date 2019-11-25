@@ -8,13 +8,11 @@ import java.util.Locale;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.entities.Settlement;
-import com.hedera.hcsapp.restclasses.SettlementProposal;
-import com.hedera.hcslib.proto.java.TransactionID;
+import com.hedera.hcslib.proto.java.ApplicationMessageId;
 
 import proto.CreditBPM;
 import proto.Money;
 import proto.SettleProposeBPM;
-import proto.SettlementBPM;
 
 public final class Utils {
     public static String TimestampToDate(long seconds, int nanos) {
@@ -34,10 +32,10 @@ public final class Utils {
         return formattedDate;
     }
     
-    public static String TransactionIdToString(TransactionID transactionId) {
+    public static String TransactionIdToString(ApplicationMessageId transactionId) {
         String txId = "0.0." + transactionId.getAccountID().getAccountNum()
-                + "-" + transactionId.getTransactionValidStart().getSeconds()
-                + "-" + transactionId.getTransactionValidStart().getNanos();
+                + "-" + transactionId.getValidStart().getSeconds()
+                + "-" + transactionId.getValidStart().getNanos();
         return txId;
     }
     

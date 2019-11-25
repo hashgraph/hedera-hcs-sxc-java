@@ -8,6 +8,7 @@ services:
         - "8161:8161"
         # jms
         - "61616:61616"
+        #- 61616
       networks: [backing-services]
       volumes: [
         "activemq-data:/var/lib/artemis/data"

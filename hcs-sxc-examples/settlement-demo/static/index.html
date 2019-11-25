@@ -647,8 +647,8 @@
                 }
                 if(isFormValid){
                     postBody = `{
-                                  "recipientName"   : "${thisuserName}" 
-                                , "payerName"       : "${document.getElementById('new-credit-payer').value}"
+                                  "recipientName"   : "${document.getElementById('new-credit-payer').value}" 
+                                , "payerName"       : "${thisuserName}"
                                 , "reference"       : "${document.getElementById('new-credit-service-reference').value}"
                                 , "amount"          : ${document.getElementById('new-credit-amount').value}
                                 , "currency"        : "USD"
@@ -667,7 +667,7 @@
                     }).then(function(response) {
                         return response.json();
                     }).then(function(data) {
-                        showSnackBarMessage("New credit requenst sent");
+                        showSnackBarMessage("New credit request sent");
                        
                     }).catch(function(res){
                         showSnackBarMessage(res);

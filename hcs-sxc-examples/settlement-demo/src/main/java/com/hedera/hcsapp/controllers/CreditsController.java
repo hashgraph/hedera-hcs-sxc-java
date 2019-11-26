@@ -100,8 +100,8 @@ public class CreditsController {
             credit = new Credit();
             credit.setTransactionId("0.0.1234-2222-28");
             credit.setThreadId(threadId);
-            credit.setPayerName("Alice");
-            credit.setRecipientName(user);
+            credit.setPayerName(user);
+            credit.setRecipientName("Alice");
             credit.setAmount(3);
             credit.setCurrency("EUR");
             credit.setAdditionalNotes("memo 3");

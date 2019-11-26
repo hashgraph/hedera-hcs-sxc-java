@@ -221,7 +221,30 @@
                     <span class="mdc-top-app-bar__title">HCS - Settlement Demo</span>
                 </section>
                 <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end">
-                    <button class="mdc-icon-button material-icons mdc-top-app-bar__action-item--unbounded" aria-label="Download">file_download</button>
+                    <div style="position:relative">
+                    <button class="mdc-icon-button material-icons mdc-top-app-bar__action-item--unbounded" aria-label="Alert">notifications</button>
+                    <div id="notification-badge" 
+                        class="" 
+                        style=" 
+                         display:none;
+                         width:20px;
+                         height:20px;
+                         line-height: 20px;
+                         text-align: center;
+                         font-size: 10px;
+                         font-weight: bold;
+                         font-family: Roboto;
+                         border-radius: 50%;
+                         position:absolute; 
+                         background-color: red;
+                         top:5px;
+                         right:5px;
+                         "
+                        >
+                        0
+                    </div>
+                    </div>
+                    
                     <button class="mdc-icon-button material-icons mdc-top-app-bar__action-item--unbounded" aria-label="Print this page">print</button>
                     <button class="mdc-icon-button material-icons mdc-top-app-bar__action-item--unbounded" aria-label="Bookmark this page">bookmark</button>
                 </section>
@@ -347,8 +370,8 @@
                                         <thead>
                                             <tr class="mdc-data-table__header-row">
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">ThreadID</th>
-                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Creditor</th>
-                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Debtor</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Payer</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recipient</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Reference</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Amount</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Date</th>
@@ -362,8 +385,8 @@
                                             <template id="credit-table-body-template">
                                                 <tr class="mdc-data-table__row">
                                                     <td id="threadId"       class="mdc-data-table__cell overflow-elipsis">665</td>
-                                                    <td id="creditor"       class="mdc-data-table__cell">Alice</td>
-                                                    <td id="debtor"         class="mdc-data-table__cell">Bob</td>
+                                                    <td id="payer"         class="mdc-data-table__cell">Alice</td>
+                                                    <td id="recipient"       class="mdc-data-table__cell">Bob</td>
                                                     <td id="reference"      class="mdc-data-table__cell">A77U312</td>
                                                     <td id="amount"         class="mdc-data-table__cell">$120</td>
                                                     <td id="date"           class="mdc-data-table__cell">13 Nov</td>
@@ -409,8 +432,8 @@
                         <div style="display:fex; flex-direction: column">
                             <form id="new-credit-dialog-form">
                                 <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text" disabled id="new-credit-payer"
-                                           value="{{newCreditPayer}}"
+                                    <input type="text" disabled id="new-credit-recipient"
+                                           value="{{newCreditRecipient}}"
                                            required
                                            class="mdc-text-field__input ">
                                     <label class="mdc-floating-label" for="my-text-field">
@@ -602,17 +625,17 @@
                   clonedRow = tableBodyTemplate.content.cloneNode(true);
                   clonedRow.getElementById("threadId").innerHTML = i_UserCredits[z].threadId;
                         clonedRow.getElementById("threadId").title = i_UserCredits[z].threadId;
-                  clonedRow.getElementById("creditor").innerHTML = i_UserCredits[z].recipientName;
-                  clonedRow.getElementById("debtor").innerHTML = i_UserCredits[z].payerName;
+                  clonedRow.getElementById("recipient").innerHTML = i_UserCredits[z].recipientName;
+                  clonedRow.getElementById("payer").innerHTML = i_UserCredits[z].payerName;
                   clonedRow.getElementById("reference").innerHTML = i_UserCredits[z].reference;
                   clonedRow.getElementById("amount").innerHTML = i_UserCredits[z].currency + ' '+ i_UserCredits[z].amount;
                   clonedRow.getElementById("date").innerHTML = i_UserCredits[z].createdDate;
                   clonedRow.getElementById("time").innerHTML = i_UserCredits[z].createdTime;
                   clonedRow.getElementById("status").innerHTML = i_UserCredits[z].status;
-                  if(i_UserCredits[z].payerName === thisuserName &&  i_UserCredits[z].status === 'CREDIT_AWAIT_ACK'){
+                  if(i_UserCredits[z].payerName === userName &&  i_UserCredits[z].status === 'CREDIT_AWAIT_ACK'){
                     let threadId = i_UserCredits[z].threadId;
                     newButton = document.createElement("button");
-                    newButton.innerHTML = "Confirm";
+                    newButton.innerHTML = "Accept";
                     newButton.classList.add("mdc-button");
                     newButton.classList.add("mdc-button--outlined");
                     newButton.addEventListener("click", function(){openConfirmCreditDialog(threadId);});
@@ -651,7 +674,7 @@
                     e.value='';}
                 );
                 
-                $newCreditDialog.querySelector("#new-credit-payer").value = recipient;
+                $newCreditDialog.querySelector("#new-credit-recipient").value = recipient;
                 newCreditDialog.open();
                 return false;
             }
@@ -668,8 +691,8 @@
                 }
                 if(isFormValid){
                     postBody = `{
-                                  "recipientName"   : "${thisuserName}" 
-                                , "payerName"       : "${document.getElementById('new-credit-payer').value}"
+                                  "payerName"       : "${thisuserName}"
+                                , "recipientName"   : "${document.getElementById('new-credit-recipient').value}"  
                                 , "reference"       : "${document.getElementById('new-credit-service-reference').value}"
                                 , "amount"          : ${document.getElementById('new-credit-amount').value}
                                 , "currency"        : "USD"
@@ -807,8 +830,10 @@
             async function onStompMessage(messageOutput) {
                 notifyUi = messageOutput.context;
                 await renderPanel(messageOutput.payer, messageOutput.recipient);
-                showSnackBarMessage(messageOutput.threadId + " updated");
-            }
+                //showSnackBarMessage(messageOutput.threadId + " updated");
+                document.getElementById("notification-badge").innerHTML = document.getElementById("notification-badge").innerHTML * 1.0 + 1;
+                document.getElementById("notification-badge").style.display="block"
+             }
         </script>
     </body>
 </html>

@@ -152,7 +152,7 @@
                             </to>
                             <extraDirectories>
                                 <paths>
-                                    <path>src/main/resources</path>
+                                    <path>.</path>
                                 </paths>
                             </extraDirectories>
                             <mainClass>com.hedera.simple-message-demo.HCSLibCallBackSetup</mainClass>

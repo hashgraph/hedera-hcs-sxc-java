@@ -33,6 +33,8 @@ CREATE TABLE settlements (
     ,net_value BIGINT NOT NULL
     ,currency VARCHAR(3) NOT NULL
     ,status VARCHAR(30) DEFAULT 'CREDIT_NEW'
+    ,created_date VARCHAR(30) NOT NULL
+    ,created_time VARCHAR(30) NOT NULL
 );
 
 DROP TABLE IF EXISTS settlement_items;

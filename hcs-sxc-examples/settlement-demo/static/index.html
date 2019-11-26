@@ -579,9 +579,10 @@
         
         <script>
             thisuserName = "";
-
-            let f = async (url) => {
-                let responseWhoami =  await fetch(url);
+            init();
+            
+            async function init ()  {
+                let responseWhoami =  await fetch('addressbook/me/');
                 let whoami = await responseWhoami.json();
                 thisuserName =  whoami.name;
                 
@@ -589,32 +590,35 @@
                 document.getElementById("this-pk").innerHTML=whoami.publicKey;
                 document.getElementById("this-pk").title=whoami.publicKey;
                 
+                
+                
+                
                 let responseAddressBook = await fetch('addressbook/buyerseller/');
                 let addressBook  = await responseAddressBook.json(); 
                 
                 for(i=0; i < addressBook.length; i++){
                     var userName = addressBook[i].name;
-                    await renderPanel(userName, thisuserName);
+                    await renderCreditsPanel(userName);
                      
                 }
                 styleButtons();
-                //styleDataTables();
-
             };
-            f('addressbook/me/');
             
             
-            async function  renderPanel(userName, thisuserName){
+            
+            async function  renderCreditsPanel(userName){
                 //if (document.getElementById(userName) === null) {
                 var panelTemplate = document.getElementById("credit-and-debit-panel");
                 var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
                 clonedPanelTemplate.querySelector(".panel").id=userName;    
                 clonedPanelTemplate.getElementById("credits-and-debits-user").innerHTML = userName;
-                clonedPanelTemplate.getElementById("new-credit-button").addEventListener("click",(function(passName){
-                   return function(){openNewCreditDialog(passName);};
-                })(userName));
 
-                //}
+                let userNameP = userName; {
+                    clonedPanelTemplate.getElementById("new-credit-button").addEventListener("click",
+                        function(){openNewCreditDialog(userNameP);
+                    });
+                }
+
                 var tableBody = clonedPanelTemplate.getElementById("credit-table-body");
                 var tableBodyTemplate = clonedPanelTemplate.getElementById("credit-table-body-template");
 
@@ -624,7 +628,7 @@
                 for(z=0; z < i_UserCredits.length ; z++){
                   clonedRow = tableBodyTemplate.content.cloneNode(true);
                   clonedRow.getElementById("threadId").innerHTML = i_UserCredits[z].threadId;
-                        clonedRow.getElementById("threadId").title = i_UserCredits[z].threadId;
+                  clonedRow.getElementById("threadId").title = i_UserCredits[z].threadId;
                   clonedRow.getElementById("recipient").innerHTML = i_UserCredits[z].recipientName;
                   clonedRow.getElementById("payer").innerHTML = i_UserCredits[z].payerName;
                   clonedRow.getElementById("reference").innerHTML = i_UserCredits[z].reference;
@@ -660,12 +664,15 @@
         </script>
         
         <script>
-            /* Functions for the new credit dialog. () */
-            newCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('new-credit-dialog'));
-            confirmCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-credit-dialog'));
             
            
             function openNewCreditDialog(recipient) {
+                
+                /* Functions for the new credit dialog. () */
+                newCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('new-credit-dialog'));
+                confirmCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-credit-dialog'));
+
+                
                 event.preventDefault();
                 $newCreditDialog = document.getElementById('new-credit-dialog');
                 /*Clear styles and values to reuse fields*/
@@ -829,8 +836,15 @@
             
             async function onStompMessage(messageOutput) {
                 notifyUi = messageOutput.context;
-                await renderPanel(messageOutput.payer, messageOutput.recipient);
-                //showSnackBarMessage(messageOutput.threadId + " updated");
+                switch (notifyUi) {
+                    case "credits": 
+                        await renderCreditsPanel(messageOutput.recipient);
+                        break;
+                    case "settlements":
+                        break;
+                    default: alert("wrong target element");
+                }
+                
                 document.getElementById("notification-badge").innerHTML = document.getElementById("notification-badge").innerHTML * 1.0 + 1;
                 document.getElementById("notification-badge").style.display="block"
              }

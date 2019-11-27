@@ -25,6 +25,7 @@ import com.hedera.hcslib.HCSLib;
 import com.hedera.hcslib.consensus.OutboundHCSMessage;
 import com.hedera.hcslib.interfaces.LibMessagePersistence;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
+import com.hedera.hcslib.proto.java.ApplicationMessageChunk;
 import com.hedera.hcslib.proto.java.ApplicationMessageId;
 import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages.MirrorGetTopicMessagesResponse;
 
@@ -146,8 +147,12 @@ public class AuditController {
         for (Map.Entry<String, MirrorGetTopicMessagesResponse> mirrorResponse : mirrorResponses.entrySet()) {
             
             try {
-                ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(mirrorResponse.getValue().getMessage());
-                ApplicationMessageId applicationMessageIdProto = applicationMessage.getApplicationMessageId();
+//                ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(mirrorResponse.getValue().getMessage());
+                
+                ApplicationMessageChunk chunk = ApplicationMessageChunk.parseFrom(mirrorResponse.getValue().getMessage());
+
+                ApplicationMessageId applicationMessageIdProto = chunk.getApplicationMessageId();
+
                 String appMessageId = applicationMessageIdProto.getAccountID().getShardNum()
                         + "." + applicationMessageIdProto.getAccountID().getRealmNum()
                         + "." + applicationMessageIdProto.getAccountID().getAccountNum()
@@ -160,7 +165,10 @@ public class AuditController {
                     auditHCSMessage.setConsensusTimeStampNanos(mirrorResponse.getValue().getConsensusTimestamp().getNanos());
                     auditHCSMessage.setRunningHash(mirrorResponse.getValue().getRunningHash().toStringUtf8());
                     auditHCSMessage.setSequenceNumber(mirrorResponse.getValue().getSequenceNumber());
-                    auditHCSMessage.setMessage(applicationMessage.toString());
+                    
+                    auditHCSMessage.setPart(chunk.getChunkIndex() + " of " + chunk.getChunksCount());
+                    
+                    auditHCSMessage.setMessage(ApplicationMessage.parseFrom(chunk.getMessageChunk()).toString());
                     
                     auditHCSMessages.getAuditHCSMessages().add(auditHCSMessage);
                 }

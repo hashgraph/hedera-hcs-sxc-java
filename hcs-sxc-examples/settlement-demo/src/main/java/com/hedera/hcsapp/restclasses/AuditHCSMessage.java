@@ -10,4 +10,5 @@ public class AuditHCSMessage {
     private String runningHash;
     private long sequenceNumber;
     private String message;
+    private String part;
 }

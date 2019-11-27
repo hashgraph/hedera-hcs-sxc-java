@@ -12,6 +12,7 @@ import com.hedera.hashgraph.sdk.consensus.TopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcslib.config.Config;
 import com.hedera.hcslib.config.Environment;
+import com.hedera.hcslib.interfaces.LibMessagePersistence;
 
 public final class HCSLib {
 
@@ -27,6 +28,8 @@ public final class HCSLib {
     private String initialContextFactory = "";
     private long hcsTransactionFee = 0;
     private long applicationId = 0;
+    private static LibMessagePersistence persistence;
+
     /**
      * Constructor for HCS Lib
      * @param applicationId - unique value per app instance using the library, if the app generates this value and stops/starts,
@@ -112,5 +115,13 @@ public final class HCSLib {
     }
     public long getApplicationId() {
         return this.applicationId;
+    }
+    
+    public void setMessagePersistence(LibMessagePersistence persistence) {
+        HCSLib.persistence = persistence;
+    }
+
+    public LibMessagePersistence getMessagePersistence() {
+        return HCSLib.persistence;
     }
 }

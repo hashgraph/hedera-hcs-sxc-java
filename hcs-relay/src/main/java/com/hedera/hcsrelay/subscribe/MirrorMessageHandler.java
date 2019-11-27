@@ -14,7 +14,6 @@ public final class MirrorMessageHandler {
         try {
             Config config = new Config();
             
-            
             log.info("Got message from mirror node");
             log.info("  Topic number: " + topicId.getTopicNum());
             log.info("  Consensus TimeStamp: " + messagesResponse.getConsensusTimestamp());

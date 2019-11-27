@@ -81,7 +81,7 @@ public class SettlementsController {
             settlementProposal.setPayerName(settlementfromDB.getPayerName());
             settlementProposal.setRecipientName(settlementfromDB.getRecipientName());
             settlementProposal.setThreadId(settlementfromDB.getThreadId());
-            settlementProposal.setTransactionId(settlementfromDB.getTransactionId());
+            settlementProposal.setApplicationMessageId(settlementfromDB.getApplicationMessageId());
             settlementProposal.setStatus(settlementfromDB.getStatus());
             settlementProposal.setCreatedDate(settlementfromDB.getCreatedDate());
             settlementProposal.setCreatedTime(settlementfromDB.getCreatedTime());
@@ -108,7 +108,7 @@ public class SettlementsController {
         }
     }
     @PostMapping(value = "/settlements", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Settlement> settlementNew(@RequestBody SettlementProposal settleProposal) {
+    public ResponseEntity<Settlement> settlementNew(@RequestBody SettlementProposal settleProposal) throws Exception {
         log.debug("POST to /settlements/");
 
         HttpHeaders headers = new HttpHeaders();
@@ -127,7 +127,6 @@ public class SettlementsController {
                 .setAdditionalNotes(settleProposal.getAdditionalNotes())
                 .setPayerName(settleProposal.getPayerName())
                 .setRecipientName(settleProposal.getRecipientName())
-                .setThreadId(threadId)
                 .setNetValue(value);
         
         for (String proposedThreadId : settleProposal.getThreadIds()) {
@@ -135,6 +134,7 @@ public class SettlementsController {
         }
                 
         SettlementBPM settlementBPM = SettlementBPM.newBuilder()
+                .setThreadId(threadId)
                 .setSettlePropose(settleProposeBPM.build())
                 .build();
         
@@ -150,7 +150,7 @@ public class SettlementsController {
             settlement.setRecipientName(settleProposal.getRecipientName());
             settlement.setStatus(Enums.state.SETTLE_PROPOSE_PENDING.name());
             settlement.setThreadId(threadId);
-            settlement.setTransactionId(Utils.TransactionIdToString(transactionId));
+            settlement.setApplicationMessageId(Utils.TransactionIdToString(transactionId));
             settlement.setCreatedDate(Utils.TimestampToDate(seconds, nanos));
             settlement.setCreatedTime(Utils.TimestampToTime(seconds, nanos));
 
@@ -180,7 +180,7 @@ public class SettlementsController {
     }
     
     @PostMapping(value = "/settlements/ack/{threadId}", produces = "application/json")
-    public ResponseEntity<SettlementProposal> settleProposeAck(@PathVariable String threadId) {
+    public ResponseEntity<SettlementProposal> settleProposeAck(@PathVariable String threadId) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");    
 
@@ -199,8 +199,7 @@ public class SettlementsController {
                     .setAdditionalNotes(settlement.get().getAdditionalNotes())
                     .setNetValue(value)
                     .setPayerName(settlement.get().getPayerName())
-                    .setRecipientName(settlement.get().getRecipientName())
-                    .setThreadId(threadId);
+                    .setRecipientName(settlement.get().getRecipientName());
             
             List<SettlementItem> settlementItems = settlementItemRepository.findAllSettlementItems(threadId);
             for (SettlementItem settlementItem : settlementItems) {
@@ -210,10 +209,10 @@ public class SettlementsController {
             
             SettleProposeAckBPM settleProposeAck = SettleProposeAckBPM.newBuilder()
                     .setSettlePropose(settleProposeBPM.build())
-                    .setThreadId(threadId)
                     .build();
             
             SettlementBPM settlementBPM = SettlementBPM.newBuilder()
+                    .setThreadId(threadId)
                     .setSettleProposeAck(settleProposeAck)
                     .build();
 
@@ -225,7 +224,7 @@ public class SettlementsController {
             settlementProposal.setThreadId(threadId);
             settlementProposal.setThreadIds(threadIds);
             settlementProposal.setStatus(settlement.get().getStatus());
-            settlementProposal.setTransactionId(settlement.get().getTransactionId());
+            settlementProposal.setApplicationMessageId(settlement.get().getApplicationMessageId());
             settlementProposal.setCreatedDate(settlement.get().getCreatedDate());
             settlementProposal.setCreatedTime(settlement.get().getCreatedTime());
             

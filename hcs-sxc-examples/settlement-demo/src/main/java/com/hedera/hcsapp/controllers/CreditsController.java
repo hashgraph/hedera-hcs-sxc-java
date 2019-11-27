@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 public class CreditsController {
 
-        @Autowired
+    @Autowired
     CreditRepository creditRepository;
     @Autowired
     AddressBookRepository addressBookRepository;
@@ -62,7 +62,7 @@ public class CreditsController {
             Instant now = Instant.now();
             String threadId = now.getEpochSecond() + "-" + now.getNano();
             Credit credit = new Credit();
-            credit.setTransactionId("0.0.1234-1111-11");
+            credit.setApplicationMessageId("0.0.1234-1111-11");
             credit.setThreadId(threadId);
             credit.setPayerName("Alice");
             credit.setRecipientName(user);
@@ -78,7 +78,7 @@ public class CreditsController {
             now = Instant.now();
             threadId = now.getEpochSecond() + "-" + now.getNano();
             credit = new Credit();
-            credit.setTransactionId("0.0.1234-2222-22");
+            credit.setApplicationMessageId("0.0.1234-2222-22");
             credit.setThreadId(threadId);
             credit.setPayerName("Alice");
             credit.setRecipientName(user);
@@ -94,7 +94,7 @@ public class CreditsController {
             now = Instant.now();
             threadId = now.getEpochSecond() + "-" + now.getNano();
             credit = new Credit();
-            credit.setTransactionId("0.0.1234-2222-28");
+            credit.setApplicationMessageId("0.0.1234-2222-28");
             credit.setThreadId(threadId);
             credit.setPayerName(user);
             credit.setRecipientName("Alice");
@@ -121,7 +121,7 @@ public class CreditsController {
     }
 
     @PostMapping(value = "/credits/ack/{threadId}", produces = "application/json")
-    public ResponseEntity<Credit> creditAck(@PathVariable String threadId) {
+    public ResponseEntity<Credit> creditAck(@PathVariable String threadId) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
 
@@ -131,10 +131,10 @@ public class CreditsController {
 
         CreditAckBPM creditAckBPM = CreditAckBPM.newBuilder()
                 .setCredit(creditBPM)
-                .setThreadId(threadId)
                 .build();
 
         SettlementBPM settlementBPM = SettlementBPM.newBuilder()
+                .setThreadId(threadId)
                 .setCreditAck(creditAckBPM)
                 .build();
 
@@ -155,7 +155,7 @@ public class CreditsController {
     }
 
     @PostMapping(value = "/credits", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Credit> creditNew(@RequestBody CreditProposal creditCreate) {
+    public ResponseEntity<Credit> creditNew(@RequestBody CreditProposal creditCreate) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
 
@@ -174,11 +174,11 @@ public class CreditsController {
                 .setRecipientName(creditCreate.getRecipientName())
                 .setServiceRef(creditCreate.getReference())
                 .setValue(value)
-                .setThreadId(threadId)
                 .setCreatedDate(Utils.TimestampToDate(seconds, nanos))
                 .setCreatedTime(Utils.TimestampToTime(seconds, nanos))
                 .build();
         SettlementBPM settlementBPM = SettlementBPM.newBuilder()
+                .setThreadId(threadId)
                 .setCredit(creditBPM)
                 .build();
 
@@ -196,7 +196,7 @@ public class CreditsController {
 
             credit.setCreatedDate(Utils.TimestampToDate(seconds, nanos));
             credit.setCreatedTime(Utils.TimestampToTime(seconds, nanos));
-            credit.setTransactionId(Utils.TransactionIdToString(transactionId));
+            credit.setApplicationMessageId(Utils.TransactionIdToString(transactionId));
             credit.setThreadId(threadId);
             credit.setStatus(Enums.state.CREDIT_PENDING.name());
 

@@ -78,18 +78,18 @@ public class HCSIntegration {
 
             SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessage.getBusinessProcessMessage().toByteArray());
             // (CREDIT_PENDING , r ,threadId ,credit) => (CREDIT_AWAIT_ACK ,r ,threadId , credit[threadId].txId=r.MessageId)
+            String threadId = settlementBPM.getThreadId();
             if (settlementBPM.hasCredit()) {
                 String priorState = Enums.state.CREDIT_PENDING.name();
                 String nextState = Enums.state.CREDIT_AWAIT_ACK.name();
 
                 CreditBPM creditBPM = settlementBPM.getCredit();
-                String threadId = creditBPM.getThreadId();
                 // update the credit state
                 creditRepository.findById(threadId).ifPresentOrElse(
                         (credit) -> {
                             if (credit.getStatus().equals(priorState)) {
                                 credit.setStatus(nextState);
-                                credit.setTransactionId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                                credit.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
                                 creditRepository.save(credit);
                                 notify("credits", credit.getPayerName(), credit.getRecipientName(),threadId);
                             } else {
@@ -97,9 +97,9 @@ public class HCSIntegration {
                             }
                         },
                         () -> {
-                            Credit credit = Utils.creditFromCreditBPM(creditBPM);
+                            Credit credit = Utils.creditFromCreditBPM(creditBPM, threadId);
                             credit.setStatus(nextState);
-                            credit.setTransactionId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                            credit.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
                             creditRepository.save(credit);
                             notify("credits", credit.getPayerName(), credit.getRecipientName(),threadId);
                             log.info("Adding new credit to Database: " + threadId);
@@ -112,7 +112,6 @@ public class HCSIntegration {
                 String nextState = Enums.state.CREDIT_ACK.name();
 
                 CreditAckBPM creditAckBPM = settlementBPM.getCreditAck();
-                String threadId = creditAckBPM.getThreadId();
                 // update the credit state
                 creditRepository.findById(threadId).ifPresentOrElse(
                         (credit) -> {
@@ -153,25 +152,24 @@ public class HCSIntegration {
                 String nextState = Enums.state.SETTLE_PROPOSE_AWAIT_ACK.name();
 
                 SettleProposeBPM settleProposeBPM = settlementBPM.getSettlePropose();
-                String threadId = settleProposeBPM.getThreadId();
                 // update the settlement state
                 settlementRepository.findById(threadId).ifPresentOrElse(
                         (settlement) -> {
                             if (settlement.getStatus().equals(priorState)) {
                                 settlement.setStatus(nextState);
-                                settlement.setTransactionId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                                settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
                                 settlementRepository.save(settlement);
                                 // update the credits too
-                                UpdateCreditState(threadId, nextState);
+                                updateCreditStateForSettlementItems(threadId, nextState);
                                 notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
                             } else {
                                 log.error("Settlement status should be " + priorState + ", found : " + settlement.getStatus());
                             }
                         },
                         () -> {
-                            Settlement settlement = Utils.settlementFromSettleProposeBPM(settleProposeBPM);
+                            Settlement settlement = Utils.settlementFromSettleProposeBPM(settleProposeBPM, threadId);
                             settlement.setStatus(nextState);
-                            settlement.setTransactionId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                            settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
                             settlementRepository.save(settlement);
                             log.info("Adding new settlement to Database: " + threadId);
 
@@ -181,7 +179,7 @@ public class HCSIntegration {
                                 settlementItemRepository.save(settlementItem);
                             }
                             // update the credits too
-                            UpdateCreditState(threadId, nextState);
+                            updateCreditStateForSettlementItems(threadId, nextState);
 
                             notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
                         }
@@ -191,7 +189,6 @@ public class HCSIntegration {
                 String nextState = Enums.state.SETTLE_PROPOSE_ACK.name();
 
                 SettleProposeAckBPM settleProposeAckBPM = settlementBPM.getSettleProposeAck();
-                String threadId = settleProposeAckBPM.getThreadId();
                 // update the settlement state
                 settlementRepository.findById(threadId).ifPresentOrElse(
                         (settlement) -> {
@@ -200,7 +197,7 @@ public class HCSIntegration {
                                 settlementRepository.save(settlement);
 
                                 // update the credits too
-                                UpdateCreditState(threadId, nextState);
+                                updateCreditStateForSettlementItems(threadId, nextState);
 
                                 notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
                             } else {
@@ -232,7 +229,7 @@ public class HCSIntegration {
 
     }
     
-    private void UpdateCreditState(String threadId, String newState) {
+    private void updateCreditStateForSettlementItems(String threadId, String newState) {
         settlementItemRepository.findAllSettlementItems(threadId).forEach(
                 (settlementItem) -> {
                     creditRepository.findById(settlementItem.getId().getSettledThreadId()).ifPresent(

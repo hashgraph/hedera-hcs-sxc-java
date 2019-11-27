@@ -359,7 +359,7 @@
                                     <table class="mdc-data-table__table" aria-label="Dessert calories">
                                         <thead>
                                             <tr class="mdc-data-table__header-row">
-                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col"><button  class="mdc-button mdc-button--outlined">Settle</button></th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col"><button id="settle-now-button" class="mdc-button mdc-button--outlined">Settle</button></th>
                                                 
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">ThreadID</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Payer</th>
@@ -376,10 +376,9 @@
                                         <tbody id="credit-table-body" class="mdc-data-table__content">
                                             <template id="credit-table-body-template">
                                                 <tr class="mdc-data-table__row">
-                                                    <td  class="mdc-data-table__cell"  style="text-align: center">
+                                                    <td id="settlebox" class="mdc-data-table__cell"  style="text-align: center">
                                                         <div id="settle-check"  style="visibility: hidden;" class="mdc-checkbox">
                                                             <input type="checkbox"
-                                                                   checked
                                                                    disabled
                                                                    class="mdc-checkbox__native-control"
                                                                    id="checkbox-1"/>
@@ -399,7 +398,7 @@
                                                     <td id="payer"          class="mdc-data-table__cell">Alice</td>
                                                     <td id="recipient"      class="mdc-data-table__cell">Bob</td>
                                                     <td id="reference"      class="mdc-data-table__cell">A77U312</td>
-                                                    <td id="amount"         class="mdc-data-table__cell">$120</td>
+                                                    <td id="amount"         class="mdc-data-table__cell" data-amount="120" data-currency="USD">$120</td>
                                                     <td id="date"           class="mdc-data-table__cell">13 Nov</td>
                                                     <td id="time"           class="mdc-data-table__cell">09:31</td>
                                                     <td id="status"         class="mdc-data-table__cell">Pending</td>
@@ -561,6 +560,101 @@
             </div>
         </div><div class="mdc-dialog-scrim"></div>
         
+        
+        <div id="settle-now-dialog" 
+           
+            class="mdc-dialog"
+             role="alertdialog"
+             aria-modal="true"
+             aria-labelledby="my-dialog-title"
+             aria-describedby="my-dialog-content">
+            <div class="mdc-dialog__container">
+                <div class="mdc-dialog__surface" >
+                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
+                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
+                    -->Create Settlement Request<!--
+                    --></h2>
+                    <div class="mdc-dialog__content" id="my-dialog-content" >
+                        
+                        <div style="display:fex; flex-direction: column">
+                            <form id="new-credit-dialog-form">
+                                
+                                <div class="mdc-text-field mdc-text-field--full-width">
+                                    <input type="text" disabled id="settle-now-thread-ids"
+                                           value="{{threadIds}}"
+                                           required
+                                           class="mdc-text-field__input ">
+                                    <label class="mdc-floating-label" for="settle-now-thread-ids">
+                                        ThreadIds
+                                    </label>
+                                </div>
+                                
+                                <div class="mdc-text-field mdc-text-field--full-width">
+                                    <input type="text" disabled id="settle-now-payer"
+                                           value="{{settleNowPayer}}"
+                                           required
+                                           class="mdc-text-field__input ">
+                                    <label class="mdc-floating-label" for="settle-now-payer">
+                                        Payer 
+                                    </label>
+                                </div>
+                                
+                                <div class="mdc-text-field mdc-text-field--full-width">
+                                    <input type="text" disabled id="settle-now-recipient"
+                                           value="{{settleNowRecipient}}"
+                                           required
+                                           class="mdc-text-field__input ">
+                                    <label class="mdc-floating-label" for="settle-now-recipient">
+                                        Recipient 
+                                    </label>
+                                </div>
+                                
+                                <div class="mdc-text-field mdc-text-field--full-width">
+                                    <input type="text" disabled id="settle-now-net-value"
+                                           value="{{netValue}}"
+                                           required
+                                           class="mdc-text-field__input ">
+                                    <label class="mdc-floating-label" for="settle-now-net-value">
+                                        Net Value 
+                                    </label>
+                                </div>
+                                
+                                <div class="mdc-text-field mdc-text-field--full-width">
+                                    <input type="text"
+                                           id="new-credit-additional-notes"
+                                           required minlength=4
+                                           id="my-text-field" class="mdc-text-field__input">
+                                    <label class="mdc-floating-label" for="new-credit-additional-notes">
+                                        Additional Notes
+                                    </label>
+                                </div>
+                                
+                                <div class="mdc-text-field-helper-line">
+                                    <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
+                                        Field is required and must be at least 4 characters long
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+            
+                    <footer class="mdc-dialog__actions" style="padding:24px">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+                            <span class="mdc-button__label">Cancel</span>
+                        </button>
+                        <button type="button" 
+                                onclick="sendNewCreditDialog()"
+                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
+                        >
+                            <span class="mdc-button__label">Send Now</span>
+                        </button>
+                    </footer>
+                </div>
+
+            </div>
+        </div><div class="mdc-dialog-scrim"></div>
+        
         <div id="snackbar" class="mdc-snackbar">
                 <div class="mdc-snackbar__surface">
                     <div class="mdc-snackbar__label"
@@ -617,8 +711,11 @@
 
                 let userNameP = userName; {
                     clonedPanelTemplate.getElementById("new-credit-button").addEventListener("click",
-                        function(){openNewCreditDialog(userNameP);
-                    });
+                        function(){openNewCreditDialog(userNameP);}
+                    );
+                    clonedPanelTemplate.getElementById("settle-now-button").addEventListener("click",
+                        function(){openSettleNowDialog(userNameP);}
+                    );
                 }
 
                 var tableBody = clonedPanelTemplate.getElementById("credit-table-body");
@@ -631,6 +728,7 @@
                   clonedRow = tableBodyTemplate.content.cloneNode(true);
                   if(i_UserCredits[z].status === 'CREDIT_ACK'){
                     clonedRow.getElementById("settle-check").style.visibility="visible";
+                    clonedRow.getElementById("checkbox-1").checked="true";
                   }
                   clonedRow.getElementById("threadId").innerHTML = i_UserCredits[z].threadId;
                   clonedRow.getElementById("threadId").title = i_UserCredits[z].threadId;
@@ -638,6 +736,10 @@
                   clonedRow.getElementById("payer").innerHTML = i_UserCredits[z].payerName;
                   clonedRow.getElementById("reference").innerHTML = i_UserCredits[z].reference;
                   clonedRow.getElementById("amount").innerHTML = i_UserCredits[z].currency + ' '+ i_UserCredits[z].amount;
+                  clonedRow.getElementById("amount").setAttribute("data-amount", i_UserCredits[z].amount );
+                  clonedRow.getElementById("amount").setAttribute("data-currency", i_UserCredits[z].currency );
+                  
+                  
                   clonedRow.getElementById("date").innerHTML = i_UserCredits[z].createdDate;
                   clonedRow.getElementById("time").innerHTML = i_UserCredits[z].createdTime;
                   clonedRow.getElementById("status").innerHTML = i_UserCredits[z].status;
@@ -763,16 +865,44 @@
                     });
             }
             
-            function openSettleNowDialog(panelId){
+            function openSettleNowDialog(otherUserId){
                 /* Functions for settlement dialog in credit tab */
                 settleNowDialog  = new mdc.dialog.MDCDialog(document.getElementById('settle-now-dialog'));
-                
-                
                 event.preventDefault();
                 $settleNowDialog = document.getElementById('settle-now-dialog');
                 /*
                  * Calculate the net amount.
-                 */ 
+                 */
+                
+                var thisUserPays = 0;
+                var otherUserPays = 0;
+                var payerName = "";
+                var recipientName = "";
+                var threadIds=[];    
+                document.querySelectorAll("#"+otherUserId+" .mdc-data-table__row").forEach(
+                       r=>{
+                            if(r.cells.settlebox.querySelector("input").checked){
+                                threadIds.push(r.cells.threadId.textContent);
+                                rowAmount = 1*r.cells.amount.getAttribute("data-amount");
+                                if (r.cells.payer.textContent!==otherUserId){
+                                   thisUserPays += rowAmount ;
+                                } else {
+                                   otherUserPays += rowAmount ; 
+                                }
+                            }
+                        }
+                );
+                
+                payerName = thisUserPays > otherUserPays? thisuserName : otherUserId;
+                recipientName = thisUserPays < otherUserPays? thisuserName : otherUserId;
+                netValue = Math.abs(thisUserPays - otherUserPays);
+                document.querySelector("#settle-now-dialog #settle-now-thread-ids").value=threadIds;
+                document.querySelector("#settle-now-dialog #settle-now-payer").value= payerName;
+                document.querySelector("#settle-now-dialog #settle-now-recipient").value= recipientName;
+                document.querySelector("#settle-now-dialog #settle-now-net-value").value= netValue;
+                
+                //alert(thisUserPays + " " + otherUserPays);
+                
                 settleNowDialog.open();
                 return false;
             }
@@ -794,7 +924,6 @@
             });
             
             
-
             styleButtons();
             styleTextFields();
             styleTextFieldIcons();
@@ -847,9 +976,10 @@
         <script>
             var socket = new SockJS('/notifications');
                 stompClient = Stomp.over(socket);  
+                stompClient.debug = null;
                 stompClient.connect({}, function(frame) {
                   
-                    console.log('Connected: ' + frame);
+                    //console.log('Connected: ' + frame);
                     stompClient.subscribe('/notifications/messages', function(messageOutput) {
                         onStompMessage(JSON.parse(messageOutput.body));
                     });
@@ -862,12 +992,12 @@
                         await renderCreditsPanel(
                                 messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
                                 );
+                        styleButtons();
                         break;
                     case "settlements":
                         break;
                     default: alert("wrong target element");
                 }
-                
                 document.getElementById("notification-badge").innerHTML = document.getElementById("notification-badge").innerHTML * 1.0 + 1;
                 document.getElementById("notification-badge").style.display="block"
              }

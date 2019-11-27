@@ -8,6 +8,7 @@ services:
         - "8161:8161"
         # jms
         - "61616:61616"
+        #- 61616
       networks: [backing-services]
       volumes: [
         "activemq-data:/var/lib/artemis/data"
@@ -24,81 +25,88 @@ services:
         , RESTORE_CONFIGURATION=true
       ]
     hcs-relay:
-        depends_on:
-            - hcsqueue
-        image: hederahashgraph/hcs-relay:latest
-        restart: on-failure
-        networks: [backing-services]
+      depends_on:
+        - hcsqueue
+      image: hederahashgraph/hcs-relay:latest
+      restart: on-failure
+      networks: [backing-services]
 
-     # Alice:
-     #   image: hederahashgraph/settlement-demo:latest
-     #   restart: always
-     #   environment:
-     #     - APP_ID=0
-     #     - PK=302e020100300506032b6570042204201d9ea0540b427483eb74816ebe2372f0890c5059b20d94f32a7efbf457d2c4a2
-     #   tty: true
-     #   ports:
-     #     - 8080:8081
+    # alice:
+    #   image: hederahashgraph/settlement-demo:latest
+    #   restart: on-failure
+    #   environment:
+    #     - APP_ID=0
+    #     - PK=302e020100300506032b6570042204201d9ea0540b427483eb74816ebe2372f0890c5059b20d94f32a7efbf457d2c4a2
+    #   tty: true
+    #   ports:
+    #     - 8081:8080
+    #   networks: [backing-services]
 
-     # Bob:
-     #   image: hederahashgraph/settlement-demo:latest
-     #   restart: always
-     #   environment:
-     #     - APP_ID=1
-     #     - PK=302e020100300506032b6570042204203d0c9e6ae0e498b84733a4d2834bf7175499aba40b406bb987e74f7f4f08616d
-     #   tty: true
-     #   ports:
-     #     - 8080:8082
+    #bob:
+    #  image: hederahashgraph/settlement-demo:latest
+    #  restart: on-failure
+    #  environment:
+    #    - APP_ID=1
+    #    - PK=302e020100300506032b6570042204203d0c9e6ae0e498b84733a4d2834bf7175499aba40b406bb987e74f7f4f08616d
+    #  tty: true
+    #  ports:
+    #    - 8082:8080
+    #  networks: [backing-services]
 
-     # Carlos:
+     # carlos:
      #   image: hederahashgraph/settlement-demo:latest
-     #   restart: always
+     #   restart: on-failure
      #   environment:
      #     - APP_ID=2
      #     - PK=302e020100300506032b657004220420b88375ae4efc84b8786e8d3940f18c7ea75ac0b8d4637fcd000c584972b7596d
      #   tty: true
      #   ports:
-     #     - 8080:8083
+     #     - 8083:8080
+     #   networks: [backing-services]
 
-     # Diana:
+     # diana:
      #   image: hederahashgraph/settlement-demo:latest
-     #   restart: always
+     #   restart: on-failure
      #   environment:
      #     - APP_ID=3
      #     - PK=302e020100300506032b65700422042058ffbba6e0884177e5b12d92b8c2a0206cb5a5a5bd8883454e692800e9d7720f
      #   tty: true
      #   ports:
-     #     - 8080:8084
+     #     - 8084:8080
+     #   networks: [backing-services]
 
-     # Erica:
+     # erica:
      #   image: hederahashgraph/settlement-demo:latest
-     #   restart: always
+     #   restart: on-failure
      #   environment:
      #     - APP_ID=4
      #     - PK=302e020100300506032b657004220420f647b58a13f81a7e10a861ff12263d0d567800189746e02f7ce26ac875d4e91e
      #   tty: true
      #   ports:
-     #     - 8080:8085
+     #     - 8085:8080
+     #   networks: [backing-services]
 
-     # Farouk:
+     # farouk:
      #   image: hederahashgraph/settlement-demo:latest
-     #   restart: always
+     #   restart: on-failure
      #   environment:
      #     - APP_ID=5
      #     - PK=302e020100300506032b657004220420dae692b57c6c8d5299dd333180b51f41c8c9c6291e9a5a6661d75cbb04d515ad
      #   tty: true
      #   ports:
-     #     - 8080:8086
+     #     - 8086:8080
+     #   networks: [backing-services]
 
-     # Grace:
+     # grace:
      #   image: hederahashgraph/settlement-demo:latest
-     #   restart: always
+     #   restart: on-failure
      #   environment:
      #     - APP_ID=6
      #     - PK=302e020100300506032b6570042204209be605c289bf103fdd2c48f2c7b44bae0e59582a147914708d1780ed1bad6983
      #   tty: true
      #   ports:
-     #     - 8080:8087
+     #     - 8087:8080
+     #   networks: [backing-services]
 
 volumes:
   activemq-data: {}

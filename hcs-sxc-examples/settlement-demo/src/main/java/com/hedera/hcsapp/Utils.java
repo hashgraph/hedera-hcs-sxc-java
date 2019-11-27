@@ -54,7 +54,7 @@ public final class Utils {
         credit.setReference(creditBPM.getServiceRef());
         credit.setApplicationMessageId(creditBPM.getApplicationMessageId());
         credit.setCreatedDate(creditBPM.getCreatedDate());
-        credit.setCreatedTime(creditBPM.getCreatedDate());
+        credit.setCreatedTime(creditBPM.getCreatedTime());
         credit.setAmount(creditBPM.getValue().getUnits());
         credit.setCurrency(creditBPM.getValue().getCurrencyCode());
         credit.setThreadId(threadId);

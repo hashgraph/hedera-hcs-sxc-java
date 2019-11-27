@@ -11,18 +11,22 @@ import com.hedera.hcslib.proto.java.ApplicationMessageId;
 import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages;
 import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages.MirrorGetTopicMessagesResponse;
 import com.hedera.plugin.persistence.config.Config;
+
+import lombok.extern.log4j.Log4j2;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Log4j2
 public class PersistMessages 
         implements LibMessagePersistence{
     
     private Map<ApplicationMessageId, List<ApplicationMessageChunk>> partialMessages;
-    private Map<TransactionId, SubmitMessageTransaction> transactions;
-    private Map<Timestamp, MirrorGetTopicMessagesResponse> mirrorTopicMessages;
-    private Map<ApplicationMessageId, ApplicationMessage> applicationMessages;
+    private Map<String, SubmitMessageTransaction> transactions;
+    private Map<String, MirrorGetTopicMessagesResponse> mirrorTopicMessages;
+    private Map<String, ApplicationMessage> applicationMessages;
     
     private Config config = null;
     private MessagePersistenceLevel persistenceLevel = null;
@@ -45,32 +49,41 @@ public class PersistMessages
     // Mirror responses
     @Override
     public void storeMirrorResponse(MirrorGetTopicMessagesResponse mirrorTopicMessageResponse) {
-        mirrorTopicMessages.put(mirrorTopicMessageResponse.getConsensusTimestamp(), mirrorTopicMessageResponse);
+        String timestamp = mirrorTopicMessageResponse.getConsensusTimestamp().getSeconds() + "." + mirrorTopicMessageResponse.getConsensusTimestamp().getNanos();
+        mirrorTopicMessages.put(timestamp, mirrorTopicMessageResponse);
+        log.info("storeMirrorResponse " + timestamp + "-" + mirrorTopicMessageResponse);
     }
     
     @Override 
-    public MirrorGetTopicMessagesResponse mirrorResponse(Timestamp timestamp) {
+    public MirrorGetTopicMessagesResponse getMirrorResponse(String timestamp) {
         return mirrorTopicMessages.get(timestamp);
     }
         
     @Override 
-    public Map<Timestamp, MirrorGetTopicMessagesResponse> mirrorResponses() {
+    public Map<String, MirrorGetTopicMessagesResponse> getMirrorResponses() {
         return mirrorTopicMessages;
     }
 
     // Transactions
     @Override
     public void storeTransaction(TransactionId transactionId, SubmitMessageTransaction submitMessageTransaction) {
-        transactions.put(transactionId, submitMessageTransaction);
+        String txId = transactionId.getAccountId().getShardNum()
+                + "." + transactionId.getAccountId().getRealmNum()
+                + "." + transactionId.getAccountId().getAccountNum()
+                + "-" + transactionId.getValidStart().getEpochSecond()
+                + "-" + transactionId.getValidStart().getNano();
+        
+        transactions.put(txId, submitMessageTransaction);
+        log.info("storeTransaction " + txId + "-" + submitMessageTransaction);
     }
     
     @Override 
-    public SubmitMessageTransaction submittedTransaction(TransactionId transactionId) {
+    public SubmitMessageTransaction getSubmittedTransaction(String transactionId) {
         return transactions.get(transactionId);
     }
 
     @Override 
-    public Map<TransactionId, SubmitMessageTransaction> submittedTransactions() {
+    public Map<String, SubmitMessageTransaction> getSubmittedTransactions() {
         return transactions;
     }
     
@@ -81,17 +94,24 @@ public class PersistMessages
 
     @Override
     public void storeApplicationMessage(ApplicationMessageId applicationMessageId, ApplicationMessage applicationMessage) {
-        applicationMessages.put(applicationMessageId, applicationMessage);
+        String appMessageId = applicationMessageId.getAccountID().getShardNum()
+                + "." + applicationMessageId.getAccountID().getRealmNum()
+                + "." + applicationMessageId.getAccountID().getAccountNum()
+                + "-" + applicationMessageId.getValidStart().getSeconds()
+                + "-" + applicationMessageId.getValidStart().getNanos();
+
+        applicationMessages.put(appMessageId, applicationMessage);
+        log.info("storeApplicationMessage " + appMessageId + "-" + applicationMessage);
     }
 
     @Override
-    public ApplicationMessage getApplicationMessage(ApplicationMessageId applicationMessageId) {
+    public ApplicationMessage getApplicationMessage(String applicationMessageId) {
         return applicationMessages.get(applicationMessageId);
     }
 
     
     @Override
-    public Map<ApplicationMessageId, ApplicationMessage> getApplicationMessages() {
+    public Map<String, ApplicationMessage> getApplicationMessages() {
         return applicationMessages;
     }
 

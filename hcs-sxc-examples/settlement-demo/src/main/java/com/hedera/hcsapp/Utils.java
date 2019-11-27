@@ -8,7 +8,9 @@ import java.util.Locale;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.entities.Settlement;
+import com.hedera.hcslib.proto.java.AccountID;
 import com.hedera.hcslib.proto.java.ApplicationMessageId;
+import com.hedera.hcslib.proto.java.Timestamp;
 
 import proto.CreditBPM;
 import proto.Money;
@@ -16,16 +18,13 @@ import proto.SettleProposeBPM;
 
 public final class Utils {
     public static String TimestampToDate(long seconds, int nanos) {
-        
         LocalDateTime dateTime = LocalDateTime.ofEpochSecond(seconds, nanos, ZoneOffset.UTC);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM", Locale.getDefault());
         String formattedDate = dateTime.format(formatter);
         return formattedDate;
-        
     }
     
     public static String TimestampToTime(long seconds, int nanos) {
-        
         LocalDateTime dateTime = LocalDateTime.ofEpochSecond(seconds, nanos, ZoneOffset.UTC);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm", Locale.getDefault());
         String formattedDate = dateTime.format(formatter);
@@ -46,19 +45,19 @@ public final class Utils {
         return txId;
     }
     
-    public static Credit creditFromCreditBPM(CreditBPM creditBPM) {
+    public static Credit creditFromCreditBPM(CreditBPM creditBPM, String threadId) {
         Credit credit = new Credit();
         
         credit.setAdditionalNotes(creditBPM.getAdditionalNotes());
         credit.setPayerName(creditBPM.getPayerName());
         credit.setRecipientName(creditBPM.getRecipientName());
         credit.setReference(creditBPM.getServiceRef());
-        credit.setTransactionId(creditBPM.getTransactionId());
+        credit.setApplicationMessageId(creditBPM.getApplicationMessageId());
         credit.setCreatedDate(creditBPM.getCreatedDate());
         credit.setCreatedTime(creditBPM.getCreatedDate());
         credit.setAmount(creditBPM.getValue().getUnits());
         credit.setCurrency(creditBPM.getValue().getCurrencyCode());
-        credit.setThreadId(creditBPM.getThreadId());
+        credit.setThreadId(threadId);
         
         return credit;
     }
@@ -74,17 +73,16 @@ public final class Utils {
                 .setPayerName(credit.getPayerName())
                 .setRecipientName(credit.getRecipientName())
                 .setServiceRef(credit.getReference())
-                .setTransactionId(credit.getTransactionId())
+                .setApplicationMessageId(credit.getApplicationMessageId())
                 .setCreatedDate(credit.getCreatedDate())
                 .setCreatedTime(credit.getCreatedTime())
                 .setValue(value)
-                .setThreadId(credit.getThreadId())
                 .build();
 
         return creditBPM;
     }
 
-    public static Settlement settlementFromSettleProposeBPM(SettleProposeBPM settleProposeBPM) {
+    public static Settlement settlementFromSettleProposeBPM(SettleProposeBPM settleProposeBPM, String threadId) {
         Settlement settlement = new Settlement();
         
         settlement.setAdditionalNotes(settleProposeBPM.getAdditionalNotes());
@@ -92,9 +90,33 @@ public final class Utils {
         settlement.setNetValue(settleProposeBPM.getNetValue().getUnits());
         settlement.setPayerName(settleProposeBPM.getPayerName());
         settlement.setRecipientName(settleProposeBPM.getRecipientName());
-        settlement.setThreadId(settleProposeBPM.getThreadId());
+        settlement.setThreadId(threadId);
+        settlement.setCreatedDate(settleProposeBPM.getCreatedDate());
+        settlement.setCreatedTime(settleProposeBPM.getCreatedTime());
         
         return settlement;
+    }
+    public static ApplicationMessageId applicationMessageIdFromString(String appMessageId) {
+        String[] messageIdParts = appMessageId.split("-");
+        String[] account = messageIdParts[0].split("\\.");
+        
+        AccountID accountId = AccountID.newBuilder()
+                .setShardNum(Long.parseLong(account[0]))
+                .setRealmNum(Long.parseLong(account[1]))
+                .setAccountNum(Long.parseLong(account[2]))
+                .build();
+        
+        Timestamp timestamp = Timestamp.newBuilder()
+                .setSeconds(Long.parseLong(messageIdParts[1]))
+                .setNanos(Integer.parseInt(messageIdParts[2]))
+                .build();
+        
+        ApplicationMessageId applicationMessageId = ApplicationMessageId.newBuilder()
+                .setAccountID(accountId)
+                .setValidStart(timestamp)
+                .build();
+        
+        return applicationMessageId;
     }
 
 }

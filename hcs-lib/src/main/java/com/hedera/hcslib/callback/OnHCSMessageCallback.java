@@ -43,13 +43,12 @@ import org.apache.activemq.artemis.jms.client.ActiveMQTextMessage;
 public final class OnHCSMessageCallback {
     
  
-    LibMessagePersistence persistence;
     private final List<HCSCallBackInterface> observers = new ArrayList<>();
 
     public OnHCSMessageCallback (HCSLib hcsLib) throws Exception {
         // load persistence implementation at runtime
         Class<?> persistenceClass = Plugins.find("com.hedera.plugin.persistence.*", "com.hedera.hcslib.interfaces.LibMessagePersistence", true);
-        persistence = (LibMessagePersistence)persistenceClass.newInstance();
+        hcsLib.setMessagePersistence((LibMessagePersistence)persistenceClass.newInstance());
 
         String contextFactory = hcsLib.getInitialContextFactory();
         String tcpConnectionFactory = hcsLib.getTCPConnectionFactory();
@@ -104,15 +103,15 @@ public final class OnHCSMessageCallback {
                                 messageFromJMS.acknowledge();
                             } else if (messageFromJMS instanceof ActiveMQObjectMessage) {
                                 HCSRelayMessage rlm = (HCSRelayMessage)((ActiveMQObjectMessage) messageFromJMS).getObject();
-                                persistence.storeMirrorResponse(rlm.getTopicMessagesResponse());
+                                hcsLib.getMessagePersistence().storeMirrorResponse(rlm.getTopicMessagesResponse());
                                 
                                 ByteString message = rlm.getTopicMessagesResponse().getMessage();
                                 ApplicationMessageChunk messagePart = ApplicationMessageChunk.parseFrom(message);
                                 
                                 Optional<ApplicationMessage> messageEnvelopeOptional = 
-                                        pushUntilCompleteMessage(messagePart, persistence);
+                                        pushUntilCompleteMessage(messagePart, hcsLib.getMessagePersistence());
                                 if (messageEnvelopeOptional.isPresent()){
-                                    persistence.storeApplicationMessage(messageEnvelopeOptional.get().getApplicationMessageId(), messageEnvelopeOptional.get());
+                                    hcsLib.getMessagePersistence().storeApplicationMessage(messageEnvelopeOptional.get().getApplicationMessageId(), messageEnvelopeOptional.get());
                                     OnHCSMessageCallback.this.notifyObservers( messageEnvelopeOptional.get().toByteArray(), messageEnvelopeOptional.get().getApplicationMessageId());
                                     messageFromJMS.acknowledge();
                                 }

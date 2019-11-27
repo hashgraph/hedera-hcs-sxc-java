@@ -64,7 +64,7 @@ public class CreditsController {
 
             // TODO remove this automatic data generation
             Credit credit = new Credit();
-            credit.setTransactionId("0.0.1234-1111-11");
+            credit.setApplicationMessageId("0.0.1234-1111-11");
             credit.setThreadId(threadId);
             credit.setPayerName("Alice");
             credit.setRecipientName(user);
@@ -81,7 +81,7 @@ public class CreditsController {
             now = Instant.now();
             threadId = now.getEpochSecond() + "-" + now.getNano();
             credit = new Credit();
-            credit.setTransactionId("0.0.1234-2222-22");
+            credit.setApplicationMessageId("0.0.1234-2222-22");
             credit.setThreadId(threadId);
             credit.setPayerName(user);
             credit.setRecipientName("Alice");
@@ -98,7 +98,7 @@ public class CreditsController {
             now = Instant.now();
             threadId = now.getEpochSecond() + "-" + now.getNano();
             credit = new Credit();
-            credit.setTransactionId("0.0.1234-2222-28");
+            credit.setApplicationMessageId("0.0.1234-2222-28");
             credit.setThreadId(threadId);
             credit.setPayerName("Alice");
             credit.setRecipientName(user);
@@ -136,10 +136,10 @@ public class CreditsController {
 
         CreditAckBPM creditAckBPM = CreditAckBPM.newBuilder()
                 .setCredit(creditBPM)
-                .setThreadId(threadId)
                 .build();
 
         SettlementBPM settlementBPM = SettlementBPM.newBuilder()
+                .setThreadId(threadId)
                 .setCreditAck(creditAckBPM)
                 .build();
 
@@ -179,11 +179,11 @@ public class CreditsController {
                 .setRecipientName(creditCreate.getRecipientName())
                 .setServiceRef(creditCreate.getReference())
                 .setValue(value)
-                .setThreadId(threadId)
                 .setCreatedDate(Utils.TimestampToDate(seconds, nanos))
                 .setCreatedTime(Utils.TimestampToTime(seconds, nanos))
                 .build();
         SettlementBPM settlementBPM = SettlementBPM.newBuilder()
+                .setThreadId(threadId)
                 .setCredit(creditBPM)
                 .build();
 
@@ -201,7 +201,7 @@ public class CreditsController {
 
             credit.setCreatedDate(Utils.TimestampToDate(seconds, nanos));
             credit.setCreatedTime(Utils.TimestampToTime(seconds, nanos));
-            credit.setTransactionId(Utils.TransactionIdToString(transactionId));
+            credit.setApplicationMessageId(Utils.TransactionIdToString(transactionId));
             credit.setThreadId(threadId);
             credit.setStatus(Enums.state.CREDIT_PENDING.name());
 

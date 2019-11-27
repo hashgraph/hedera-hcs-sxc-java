@@ -108,7 +108,7 @@ public class SettlementsController {
         }
     }
     @PostMapping(value = "/settlements", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Settlement> settlementNew(@RequestBody SettlementProposal settleProposal) {
+    public ResponseEntity<Settlement> settlementNew(@RequestBody SettlementProposal settleProposal) throws Exception {
         log.debug("POST to /settlements/");
 
         HttpHeaders headers = new HttpHeaders();
@@ -180,7 +180,7 @@ public class SettlementsController {
     }
     
     @PostMapping(value = "/settlements/ack/{threadId}", produces = "application/json")
-    public ResponseEntity<SettlementProposal> settleProposeAck(@PathVariable String threadId) {
+    public ResponseEntity<SettlementProposal> settleProposeAck(@PathVariable String threadId) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");    
 

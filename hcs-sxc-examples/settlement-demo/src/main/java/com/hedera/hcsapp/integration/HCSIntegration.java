@@ -162,7 +162,7 @@ public class HCSIntegration {
                                 settlement.setTransactionId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
                                 settlementRepository.save(settlement);
                                 // update the credits too
-                                UpdateCreditState(threadId, nextState);
+                                updateCreditStateForSettlementItems(threadId, nextState);
                                 notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
                             } else {
                                 log.error("Settlement status should be " + priorState + ", found : " + settlement.getStatus());
@@ -181,7 +181,7 @@ public class HCSIntegration {
                                 settlementItemRepository.save(settlementItem);
                             }
                             // update the credits too
-                            UpdateCreditState(threadId, nextState);
+                            updateCreditStateForSettlementItems(threadId, nextState);
 
                             notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
                         }
@@ -200,7 +200,7 @@ public class HCSIntegration {
                                 settlementRepository.save(settlement);
 
                                 // update the credits too
-                                UpdateCreditState(threadId, nextState);
+                                updateCreditStateForSettlementItems(threadId, nextState);
 
                                 notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
                             } else {
@@ -232,7 +232,7 @@ public class HCSIntegration {
 
     }
     
-    private void UpdateCreditState(String threadId, String newState) {
+    private void updateCreditStateForSettlementItems(String threadId, String newState) {
         settlementItemRepository.findAllSettlementItems(threadId).forEach(
                 (settlementItem) -> {
                     creditRepository.findById(settlementItem.getId().getSettledThreadId()).ifPresent(

@@ -16,6 +16,8 @@ import com.hedera.hashgraph.sdk.consensus.SubmitMessageTransaction;
 import com.hedera.hashgraph.sdk.consensus.TopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcslib.HCSLib;
+import com.hedera.hcslib.interfaces.LibMessagePersistence;
+import com.hedera.hcslib.plugins.Plugins;
 import com.hedera.hcslib.proto.java.AccountID;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
 import com.hedera.hcslib.proto.java.ApplicationMessageChunk;
@@ -38,8 +40,9 @@ public final class OutboundHCSMessage {
     private List<TopicId> topicIds = new ArrayList<TopicId>();
     private long hcsTransactionFee = 0L;
     private TransactionId transactionId = null;
+    private LibMessagePersistence persistence;
 
-    public OutboundHCSMessage(HCSLib hcsLib) {
+    public OutboundHCSMessage(HCSLib hcsLib) throws Exception {
         this.signMessages = hcsLib.getSignMessages();
         this.encryptMessages = hcsLib.getEncryptMessages();
         this.rotateKeys = hcsLib.getRotateKeys();
@@ -48,6 +51,10 @@ public final class OutboundHCSMessage {
         this.ed25519PrivateKey = hcsLib.getEd25519PrivateKey();
         this.topicIds = hcsLib.getTopicIds();
         this.hcsTransactionFee = hcsLib.getHCSTransactionFee();
+
+        // load persistence implementation at runtime
+        Class<?> persistenceClass = Plugins.find("com.hedera.plugin.persistence.*", "com.hedera.hcslib.interfaces.LibMessagePersistence", true);
+        this.persistence = (LibMessagePersistence)persistenceClass.newInstance();
     }
 
     public OutboundHCSMessage overrideMessageSignature(boolean signMessages) {
@@ -126,11 +133,16 @@ public final class OutboundHCSMessage {
         
         TransactionId transactionId = firstTransactionId;
         for (ApplicationMessageChunk messageChunk : parts) {
-            TransactionReceipt receipt = new SubmitMessageTransaction(client)
+            
+            SubmitMessageTransaction tx = new SubmitMessageTransaction(client)
                 .setMessage(messageChunk.toByteArray())
                 .setTopicId(this.topicIds.get(topicIndex))
-                .setTransactionId(transactionId)
-                .executeForReceipt();
+                .setTransactionId(transactionId);
+            
+            // persist the transaction
+            this.persistence.storeTransaction(transactionId, tx);
+            
+            TransactionReceipt receipt = tx.executeForReceipt();
             
             transactionId = new TransactionId(this.operatorAccountId);
             /*

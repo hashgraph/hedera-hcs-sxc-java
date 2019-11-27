@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 public class CreditsController {
 
-        @Autowired
+    @Autowired
     CreditRepository creditRepository;
     @Autowired
     AddressBookRepository addressBookRepository;
@@ -126,7 +126,7 @@ public class CreditsController {
     }
 
     @PostMapping(value = "/credits/ack/{threadId}", produces = "application/json")
-    public ResponseEntity<Credit> creditAck(@PathVariable String threadId) {
+    public ResponseEntity<Credit> creditAck(@PathVariable String threadId) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
 
@@ -160,7 +160,7 @@ public class CreditsController {
     }
 
     @PostMapping(value = "/credits", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Credit> creditNew(@RequestBody CreditProposal creditCreate) {
+    public ResponseEntity<Credit> creditNew(@RequestBody CreditProposal creditCreate) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
 

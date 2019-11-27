@@ -1,10 +1,15 @@
 <html>
     <head>
         <title>Chat WebSocket</title>
+       
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+        <!--
         <script src="./js/sockjs.min.js"></script>
         <script src="./js/stomp.min.js"></script>
-        <script type="text/javascript">
-var stompClient = null;
+        -->
+       <script type="text/javascript">
+            var stompClient = null;
              
             function setConnected(connected) {
                 document.getElementById('connect').disabled = connected;

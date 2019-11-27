@@ -58,11 +58,9 @@ public class CreditsController {
         headers.add("Content-Type", "application/json");
 
         if (creditRepository.findAllCreditsForUsers("Alice", user).isEmpty()) {
+
             Instant now = Instant.now();
             String threadId = now.getEpochSecond() + "-" + now.getNano();
-
-
-            // TODO remove this automatic data generation
             Credit credit = new Credit();
             credit.setTransactionId("0.0.1234-1111-11");
             credit.setThreadId(threadId);
@@ -75,7 +73,6 @@ public class CreditsController {
             credit.setStatus(Enums.state.CREDIT_PENDING.name());
             credit.setCreatedDate("7, Nov");
             credit.setCreatedTime("10:00");
-
             creditRepository.save(credit);
 
             now = Instant.now();
@@ -83,16 +80,15 @@ public class CreditsController {
             credit = new Credit();
             credit.setTransactionId("0.0.1234-2222-22");
             credit.setThreadId(threadId);
-            credit.setPayerName(user);
-            credit.setRecipientName("Alice");
+            credit.setPayerName("Alice");
+            credit.setRecipientName(user);
             credit.setAmount(2);
-            credit.setCurrency("EUR");
+            credit.setCurrency("USD");
             credit.setAdditionalNotes("memo 2");
             credit.setReference("service ref 2");
-            credit.setStatus(Enums.state.CREDIT_PENDING.name());
+            credit.setStatus(Enums.state.CREDIT_ACK.name());
             credit.setCreatedDate("8, Nov");
             credit.setCreatedTime("11:00");
-
             creditRepository.save(credit);
 
             now = Instant.now();
@@ -103,13 +99,12 @@ public class CreditsController {
             credit.setPayerName(user);
             credit.setRecipientName("Alice");
             credit.setAmount(3);
-            credit.setCurrency("EUR");
+            credit.setCurrency("USD");
             credit.setAdditionalNotes("memo 3");
             credit.setReference("service ref 3");
             credit.setStatus(Enums.state.CREDIT_AWAIT_ACK.name());
             credit.setCreatedDate("8, Nov");
             credit.setCreatedTime("11:10");
-   
             creditRepository.save(credit);
         }
 

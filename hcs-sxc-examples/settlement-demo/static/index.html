@@ -308,8 +308,6 @@
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">account_box</i>
                         <span class="mdc-list-item__text">Account</span>
                     </a>
-
-
                 </div>
             </div>
         </aside>
@@ -327,21 +325,17 @@
                                 Outstanding Credits and Debits
                             </b>
                         </section>
-
                     </div>           
                 </header>
-
                 <div 
                     id="credit-and-debit-panel-holder"
                     class="mdc-top-app-bar--fixed-adjust mdc-typography--body2"
                      style='margin: 16px 32px;'
                      >
-
                     <template id="credit-and-debit-panel" >
                         <div id="{{username}}" class="panel">
                             <details>
                             <summary>
-
                                 <div class="message-container" style="margin-left:55px; margin-right: 16px;">
                                     <div style="display: flex">
                                         <span 
@@ -355,12 +349,8 @@
                                             class="mdc-button mdc-button--unelevated">
                                             new credit
                                         </button>
-                                        <button  class="mdc-button mdc-button--outlined">
-                                            settle now
-                                        </button>
                                     </div>
                                 </div>
-
                             </summary>
                             <div class="content"
                                  style="overflow-x: scroll"
@@ -369,6 +359,8 @@
                                     <table class="mdc-data-table__table" aria-label="Dessert calories">
                                         <thead>
                                             <tr class="mdc-data-table__header-row">
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col"><button  class="mdc-button mdc-button--outlined">Settle</button></th>
+                                                
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">ThreadID</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Payer</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recipient</th>
@@ -384,9 +376,28 @@
                                         <tbody id="credit-table-body" class="mdc-data-table__content">
                                             <template id="credit-table-body-template">
                                                 <tr class="mdc-data-table__row">
+                                                    <td  class="mdc-data-table__cell"  style="text-align: center">
+                                                        <div id="settle-check"  style="visibility: hidden;" class="mdc-checkbox">
+                                                            <input type="checkbox"
+                                                                   checked
+                                                                   disabled
+                                                                   class="mdc-checkbox__native-control"
+                                                                   id="checkbox-1"/>
+                                                            <div class="mdc-checkbox__background">
+                                                              <svg class="mdc-checkbox__checkmark"
+                                                                   viewBox="0 0 24 24">
+                                                                <path class="mdc-checkbox__checkmark-path"
+                                                                      fill="none"
+                                                                      d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                                                              </svg>
+                                                              <div class="mdc-checkbox__mixedmark"></div>
+                                                            </div>
+                                                            <div class="mdc-checkbox__ripple"></div>
+                                                          </div>
+                                                    </td>
                                                     <td id="threadId"       class="mdc-data-table__cell overflow-elipsis">665</td>
-                                                    <td id="payer"         class="mdc-data-table__cell">Alice</td>
-                                                    <td id="recipient"       class="mdc-data-table__cell">Bob</td>
+                                                    <td id="payer"          class="mdc-data-table__cell">Alice</td>
+                                                    <td id="recipient"      class="mdc-data-table__cell">Bob</td>
                                                     <td id="reference"      class="mdc-data-table__cell">A77U312</td>
                                                     <td id="amount"         class="mdc-data-table__cell">$120</td>
                                                     <td id="date"           class="mdc-data-table__cell">13 Nov</td>
@@ -396,7 +407,6 @@
                                                     <td id="notes"          class="mdc-data-table__cell">1 x XYZ Service</td>
                                                 </tr>
                                             </template>
-
                                         </tbody>
                                     </table>
                                 </div>
@@ -404,12 +414,8 @@
                         </details>
                         </div>
                     </template>
-                   
-                   
                 </div>
-
             </main>
-
         </div>
 
         <div id="new-credit-dialog" 
@@ -568,11 +574,7 @@
                 </div>
         </div>
        
-       
-        
-
         <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
-        
         <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
       
@@ -627,6 +629,9 @@
                 
                 for(z=0; z < i_UserCredits.length ; z++){
                   clonedRow = tableBodyTemplate.content.cloneNode(true);
+                  if(i_UserCredits[z].status === 'CREDIT_ACK'){
+                    clonedRow.getElementById("settle-check").style.visibility="visible";
+                  }
                   clonedRow.getElementById("threadId").innerHTML = i_UserCredits[z].threadId;
                   clonedRow.getElementById("threadId").title = i_UserCredits[z].threadId;
                   clonedRow.getElementById("recipient").innerHTML = i_UserCredits[z].recipientName;
@@ -645,6 +650,7 @@
                     newButton.addEventListener("click", function(){openConfirmCreditDialog(threadId);});
                     clonedRow.getElementById("action").appendChild(newButton);
                   }
+                  
                   clonedRow.getElementById("notes").innerHTML = i_UserCredits[z].additionalNotes;
                   tableBody.appendChild(clonedRow);
               }     
@@ -670,8 +676,7 @@
                 
                 /* Functions for the new credit dialog. () */
                 newCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('new-credit-dialog'));
-                confirmCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-credit-dialog'));
-
+                
                 
                 event.preventDefault();
                 $newCreditDialog = document.getElementById('new-credit-dialog');
@@ -728,6 +733,8 @@
             
             function openConfirmCreditDialog(threadId) {
                 event.preventDefault();
+                confirmCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-credit-dialog'));
+
                 $confirmCreditDialog = document.getElementById('confirm-credit-dialog');
                 $confirmCreditDialog.querySelector("#thread-id").value=threadId;
                 //  styleTextFields();
@@ -754,6 +761,20 @@
                     }).catch(function(res){
                         showSnackBarMessage(res);
                     });
+            }
+            
+            function openSettleNowDialog(panelId){
+                /* Functions for settlement dialog in credit tab */
+                settleNowDialog  = new mdc.dialog.MDCDialog(document.getElementById('settle-now-dialog'));
+                
+                
+                event.preventDefault();
+                $settleNowDialog = document.getElementById('settle-now-dialog');
+                /*
+                 * Calculate the net amount.
+                 */ 
+                settleNowDialog.open();
+                return false;
             }
             
         </script>
@@ -838,7 +859,9 @@
                 notifyUi = messageOutput.context;
                 switch (notifyUi) {
                     case "credits": 
-                        await renderCreditsPanel(messageOutput.recipient);
+                        await renderCreditsPanel(
+                                messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
+                                );
                         break;
                     case "settlements":
                         break;

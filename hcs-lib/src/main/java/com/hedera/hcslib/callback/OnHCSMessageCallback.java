@@ -5,8 +5,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcslib.HCSLib;
 import com.hedera.hcslib.consensus.HCSResponse;
 import com.hedera.hcslib.interfaces.LibMessagePersistence;
-import com.hedera.hcslib.interfaces.MessagePersistenceLevel;
-
 import com.hedera.hcslib.messages.HCSRelayMessage;
 import com.hedera.hcslib.plugins.Plugins;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
@@ -45,13 +43,12 @@ import org.apache.activemq.artemis.jms.client.ActiveMQTextMessage;
 public final class OnHCSMessageCallback {
     
  
-    LibMessagePersistence persistence;
     private final List<HCSCallBackInterface> observers = new ArrayList<>();
 
     public OnHCSMessageCallback (HCSLib hcsLib) throws Exception {
         // load persistence implementation at runtime
         Class<?> persistenceClass = Plugins.find("com.hedera.plugin.persistence.*", "com.hedera.hcslib.interfaces.LibMessagePersistence", true);
-        persistence = (LibMessagePersistence)persistenceClass.newInstance();
+        hcsLib.setMessagePersistence((LibMessagePersistence)persistenceClass.newInstance());
 
         String contextFactory = hcsLib.getInitialContextFactory();
         String tcpConnectionFactory = hcsLib.getTCPConnectionFactory();
@@ -106,14 +103,15 @@ public final class OnHCSMessageCallback {
                                 messageFromJMS.acknowledge();
                             } else if (messageFromJMS instanceof ActiveMQObjectMessage) {
                                 HCSRelayMessage rlm = (HCSRelayMessage)((ActiveMQObjectMessage) messageFromJMS).getObject();
-                                persistence.storeMessage(MessagePersistenceLevel.NONE, rlm.getTopicMessagesResponse().toBuilder());
-                                   
+                                hcsLib.getMessagePersistence().storeMirrorResponse(rlm.getTopicMessagesResponse());
+                                
                                 ByteString message = rlm.getTopicMessagesResponse().getMessage();
                                 ApplicationMessageChunk messagePart = ApplicationMessageChunk.parseFrom(message);
                                 
                                 Optional<ApplicationMessage> messageEnvelopeOptional = 
-                                        pushUntilCompleteMessage(messagePart, persistence);
+                                        pushUntilCompleteMessage(messagePart, hcsLib.getMessagePersistence());
                                 if (messageEnvelopeOptional.isPresent()){
+                                    hcsLib.getMessagePersistence().storeApplicationMessage(messageEnvelopeOptional.get().getApplicationMessageId(), messageEnvelopeOptional.get());
                                     OnHCSMessageCallback.this.notifyObservers( messageEnvelopeOptional.get().toByteArray(), messageEnvelopeOptional.get().getApplicationMessageId());
                                     messageFromJMS.acknowledge();
                                 }
@@ -193,7 +191,7 @@ public final class OnHCSMessageCallback {
         } else {
             chunkList.add(messageChunk);
         }
-        persistence.putChunks(applicationMessageId, chunkList);
+        persistence.putParts(applicationMessageId, chunkList);
         
         if(messageChunk.getChunksCount() == 1){
                 ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(messageChunk.getMessageChunk());

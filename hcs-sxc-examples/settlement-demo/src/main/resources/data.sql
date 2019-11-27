@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS credits;
 
 CREATE TABLE credits (
     thread_id VARCHAR(20) PRIMARY KEY
-    ,transaction_id VARCHAR(100) 
+    ,application_message_id VARCHAR(100) 
     ,payer_name VARCHAR(88) NOT NULL
     ,recipient_name VARCHAR(88) NOT NULL
     ,reference VARCHAR(50) DEFAULT NULL
@@ -26,7 +26,7 @@ DROP TABLE IF EXISTS settlements;
 
 CREATE TABLE settlements (
     thread_id VARCHAR(20) PRIMARY KEY
-    ,transaction_id VARCHAR(100) 
+    ,application_message_id VARCHAR(100) 
     ,payer_name VARCHAR(88) NOT NULL
     ,recipient_name VARCHAR(88) NOT NULL
     ,additional_notes VARCHAR(100) DEFAULT NULL

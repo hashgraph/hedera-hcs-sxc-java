@@ -10,7 +10,7 @@ import lombok.Data;
 public final class SettlementProposal {
     
     private String threadId;
-    private String transactionId;
+    private String applicationMessageId;
     private String payerName;
     private String recipientName;
     private String additionalNotes;

@@ -624,7 +624,7 @@
                                            id="new-credit-additional-notes"
                                            required minlength=4
                                            id="my-text-field" class="mdc-text-field__input">
-                                    <label class="mdc-floating-label" for="new-credit-additional-notes">
+                                    <label class="mdc-floating-label" for="settle-now-additional-notes">
                                         Additional Notes
                                     </label>
                                 </div>
@@ -643,8 +643,8 @@
                         <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
                             <span class="mdc-button__label">Cancel</span>
                         </button>
-                        <button type="button" 
-                                onclick="sendNewCreditDialog()"
+                        <button id="settle-now-send" type="button" 
+                                onclick="{{settleNowAction}}"
                                 class="mdc-button mdc-button--raised  mdc-dialog__button" 
                         >
                             <span class="mdc-button__label">Send Now</span>
@@ -900,8 +900,40 @@
                 document.querySelector("#settle-now-dialog #settle-now-payer").value= payerName;
                 document.querySelector("#settle-now-dialog #settle-now-recipient").value= recipientName;
                 document.querySelector("#settle-now-dialog #settle-now-net-value").value= netValue;
+                document.querySelector("#settle-now-dialog #settle-now-send").addEventListener("click",function(){
+                    //alert(thisUserPays + " " + otherUserPays);
+                    settleNowDialog.close();
+                    
+                    postBody = `{
+                                  "payerName"       : "${payerName}"
+                                , "recipientName"   : "${recipientName}"  
+                                , "netValue"        : ${netValue}
+                                , "currency"        : "USD"
+                                , "threadIds"       : ${JSON.stringify(threadIds)}
+                                , "additionalNotes" :"fixme"
+                                }`;
+                    
+              
+                    showSnackBarMessage("sending new settlement request to HH Network ...");
+                    fetch('http://localhost:8080/settlements', {
+                        method: 'post',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: postBody
+                    }).then(function(response) {
+                        return response.json();
+                    }).then(function(data) {
+                        showSnackBarMessage("New settlement requenst sent");
+                       
+                    }).catch(function(res){
+                        showSnackBarMessage(res);
+                    });
+                    
+                    
+                }); // end click handler
                 
-                //alert(thisUserPays + " " + otherUserPays);
                 
                 settleNowDialog.open();
                 return false;
@@ -988,13 +1020,12 @@
             async function onStompMessage(messageOutput) {
                 notifyUi = messageOutput.context;
                 switch (notifyUi) {
-                    case "credits": 
+                    case "credits":  // fall through
+                    case "settlements":
                         await renderCreditsPanel(
                                 messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
                                 );
                         styleButtons();
-                        break;
-                    case "settlements":
                         break;
                     default: alert("wrong target element");
                 }

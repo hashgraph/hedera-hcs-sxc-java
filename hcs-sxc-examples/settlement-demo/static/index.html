@@ -644,7 +644,7 @@
                             <span class="mdc-button__label">Cancel</span>
                         </button>
                         <button id="settle-now-send" type="button" 
-                                onclick="{{settleNowAction}}"
+                                
                                 class="mdc-button mdc-button--raised  mdc-dialog__button" 
                         >
                             <span class="mdc-button__label">Send Now</span>
@@ -730,8 +730,11 @@
                     clonedRow.getElementById("settle-check").style.visibility="visible";
                     clonedRow.getElementById("checkbox-1").checked="true";
                   }
-                  clonedRow.getElementById("threadId").innerHTML = i_UserCredits[z].threadId;
-                  clonedRow.getElementById("threadId").title = i_UserCredits[z].threadId;
+                  threadId = i_UserCredits[z].threadId;
+                  clonedRow.getElementById("threadId").innerHTML = threadId.substring(0,2) + "..." + threadId.substring(threadId.length - 4,threadId.length);
+                  clonedRow.getElementById("threadId").title = threadId;
+                  clonedRow.getElementById("threadId").setAttribute("data-thread-id", threadId );
+       
                   clonedRow.getElementById("recipient").innerHTML = i_UserCredits[z].recipientName;
                   clonedRow.getElementById("payer").innerHTML = i_UserCredits[z].payerName;
                   clonedRow.getElementById("reference").innerHTML = i_UserCredits[z].reference;
@@ -742,7 +745,9 @@
                   
                   clonedRow.getElementById("date").innerHTML = i_UserCredits[z].createdDate;
                   clonedRow.getElementById("time").innerHTML = i_UserCredits[z].createdTime;
-                  clonedRow.getElementById("status").innerHTML = i_UserCredits[z].status;
+                  clonedRow.getElementById("status").innerHTML =  i_UserCredits[z].status.toLowerCase().replace("_"," ");
+                  clonedRow.getElementById("status").style.textTransform = "capitalize";
+                  
                   if(i_UserCredits[z].payerName === userName &&  i_UserCredits[z].status === 'CREDIT_AWAIT_ACK'){
                     let threadId = i_UserCredits[z].threadId;
                     newButton = document.createElement("button");
@@ -882,7 +887,7 @@
                 document.querySelectorAll("#"+otherUserId+" .mdc-data-table__row").forEach(
                        r=>{
                             if(r.cells.settlebox.querySelector("input").checked){
-                                threadIds.push(r.cells.threadId.textContent);
+                                threadIds.push(r.cells.threadId.title);
                                 rowAmount = 1*r.cells.amount.getAttribute("data-amount");
                                 if (r.cells.payer.textContent!==otherUserId){
                                    thisUserPays += rowAmount ;

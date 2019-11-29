@@ -1,5 +1,6 @@
 package com.hedera.hcsapp;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -117,6 +118,11 @@ public final class Utils {
                 .build();
         
         return applicationMessageId;
+    }
+    
+    public static String getThreadId() {
+        Instant now = Instant.now();
+        return now.getEpochSecond() + "-" + now.getNano();
     }
 
 }

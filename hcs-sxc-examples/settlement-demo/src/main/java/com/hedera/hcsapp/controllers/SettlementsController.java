@@ -117,7 +117,8 @@ public class SettlementsController {
         Instant now = Instant.now();
         Long seconds = now.getEpochSecond();
         int nanos = now.getNano();
-        String threadId = seconds + "-" + nanos;
+        
+        String threadId = Utils.getThreadId();
         
         Money value = Money.newBuilder()
                 .setCurrencyCode(settleProposal.getCurrency())

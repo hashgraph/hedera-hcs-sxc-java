@@ -59,8 +59,7 @@ public class CreditsController {
 
         if (creditRepository.findAllCreditsForUsers("Alice", user).isEmpty()) {
 
-            Instant now = Instant.now();
-            String threadId = now.getEpochSecond() + "-" + now.getNano();
+            String threadId = Utils.getThreadId();
             Credit credit = new Credit();
             credit.setApplicationMessageId("0.0.1234-1111-11");
             credit.setThreadId(threadId);
@@ -75,8 +74,7 @@ public class CreditsController {
             credit.setCreatedTime("10:00");
             creditRepository.save(credit);
 
-            now = Instant.now();
-            threadId = now.getEpochSecond() + "-" + now.getNano();
+            threadId = Utils.getThreadId();
             credit = new Credit();
             credit.setApplicationMessageId("0.0.1234-2222-22");
             credit.setThreadId(threadId);
@@ -91,8 +89,7 @@ public class CreditsController {
             credit.setCreatedTime("11:00");
             creditRepository.save(credit);
 
-            now = Instant.now();
-            threadId = now.getEpochSecond() + "-" + now.getNano();
+            threadId = Utils.getThreadId();
             credit = new Credit();
             credit.setApplicationMessageId("0.0.1234-2222-28");
             credit.setThreadId(threadId);
@@ -162,7 +159,7 @@ public class CreditsController {
         Instant now = Instant.now();
         Long seconds = now.getEpochSecond();
         int nanos = now.getNano();
-        String threadId = seconds + "-" + nanos;
+        String threadId = Utils.getThreadId();
 
         Money value = Money.newBuilder()
                 .setCurrencyCode(creditCreate.getCurrency())

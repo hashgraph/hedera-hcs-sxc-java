@@ -27,9 +27,7 @@ import com.hedera.hcslib.callback.OnHCSMessageCallback;
 import com.hedera.hcslib.consensus.HCSResponse;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
 import lombok.extern.log4j.Log4j2;
-import proto.CreditAckBPM;
 import proto.CreditBPM;
-import proto.SettleProposeAckBPM;
 import proto.SettleProposeBPM;
 import proto.SettlementBPM;
 
@@ -111,7 +109,6 @@ public class HCSIntegration {
                 String priorState = Enums.state.CREDIT_AWAIT_ACK.name();
                 String nextState = Enums.state.CREDIT_ACK.name();
 
-                CreditAckBPM creditAckBPM = settlementBPM.getCreditAck();
                 // update the credit state
                 creditRepository.findById(threadId).ifPresentOrElse(
                         (credit) -> {
@@ -188,7 +185,6 @@ public class HCSIntegration {
                 String priorState = Enums.state.SETTLE_PROPOSE_AWAIT_ACK.name();
                 String nextState = Enums.state.SETTLE_PROPOSE_ACK.name();
 
-                SettleProposeAckBPM settleProposeAckBPM = settlementBPM.getSettleProposeAck();
                 // update the settlement state
                 settlementRepository.findById(threadId).ifPresentOrElse(
                         (settlement) -> {

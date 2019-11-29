@@ -1,5 +1,6 @@
 package com.hedera.hcsapp.controllers;
 
+
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.protobuf.ByteString;
@@ -23,7 +24,6 @@ import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages.MirrorGetTopicMes
 import com.hedera.hcslib.proto.java.ApplicationMessageId;
 import com.hedera.hcslib.proto.java.Timestamp;
 
-import lombok.extern.log4j.Log4j2;
 import proto.CreditBPM;
 import proto.SettlementBPM;
 
@@ -36,7 +36,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 
-@Log4j2
 @RestController
 public class AdminController {
 
@@ -53,7 +52,6 @@ public class AdminController {
     AddressBookRepository addressBookRepository;
 
     private static AppData appData;
-    private static int topicIndex = 0; // refers to the first topic ID in the config.yaml
 
     public AdminController() throws FileNotFoundException, IOException {
 

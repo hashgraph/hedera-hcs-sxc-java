@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.gson.JsonArray;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hashgraph.sdk.TransactionId;
@@ -32,12 +31,9 @@ import com.hedera.hcsapp.repository.CreditRepository;
 import com.hedera.hcsapp.repository.SettlementItemRepository;
 import com.hedera.hcsapp.repository.SettlementRepository;
 import com.hedera.hcsapp.restclasses.SettlementProposal;
-import com.hedera.hcslib.HCSLib;
 import com.hedera.hcslib.consensus.OutboundHCSMessage;
 
 import lombok.extern.log4j.Log4j2;
-import proto.CreditAckBPM;
-import proto.CreditBPM;
 import proto.Money;
 import proto.SettleProposeAckBPM;
 import proto.SettleProposeBPM;
@@ -99,6 +95,7 @@ public class SettlementsController {
             }
             settlementProposal.setThreadIds(threadIds);
             settlementProposal.setCredits(creditList);
+            settlementProposal.setTopicId(appData.getHCSLib().getTopicIds().get(appData.getTopicIndex()).toString());
             settlementsList.add(settlementProposal);
         }
         if (settlementsList.size() != 0) {
@@ -108,7 +105,7 @@ public class SettlementsController {
         }
     }
     @PostMapping(value = "/settlements", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Settlement> settlementNew(@RequestBody SettlementProposal settleProposal) throws Exception {
+    public ResponseEntity<SettlementProposal> settlementNew(@RequestBody SettlementProposal settleProposal) throws Exception {
         log.debug("POST to /settlements/");
 
         HttpHeaders headers = new HttpHeaders();
@@ -172,7 +169,9 @@ public class SettlementsController {
 
             log.info("Message sent successfully.");
 
-            return new ResponseEntity<>(settlement, headers, HttpStatus.OK);
+            settleProposal.setThreadId(threadId);
+            settleProposal.setTopicId(appData.getHCSLib().getTopicIds().get(appData.getTopicIndex()).toString());
+            return new ResponseEntity<>(settleProposal, headers, HttpStatus.OK);
         } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
             // TODO Auto-generated catch block
             log.error(e);
@@ -228,6 +227,7 @@ public class SettlementsController {
             settlementProposal.setApplicationMessageId(settlement.get().getApplicationMessageId());
             settlementProposal.setCreatedDate(settlement.get().getCreatedDate());
             settlementProposal.setCreatedTime(settlement.get().getCreatedTime());
+            settlementProposal.setTopicId(appData.getHCSLib().getTopicIds().get(appData.getTopicIndex()).toString());
             
             try {
                 TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib())

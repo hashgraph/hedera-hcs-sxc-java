@@ -57,54 +57,6 @@ public class CreditsController {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
 
-        if (creditRepository.findAllCreditsForUsers("Alice", user).isEmpty()) {
-
-            String threadId = Utils.getThreadId();
-            Credit credit = new Credit();
-            credit.setApplicationMessageId("0.0.1234-1111-11");
-            credit.setThreadId(threadId);
-            credit.setPayerName("Alice");
-            credit.setRecipientName(user);
-            credit.setAmount(1);
-            credit.setCurrency("USD");
-            credit.setAdditionalNotes("memo 1");
-            credit.setReference("service ref 1");
-            credit.setStatus(Enums.state.CREDIT_PENDING.name());
-            credit.setCreatedDate("7, Nov");
-            credit.setCreatedTime("10:00");
-            creditRepository.save(credit);
-
-            threadId = Utils.getThreadId();
-            credit = new Credit();
-            credit.setApplicationMessageId("0.0.1234-2222-22");
-            credit.setThreadId(threadId);
-            credit.setPayerName("Alice");
-            credit.setRecipientName(user);
-            credit.setAmount(2);
-            credit.setCurrency("USD");
-            credit.setAdditionalNotes("memo 2");
-            credit.setReference("service ref 2");
-            credit.setStatus(Enums.state.CREDIT_ACK.name());
-            credit.setCreatedDate("8, Nov");
-            credit.setCreatedTime("11:00");
-            creditRepository.save(credit);
-
-            threadId = Utils.getThreadId();
-            credit = new Credit();
-            credit.setApplicationMessageId("0.0.1234-2222-28");
-            credit.setThreadId(threadId);
-            credit.setPayerName(user);
-            credit.setRecipientName("Alice");
-            credit.setAmount(3);
-            credit.setCurrency("USD");
-            credit.setAdditionalNotes("memo 3");
-            credit.setReference("service ref 3");
-            credit.setStatus(Enums.state.CREDIT_AWAIT_ACK.name());
-            credit.setCreatedDate("8, Nov");
-            credit.setCreatedTime("11:10");
-            creditRepository.save(credit);
-        }
-
         AppData appData = new AppData();
         List<Credit> creditList = new ArrayList<Credit>();
 

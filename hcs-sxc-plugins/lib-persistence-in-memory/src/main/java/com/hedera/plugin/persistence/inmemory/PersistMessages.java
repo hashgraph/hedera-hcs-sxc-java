@@ -140,4 +140,12 @@ public class PersistMessages
                 break;
         }
     }
+
+    @Override
+    public void clear() {
+        partialMessages = new HashMap<>();
+        transactions = new HashMap<>();
+        mirrorTopicMessages = new HashMap<>();
+        applicationMessages = new HashMap<>();
+    }
 }

@@ -34,4 +34,7 @@ public interface LibMessagePersistence {
     public void storeApplicationMessage(ApplicationMessageId applicationMessageId, ApplicationMessage applicationMessage);
     public Map<String, ApplicationMessage> getApplicationMessages();
     public ApplicationMessage getApplicationMessage(String applicationMessageId);
+    
+    // clear all data
+    public void clear();
 }

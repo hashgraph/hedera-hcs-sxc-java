@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Log4j2
 @RestController
-public class TestDataController {
+public class AdminController {
 
     @Autowired
     CreditRepository creditRepository;
@@ -55,13 +55,13 @@ public class TestDataController {
     private static AppData appData;
     private static int topicIndex = 0; // refers to the first topic ID in the config.yaml
 
-    public TestDataController() throws FileNotFoundException, IOException {
+    public AdminController() throws FileNotFoundException, IOException {
 
         appData = new AppData();
     }
 
-    @GetMapping(value = "/testdata", produces = "application/json")
-    public ResponseEntity<List<Credit>> testdata() throws FileNotFoundException, IOException {
+    @GetMapping(value = "/admin/createtestdata", produces = "application/json")
+    public ResponseEntity<List<Credit>> createTestData() throws FileNotFoundException, IOException {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
 
@@ -237,4 +237,20 @@ public class TestDataController {
         
     }
 
+    @GetMapping(value = "/admin/deletedata", produces = "application/json")
+    public ResponseEntity<List<Credit>> deleteData() throws FileNotFoundException, IOException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json");
+
+        HCSLib hcsLib = appData.getHCSLib();
+        LibMessagePersistence persistence = hcsLib.getMessagePersistence();
+
+        persistence.clear();
+        
+        creditRepository.deleteAll();
+        settlementRepository.deleteAll();
+        settlementItemRepository.deleteAll();
+        
+        return new ResponseEntity<>(headers, HttpStatus.OK);
+    }
 }

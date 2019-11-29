@@ -8,210 +8,8 @@
         <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
         <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="styles/custom.css"/>
         
-        
-        <style>
-            :root {--mdc-theme-primary: rgb(69, 90, 100)}
-            body {
-                display: flex;
-                height: 100vh;
-                padding: 0px;
-                margin: 0px;
-                background-color: #fafafa;
-            }
-
-            .mdc-drawer-app-content {
-                flex: auto;
-                overflow: auto;
-                position: relative;
-            }
-
-
-            .main-content {
-                overflow: auto;
-                height: 100%;
-            }
-
-            .app-bar {
-                position: absolute;
-            }
-
-            .mdc-top-app-bar {
-                z-index: 7;
-            }
-            .mdc-drawer{
-                background-color: #fafafa;
-            }
-
-
-            /* collapsible list no js version */
-
-            div.panel{
-
-                margin: auto;
-                margin-top: calc(2% - 0px);
-            }
-            details{
-                background:#fff;
-                font-size:16px;
-                border-bottom:1px solid #e0e0e0;
-                box-shadow:0 0 2px rgba(0,0,0,0.12),0 2px 4px rgba(0,0,0,0.24);
-                display:flex; 
-            }
-
-            details div.content{
-                padding:0px 24px 24px 24px;
-            }
-
-            details[open] summary:after {
-                color:#9e9e9e;
-                content: "expand_less";
-                font-family: 'Material Icons';
-            }
-            details[open]{
-                margin-top:16px;
-                margin-bottom:16px;
-                border:none;
-                border-radius: 2px;
-
-
-            }
-            details[open]:first-child{
-                margin-top:0;
-                margin-bottom:16px;
-                border:none;
-            }
-            details[open]:last-child{
-                margin-top:16px;
-                margin-bottom:0px;
-                border:none;
-            }
-
-            summary{
-                outline:none;
-                cursor: pointer;
-                padding: 16px 24px;
-                color:#212121;
-                position: relative;
-                font-size: 15px;
-            }
-            summary:hover{
-                background:#eeeeee;
-            }
-
-            details[open] summary:hover{
-                background:none;
-            }
-            summary ul {
-                padding-left: 0;
-                list-style: none;
-                display: -webkit-flex;
-                display: flex;
-                align-items: center;
-            }
-            summary ul li{
-                flex: 1 100%;
-                flex-flow: row wrap;
-            }
-            summary ul li span{
-                display: block;
-                font-size: 12px;
-                margin-top: 6px;
-                opacity: .75;
-            }
-            summary::-webkit-details-marker {
-                display: none;
-            }
-
-            summary {
-                list-style-type: none;
-                list-style-image: none;
-
-            }
-            summary::after {
-                content: "expand_more";
-                font-family: 'Material Icons';
-                color: #9e9e9e;
-                font-size: 1.5em;
-                padding: 0;
-                text-align: center;
-                margin-top: 0;
-                position: absolute;
-                top: calc(50% - 12px);
-                bottom: 0;
-
-                width: 6%;
-            }  
-
-            .message {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                width: 170px;
-                display: inline-block;
-            }
-            summary {
-                padding:8px!important;
-            }
-            summary .message-container {
-                padding:16px 4px;
-            }
-
-
-            /* end collapsible menu*/
-
-            /* bottom drawers */
-            .mdc-drawer--bottom{
-                left:calc(50% - 50%);
-                width:100%;
-                bottom: 0px;
-                height:300px;
-
-            }
-            @media only screen and (min-width: 768px) {
-                .mdc-drawer--bottom{
-                    left:calc(50% - 300px);
-                    width:600px;
-                    bottom: 0px;
-                    height:300px;
-
-                }
-            }
-
-
-            .mdc-drawer--bottom.mdc-drawer--open{
-
-            }
-            .mdc-drawer--bottom.mdc-drawer--animate{
-                transform: translateX(0) translateY(100%    );
-            }
-            .mdc-drawer--bottom.mdc-drawer--opening{
-                transform: none;
-
-                transform: translate(0,0px);
-
-                transition-duration: 250ms;
-            }
-            .mdc-drawer--bottom.mdc-drawer--closing{
-                transform: translateY(100%);
-                transition-duration: 250ms;
-            }
-
-            .mdc-text-field--full-width {
-               width: 100%;
-               margin: 8px auto;
-            }
-            
-            .overflow-elipsis{
-                display: inline-block;
-                max-width: 100px;
-                padding: 16px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
-
-        </style>
     </head>
     <body>
         <header class="mdc-top-app-bar app-bar mdc-top-app-bar--fixed" id="app-bar">     
@@ -222,27 +20,25 @@
                 </section>
                 <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end">
                     <div style="position:relative">
-                    <button class="mdc-icon-button material-icons mdc-top-app-bar__action-item--unbounded" aria-label="Alert">notifications</button>
-                    <div id="notification-badge" 
-                        class="" 
-                        style=" 
-                         display:none;
-                         width:20px;
-                         height:20px;
-                         line-height: 20px;
-                         text-align: center;
-                         font-size: 10px;
-                         font-weight: bold;
-                         font-family: Roboto;
-                         border-radius: 50%;
-                         position:absolute; 
-                         background-color: red;
-                         top:5px;
-                         right:5px;
-                         "
-                        >
-                        0
-                    </div>
+                        <button class="mdc-icon-button material-icons mdc-top-app-bar__action-item--unbounded" aria-label="Alert">notifications</button>
+                        <div id="notification-badge" 
+                            style=" 
+                             display:none;
+                             width:20px;
+                             height:20px;
+                             line-height: 20px;
+                             text-align: center;
+                             font-size: 10px;
+                             font-weight: bold;
+                             font-family: Roboto;
+                             border-radius: 50%;
+                             position:absolute; 
+                             background-color: red;
+                             top:5px;
+                             right:5px;
+                             ">
+                            0
+                        </div>
                     </div>
                     
                     <button class="mdc-icon-button material-icons mdc-top-app-bar__action-item--unbounded" aria-label="Print this page">print</button>
@@ -250,10 +46,6 @@
                 </section>
             </div>           
         </header>
-
-
-
-
 
         <aside id="left-drawer" class="mdc-drawer mdc-drawer--dismissible   mdc-top-app-bar--fixed-adjust">
             <div class="mdc-drawer__content">
@@ -278,20 +70,19 @@
                                 PK 302fdsadfsafdsadfsadfsdfsadfsadfsadf
                             </span>
                         </section>
-
                     </div>           
                 </header>
                 <div class="mdc-list  mdc-top-app-bar--fixed-adjust">
 
-                    <a class="mdc-list-item" href="#">
+                    <a class="mdc-list-item mdc-list-item--activated" href="#overview">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">home</i>
                         <span class="mdc-list-item__text">Overview</span>
                     </a>
-                    <a class="mdc-list-item mdc-list-item--activated" href="#" aria-current="page">
+                    <a class="mdc-list-item" href="#credits-and-debits" aria-current="page">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">money</i>
                         <span class="mdc-list-item__text">Credits and Debits</span>
                     </a>
-                    <a class="mdc-list-item " href="#" aria-current="page">
+                    <a class="mdc-list-item " href="#settlements" aria-current="page">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">verified_user</i>
                         <span class="mdc-list-item__text">Settlements</span>
                     </a>
@@ -321,20 +112,27 @@
                         id="app-bar-of-main-content">     
                     <div class="mdc-top-app-bar__row">
                         <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-                            <b class="mdc-top-app-bar__title ">
-                                Outstanding Credits and Debits
+                            <b id="header-title" class="mdc-top-app-bar__title ">
+                                Overview
                             </b>
                         </section>
                     </div>           
                 </header>
-                <div 
-                    id="credit-and-debit-panel-holder"
-                    class="mdc-top-app-bar--fixed-adjust mdc-typography--body2"
-                     style='margin: 16px 32px;'
-                     >
-                    <template id="credit-and-debit-panel" >
-                        <div id="{{username}}" class="panel">
-                            <details>
+                <template id="credit-and-debit-panel" >
+                    
+                    <div id="{{username}}" class="panel">
+                        <div role="progressbar" class="mdc-linear-progress mdc-linear-progress--indeterminate	mdc-linear-progress--closed" aria-label="Example Progress Bar" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0">
+                            <div class="mdc-linear-progress__buffering-dots"></div>
+                            <div class="mdc-linear-progress__buffer"></div>
+                            <div class="mdc-linear-progress__bar mdc-linear-progress__primary-bar">
+                              <span class="mdc-linear-progress__bar-inner"></span>
+                            </div>
+                            <div class="mdc-linear-progress__bar mdc-linear-progress__secondary-bar">
+                              <span class="mdc-linear-progress__bar-inner"></span>
+                            </div>
+                        </div>      
+                        
+                        <details>
                             <summary>
                                 <div class="message-container" style="margin-left:55px; margin-right: 16px;">
                                     <div style="display: flex">
@@ -359,7 +157,7 @@
                                     <table class="mdc-data-table__table" aria-label="Dessert calories">
                                         <thead>
                                             <tr class="mdc-data-table__header-row">
-                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col"><button id="settle-now-button" class="mdc-button mdc-button--outlined">Settle</button></th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col"><button id="settle-now-button" disabled class="mdc-button mdc-button--outlined">Settle</button></th>
                                                 
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">ThreadID</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Payer</th>
@@ -410,9 +208,17 @@
                                     </table>
                                 </div>
                             </div>
+                            
                         </details>
-                        </div>
-                    </template>
+                            
+                    </div>
+                </template>
+                <div 
+                    id="main-panel-holder"
+                    class="mdc-top-app-bar--fixed-adjust mdc-typography--body2"
+                     style='margin: 16px 32px;'
+                     >
+                    
                 </div>
             </main>
         </div>
@@ -460,7 +266,6 @@
                                         Field is required and must be at least 4 characters long
                                     </div>
                                 </div>
-                                
                                 
                                 <div class="mdc-text-field  mdc-text-field--with-leading-icon  mdc-text-field--full-width">
                                     <i class="material-icons mdc-text-field__icon">money</i>
@@ -523,7 +328,6 @@
              aria-labelledby="my-dialog-title"
              aria-describedby="my-dialog-content">
             <div class="mdc-dialog__container">
-
 
                 <div class="mdc-dialog__surface" >
                     <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
@@ -644,7 +448,6 @@
                             <span class="mdc-button__label">Cancel</span>
                         </button>
                         <button id="settle-now-send" type="button" 
-                                
                                 class="mdc-button mdc-button--raised  mdc-dialog__button" 
                         >
                             <span class="mdc-button__label">Send Now</span>
@@ -675,9 +478,11 @@
         
         <script>
             thisuserName = "";
-            init();
+            
+            document.addEventListener("DOMContentLoaded", init);
             
             async function init ()  {
+                location.hash ='';
                 let responseWhoami =  await fetch('addressbook/me/');
                 let whoami = await responseWhoami.json();
                 thisuserName =  whoami.name;
@@ -688,35 +493,61 @@
                 
                 
                 
-                
                 let responseAddressBook = await fetch('addressbook/buyerseller/');
                 let addressBook  = await responseAddressBook.json(); 
                 
-                for(i=0; i < addressBook.length; i++){
-                    var userName = addressBook[i].name;
-                    await renderCreditsPanel(userName);
-                     
-                }
-                styleButtons();
+                window.onhashchange = async function(){
+                    document.getElementById("main-panel-holder").innerHTML = "";
+                    switch(location.hash){
+                        case '#credits-and-debits':
+                            document.title='Credits and Debits';
+                            document.getElementById("header-title").innerHTML = 'Outstanding Credits and Debits';
+                            for(i=0; i < addressBook.length; i++){
+                                var userName = addressBook[i].name;
+                                await renderPanel(userName,'credits-and-debits');
+                            }
+                            break;
+                        case '#settlements':
+                            document.title='Settlements';
+                            document.getElementById("header-title").innerHTML = 'Settlements';
+                            for(i=0; i < addressBook.length; i++){
+                                var userName = addressBook[i].name;
+                                await renderPanel(userName,'settlements');
+                            }
+                            break;
+                        default:
+                            document.title='Overview';
+                            document.getElementById("header-title").innerHTML = 'Overview';
+                            break;
+                         
+                    }
+                    styleButtons();
+                };
             };
             
             
             
-            async function  renderCreditsPanel(userName){
+            async function  renderPanel(userName, panelType){
                 //if (document.getElementById(userName) === null) {
                 var panelTemplate = document.getElementById("credit-and-debit-panel");
                 var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
                 clonedPanelTemplate.querySelector(".panel").id=userName;    
                 clonedPanelTemplate.getElementById("credits-and-debits-user").innerHTML = userName;
-
+                
                 let userNameP = userName; {
                     clonedPanelTemplate.getElementById("new-credit-button").addEventListener("click",
-                        function(){openNewCreditDialog(userNameP);}
+                        function(){
+                            openNewCreditDialog(userNameP);
+                        }
                     );
                     clonedPanelTemplate.getElementById("settle-now-button").addEventListener("click",
-                        function(){openSettleNowDialog(userNameP);}
+                        function(){
+                            
+                            openSettleNowDialog(userNameP);
+                        }
                     );
                 }
+
 
                 var tableBody = clonedPanelTemplate.getElementById("credit-table-body");
                 var tableBodyTemplate = clonedPanelTemplate.getElementById("credit-table-body-template");
@@ -725,52 +556,51 @@
                 var i_UserCredits = await responseCredits.json();
                 
                 for(z=0; z < i_UserCredits.length ; z++){
-                  clonedRow = tableBodyTemplate.content.cloneNode(true);
-                  if(i_UserCredits[z].status === 'CREDIT_ACK'){
-                    clonedRow.getElementById("settle-check").style.visibility="visible";
-                    clonedRow.getElementById("checkbox-1").checked="true";
-                  }
-                  threadId = i_UserCredits[z].threadId;
-                  clonedRow.getElementById("threadId").innerHTML = threadId.substring(0,2) + "..." + threadId.substring(threadId.length - 4,threadId.length);
-                  clonedRow.getElementById("threadId").title = threadId;
-                  clonedRow.getElementById("threadId").setAttribute("data-thread-id", threadId );
-       
-                  clonedRow.getElementById("recipient").innerHTML = i_UserCredits[z].recipientName;
-                  clonedRow.getElementById("payer").innerHTML = i_UserCredits[z].payerName;
-                  clonedRow.getElementById("reference").innerHTML = i_UserCredits[z].reference;
-                  clonedRow.getElementById("amount").innerHTML = i_UserCredits[z].currency + ' '+ i_UserCredits[z].amount;
-                  clonedRow.getElementById("amount").setAttribute("data-amount", i_UserCredits[z].amount );
-                  clonedRow.getElementById("amount").setAttribute("data-currency", i_UserCredits[z].currency );
-                  
-                  
-                  clonedRow.getElementById("date").innerHTML = i_UserCredits[z].createdDate;
-                  clonedRow.getElementById("time").innerHTML = i_UserCredits[z].createdTime;
-                  clonedRow.getElementById("status").innerHTML =  i_UserCredits[z].status.toLowerCase().replace("_"," ");
-                  clonedRow.getElementById("status").style.textTransform = "capitalize";
-                  
-                  if(i_UserCredits[z].payerName === userName &&  i_UserCredits[z].status === 'CREDIT_AWAIT_ACK'){
-                    let threadId = i_UserCredits[z].threadId;
-                    newButton = document.createElement("button");
-                    newButton.innerHTML = "Accept";
-                    newButton.classList.add("mdc-button");
-                    newButton.classList.add("mdc-button--outlined");
-                    newButton.addEventListener("click", function(){openConfirmCreditDialog(threadId);});
-                    clonedRow.getElementById("action").appendChild(newButton);
-                  }
-                  
-                  clonedRow.getElementById("notes").innerHTML = i_UserCredits[z].additionalNotes;
-                  tableBody.appendChild(clonedRow);
-              }     
-              if (document.getElementById(userName) === null) {
-                  document.getElementById("credit-and-debit-panel-holder").appendChild(clonedPanelTemplate);
-              } else {
-                  existingPanel = document.getElementById(userName);
-                  clonedPanelTemplate.querySelector("details").setAttribute("open","true");
-                  existingPanel.replaceWith(clonedPanelTemplate);
-              }
+                    clonedRow = tableBodyTemplate.content.cloneNode(true);
+                    if(i_UserCredits[z].status === 'CREDIT_ACK'){
+                        clonedPanelTemplate.getElementById("settle-now-button").removeAttribute("disabled");
+                        clonedRow.getElementById("settle-check").style.visibility="visible";
+                        clonedRow.getElementById("checkbox-1").checked="true";
+                    }
+                    threadId = i_UserCredits[z].threadId;
+                    clonedRow.getElementById("threadId").innerHTML = threadId.substring(0,2) + "..." + threadId.substring(threadId.length - 4,threadId.length);
+                    clonedRow.getElementById("threadId").title = threadId;
+                    clonedRow.getElementById("threadId").setAttribute("data-thread-id", threadId );
 
-       
-            
+                    clonedRow.getElementById("recipient").innerHTML = i_UserCredits[z].recipientName;
+                    clonedRow.getElementById("payer").innerHTML = i_UserCredits[z].payerName;
+                    clonedRow.getElementById("reference").innerHTML = i_UserCredits[z].reference;
+                    clonedRow.getElementById("amount").innerHTML = i_UserCredits[z].currency + ' '+ i_UserCredits[z].amount;
+                    clonedRow.getElementById("amount").setAttribute("data-amount", i_UserCredits[z].amount );
+                    clonedRow.getElementById("amount").setAttribute("data-currency", i_UserCredits[z].currency );
+
+
+                    clonedRow.getElementById("date").innerHTML = i_UserCredits[z].createdDate;
+                    clonedRow.getElementById("time").innerHTML = i_UserCredits[z].createdTime;
+                    clonedRow.getElementById("status").innerHTML =  i_UserCredits[z].status.toLowerCase().replace(/_/g," ");
+                    clonedRow.getElementById("status").style.textTransform = "capitalize";
+
+                    if(i_UserCredits[z].payerName === userName &&  i_UserCredits[z].status === 'CREDIT_AWAIT_ACK'){
+                      let threadId = i_UserCredits[z].threadId;
+                      newButton = document.createElement("button");
+                      newButton.innerHTML = "Accept";
+                      newButton.classList.add("mdc-button");
+                      newButton.classList.add("mdc-button--outlined");
+                      newButton.addEventListener("click", function(){openConfirmCreditDialog(threadId);});
+                      clonedRow.getElementById("action").appendChild(newButton);
+                    }
+                  
+                    clonedRow.getElementById("notes").innerHTML = i_UserCredits[z].additionalNotes;
+                    tableBody.appendChild(clonedRow);
+                }     
+                if (document.getElementById(userName) === null) { // check if panel exists
+                    document.getElementById("main-panel-holder").appendChild(clonedPanelTemplate);
+                } else {
+                    existingPanel = document.getElementById(userName);
+                    clonedPanelTemplate.querySelector("details").setAttribute("open","true");
+                    existingPanel.replaceWith(clonedPanelTemplate);
+                }
+
            }
           
             
@@ -833,7 +663,7 @@
                         showSnackBarMessage("New credit requenst sent");
                        
                     }).catch(function(res){
-                        showSnackBarMessage(res);
+                        alert(res);
                     });
                 }      
             }
@@ -866,7 +696,7 @@
                         showSnackBarMessage("confirmation sent");
                        
                     }).catch(function(res){
-                        showSnackBarMessage(res);
+                        alert(res);
                     });
             }
             
@@ -909,6 +739,11 @@
                     //alert(thisUserPays + " " + otherUserPays);
                     settleNowDialog.close();
                     
+                    el = document.getElementById(otherUserId);
+                    el.style.opacity=0.4;
+                    el.style.pointerEvents =  'none';
+                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
+                    
                     postBody = `{
                                   "payerName"       : "${payerName}"
                                 , "recipientName"   : "${recipientName}"  
@@ -928,12 +763,13 @@
                         },
                         body: postBody
                     }).then(function(response) {
-                        return response.json();
-                    }).then(function(data) {
-                        showSnackBarMessage("New settlement requenst sent");
-                       
+                        if (response.status===200){
+                            showSnackBarMessage("Settlement reuest sent");
+                        } else {
+                            alert("Failed to send message to HH network");
+                        }
                     }).catch(function(res){
-                        showSnackBarMessage(res);
+                        alert(res);
                     });
                     
                     
@@ -965,15 +801,6 @@
             styleTextFields();
             styleTextFieldIcons();
        
-
-            function showSnackBarMessage(message){
-                snackbarEl = document.getElementById("snackbar");
-                snackbar = new mdc.snackbar.MDCSnackbar(snackbarEl);
-                snackbar.labelText = message;
-                snackbar.timeoutMs = 5000;
-                snackbar.open();
-            
-            }
 
             function styleButtons(){
                 buttons = document.querySelectorAll('.mdc-button');
@@ -1025,18 +852,35 @@
             async function onStompMessage(messageOutput) {
                 notifyUi = messageOutput.context;
                 switch (notifyUi) {
-                    case "credits":  // fall through
-                    case "settlements":
-                        await renderCreditsPanel(
+                    case "credits":  
+                        await renderPanel(
                                 messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
+                                ,'credits-and-debits'
                                 );
-                        styleButtons();
+                         styleButtons();
+                        break;
+                    case "settlements":
+                         await renderPanel(
+                                messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
+                                ,'settlements'
+                                );
+                         styleButtons();
+                       
                         break;
                     default: alert("wrong target element");
                 }
                 document.getElementById("notification-badge").innerHTML = document.getElementById("notification-badge").innerHTML * 1.0 + 1;
-                document.getElementById("notification-badge").style.display="block"
+                document.getElementById("notification-badge").style.display="block";
              }
+             
+            function showSnackBarMessage(message){
+                snackbarEl = document.getElementById("snackbar");
+                snackbar = new mdc.snackbar.MDCSnackbar(snackbarEl);
+                snackbar.labelText = message;
+                snackbar.timeoutMs = 5000;
+                snackbar.open();
+            
+            }
         </script>
     </body>
 </html>

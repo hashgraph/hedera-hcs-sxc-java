@@ -2,13 +2,13 @@ package com.hedera.hcsapp;
 
 public final class Enums {
     public enum state {
-        CREDIT_PENDING
-        ,CREDIT_AWAIT_ACK
-        ,CREDIT_ACK
+        CREDIT_PROPOSED_PENDING
+        ,CREDIT_PROPOSED
+        ,CREDIT_AGREED
         
-        ,SETTLE_PROPOSE_PENDING
-        ,SETTLE_PROPOSE_AWAIT_ACK
-        ,SETTLE_PROPOSE_ACK
+        ,SETTLEMENT_PROPOSED_PENDING
+        ,SETTLEMENT_PROPOSED
+        ,SETTLEMENT_AGREED
 
         ,SETTLE_INIT_PENDING
         ,SETTLE_INIT_AWAIT_ACK

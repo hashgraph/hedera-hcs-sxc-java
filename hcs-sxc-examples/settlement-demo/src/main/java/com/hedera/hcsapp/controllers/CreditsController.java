@@ -154,7 +154,7 @@ public class CreditsController {
             credit.setCreatedTime(Utils.TimestampToTime(seconds, nanos));
             credit.setApplicationMessageId(Utils.TransactionIdToString(transactionId));
             credit.setThreadId(threadId);
-            credit.setStatus(Enums.state.CREDIT_PENDING.name());
+            credit.setStatus(Enums.state.CREDIT_PROPOSED_PENDING.name());
 
             credit = creditRepository.save(credit);
 

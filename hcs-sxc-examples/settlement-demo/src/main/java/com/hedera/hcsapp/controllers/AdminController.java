@@ -77,7 +77,7 @@ public class AdminController {
         credit.setCurrency("USD");
         credit.setAdditionalNotes("memo 1");
         credit.setReference("service ref 1");
-        credit.setStatus(Enums.state.CREDIT_PENDING.name());
+        credit.setStatus(Enums.state.CREDIT_PROPOSED_PENDING.name());
         credit.setCreatedDate("7, Nov");
         credit.setCreatedTime("10:00");
         creditRepository.save(credit);
@@ -126,7 +126,7 @@ public class AdminController {
         credit.setCurrency("USD");
         credit.setAdditionalNotes("memo 2");
         credit.setReference("service ref 2");
-        credit.setStatus(Enums.state.CREDIT_ACK.name());
+        credit.setStatus(Enums.state.CREDIT_AGREED.name());
         credit.setCreatedDate("8, Nov");
         credit.setCreatedTime("11:00");
         creditRepository.save(credit);
@@ -159,7 +159,7 @@ public class AdminController {
         credit.setCurrency("USD");
         credit.setAdditionalNotes("memo 3");
         credit.setReference("service ref 3");
-        credit.setStatus(Enums.state.CREDIT_AWAIT_ACK.name());
+        credit.setStatus(Enums.state.CREDIT_PROPOSED.name());
         credit.setCreatedDate("8, Nov");
         credit.setCreatedTime("11:10");
         creditRepository.save(credit);
@@ -193,7 +193,7 @@ public class AdminController {
         settlement.setNetValue(20);
         settlement.setPayerName("Bob");
         settlement.setRecipientName("Alice");
-        settlement.setStatus(Enums.state.SETTLE_PROPOSE_ACK.name());
+        settlement.setStatus(Enums.state.SETTLEMENT_AGREED.name());
         settlement.setThreadId(threadId);
         settlementRepository.save(settlement);
         
@@ -217,7 +217,7 @@ public class AdminController {
         settlement.setNetValue(20);
         settlement.setPayerName("Bob");
         settlement.setRecipientName("Alice");
-        settlement.setStatus(Enums.state.SETTLE_PROPOSE_AWAIT_ACK.name());
+        settlement.setStatus(Enums.state.SETTLEMENT_PROPOSED.name());
         settlement.setThreadId(threadId);
         settlementRepository.save(settlement);
         

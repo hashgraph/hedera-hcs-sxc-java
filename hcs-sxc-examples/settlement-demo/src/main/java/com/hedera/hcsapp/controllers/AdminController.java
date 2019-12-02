@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.protobuf.ByteString;
 import com.hedera.hcsapp.AppData;
-import com.hedera.hcsapp.Enums;
+import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.Utils;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.entities.Settlement;
@@ -67,17 +67,17 @@ public class AdminController {
         LibMessagePersistence persistence = hcsLib.getMessagePersistence();
 
         // credits
-        String threadId = Utils.getThreadId();
+        String threadId1 = Utils.getThreadId();
         Credit credit = new Credit();
         credit.setApplicationMessageId("0.0.1234-1111-11");
-        credit.setThreadId(threadId);
+        credit.setThreadId(threadId1);
         credit.setPayerName("Bob");
         credit.setRecipientName("Alice");
         credit.setAmount(1);
         credit.setCurrency("USD");
         credit.setAdditionalNotes("memo 1");
         credit.setReference("service ref 1");
-        credit.setStatus(Enums.state.CREDIT_PROPOSED_PENDING.name());
+        credit.setStatus(States.CREDIT_PROPOSED_PENDING.name());
         credit.setCreatedDate("7, Nov");
         credit.setCreatedTime("10:00");
         creditRepository.save(credit);
@@ -89,7 +89,7 @@ public class AdminController {
         
         CreditBPM creditBPM = Utils.creditBPMFromCredit(credit);
         SettlementBPM settlementBPM = SettlementBPM.newBuilder()
-                .setThreadId(threadId)
+                .setThreadId(threadId1)
                 .setCredit(creditBPM)
                 .build();
         
@@ -116,17 +116,17 @@ public class AdminController {
         
         persistence.storeMirrorResponse(mirrorGetTopicMessagesResponse);
                 
-        threadId = Utils.getThreadId();
+        String threadId2 = Utils.getThreadId();
         credit = new Credit();
         credit.setApplicationMessageId("0.0.1234-2222-22");
-        credit.setThreadId(threadId);
+        credit.setThreadId(threadId2);
         credit.setPayerName("Alice");
         credit.setRecipientName("Bob");
         credit.setAmount(2);
         credit.setCurrency("USD");
         credit.setAdditionalNotes("memo 2");
         credit.setReference("service ref 2");
-        credit.setStatus(Enums.state.CREDIT_AGREED.name());
+        credit.setStatus(States.CREDIT_AGREED.name());
         credit.setCreatedDate("8, Nov");
         credit.setCreatedTime("11:00");
         creditRepository.save(credit);
@@ -138,7 +138,7 @@ public class AdminController {
         
         creditBPM = Utils.creditBPMFromCredit(credit);
         settlementBPM = SettlementBPM.newBuilder()
-                .setThreadId(threadId)
+                .setThreadId(threadId2)
                 .setCredit(creditBPM)
                 .build();
         
@@ -149,17 +149,17 @@ public class AdminController {
 
         persistence.storeApplicationMessage(applicationMessageId, applicationMessage);
         
-        threadId = Utils.getThreadId();
+        String threadId3 = Utils.getThreadId();
         credit = new Credit();
         credit.setApplicationMessageId("0.0.1234-2222-28");
-        credit.setThreadId(threadId);
+        credit.setThreadId(threadId3);
         credit.setPayerName("Carlos");
         credit.setRecipientName("Alice");
         credit.setAmount(3);
         credit.setCurrency("USD");
         credit.setAdditionalNotes("memo 3");
         credit.setReference("service ref 3");
-        credit.setStatus(Enums.state.CREDIT_PROPOSED.name());
+        credit.setStatus(States.CREDIT_PROPOSED.name());
         credit.setCreatedDate("8, Nov");
         credit.setCreatedTime("11:10");
         creditRepository.save(credit);
@@ -171,7 +171,7 @@ public class AdminController {
         
         creditBPM = Utils.creditBPMFromCredit(credit);
         settlementBPM = SettlementBPM.newBuilder()
-                .setThreadId(threadId)
+                .setThreadId(threadId3)
                 .setCredit(creditBPM)
                 .build();
         
@@ -183,7 +183,7 @@ public class AdminController {
         persistence.storeApplicationMessage(applicationMessageId, applicationMessage);
 
         // settlements
-        threadId = Utils.getThreadId();
+        String threadId = Utils.getThreadId();
         Settlement settlement = new Settlement();
         settlement.setAdditionalNotes("Settlement 1");
         settlement.setApplicationMessageId("0.0.1234-333-33");
@@ -193,20 +193,19 @@ public class AdminController {
         settlement.setNetValue(20);
         settlement.setPayerName("Bob");
         settlement.setRecipientName("Alice");
-        settlement.setStatus(Enums.state.SETTLEMENT_AGREED.name());
+        settlement.setStatus(States.SETTLEMENT_AGREED.name());
         settlement.setThreadId(threadId);
         settlementRepository.save(settlement);
         
         SettlementItem settlementItem = new SettlementItem();
-        String settledThreadId = Utils.getThreadId();
-        settlementItem.setId(new SettlementItemId(settledThreadId, threadId));
+        settlementItem.setId(new SettlementItemId(threadId1, threadId));
         settlementItem = settlementItemRepository.save(settlementItem);
         
         settlementItem = new SettlementItem();
-        settledThreadId = Utils.getThreadId();
-        settlementItem.setId(new SettlementItemId(settledThreadId, threadId));
+        settlementItem.setId(new SettlementItemId(threadId2, threadId));
         settlementItem = settlementItemRepository.save(settlementItem);
 
+        // second settlement
         threadId = Utils.getThreadId();
         settlement = new Settlement();
         settlement.setAdditionalNotes("Settlement 2");
@@ -217,20 +216,14 @@ public class AdminController {
         settlement.setNetValue(20);
         settlement.setPayerName("Bob");
         settlement.setRecipientName("Alice");
-        settlement.setStatus(Enums.state.SETTLEMENT_PROPOSED.name());
+        settlement.setStatus(States.SETTLEMENT_PROPOSED.name());
         settlement.setThreadId(threadId);
         settlementRepository.save(settlement);
         
         settlementItem = new SettlementItem();
-        settledThreadId = Utils.getThreadId();
-        settlementItem.setId(new SettlementItemId(settledThreadId, threadId));
+        settlementItem.setId(new SettlementItemId(threadId3, threadId));
         settlementItem = settlementItemRepository.save(settlementItem);
         
-        settlementItem = new SettlementItem();
-        settledThreadId = Utils.getThreadId();
-        settlementItem.setId(new SettlementItemId(settledThreadId, threadId));
-        settlementItem = settlementItemRepository.save(settlementItem);
-
         return new ResponseEntity<>(headers, HttpStatus.OK);
         
     }

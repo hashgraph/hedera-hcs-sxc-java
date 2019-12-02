@@ -21,7 +21,7 @@ import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hcsapp.AppData;
-import com.hedera.hcsapp.Enums;
+import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.Utils;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.entities.Settlement;
@@ -53,7 +53,7 @@ public class SettlementsController {
 
     @Autowired
     CreditRepository creditRepository;
-
+    
     private static AppData appData;
     private static int topicIndex = 0; // refers to the first topic ID in the config.yaml
     
@@ -71,7 +71,7 @@ public class SettlementsController {
         List<SettlementRest> settlementsList = new ArrayList<SettlementRest>();
         List<Settlement> settlements = settlementRepository.findAllSettlementsForUsers(appData.getUserName(), user);
         for (Settlement settlementfromDB : settlements) {
-            SettlementRest settlementResponse = new SettlementRest(settlementfromDB, appData);
+            SettlementRest settlementResponse = new SettlementRest(settlementfromDB, appData, settlementItemRepository, creditRepository);
             settlementsList.add(settlementResponse);
         }
         if (settlementsList.size() != 0) {
@@ -122,7 +122,7 @@ public class SettlementsController {
             settlement.setNetValue(settleProposal.getNetValue());
             settlement.setPayerName(settleProposal.getPayerName());
             settlement.setRecipientName(settleProposal.getRecipientName());
-            settlement.setStatus(Enums.state.SETTLEMENT_PROPOSED_PENDING.name());
+            settlement.setStatus(States.SETTLEMENT_PROPOSED_PENDING.name());
             settlement.setThreadId(threadId);
             settlement.setApplicationMessageId(Utils.TransactionIdToString(transactionId));
             settlement.setCreatedDate(Utils.TimestampToDate(seconds, nanos));
@@ -145,7 +145,8 @@ public class SettlementsController {
 
             log.info("Message sent successfully.");
 
-            return new ResponseEntity<>(new SettlementRest(settlement, appData), headers, HttpStatus.OK);
+            SettlementRest settlementResponse = new SettlementRest(settlement, appData, settlementItemRepository, creditRepository);
+            return new ResponseEntity<>(settlementResponse, headers, HttpStatus.OK);
         } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
             // TODO Auto-generated catch block
             log.error(e);
@@ -194,10 +195,11 @@ public class SettlementsController {
 
                 log.info("Message sent successfully.");
                 
-                settlement.get().setStatus(Enums.state.SETTLEMENT_PROPOSED_PENDING.name());
+                settlement.get().setStatus(States.SETTLEMENT_PROPOSED_PENDING.name());
                 Settlement newSettlement = settlementRepository.save(settlement.get());
 
-                return new ResponseEntity<>(new SettlementRest(newSettlement, appData), headers, HttpStatus.OK);
+                SettlementRest settlementResponse = new SettlementRest(newSettlement, appData, settlementItemRepository, creditRepository);
+                return new ResponseEntity<>(settlementResponse, headers, HttpStatus.OK);
 
             } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
                 log.error(e);

@@ -1,6 +1,7 @@
 package com.hedera.hcsapp.restclasses;
 
 import com.hedera.hcsapp.AppData;
+import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.entities.Credit;
 
 import lombok.Data;
@@ -17,6 +18,7 @@ public final class CreditRest {
     private String currency;
     private String additionalNotes;
     private String status;
+    private String displayStatus;
     private String createdDate;
     private String createdTime;
     private String topicId;
@@ -34,5 +36,6 @@ public final class CreditRest {
         this.createdDate = credit.getCreatedDate();
         this.createdTime = credit.getCreatedTime();
         this.topicId = appData.getHCSLib().getTopicIds().get(appData.getTopicIndex()).toString();
+        this.displayStatus = States.valueOf(this.status).getDisplay().replace("Credit ", ""); 
     }
 }

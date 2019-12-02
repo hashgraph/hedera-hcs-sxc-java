@@ -196,3 +196,9 @@ summary .message-container {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+pre { padding: 5px; margin: 5px; }
+.string { color: green; }
+.number { color: darkorange; }
+.boolean { color: blue; }
+.null { color: magenta; }
+.key { color: red; }

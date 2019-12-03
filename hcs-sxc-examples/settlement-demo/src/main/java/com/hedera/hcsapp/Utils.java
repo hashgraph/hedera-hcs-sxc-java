@@ -124,5 +124,4 @@ public final class Utils {
         Instant now = Instant.now();
         return now.getEpochSecond() + "-" + now.getNano();
     }
-
 }

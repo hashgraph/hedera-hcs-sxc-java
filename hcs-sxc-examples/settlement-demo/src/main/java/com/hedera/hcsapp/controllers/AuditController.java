@@ -21,7 +21,6 @@ import com.hedera.hcslib.proto.java.ApplicationMessageChunk;
 import com.hedera.hcslib.proto.java.ApplicationMessageId;
 import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages.MirrorGetTopicMessagesResponse;
 
-import lombok.extern.log4j.Log4j2;
 import proto.SettlementBPM;
 
 import java.io.FileNotFoundException;
@@ -35,7 +34,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@Log4j2
 @RestController
 public class AuditController {
 
@@ -46,7 +44,6 @@ public class AuditController {
     SettlementRepository settlementRepository;
 
     private static AppData appData;
-//    private static int topicIndex = 0; // refers to the first topic ID in the config.yaml
 
     public AuditController() throws FileNotFoundException, IOException {
 
@@ -95,10 +92,6 @@ public class AuditController {
             }
         );
         
-//        for (Map.Entry<String, AuditThreadId> auditThread : threads.entrySet()) {
-//            auditThreadIds.getThreadIds().add(auditThread.getValue());
-//        }
-        
         return new ResponseEntity<>(auditThreadIds, headers, HttpStatus.OK);
     }
     
@@ -119,7 +112,7 @@ public class AuditController {
             SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessage.getValue().getBusinessProcessMessage());
             
             if (settlementBPM.getThreadId().contentEquals(threadId)) {
-                AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage();
+                AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
                 auditApplicationMessage.setApplicationMessageId(applicationMessageId);
                 auditApplicationMessage.setMessage(settlementBPM.toString());
                 auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
@@ -144,8 +137,6 @@ public class AuditController {
         for (Map.Entry<String, MirrorGetTopicMessagesResponse> mirrorResponse : mirrorResponses.entrySet()) {
             
             try {
-//                ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(mirrorResponse.getValue().getMessage());
-                
                 ApplicationMessageChunk chunk = ApplicationMessageChunk.parseFrom(mirrorResponse.getValue().getMessage());
 
                 ApplicationMessageId applicationMessageIdProto = chunk.getApplicationMessageId();
@@ -157,7 +148,7 @@ public class AuditController {
                         + "-" + applicationMessageIdProto.getValidStart().getNanos();
                 
                 if (appMessageId.contentEquals(applicationMessageId)) {
-                    AuditHCSMessage auditHCSMessage = new AuditHCSMessage();
+                    AuditHCSMessage auditHCSMessage = new AuditHCSMessage(appData);
                     auditHCSMessage.setConsensusTimeStampSeconds(mirrorResponse.getValue().getConsensusTimestamp().getSeconds());
                     auditHCSMessage.setConsensusTimeStampNanos(mirrorResponse.getValue().getConsensusTimestamp().getNanos());
                     auditHCSMessage.setRunningHash(mirrorResponse.getValue().getRunningHash().toStringUtf8());
@@ -170,7 +161,6 @@ public class AuditController {
                     auditHCSMessages.getAuditHCSMessages().add(auditHCSMessage);
                 }
             } catch (InvalidProtocolBufferException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }

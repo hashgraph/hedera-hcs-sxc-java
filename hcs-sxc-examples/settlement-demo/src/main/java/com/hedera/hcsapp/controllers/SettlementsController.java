@@ -17,12 +17,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.gson.JsonArray;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hcsapp.AppData;
-import com.hedera.hcsapp.Enums;
+import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.Utils;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.entities.Settlement;
@@ -31,13 +30,12 @@ import com.hedera.hcsapp.entities.SettlementItemId;
 import com.hedera.hcsapp.repository.CreditRepository;
 import com.hedera.hcsapp.repository.SettlementItemRepository;
 import com.hedera.hcsapp.repository.SettlementRepository;
+import com.hedera.hcsapp.restclasses.CreditRest;
 import com.hedera.hcsapp.restclasses.SettlementProposal;
-import com.hedera.hcslib.HCSLib;
+import com.hedera.hcsapp.restclasses.SettlementRest;
 import com.hedera.hcslib.consensus.OutboundHCSMessage;
 
 import lombok.extern.log4j.Log4j2;
-import proto.CreditAckBPM;
-import proto.CreditBPM;
 import proto.Money;
 import proto.SettleProposeAckBPM;
 import proto.SettleProposeBPM;
@@ -55,7 +53,7 @@ public class SettlementsController {
 
     @Autowired
     CreditRepository creditRepository;
-
+    
     private static AppData appData;
     private static int topicIndex = 0; // refers to the first topic ID in the config.yaml
     
@@ -64,42 +62,17 @@ public class SettlementsController {
     }
     
     @GetMapping(value = "/settlements/{user}", produces = "application/json")
-    public ResponseEntity<List<SettlementProposal>> settlementsForUser(@PathVariable String user) throws FileNotFoundException, IOException {
+    public ResponseEntity<List<SettlementRest>> settlementsForUser(@PathVariable String user) throws FileNotFoundException, IOException {
         log.debug("/settlements/" + user);
         
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");    
 
-        List<SettlementProposal> settlementsList = new ArrayList<SettlementProposal>();
-        List<Credit> creditList = new ArrayList<Credit>();
+        List<SettlementRest> settlementsList = new ArrayList<SettlementRest>();
         List<Settlement> settlements = settlementRepository.findAllSettlementsForUsers(appData.getUserName(), user);
         for (Settlement settlementfromDB : settlements) {
-            SettlementProposal settlementProposal = new SettlementProposal();
-            settlementProposal.setAdditionalNotes(settlementfromDB.getAdditionalNotes());
-            settlementProposal.setNetValue(settlementfromDB.getNetValue());
-            settlementProposal.setCurrency(settlementfromDB.getCurrency());
-            settlementProposal.setPayerName(settlementfromDB.getPayerName());
-            settlementProposal.setRecipientName(settlementfromDB.getRecipientName());
-            settlementProposal.setThreadId(settlementfromDB.getThreadId());
-            settlementProposal.setApplicationMessageId(settlementfromDB.getApplicationMessageId());
-            settlementProposal.setStatus(settlementfromDB.getStatus());
-            settlementProposal.setCreatedDate(settlementfromDB.getCreatedDate());
-            settlementProposal.setCreatedTime(settlementfromDB.getCreatedTime());
-
-            List<SettlementItem> settlementItemsFromDB = settlementItemRepository.findAllSettlementItems(settlementfromDB.getThreadId());
-            List<String> threadIds = new ArrayList<String>();
-            for (SettlementItem settlementItem : settlementItemsFromDB) {
-                threadIds.add(settlementItem.getId().getSettledThreadId());
-                creditRepository.findById(settlementItem.getId().getSettledThreadId()).ifPresent(
-                        (credit) -> {
-                            creditList.add(credit);        
-                        }
-                );
-                    
-            }
-            settlementProposal.setThreadIds(threadIds);
-            settlementProposal.setCredits(creditList);
-            settlementsList.add(settlementProposal);
+            SettlementRest settlementResponse = new SettlementRest(settlementfromDB, appData, settlementItemRepository, creditRepository);
+            settlementsList.add(settlementResponse);
         }
         if (settlementsList.size() != 0) {
             return new ResponseEntity<>(settlementsList, headers, HttpStatus.OK);
@@ -108,7 +81,7 @@ public class SettlementsController {
         }
     }
     @PostMapping(value = "/settlements", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Settlement> settlementNew(@RequestBody SettlementProposal settleProposal) throws Exception {
+    public ResponseEntity<SettlementRest> settlementNew(@RequestBody SettlementProposal settleProposal) throws Exception {
         log.debug("POST to /settlements/");
 
         HttpHeaders headers = new HttpHeaders();
@@ -149,7 +122,7 @@ public class SettlementsController {
             settlement.setNetValue(settleProposal.getNetValue());
             settlement.setPayerName(settleProposal.getPayerName());
             settlement.setRecipientName(settleProposal.getRecipientName());
-            settlement.setStatus(Enums.state.SETTLE_PROPOSE_PENDING.name());
+            settlement.setStatus(States.SETTLEMENT_PROPOSED_PENDING.name());
             settlement.setThreadId(threadId);
             settlement.setApplicationMessageId(Utils.TransactionIdToString(transactionId));
             settlement.setCreatedDate(Utils.TimestampToDate(seconds, nanos));
@@ -172,7 +145,8 @@ public class SettlementsController {
 
             log.info("Message sent successfully.");
 
-            return new ResponseEntity<>(settlement, headers, HttpStatus.OK);
+            SettlementRest settlementResponse = new SettlementRest(settlement, appData, settlementItemRepository, creditRepository);
+            return new ResponseEntity<>(settlementResponse, headers, HttpStatus.OK);
         } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
             // TODO Auto-generated catch block
             log.error(e);
@@ -181,13 +155,10 @@ public class SettlementsController {
     }
     
     @PostMapping(value = "/settlements/ack/{threadId}", produces = "application/json")
-    public ResponseEntity<SettlementProposal> settleProposeAck(@PathVariable String threadId) throws Exception {
+    public ResponseEntity<SettlementRest> settleProposeAck(@PathVariable String threadId) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");    
 
-        SettlementProposal settlementProposal = new SettlementProposal();
-        List<String> threadIds = new ArrayList<String>();
-        
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
         
         if (settlement.isPresent()) {
@@ -205,7 +176,6 @@ public class SettlementsController {
             List<SettlementItem> settlementItems = settlementItemRepository.findAllSettlementItems(threadId);
             for (SettlementItem settlementItem : settlementItems) {
                 settleProposeBPM.addThreadIds(settlementItem.getId().getSettledThreadId());
-                threadIds.add(settlementItem.getId().getSettledThreadId());
             }
             
             SettleProposeAckBPM settleProposeAck = SettleProposeAckBPM.newBuilder()
@@ -217,18 +187,6 @@ public class SettlementsController {
                     .setSettleProposeAck(settleProposeAck)
                     .build();
 
-            settlementProposal.setAdditionalNotes(settlement.get().getAdditionalNotes());
-            settlementProposal.setCurrency(settlement.get().getCurrency());
-            settlementProposal.setNetValue(settlement.get().getNetValue());
-            settlementProposal.setPayerName(settlement.get().getPayerName());
-            settlementProposal.setRecipientName(settlement.get().getRecipientName());
-            settlementProposal.setThreadId(threadId);
-            settlementProposal.setThreadIds(threadIds);
-            settlementProposal.setStatus(settlement.get().getStatus());
-            settlementProposal.setApplicationMessageId(settlement.get().getApplicationMessageId());
-            settlementProposal.setCreatedDate(settlement.get().getCreatedDate());
-            settlementProposal.setCreatedTime(settlement.get().getCreatedTime());
-            
             try {
                 TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib())
                       .overrideEncryptedMessages(false)
@@ -236,8 +194,12 @@ public class SettlementsController {
                       .sendMessage(topicIndex, settlementBPM.toByteArray());
 
                 log.info("Message sent successfully.");
+                
+                settlement.get().setStatus(States.SETTLEMENT_PROPOSED_PENDING.name());
+                Settlement newSettlement = settlementRepository.save(settlement.get());
 
-                return new ResponseEntity<>(settlementProposal, headers, HttpStatus.OK);
+                SettlementRest settlementResponse = new SettlementRest(newSettlement, appData, settlementItemRepository, creditRepository);
+                return new ResponseEntity<>(settlementResponse, headers, HttpStatus.OK);
 
             } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
                 log.error(e);

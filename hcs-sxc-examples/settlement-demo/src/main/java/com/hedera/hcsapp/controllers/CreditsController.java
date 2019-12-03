@@ -6,12 +6,13 @@ import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hcsapp.AppData;
-import com.hedera.hcsapp.Enums;
+import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.Utils;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.repository.AddressBookRepository;
 import com.hedera.hcsapp.repository.CreditRepository;
 import com.hedera.hcsapp.restclasses.CreditProposal;
+import com.hedera.hcsapp.restclasses.CreditRest;
 import com.hedera.hcslib.consensus.OutboundHCSMessage;
 
 import lombok.extern.log4j.Log4j2;
@@ -45,7 +46,6 @@ public class CreditsController {
     AddressBookRepository addressBookRepository;
 
     private static AppData appData;
-    private static int topicIndex = 0; // refers to the first topic ID in the config.yaml
 
     public CreditsController() throws FileNotFoundException, IOException {
 
@@ -53,24 +53,29 @@ public class CreditsController {
     }
 
     @GetMapping(value = "/credits/{user}", produces = "application/json")
-    public ResponseEntity<List<Credit>> credits(@PathVariable String user) throws FileNotFoundException, IOException {
+    public ResponseEntity<List<CreditRest>> credits(@PathVariable String user) throws FileNotFoundException, IOException {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
 
         AppData appData = new AppData();
         List<Credit> creditList = new ArrayList<Credit>();
+        List<CreditRest> restResponse = new ArrayList<CreditRest>();
 
         if (user == null) {
             creditList = (List<Credit>) creditRepository.findAll();
         } else {
             creditList = creditRepository.findAllCreditsForUsers(appData.getUserName(), user);
         }
+        
+        for (Credit credit : creditList) {
+            restResponse.add(new CreditRest(credit, appData));
+        }
 
-        return new ResponseEntity<>(creditList, headers, HttpStatus.OK);
+        return new ResponseEntity<>(restResponse, headers, HttpStatus.OK);
     }
 
     @PostMapping(value = "/credits/ack/{threadId}", produces = "application/json")
-    public ResponseEntity<Credit> creditAck(@PathVariable String threadId) throws Exception {
+    public ResponseEntity<CreditRest> creditAck(@PathVariable String threadId) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
 
@@ -91,11 +96,13 @@ public class CreditsController {
             TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib())
                   .overrideEncryptedMessages(false)
                   .overrideMessageSignature(false)
-                  .sendMessage(topicIndex, settlementBPM.toByteArray());
+                  .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
 
             log.info("Message sent successfully.");
 
-            return new ResponseEntity<>(credit, headers, HttpStatus.OK);
+            CreditRest creditRest = new CreditRest(credit, appData);
+            
+            return new ResponseEntity<>(creditRest, headers, HttpStatus.OK);
         } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
             // TODO Auto-generated catch block
             log.error(e);
@@ -104,7 +111,7 @@ public class CreditsController {
     }
 
     @PostMapping(value = "/credits", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Credit> creditNew(@RequestBody CreditProposal creditCreate) throws Exception {
+    public ResponseEntity<CreditRest> creditNew(@RequestBody CreditProposal creditCreate) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
 
@@ -147,7 +154,7 @@ public class CreditsController {
             credit.setCreatedTime(Utils.TimestampToTime(seconds, nanos));
             credit.setApplicationMessageId(Utils.TransactionIdToString(transactionId));
             credit.setThreadId(threadId);
-            credit.setStatus(Enums.state.CREDIT_PENDING.name());
+            credit.setStatus(States.CREDIT_PROPOSED_PENDING.name());
 
             credit = creditRepository.save(credit);
 
@@ -155,11 +162,12 @@ public class CreditsController {
                   .overrideEncryptedMessages(false)
                   .overrideMessageSignature(false)
                   .withFirstTransactionId(transactionId)
-                  .sendMessage(topicIndex, settlementBPM.toByteArray());
+                  .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
 
             log.info("Message sent successfully.");
 
-            return new ResponseEntity<>(credit, headers, HttpStatus.OK);
+            CreditRest creditRest = new CreditRest(credit, appData);
+            return new ResponseEntity<>(creditRest, headers, HttpStatus.OK);
         } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
             // TODO Auto-generated catch block
             log.error(e);

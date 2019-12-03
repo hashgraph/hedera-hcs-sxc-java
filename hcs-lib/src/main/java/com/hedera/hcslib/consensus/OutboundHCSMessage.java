@@ -135,10 +135,10 @@ public final class OutboundHCSMessage {
         for (ApplicationMessageChunk messageChunk : parts) {
             
             SubmitMessageTransaction tx = new SubmitMessageTransaction(client)
-                .setMessage(messageChunk.toByteArray())
-                .setTopicId(this.topicIds.get(topicIndex))
+                    .setMessage(messageChunk.toByteArray())
+                    .setTopicId(this.topicIds.get(topicIndex))
                 .setTransactionId(transactionId);
-            
+               
             // persist the transaction
             this.persistence.storeTransaction(transactionId, tx);
             

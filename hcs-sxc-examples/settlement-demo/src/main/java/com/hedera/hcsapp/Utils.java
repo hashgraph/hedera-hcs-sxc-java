@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Random;
 
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hcsapp.entities.Credit;
@@ -18,6 +19,8 @@ import proto.Money;
 import proto.SettleProposeBPM;
 
 public final class Utils {
+    private static Random random = new Random();
+
     public static String TimestampToDate(long seconds, int nanos) {
         LocalDateTime dateTime = LocalDateTime.ofEpochSecond(seconds, nanos, ZoneOffset.UTC);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM", Locale.getDefault());
@@ -122,7 +125,15 @@ public final class Utils {
     
     public static String getThreadId() {
         Instant now = Instant.now();
-        return now.getEpochSecond() + "-" + now.getNano();
+        long nano = now.getNano();
+        
+        long remainder = nano - (nano / 1000 * 1000); // check nanos end with 000.
+        if (remainder == 0) {
+            int rndNano = random.nextInt(1000);
+            nano = nano + rndNano;
+        }
+     
+        return now.getEpochSecond() + "-" + nano;
     }
 
 }

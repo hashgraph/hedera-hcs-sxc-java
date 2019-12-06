@@ -100,6 +100,9 @@ public class CreditsController {
 
             log.info("Message sent successfully.");
 
+            credit.setStatus(States.CREDIT_AGREED_PENDING.name());
+            credit = creditRepository.save(credit);
+
             CreditRest creditRest = new CreditRest(credit, appData);
             
             return new ResponseEntity<>(creditRest, headers, HttpStatus.OK);
@@ -156,8 +159,6 @@ public class CreditsController {
             credit.setThreadId(threadId);
             credit.setStatus(States.CREDIT_PROPOSED_PENDING.name());
 
-            credit = creditRepository.save(credit);
-
             new OutboundHCSMessage(appData.getHCSLib())
                   .overrideEncryptedMessages(false)
                   .overrideMessageSignature(false)
@@ -166,6 +167,7 @@ public class CreditsController {
 
             log.info("Message sent successfully.");
 
+            credit = creditRepository.save(credit);
             CreditRest creditRest = new CreditRest(credit, appData);
             return new ResponseEntity<>(creditRest, headers, HttpStatus.OK);
         } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {

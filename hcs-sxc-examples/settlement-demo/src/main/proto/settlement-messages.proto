@@ -141,18 +141,18 @@ message SettleProposeAckBPM {
 // Sent from the payer to the recipient
 message SettleInitBPM {
 
-    // Identity of the payer
-    string payerName = 1;
-
-    // Identity of the recipient
-    string recipentName = 2;
-    
     // Identity of the payment channel
-    string paymentChannelName = 3;
+    string paymentChannelName = 1;
     
     // Optional supplementary notes or text
-    string additionalNotes = 4;
+    string additionalNotes = 2;
 
+    // Identity of the payer
+    string payerName = 3;
+
+    // Identity of the recipient
+    string recipientName = 4;
+    
     // Total amount that the payment channel will transfer from the bank account of the payer to the bank account of the recipient
     Money netValue = 5;
 

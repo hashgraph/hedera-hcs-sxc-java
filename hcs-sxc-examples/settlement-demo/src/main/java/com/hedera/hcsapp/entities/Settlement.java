@@ -22,4 +22,5 @@ public final class Settlement {
     private String status;
     private String createdDate;
     private String createdTime;
+    private String paymentChannelName;
 }

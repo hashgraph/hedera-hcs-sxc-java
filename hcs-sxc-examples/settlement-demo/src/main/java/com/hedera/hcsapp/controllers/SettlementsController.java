@@ -31,12 +31,15 @@ import com.hedera.hcsapp.repository.CreditRepository;
 import com.hedera.hcsapp.repository.SettlementItemRepository;
 import com.hedera.hcsapp.repository.SettlementRepository;
 import com.hedera.hcsapp.restclasses.CreditRest;
+import com.hedera.hcsapp.restclasses.SettlementChannelProposal;
 import com.hedera.hcsapp.restclasses.SettlementProposal;
 import com.hedera.hcsapp.restclasses.SettlementRest;
 import com.hedera.hcslib.consensus.OutboundHCSMessage;
 
 import lombok.extern.log4j.Log4j2;
 import proto.Money;
+import proto.SettleInitAckBPM;
+import proto.SettleInitBPM;
 import proto.SettleProposeAckBPM;
 import proto.SettleProposeBPM;
 import proto.SettlementBPM;
@@ -162,6 +165,7 @@ public class SettlementsController {
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
         
         if (settlement.isPresent()) {
+            
             Money value = Money.newBuilder()
                     .setCurrencyCode(settlement.get().getCurrency())
                     .setUnits(settlement.get().getNetValue())
@@ -195,7 +199,112 @@ public class SettlementsController {
 
                 log.info("Message sent successfully.");
                 
-                settlement.get().setStatus(States.SETTLEMENT_PROPOSED_PENDING.name());
+                settlement.get().setStatus(States.SETTLEMENT_AGREED_PENDING.name());
+                Settlement newSettlement = settlementRepository.save(settlement.get());
+
+                SettlementRest settlementResponse = new SettlementRest(newSettlement, appData, settlementItemRepository, creditRepository);
+                return new ResponseEntity<>(settlementResponse, headers, HttpStatus.OK);
+
+            } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
+                log.error(e);
+                return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping(value = "/settlements/proposechannel", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<SettlementRest> settleProposeChannel(@RequestBody SettlementChannelProposal settlementChannelProposal) throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json");    
+
+        String threadId = settlementChannelProposal.getThreadId();
+        Optional<Settlement> settlement = settlementRepository.findById(threadId);
+        
+        if (settlement.isPresent()) {
+
+            settlement.get().setAdditionalNotes(settlementChannelProposal.getAdditionalNotes());
+            settlement.get().setPaymentChannelName(settlementChannelProposal.getPaymentChannelName());
+            
+            Money value = Money.newBuilder()
+                    .setCurrencyCode(settlement.get().getCurrency())
+                    .setUnits(settlement.get().getNetValue())
+                    .build();
+            
+            SettleInitBPM.Builder settleInitBPM = SettleInitBPM.newBuilder()
+                    .setAdditionalNotes(settlementChannelProposal.getAdditionalNotes())
+                    .setNetValue(value)
+                    .setPayerName(settlement.get().getPayerName())
+                    .setRecipientName(settlement.get().getRecipientName())
+                    .setPaymentChannelName(settlementChannelProposal.getPaymentChannelName());
+            
+            SettlementBPM settlementBPM = SettlementBPM.newBuilder()
+                    .setThreadId(threadId)
+                    .setSettleInit(settleInitBPM)
+                    .build();
+
+            try {
+                TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib())
+                      .overrideEncryptedMessages(false)
+                      .overrideMessageSignature(false)
+                      .sendMessage(topicIndex, settlementBPM.toByteArray());
+
+                log.info("Message sent successfully.");
+                
+                settlement.get().setStatus(States.SETTLE_INIT_PENDING.name());
+                Settlement newSettlement = settlementRepository.save(settlement.get());
+
+                SettlementRest settlementResponse = new SettlementRest(newSettlement, appData, settlementItemRepository, creditRepository);
+                return new ResponseEntity<>(settlementResponse, headers, HttpStatus.OK);
+
+            } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
+                log.error(e);
+                return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping(value = "/settlements/proposechannel/ack/{threadId}", produces = "application/json")
+    public ResponseEntity<SettlementRest> settleProposeChannelAck(@PathVariable String threadId) throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json");    
+
+        Optional<Settlement> settlement = settlementRepository.findById(threadId);
+        
+        if (settlement.isPresent()) {
+
+            Money value = Money.newBuilder()
+                    .setCurrencyCode(settlement.get().getCurrency())
+                    .setUnits(settlement.get().getNetValue())
+                    .build();
+            
+            SettleInitBPM.Builder settleInitBPM = SettleInitBPM.newBuilder()
+                    .setAdditionalNotes(settlement.get().getAdditionalNotes())
+                    .setNetValue(value)
+                    .setPayerName(settlement.get().getPayerName())
+                    .setRecipientName(settlement.get().getRecipientName())
+                    .setPaymentChannelName(settlement.get().getPaymentChannelName());
+            
+            SettleInitAckBPM.Builder settleInitAckBPM = SettleInitAckBPM.newBuilder()
+                    .setSettleInit(settleInitBPM);
+            
+            SettlementBPM settlementBPM = SettlementBPM.newBuilder()
+                    .setThreadId(threadId)
+                    .setSettleInitAck(settleInitAckBPM)
+                    .build();
+
+            try {
+                TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib())
+                      .overrideEncryptedMessages(false)
+                      .overrideMessageSignature(false)
+                      .sendMessage(topicIndex, settlementBPM.toByteArray());
+
+                log.info("Message sent successfully.");
+                
+                settlement.get().setStatus(States.SETTLE_INIT_ACK_PENDING.name());
                 Settlement newSettlement = settlementRepository.save(settlement.get());
 
                 SettlementRest settlementResponse = new SettlementRest(newSettlement, appData, settlementItemRepository, creditRepository);

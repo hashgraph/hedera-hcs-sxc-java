@@ -12,7 +12,7 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import com.hedera.hcsapp.AppData;
-import com.hedera.hcsapp.Enums;
+import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.Utils;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.entities.Settlement;
@@ -78,8 +78,8 @@ public class HCSIntegration {
             // (CREDIT_PENDING , r ,threadId ,credit) => (CREDIT_AWAIT_ACK ,r ,threadId , credit[threadId].txId=r.MessageId)
             String threadId = settlementBPM.getThreadId();
             if (settlementBPM.hasCredit()) {
-                String priorState = Enums.state.CREDIT_PENDING.name();
-                String nextState = Enums.state.CREDIT_AWAIT_ACK.name();
+                String priorState = States.CREDIT_PROPOSED_PENDING.name();
+                String nextState = States.CREDIT_PROPOSED.name();
 
                 CreditBPM creditBPM = settlementBPM.getCredit();
                 // update the credit state
@@ -106,8 +106,8 @@ public class HCSIntegration {
                 
             // (CREDIT_AWAIT_ACK , r , threadId ,credit) => (CREDIT_ACK , r , threadId , credit[threadId].status=CREDIT_ACK)
             } else if (settlementBPM.hasCreditAck()) {
-                String priorState = Enums.state.CREDIT_AWAIT_ACK.name();
-                String nextState = Enums.state.CREDIT_ACK.name();
+                String priorState = States.CREDIT_PROPOSED.name();
+                String nextState = States.CREDIT_AGREED.name();
 
                 // update the credit state
                 creditRepository.findById(threadId).ifPresentOrElse(
@@ -145,8 +145,8 @@ public class HCSIntegration {
             } else if (settlementBPM.hasSettlePaymentAck()) {
 
             } else if (settlementBPM.hasSettlePropose()) {
-                String priorState = Enums.state.SETTLE_PROPOSE_PENDING.name();
-                String nextState = Enums.state.SETTLE_PROPOSE_AWAIT_ACK.name();
+                String priorState = States.SETTLEMENT_PROPOSED_PENDING.name();
+                String nextState = States.SETTLEMENT_PROPOSED.name();
 
                 SettleProposeBPM settleProposeBPM = settlementBPM.getSettlePropose();
                 // update the settlement state
@@ -182,8 +182,8 @@ public class HCSIntegration {
                         }
                 );
             } else if (settlementBPM.hasSettleProposeAck()) {
-                String priorState = Enums.state.SETTLE_PROPOSE_AWAIT_ACK.name();
-                String nextState = Enums.state.SETTLE_PROPOSE_ACK.name();
+                String priorState = States.SETTLEMENT_PROPOSED.name();
+                String nextState = States.SETTLEMENT_AGREED.name();
 
                 // update the settlement state
                 settlementRepository.findById(threadId).ifPresentOrElse(

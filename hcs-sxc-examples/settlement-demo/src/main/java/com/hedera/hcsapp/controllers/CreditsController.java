@@ -6,7 +6,7 @@ import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hcsapp.AppData;
-import com.hedera.hcsapp.Enums;
+import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.Utils;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.repository.AddressBookRepository;
@@ -154,7 +154,7 @@ public class CreditsController {
             credit.setCreatedTime(Utils.TimestampToTime(seconds, nanos));
             credit.setApplicationMessageId(Utils.TransactionIdToString(transactionId));
             credit.setThreadId(threadId);
-            credit.setStatus(Enums.state.CREDIT_PENDING.name());
+            credit.setStatus(States.CREDIT_PROPOSED_PENDING.name());
 
             credit = creditRepository.save(credit);
 

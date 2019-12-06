@@ -216,6 +216,80 @@
                     </div>
                 </template>
                 
+                <template id="settlements-panel" >
+                    
+                    <div id="{{username}}" class="panel">
+                        <div role="progressbar" class="mdc-linear-progress mdc-linear-progress--indeterminate	mdc-linear-progress--closed" aria-label="Example Progress Bar" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0">
+                            <div class="mdc-linear-progress__buffering-dots"></div>
+                            <div class="mdc-linear-progress__buffer"></div>
+                            <div class="mdc-linear-progress__bar mdc-linear-progress__primary-bar">
+                              <span class="mdc-linear-progress__bar-inner"></span>
+                            </div>
+                            <div class="mdc-linear-progress__bar mdc-linear-progress__secondary-bar">
+                              <span class="mdc-linear-progress__bar-inner"></span>
+                            </div>
+                        </div>      
+                        
+                        <details>
+                            <summary>
+                                <div class="message-container" style="margin-left:55px; margin-right: 16px;">
+                                    <div style="display: flex">
+                                        <span 
+                                            id="settlements-user"
+                                            class="mdc-typography--headline6" style="flex-grow:1">
+                                            {{username}}
+                                        </span>
+                                        
+                                    </div>
+                                </div>
+                            </summary>
+                            <div class="content"
+                                 style="overflow-x: scroll"
+                                 >
+                                <div class="mdc-data-table" style="width:100%">
+                                    <table class="mdc-data-table__table" aria-label="Dessert calories">
+                                        <thead>
+                                            <tr class="mdc-data-table__header-row">
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col"></th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">ThreadID</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Payer</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recipient</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Reference</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Amount (USD)</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Date</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Time</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Status</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Actions</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Notes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="settlement-table-body" class="mdc-data-table__content">
+                                            <template id="settlement-table-body-template">
+                                                <tr class="mdc-data-table__row">
+                                                    <td id="row-role" class="mdc-data-table__cell"  style="text-align: left">
+                                                    </td>
+                                                    <td id="threadId"       class="mdc-data-table__cell overflow-elipsis">665</td>
+                                                    <td id="payer"          class="mdc-data-table__cell">Alice</td>
+                                                    <td id="recipient"      class="mdc-data-table__cell">Bob</td>
+                                                    <td id="reference"      class="mdc-data-table__cell">A77U312</td>
+                                                    <td id="amount-net"     class="mdc-data-table__cell" style="text-align: right" data-amount="120" data-currency="USD">$120</td>
+                                                    <td id="date"           class="mdc-data-table__cell">13 Nov</td>
+                                                    <td id="time"           class="mdc-data-table__cell">09:31</td>
+                                                    <td id="status"         class="mdc-data-table__cell">Pending</td>
+                                                    <td id="action"         class="mdc-data-table__cell"></td>
+                                                    <td id="notes"          class="mdc-data-table__cell">1 x XYZ Service</td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                        </details>
+                            
+                    </div>
+                </template>
+                
                 <template id="audit-table-template">
                     <div class="mdc-data-table" style="width:100%">
                         <table class="mdc-data-table__table" aria-label="Dessert calories">
@@ -249,6 +323,26 @@
                     </div>
                 </template>
                 
+                <template id="audit-thread-template">
+                    <div class="panel">
+                        <details>
+                            <summary>
+                                <div  style="display:flex; flex-direction: column; margin-left: 64px;">
+                                    <div style="display: flex; ">
+                                        <div style="padding: 16px"><b>Proposal Accepted (fixme)</b></div>
+                                        <div style="padding: 16px" id="audit-thread-message-id">0.0.1010-1575314109-166076700</div>
+                                    </div>
+                                    <div style="padding: 16px; padding-top:8px" id="audit-thread-message-text">threadId: \"1575314119-166076700\"\ncredit ...</div>
+                                </div>
+                            </summary>
+                            <div  class="content" style="overflow-x:scroll; background-color: #fafafa">
+                                <pre  style="padding: 16px;" id="audit-thread-message-parts-json">
+                                {"auditHCSMessages":[{"consensusTimeStampSeconds":1575314126,"consensusTimeStampNanos":919509001,"runningHash":"�_��:\u0005��]\u0004y9���\u0001\u0007)f��Ԓ����õ[_)9���+\u001E�\r9\u001FT�����","sequenceNumber":774,"message":"applicationMessageId {\n  validStart {\n    seconds: 1575314109\n    nanos: 166076700\n  }\n  accountID {\n    accountNum: 1010\n  }\n}\nbusinessProcessMessage: \"\\n\\0241575314119-166076700\\022:\\n\\005Alice\\022\\006Carlos\\032\\adsfafds\\\"\\b\\n\\003USD\\020\\241`*\\basfdsadf:\\0052 DecB\\00519:15\"\n","part":"1 of 1"}]}
+                                </pre>
+                            </div>
+                        </details>
+                    </div>
+                </template>
                 <div 
                     id="main-panel-holder"
                     class="flippanel mdc-top-app-bar--fixed-adjust mdc-typography--body2"
@@ -400,6 +494,48 @@
         </div><div class="mdc-dialog-scrim"></div>
         
         
+        <div id="confirm-settlement-dialog" 
+            class="mdc-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="my-dialog-title"
+            aria-describedby="my-dialog-content">
+            <div class="mdc-dialog__container">
+
+                <div class="mdc-dialog__surface" >
+                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
+                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
+                    -->Confirm Settlement<!--
+                    --></h2>
+                    <div class="mdc-dialog__content" id="my-dialog-content" >
+                        Do you accept this settlement?
+                    </div>
+                    <div class="mdc-text-field mdc-text-field--full-width">
+                        <input type="text"
+                               id="thread-id"
+                               value="{{threadId}}"
+                               disabled
+                               class="mdc-text-field__input">
+                        <label class="mdc-floating-label" for="thread-id">
+                            ThreadId
+                        </label>
+                    </div>
+                  
+                    <footer class="mdc-dialog__actions" style="padding:24px">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+                            <span class="mdc-button__label">Cancel</span>
+                        </button>
+                        <button type="button" 
+                                id="confirm-settlement-send"
+                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
+                        >
+                            <span class="mdc-button__label">Confirm</span>
+                        </button>
+                    </footer>
+                </div>
+            </div>
+        </div><div class="mdc-dialog-scrim"></div>
+        
         <div id="settle-now-dialog" 
            
             class="mdc-dialog"
@@ -491,54 +627,7 @@
             </div>
         </div><div class="mdc-dialog-scrim"></div>
         
-        
-        <div id="audit-thread-dialog" 
-           
-            class="mdc-dialog"
-             role="alertdialog"
-             aria-modal="true"
-             aria-labelledby="my-dialog-title"
-             aria-describedby="my-dialog-content">
-            <div class="mdc-dialog__container">
-                <div class="mdc-dialog__surface" >
-                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
-                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
-                        -->Audit Thread <subs id="thread-id">{{threadId}}<subs><!--
-                    --></h2>
-                    <div class="mdc-dialog__content" id="my-dialog-content" >
-                        
-                        <template id="audit-thread-template">
-                                <div class="panel">
-                                    <details>
-                                        <summary>
-                                            <table style="margin-left: 32px">
-                                                <tr><td><label style="font-weight: 500; padding-right: 8px">appMessageId</label> </td><td id="audit-thread-message-id">0.0.1010-1575314109-166076700</td></tr>
-                                                <tr><td><label style="font-weight: 500; ">message     </label> </td><td id="audit-thread-message-text">threadId: \"1575314119-166076700\"\ncredit ...</td></tr>
-                                            </table>
-                                        </summary>
-                                        <div  class="content" style="overflow-x:scroll">
-                                            <pre id="audit-thread-message-parts-json">
-                                            {"auditHCSMessages":[{"consensusTimeStampSeconds":1575314126,"consensusTimeStampNanos":919509001,"runningHash":"�_��:\u0005��]\u0004y9���\u0001\u0007)f��Ԓ����õ[_)9���+\u001E�\r9\u001FT�����","sequenceNumber":774,"message":"applicationMessageId {\n  validStart {\n    seconds: 1575314109\n    nanos: 166076700\n  }\n  accountID {\n    accountNum: 1010\n  }\n}\nbusinessProcessMessage: \"\\n\\0241575314119-166076700\\022:\\n\\005Alice\\022\\006Carlos\\032\\adsfafds\\\"\\b\\n\\003USD\\020\\241`*\\basfdsadf:\\0052 DecB\\00519:15\"\n","part":"1 of 1"}]}
-                                            </pre>
-                                        </div>
-                                    </details>
-                                </div>
-                        </template>
-                        <div id="audit-thread-panel-holder" style="display:fex; flex-direction: column">
-                        </div>
-                    </div>
-                    <footer class="mdc-dialog__actions" style="padding:24px">
-                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
-                            <span class="mdc-button__label">Close</span>
-                        </button>
-                        
-                    </footer>
-                </div>
-
-            </div>
-        </div><div class="mdc-dialog-scrim"></div>
-        
-        
+      
         <div id="snackbar" class="mdc-snackbar">
                 <div class="mdc-snackbar__surface">
                     <div class="mdc-snackbar__label"
@@ -563,7 +652,7 @@
             document.addEventListener("DOMContentLoaded", init);
             
             async function init ()  {
-                location.hash ='';
+                //location.hash ='';
                 let responseWhoami =  await fetch('addressbook/me/');
                 let whoami = await responseWhoami.json();
                 thisuserName =  whoami.name;
@@ -576,8 +665,17 @@
                 
                 let responseAddressBook = await fetch('addressbook/buyerseller/');
                 let addressBook  = await responseAddressBook.json(); 
+                switch(location.hash){
+                    case "#audit-detail": 
+                        location.hash="audit";
+                        ;
+                        break;
+                    default: //event.preventDefault();//do nothing'
+                }
+                renderMain();
+                window.onhashchange = renderMain;
                 
-                window.onhashchange = async function(){
+                async function renderMain(){
                     document.getElementById("main-panel-holder").innerHTML = "";
                     switch(location.hash){
                         case '#credits-and-debits':
@@ -585,22 +683,30 @@
                             document.getElementById("header-title").innerHTML = 'Outstanding Credits and Debits';
                             for(i=0; i < addressBook.length; i++){
                                 var userName = addressBook[i].name;
-                                await renderPanel(userName);
+                                await renderCreditsPanel(userName);
                             }
                             break;
+                        case '#settlements':
+                            document.title='Settlements';
+                            document.getElementById("header-title").innerHTML = 'Settlements';
+                            for(i=0; i < addressBook.length; i++){
+                                var userName = addressBook[i].name;
+                                await renderSettlementsPanel(userName);
+                            }
+                            break;
+                           
                         case '#audit':
                             document.title='Audit';
                             document.getElementById("header-title").innerHTML = 'Audit';
                             renderAuditIndexTable();
                             break;
-                        default:
-                            document.title='Overview';
-                            document.getElementById("header-title").innerHTML = 'Overview';
-                            break;
+                        default:// do nothing
                          
                     }
                     styleButtons();
-                };
+                }
+                
+                
             };
             
        </script>
@@ -636,32 +742,41 @@
             async function openAuditThread(threadId){
                 
                 event.preventDefault();
-                $auditThreadDialog =  document.getElementById('audit-thread-dialog');
-                auditThreadDialog  = new mdc.dialog.MDCDialog($auditThreadDialog);
-                $auditThreadDialog.querySelector("#thread-id").innerHTML = threadId;
+                
+                main = document.getElementById('main-panel-holder');
+                main.innerHTML="";
+                document.getElementById('header-title').innerHTML = "<a href='#audit' class='mdc-button'><i style='font-size:26px;' class='material-icons'>arrow_back</i></a> <span style='position:relative;top:2px'>Audit Thread ID: " + threadId + " Details</span>";
+                location.hash='audit-detail';
+                //$auditThreadDialog =  document.getElementById('audit-thread-dialog');
+                
+                //auditThreadDialog  = new mdc.dialog.MDCDialog($auditThreadDialog);
+                //$auditThreadDialog.querySelector("#thread-id").innerHTML = threadId;
                 
                 let response = await fetch('audit/'+threadId);
                 let responseJSON = await  response.json();
-                $auditThreadDialog.querySelector("#audit-thread-panel-holder").innerHTML="";
+                //$auditThreadDialog.querySelector("#audit-thread-panel-holder").innerHTML="";
                 responseJSON.auditApplicationMessages.forEach(async m=>{
-                    clonedTemplate = $auditThreadDialog.querySelector("#audit-thread-template").content.cloneNode(true);
+                    clonedTemplate = document.getElementById("audit-thread-template").content.cloneNode(true);
                     clonedTemplate.querySelector("#audit-thread-message-id").innerHTML=m.applicationMessageId;
-                    clonedTemplate.querySelector("#audit-thread-message-text").innerHTML=m.message.substring(0,40)+"...";
+                    clonedTemplate.querySelector("#audit-thread-message-text").innerHTML=syntaxHighlight(m.message);//.substring(0,180)+"...";
                     let response = await fetch('audit/'+threadId+"/"+m.applicationMessageId);
                     let responseJSON = await  response.json();
-                
                     clonedTemplate.querySelector("#audit-thread-message-parts-json").innerHTML=syntaxHighlight(responseJSON);
-                    $auditThreadDialog.querySelector("#audit-thread-panel-holder").appendChild(clonedTemplate);
+                    main.appendChild(clonedTemplate);
                 });
         
-                auditThreadDialog.open();
+                //auditThreadDialog.open();
                 return false;
             }
+            
             function syntaxHighlight(json) {
+                
                 if (typeof json != 'string') {
                      json = JSON.stringify(json, undefined, 2);
                 }
-                json = json.replace(/\\n/g, '\n\t\t\t');
+               
+                json = json.replace(/([^ -~-\n]+)/g, "Ħ");
+                json = json.replace(/\\n/g, '\n\t\t');
                 json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                 return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
                     var cls = 'number';
@@ -682,8 +797,101 @@
             
         </script>
         
+        
         <script>
-            async function  renderPanel(userName){
+            async function  renderSettlementsPanel(userName){
+                //if (document.getElementById(userName) === null) {
+                var panelTemplate = document.getElementById("settlements-panel");
+                var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
+                clonedPanelTemplate.querySelector(".panel").id=userName;    
+                clonedPanelTemplate.getElementById("settlements-user").innerHTML = userName;
+                
+              
+
+
+                var tableBody = clonedPanelTemplate.getElementById("settlement-table-body");
+                var tableBodyTemplate = clonedPanelTemplate.getElementById("settlement-table-body-template");
+
+                var responseSettlements = await fetch(`settlements/${userName}`);
+                var responseSettlementsL = await responseSettlements.json();
+                
+                for(z=0; z < responseSettlementsL.length ; z++){
+                    i_Settlements = responseSettlementsL[z];
+                    clonedRow = tableBodyTemplate.content.cloneNode(true);
+                    clonedRow.getElementById("row-role").innerHTML = "<b>Settlement "+((z*1)+1)+"</b>"; 
+                    
+                    threadId = i_Settlements.threadId;
+                    clonedRow.getElementById("threadId").innerHTML =formatThreadId(threadId);
+                    clonedRow.getElementById("threadId").title = threadId;
+                    clonedRow.getElementById("threadId").setAttribute("data-thread-id", threadId );
+
+                    clonedRow.getElementById("recipient").innerHTML = i_Settlements.recipientName;
+                    clonedRow.getElementById("payer").innerHTML = i_Settlements.payerName;
+                    clonedRow.getElementById("reference").innerHTML = "";
+                    
+                    clonedRow.getElementById("amount-net").innerHTML = "Net " + i_Settlements.netValue;
+                    /*
+                    clonedRow.getElementById("amount").innerHTML = i_Settlements.currency + ' '+ i_Settlements.amount;
+                    clonedRow.getElementById("amount").setAttribute("data-amount", i_Settlements.amount );
+                    clonedRow.getElementById("amount").setAttribute("data-currency", i_Settlements.currency );
+                    */
+
+                    clonedRow.getElementById("date").innerHTML = i_Settlements.createdDate;
+                    clonedRow.getElementById("time").innerHTML = i_Settlements.createdTime;
+                    clonedRow.getElementById("status").innerHTML =  i_Settlements.status.toLowerCase().replace(/_/g," ");
+                    clonedRow.getElementById("status").style.textTransform = "capitalize";
+
+                    if(i_Settlements.payerName === userName &&  i_Settlements.status === 'CREDIT_PROPOSED'){
+                      let threadId = i_Settlements.threadId;
+                      newButton = document.createElement("button");
+                      newButton.innerHTML = "Accept";
+                      newButton.classList.add("mdc-button");
+                      newButton.classList.add("mdc-button--outlined");
+                      newButton.addEventListener("click", function(){openConfirmCreditDialog(threadId,userName);});
+                      clonedRow.getElementById("action").appendChild(newButton);
+                    }
+                  
+                    clonedRow.getElementById("notes").innerHTML = i_Settlements.additionalNotes;
+                    tableBody.appendChild(clonedRow);
+                    for(c in i_Settlements.credits){
+                        credit = i_Settlements.credits[c];
+                        clonedCreditRow = tableBodyTemplate.content.cloneNode(true);
+                        clonedCreditRow.querySelector("tr").style.backgroundColor="#fafafa";
+                        clonedCreditRow.querySelector("tr").style.border=0;
+                        clonedCreditRow.getElementById("row-role").innerHTML = "Credit " + (c*1+1); 
+                        
+                        threadId = credit.threadId;
+                        clonedCreditRow.getElementById("threadId").innerHTML =formatThreadId(threadId);
+                        clonedCreditRow.getElementById("threadId").title = threadId;
+                        clonedCreditRow.getElementById("threadId").setAttribute("data-thread-id", threadId );
+
+                        clonedCreditRow.getElementById("recipient").innerHTML = credit.recipientName;
+                        clonedCreditRow.getElementById("payer").innerHTML = credit.payerName;
+                        clonedCreditRow.getElementById("reference").innerHTML = credit.reference;
+                        clonedCreditRow.getElementById("amount-net").innerHTML = credit.amount;
+                        //clonedCreditRow.getElementById("net-value").innerHTML = "";
+
+
+                    
+                        tableBody.appendChild(clonedCreditRow);
+                    }
+                    
+                }     
+                if (document.getElementById(userName) === null) { // check if panel exists
+                    document.getElementById("main-panel-holder").appendChild(clonedPanelTemplate);
+                } else {
+                    existingPanel = document.getElementById(userName);
+                    clonedPanelTemplate.querySelector("details").setAttribute("open","true");
+                    existingPanel.replaceWith(clonedPanelTemplate);
+                }
+
+            }
+        </script>
+        
+        
+        
+        <script>
+            async function  renderCreditsPanel(userName){
                 //if (document.getElementById(userName) === null) {
                 var panelTemplate = document.getElementById("credits-and-debits-panel");
                 var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
@@ -712,7 +920,7 @@
                 
                 for(z=0; z < i_UserCredits.length ; z++){
                     clonedRow = tableBodyTemplate.content.cloneNode(true);
-                    if(i_UserCredits[z].status === 'CREDIT_ACK'){
+                    if(i_UserCredits[z].status === 'CREDIT_AGREED'){
                         clonedPanelTemplate.getElementById("settle-now-button").removeAttribute("disabled");
                         clonedRow.getElementById("settle-check").style.visibility="visible";
                         clonedRow.getElementById("checkbox-1").checked="true";
@@ -732,16 +940,25 @@
 
                     clonedRow.getElementById("date").innerHTML = i_UserCredits[z].createdDate;
                     clonedRow.getElementById("time").innerHTML = i_UserCredits[z].createdTime;
-                    clonedRow.getElementById("status").innerHTML =  i_UserCredits[z].status.toLowerCase().replace(/_/g," ");
-                    clonedRow.getElementById("status").style.textTransform = "capitalize";
+                    clonedRow.getElementById("status").innerHTML =  i_UserCredits[z].displayStatus;
+                    //clonedRow.getElementById("status").innerHTML =  i_UserCredits[z].status.toLowerCase().replace(/_/g," ");
+                    //clonedRow.getElementById("status").style.textTransform = "capitalize";
 
-                    if(i_UserCredits[z].payerName === userName &&  i_UserCredits[z].status === 'CREDIT_AWAIT_ACK'){
+                    if(i_UserCredits[z].payerName === userName &&  i_UserCredits[z].status === 'CREDIT_PROPOSED'){
                       let threadId = i_UserCredits[z].threadId;
                       newButton = document.createElement("button");
                       newButton.innerHTML = "Accept";
                       newButton.classList.add("mdc-button");
                       newButton.classList.add("mdc-button--outlined");
                       newButton.addEventListener("click", function(){openConfirmCreditDialog(threadId,userName);});
+                      clonedRow.getElementById("action").appendChild(newButton);
+                    } else if(i_UserCredits[z].payerName === userName &&  i_UserCredits[z].status === 'SETTLEMENT_PROPOSED'){ //SETTLEMENT_PROPOSED
+                      let threadId = i_UserCredits[z].threadId;
+                      newButton = document.createElement("button");
+                      newButton.innerHTML = "Accept";
+                      newButton.classList.add("mdc-button");
+                      newButton.classList.add("mdc-button--outlined");
+                      newButton.addEventListener("click", function(){openConfirmSettlementDialog(threadId,userName);});
                       clonedRow.getElementById("action").appendChild(newButton);
                     }
                   
@@ -862,6 +1079,44 @@
                 };
                 $confirmCreditDialog.querySelector("#confirm-credit-send").onclick = clickFunction;
                 confirmCreditDialog.open();
+                return false;
+            }
+            
+            function openConfirmSettlementDialog(threadId,otherUserId) {
+                event.preventDefault();
+                confirmSettlementDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-settlement-dialog'));
+
+                $confirmSettlementDialog = document.getElementById('confirm-settlement-dialog');
+                $confirmSettlementDialog.querySelector("#thread-id").value=threadId;
+                clickFunction = function(){
+                    $confirmSettlementDialog = document.getElementById('confirm-settlement-dialog');
+                    threadId = $confirmSettlementDialog.querySelector("#thread-id").value;
+                    showSnackBarMessage("sending confirmation " + threadId + " ...");
+                    confirmSettlementDialog.close();
+
+                    el = document.getElementById(otherUserId);
+                    el.style.opacity=0.4;
+                    el.style.pointerEvents =  'none';
+                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
+
+                    fetch('settlements/ack/'+threadId, {
+                            method: 'post',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(function(response) {
+                            return response.json();
+                        }).then(function(data) {
+                            showSnackBarMessage("confirmation sent");
+
+                        }).catch(function(res){
+                            alert(res);
+                        });
+        
+                };
+                $confirmSettlementDialog.querySelector("#confirm-settlement-send").onclick = clickFunction;
+                confirmSettlementDialog.open();
                 return false;
             }
         </script>
@@ -1023,17 +1278,20 @@
                 notifyUi = messageOutput.context;
                 switch (notifyUi) {
                     case "credits":  
-                        await renderPanel(
-                                messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
-                              );
-                         styleButtons();
+                        if(location.hash === '#credits-and-debits'){
+                            await renderCreditsPanel(
+                                    messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
+                                  );
+                             styleButtons();
+                        }
                         break;
                     case "settlements":
-                         await renderPanel(
-                                messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
-                                );
-                         styleButtons();
-                       
+                        if(location.hash === '#settlements' ||  location.hash === '#credits-and-debits'){
+                            await renderSettlementsPanel(
+                                   messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
+                                   );
+                            styleButtons();
+                        }
                         break;
                     default: alert("wrong target element");
                 }

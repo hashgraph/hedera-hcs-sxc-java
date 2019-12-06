@@ -27,6 +27,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.codec.binary.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -151,7 +153,8 @@ public class AuditController {
                     AuditHCSMessage auditHCSMessage = new AuditHCSMessage(appData);
                     auditHCSMessage.setConsensusTimeStampSeconds(mirrorResponse.getValue().getConsensusTimestamp().getSeconds());
                     auditHCSMessage.setConsensusTimeStampNanos(mirrorResponse.getValue().getConsensusTimestamp().getNanos());
-                    auditHCSMessage.setRunningHash(mirrorResponse.getValue().getRunningHash().toStringUtf8());
+                    byte[] runningHash = mirrorResponse.getValue().getRunningHash().toByteArray();
+                    auditHCSMessage.setRunningHash(Hex.encodeHexString(runningHash));
                     auditHCSMessage.setSequenceNumber(mirrorResponse.getValue().getSequenceNumber());
                     
                     auditHCSMessage.setPart(chunk.getChunkIndex() + " of " + chunk.getChunksCount());

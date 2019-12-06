@@ -28,6 +28,7 @@ import com.hedera.hcslib.consensus.HCSResponse;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
 import lombok.extern.log4j.Log4j2;
 import proto.CreditBPM;
+import proto.SettleInitBPM;
 import proto.SettleProposeBPM;
 import proto.SettlementBPM;
 
@@ -106,44 +107,25 @@ public class HCSIntegration {
                 
             // (CREDIT_AWAIT_ACK , r , threadId ,credit) => (CREDIT_ACK , r , threadId , credit[threadId].status=CREDIT_ACK)
             } else if (settlementBPM.hasCreditAck()) {
-                String priorState = States.CREDIT_PROPOSED.name();
+                String priorState1 = States.CREDIT_PROPOSED.name();
+                String priorState2 = States.CREDIT_AGREED_PENDING.name();
                 String nextState = States.CREDIT_AGREED.name();
 
                 // update the credit state
                 creditRepository.findById(threadId).ifPresentOrElse(
                         (credit) -> {
-                            if (credit.getStatus().equals(priorState)) {
+                            if ((credit.getStatus().equals(priorState1)) || (credit.getStatus().equals(priorState2))) {
                                 credit.setStatus(nextState);
                                 creditRepository.save(credit);
                                 notify("credits", credit.getPayerName(), credit.getRecipientName(),threadId);
                             } else {
-                                log.error("Credit status should be " + priorState + ", found : " + credit.getStatus());
+                                log.error("Credit status should be " + priorState1 + " or " + priorState2 + ", found : " + credit.getStatus());
                             }
                         },
                         () -> {
                             log.error("No credit found for threadId: " + threadId);
                         }
                 );
-            } else if (settlementBPM.hasPaymentInit()) {
-
-            } else if (settlementBPM.hasPaymentInitAck()) {
-
-            } else if (settlementBPM.hasPaymentSent()) {
-
-            } else if (settlementBPM.hasPaymentSentAck()) {
-
-            } else if (settlementBPM.hasSettleComplete()) {
-
-            } else if (settlementBPM.hasSettleCompleteAck()) {
-
-            } else if (settlementBPM.hasSettleInit()) {
-
-            } else if (settlementBPM.hasSettleInitAck()) {
-
-            } else if (settlementBPM.hasSettlePayment()) {
-
-            } else if (settlementBPM.hasSettlePaymentAck()) {
-
             } else if (settlementBPM.hasSettlePropose()) {
                 String priorState = States.SETTLEMENT_PROPOSED_PENDING.name();
                 String nextState = States.SETTLEMENT_PROPOSED.name();
@@ -182,13 +164,14 @@ public class HCSIntegration {
                         }
                 );
             } else if (settlementBPM.hasSettleProposeAck()) {
-                String priorState = States.SETTLEMENT_PROPOSED.name();
+                String priorState1 = States.SETTLEMENT_PROPOSED.name();
+                String priorState2 = States.SETTLEMENT_AGREED_PENDING.name();
                 String nextState = States.SETTLEMENT_AGREED.name();
 
                 // update the settlement state
                 settlementRepository.findById(threadId).ifPresentOrElse(
                         (settlement) -> {
-                            if (settlement.getStatus().equals(priorState)) {
+                            if ((settlement.getStatus().equals(priorState1)) || (settlement.getStatus().equals(priorState2))) {
                                 settlement.setStatus(nextState);
                                 settlementRepository.save(settlement);
 
@@ -197,13 +180,72 @@ public class HCSIntegration {
 
                                 notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
                             } else {
-                                log.error("Settlement status should be " + priorState + ", found : " + settlement.getStatus());
+                                log.error("Settlement status should be " + priorState1 + " or " + priorState2 + ", found : " + settlement.getStatus());
                             }
                         },
                         () -> {
                             log.error("No settlement found for threadId: " + threadId);
                         }
                 );
+            } else if (settlementBPM.hasSettleInit()) {
+                String priorState1 = States.SETTLE_INIT_PENDING.name();
+                String priorState2 = States.SETTLEMENT_AGREED.name();
+                String nextState = States.SETTLE_INIT_AWAIT_ACK.name();
+
+                SettleInitBPM settleInitBPM = settlementBPM.getSettleInit();
+                // update the settlement state
+                settlementRepository.findById(threadId).ifPresent(
+                        (settlement) -> {
+                            if ((settlement.getStatus().equals(priorState1)) || (settlement.getStatus().equals(priorState2))) {
+                                settlement.setStatus(nextState);
+                                settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                                settlement.setAdditionalNotes(settleInitBPM.getAdditionalNotes());
+                                settlement.setPaymentChannelName(settleInitBPM.getPaymentChannelName());
+                                settlementRepository.save(settlement);
+                                // update the credits too
+                                updateCreditStateForSettlementItems(threadId, nextState);
+                                notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
+                            } else {
+                                log.error("Settlement status should be " + priorState1 + " or " + priorState2 + ", found : " + settlement.getStatus());
+                            }
+                        }
+                );
+            } else if (settlementBPM.hasSettleInitAck()) {
+                String priorState1 = States.SETTLE_INIT_ACK_PENDING.name();
+                String priorState2 = States.SETTLE_INIT_AWAIT_ACK.name();
+                String nextState = States.SETTLE_INIT_ACK.name();
+
+                SettleInitBPM settleInitBPM = settlementBPM.getSettleInit();
+                // update the settlement state
+                settlementRepository.findById(threadId).ifPresent(
+                        (settlement) -> {
+                            if ((settlement.getStatus().equals(priorState1)) || (settlement.getStatus().equals(priorState2))) {
+                                settlement.setStatus(nextState);
+                                settlementRepository.save(settlement);
+                                // update the credits too
+                                updateCreditStateForSettlementItems(threadId, nextState);
+                                notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
+                            } else {
+                                log.error("Settlement status should be " + priorState1 + " or " + priorState2 + ", found : " + settlement.getStatus());
+                            }
+                        }
+                );
+            } else if (settlementBPM.hasPaymentInit()) {
+
+            } else if (settlementBPM.hasPaymentInitAck()) {
+
+            } else if (settlementBPM.hasPaymentSent()) {
+
+            } else if (settlementBPM.hasPaymentSentAck()) {
+
+            } else if (settlementBPM.hasSettleComplete()) {
+
+            } else if (settlementBPM.hasSettleCompleteAck()) {
+
+            } else if (settlementBPM.hasSettlePayment()) {
+
+            } else if (settlementBPM.hasSettlePaymentAck()) {
+
             } else {
                 log.error ("Unrecognized application message");
             }

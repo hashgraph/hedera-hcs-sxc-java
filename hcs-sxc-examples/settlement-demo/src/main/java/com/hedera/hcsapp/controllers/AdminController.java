@@ -182,6 +182,44 @@ public class AdminController {
 
         persistence.storeApplicationMessage(applicationMessageId, applicationMessage);
 
+        
+         
+        String threadId4 = Utils.getThreadId();
+        credit = new Credit();
+        credit.setApplicationMessageId("0.0.1234-2222-28");
+        credit.setThreadId(threadId4);
+        credit.setPayerName("Carlos");
+        credit.setRecipientName("Alice");
+        credit.setAmount(3);
+        credit.setCurrency("USD");
+        credit.setAdditionalNotes("memo 4");
+        credit.setReference("service ref 4");
+        credit.setStatus(States.SETTLEMENT_PROPOSED.name());
+        credit.setCreatedDate("8, Nov");
+        credit.setCreatedTime("11:10");
+        creditRepository.save(credit);
+
+        applicationMessageId = ApplicationMessageId.newBuilder()
+                .setAccountID(AccountID.newBuilder().setAccountNum(1234).build())
+                .setValidStart(Timestamp.newBuilder().setSeconds(2222).setNanos(28).build())
+                .build();
+        
+        creditBPM = Utils.creditBPMFromCredit(credit);
+        settlementBPM = SettlementBPM.newBuilder()
+                .setThreadId(threadId4)
+                .setCredit(creditBPM)
+                .build();
+        
+        applicationMessage = ApplicationMessage.newBuilder()
+            .setApplicationMessageId(applicationMessageId)
+            .setBusinessProcessMessage(settlementBPM.toByteString())
+            .build();
+
+        persistence.storeApplicationMessage(applicationMessageId, applicationMessage);
+
+        
+        
+        
         // settlements
         String threadId = Utils.getThreadId();
         Settlement settlement = new Settlement();

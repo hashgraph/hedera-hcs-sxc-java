@@ -494,6 +494,48 @@
         </div><div class="mdc-dialog-scrim"></div>
         
         
+        <div id="confirm-settlement-dialog" 
+            class="mdc-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="my-dialog-title"
+            aria-describedby="my-dialog-content">
+            <div class="mdc-dialog__container">
+
+                <div class="mdc-dialog__surface" >
+                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
+                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
+                    -->Confirm Settlement<!--
+                    --></h2>
+                    <div class="mdc-dialog__content" id="my-dialog-content" >
+                        Do you accept this settlement?
+                    </div>
+                    <div class="mdc-text-field mdc-text-field--full-width">
+                        <input type="text"
+                               id="thread-id"
+                               value="{{threadId}}"
+                               disabled
+                               class="mdc-text-field__input">
+                        <label class="mdc-floating-label" for="thread-id">
+                            ThreadId
+                        </label>
+                    </div>
+                  
+                    <footer class="mdc-dialog__actions" style="padding:24px">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+                            <span class="mdc-button__label">Cancel</span>
+                        </button>
+                        <button type="button" 
+                                id="confirm-settlement-send"
+                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
+                        >
+                            <span class="mdc-button__label">Confirm</span>
+                        </button>
+                    </footer>
+                </div>
+            </div>
+        </div><div class="mdc-dialog-scrim"></div>
+        
         <div id="settle-now-dialog" 
            
             class="mdc-dialog"
@@ -910,6 +952,14 @@
                       newButton.classList.add("mdc-button--outlined");
                       newButton.addEventListener("click", function(){openConfirmCreditDialog(threadId,userName);});
                       clonedRow.getElementById("action").appendChild(newButton);
+                    } else if(i_UserCredits[z].payerName === userName &&  i_UserCredits[z].status === 'SETTLEMENT_PROPOSED'){ //SETTLEMENT_PROPOSED
+                      let threadId = i_UserCredits[z].threadId;
+                      newButton = document.createElement("button");
+                      newButton.innerHTML = "Accept";
+                      newButton.classList.add("mdc-button");
+                      newButton.classList.add("mdc-button--outlined");
+                      newButton.addEventListener("click", function(){openConfirmSettlementDialog(threadId,userName);});
+                      clonedRow.getElementById("action").appendChild(newButton);
                     }
                   
                     clonedRow.getElementById("notes").innerHTML = i_UserCredits[z].additionalNotes;
@@ -1029,6 +1079,44 @@
                 };
                 $confirmCreditDialog.querySelector("#confirm-credit-send").onclick = clickFunction;
                 confirmCreditDialog.open();
+                return false;
+            }
+            
+            function openConfirmSettlementDialog(threadId,otherUserId) {
+                event.preventDefault();
+                confirmSettlementDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-settlement-dialog'));
+
+                $confirmSettlementDialog = document.getElementById('confirm-settlement-dialog');
+                $confirmSettlementDialog.querySelector("#thread-id").value=threadId;
+                clickFunction = function(){
+                    $confirmSettlementDialog = document.getElementById('confirm-settlement-dialog');
+                    threadId = $confirmSettlementDialog.querySelector("#thread-id").value;
+                    showSnackBarMessage("sending confirmation " + threadId + " ...");
+                    confirmSettlementDialog.close();
+
+                    el = document.getElementById(otherUserId);
+                    el.style.opacity=0.4;
+                    el.style.pointerEvents =  'none';
+                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
+
+                    fetch('settlements/ack/'+threadId, {
+                            method: 'post',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(function(response) {
+                            return response.json();
+                        }).then(function(data) {
+                            showSnackBarMessage("confirmation sent");
+
+                        }).catch(function(res){
+                            alert(res);
+                        });
+        
+                };
+                $confirmSettlementDialog.querySelector("#confirm-settlement-send").onclick = clickFunction;
+                confirmSettlementDialog.open();
                 return false;
             }
         </script>

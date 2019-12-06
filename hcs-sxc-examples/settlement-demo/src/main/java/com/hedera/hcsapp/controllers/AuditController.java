@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcsapp.AppData;
+import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.entities.Settlement;
 import com.hedera.hcsapp.repository.CreditRepository;
@@ -63,7 +64,7 @@ public class AuditController {
             threads.put(credit.getThreadId(), new AuditThreadId (
                     credit.getThreadId()
                     , "Credit"
-                    , credit.getStatus()
+                    , States.valueOf(credit.getStatus()).getDisplay().replace("Credit ", "")
                     , appData.getHCSLib().getTopicIds().get(appData.getTopicIndex()).toString()
                     , credit.getCreatedDate()
                     , credit.getCreatedTime()
@@ -75,7 +76,7 @@ public class AuditController {
             threads.put(settlement.getThreadId(), new AuditThreadId (
                     settlement.getThreadId()
                     , "Settlement"
-                    , settlement.getStatus()
+                    , States.valueOf(settlement.getStatus()).getDisplay().replace("Settlement ", "")
                     , appData.getHCSLib().getTopicIds().get(appData.getTopicIndex()).toString()
                     , settlement.getCreatedDate()
                     , settlement.getCreatedTime()

@@ -184,7 +184,7 @@ public class AdminController {
 
         
          
-        String threadId4 = Utils.getThreadId();
+        String threadId4 = "1575625811-473142600";//Utils.getThreadId();
         credit = new Credit();
         credit.setApplicationMessageId("0.0.1234-2222-28");
         credit.setThreadId(threadId4);
@@ -261,8 +261,31 @@ public class AdminController {
         settlementItem = new SettlementItem();
         settlementItem.setId(new SettlementItemId(threadId3, threadId));
         settlementItem = settlementItemRepository.save(settlementItem);
+       
+        //third settlement
+        threadId = "1575625811-473142600";
+        settlement = new Settlement();
+        settlement.setAdditionalNotes("Settlement 3");
+        settlement.setApplicationMessageId("0.0.1234-4444-44");
+        settlement.setCreatedDate("18, Nov");
+        settlement.setCreatedTime("12:10");
+        settlement.setCurrency("USD");
+        settlement.setNetValue(20);
+        settlement.setPayerName("Carlos");
+        settlement.setRecipientName("Alice");
+        settlement.setStatus(States.SETTLEMENT_PROPOSED.name());
+        settlement.setThreadId(threadId);
+        settlementRepository.save(settlement);
         
+        settlementItem = new SettlementItem();
+        settlementItem.setId(new SettlementItemId(threadId3, threadId));
+        settlementItem = settlementItemRepository.save(settlementItem);
+        
+      
         return new ResponseEntity<>(headers, HttpStatus.OK);
+        
+       
+        
         
     }
 

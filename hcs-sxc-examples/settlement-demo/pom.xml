@@ -92,6 +92,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.2.0.RELEASE</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -144,6 +145,7 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <version>${jib.version}</version>
                         <configuration>
+                      
                             <to>
                                 <image>hederahashgraph/settlement-demo:latest</image>
                                 <tags>
@@ -153,6 +155,8 @@
                             <extraDirectories>
                                 <paths>
                                     <path>.</path>
+                                    
+                                    
                                 </paths>
                             </extraDirectories>
                             <mainClass>com.hedera.simple-message-demo.HCSLibCallBackSetup</mainClass>

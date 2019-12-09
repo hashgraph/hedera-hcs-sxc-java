@@ -329,7 +329,7 @@
                             <summary>
                                 <div  style="display:flex; flex-direction: column; margin-left: 64px;">
                                     <div style="display: flex; ">
-                                        <div style="padding: 16px"><b>Proposal Accepted (fixme)</b></div>
+                                        <div style="padding: 16px"><b>Application ID:</b></div>
                                         <div style="padding: 16px" id="audit-thread-message-id">0.0.1010-1575314109-166076700</div>
                                     </div>
                                     <div style="padding: 16px; padding-top:8px" id="audit-thread-message-text">threadId: \"1575314119-166076700\"\ncredit ...</div>
@@ -756,11 +756,12 @@
                 let responseJSON = await  response.json();
                 //$auditThreadDialog.querySelector("#audit-thread-panel-holder").innerHTML="";
                 responseJSON.auditApplicationMessages.forEach(async m=>{
+                    let response = await fetch('audit/'+threadId+"/"+m.applicationMessageId);
+                    let responseJSON = await  response.json();
+                    
                     clonedTemplate = document.getElementById("audit-thread-template").content.cloneNode(true);
                     clonedTemplate.querySelector("#audit-thread-message-id").innerHTML=m.applicationMessageId;
                     clonedTemplate.querySelector("#audit-thread-message-text").innerHTML=syntaxHighlight(m.message);//.substring(0,180)+"...";
-                    let response = await fetch('audit/'+threadId+"/"+m.applicationMessageId);
-                    let responseJSON = await  response.json();
                     clonedTemplate.querySelector("#audit-thread-message-parts-json").innerHTML=syntaxHighlight(responseJSON);
                     main.appendChild(clonedTemplate);
                 });
@@ -841,13 +842,14 @@
                     clonedRow.getElementById("status").innerHTML =  i_Settlements.status.toLowerCase().replace(/_/g," ");
                     clonedRow.getElementById("status").style.textTransform = "capitalize";
 
-                    if(i_Settlements.payerName === userName &&  i_Settlements.status === 'CREDIT_PROPOSED'){
+                    
+                    if(i_Settlements.payerName === userName &&  i_Settlements.status === 'SETTLEMENT_PROPOSED'){ //SETTLEMENT_PROPOSED
                       let threadId = i_Settlements.threadId;
                       newButton = document.createElement("button");
                       newButton.innerHTML = "Accept";
                       newButton.classList.add("mdc-button");
                       newButton.classList.add("mdc-button--outlined");
-                      newButton.addEventListener("click", function(){openConfirmCreditDialog(threadId,userName);});
+                      newButton.addEventListener("click", function(){openConfirmSettlementDialog(threadId,userName);});
                       clonedRow.getElementById("action").appendChild(newButton);
                     }
                   
@@ -869,6 +871,7 @@
                         clonedCreditRow.getElementById("payer").innerHTML = credit.payerName;
                         clonedCreditRow.getElementById("reference").innerHTML = credit.reference;
                         clonedCreditRow.getElementById("amount-net").innerHTML = credit.amount;
+                        clonedCreditRow.getElementById("notes").innerHTML = credit.additionalNotes;
                         //clonedCreditRow.getElementById("net-value").innerHTML = "";
 
 
@@ -920,7 +923,7 @@
                 
                 for(z=0; z < i_UserCredits.length ; z++){
                     clonedRow = tableBodyTemplate.content.cloneNode(true);
-                    if(i_UserCredits[z].status === 'CREDIT_AGREED'){
+                    if(i_UserCredits[z].status === 'CREDIT_AGREED' && i_UserCredits[z].payerName===thisuserName ){
                         clonedPanelTemplate.getElementById("settle-now-button").removeAttribute("disabled");
                         clonedRow.getElementById("settle-check").style.visibility="visible";
                         clonedRow.getElementById("checkbox-1").checked="true";
@@ -952,15 +955,7 @@
                       newButton.classList.add("mdc-button--outlined");
                       newButton.addEventListener("click", function(){openConfirmCreditDialog(threadId,userName);});
                       clonedRow.getElementById("action").appendChild(newButton);
-                    } else if(i_UserCredits[z].payerName === userName &&  i_UserCredits[z].status === 'SETTLEMENT_PROPOSED'){ //SETTLEMENT_PROPOSED
-                      let threadId = i_UserCredits[z].threadId;
-                      newButton = document.createElement("button");
-                      newButton.innerHTML = "Accept";
-                      newButton.classList.add("mdc-button");
-                      newButton.classList.add("mdc-button--outlined");
-                      newButton.addEventListener("click", function(){openConfirmSettlementDialog(threadId,userName);});
-                      clonedRow.getElementById("action").appendChild(newButton);
-                    }
+                    } 
                   
                     clonedRow.getElementById("notes").innerHTML = i_UserCredits[z].additionalNotes;
                     tableBody.appendChild(clonedRow);
@@ -1159,6 +1154,7 @@
                 settlenowDialog.querySelector("#settle-now-payer").value= payerName;
                 settlenowDialog.querySelector("#settle-now-dialog #settle-now-recipient").value= recipientName;
                 settlenowDialog.querySelector("#settle-now-dialog #settle-now-net-value").value= netValue;
+                additionalNotes = settlenowDialog.querySelector("#new-credit-additional-notes").value;
                 clickFunction = function(){
                     //alert(thisUserPays + " " + otherUserPays);
                     settleNowDialog.close();
@@ -1174,7 +1170,7 @@
                                 , "netValue"        : ${netValue}
                                 , "currency"        : "USD"
                                 , "threadIds"       : ${JSON.stringify(threadIds)}
-                                , "additionalNotes" :"fixme"
+                                , "additionalNotes" : "${additionalNotes}"
                                 }`;
                     
               
@@ -1278,7 +1274,12 @@
                 notifyUi = messageOutput.context;
                 switch (notifyUi) {
                     case "credits":  
-                        if(location.hash === '#credits-and-debits'){
+                        if(location.hash === '#settlements'){
+                            await renderSettlementsPanel(
+                                   messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
+                                   );
+                            styleButtons();
+                        } else if (location.hash === '#credits-and-debits'){
                             await renderCreditsPanel(
                                     messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
                                   );
@@ -1286,11 +1287,16 @@
                         }
                         break;
                     case "settlements":
-                        if(location.hash === '#settlements' ||  location.hash === '#credits-and-debits'){
+                        if(location.hash === '#settlements'){
                             await renderSettlementsPanel(
                                    messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
                                    );
                             styleButtons();
+                        } else if (location.hash === '#credits-and-debits'){
+                            await renderCreditsPanel(
+                                    messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
+                                  );
+                             styleButtons();
                         }
                         break;
                     default: alert("wrong target element");

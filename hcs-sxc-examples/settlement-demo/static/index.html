@@ -329,7 +329,8 @@
                             <summary>
                                 <div  style="display:flex; flex-direction: column; margin-left: 64px;">
                                     <div style="display: flex; ">
-                                        <div style="padding: 16px"><b>Application ID:</b></div>
+                                        <div style="padding: 16px"><b>Application Message ID:</b></div>
+
                                         <div style="padding: 16px" id="audit-thread-message-id">0.0.1010-1575314109-166076700</div>
                                     </div>
                                     <div style="padding: 16px; padding-top:8px" id="audit-thread-message-text">threadId: \"1575314119-166076700\"\ncredit ...</div>
@@ -839,7 +840,7 @@
 
                     clonedRow.getElementById("date").innerHTML = i_Settlements.createdDate;
                     clonedRow.getElementById("time").innerHTML = i_Settlements.createdTime;
-                    clonedRow.getElementById("status").innerHTML =  i_Settlements.status.toLowerCase().replace(/_/g," ");
+                    clonedRow.getElementById("status").innerHTML =  i_Settlements.displayStatus;
                     clonedRow.getElementById("status").style.textTransform = "capitalize";
 
                     
@@ -1002,7 +1003,7 @@
                                           "payerName"       : "${thisuserName}"
                                         , "recipientName"   : "${document.getElementById('new-credit-recipient').value}"  
                                         , "reference"       : "${document.getElementById('new-credit-service-reference').value}"
-                                        , "amount"          : ${document.getElementById('new-credit-amount').value}
+                                        , "amount"          : ${document.getElementById('new-credit-amount').value * 1}
                                         , "currency"        : "USD"
                                         , "additionalNotes" :"${document.getElementById('new-credit-additional-notes').value}"
                                         }`;
@@ -1024,7 +1025,7 @@
                             }).then(function(response) {
                                 return response.json();
                             }).then(function(data) {
-                                showSnackBarMessage("New credit requenst sent");
+                                showSnackBarMessage("New credit request sent");
 
                             }).catch(function(res){
                                 alert(res);
@@ -1318,7 +1319,7 @@
                 restore = confirm("This will delete your data and restore test data");
                 if( restore){
                         await fetch('admin/deletedata');
-                        await fetch('admin/createtestdata');
+                        //await fetch('admin/createtestdata');
                         await location.reload();
                 }
             }

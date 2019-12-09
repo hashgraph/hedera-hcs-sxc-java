@@ -10,7 +10,7 @@ appClients:
     roles: "BUYER,SELLER"
   - clientName: "Diana"
     clientKey: "302a300506032b6570032100611824b08eb56cce4b84b9bf785bdea3a9429a52084dd7fdd39dc7ce3857a3cb"
-    roles: "BUYER,SELLER"
+    roles: "PAYCHANNEL"
   - clientName: "Erica"
     clientKey: "302a300506032b65700321008ec74de357c85ee343002ea48d4f5db6b43e595e0e717c971fdfbc9a3bc2dab2"
     roles: "BUYER,SELLER"

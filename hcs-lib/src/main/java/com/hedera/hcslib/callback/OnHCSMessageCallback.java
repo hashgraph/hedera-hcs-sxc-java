@@ -80,6 +80,7 @@ public final class OnHCSMessageCallback {
                         log.info("Connected to message queue");
                     }
                     catch (JMSException ex) {
+                        ex.printStackTrace();
                         log.info("Unable to connect to message queue - sleeping 5s");
                         TimeUnit.SECONDS.sleep(5);
                     }

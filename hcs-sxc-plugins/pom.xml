@@ -15,6 +15,7 @@
 
   <modules>
     <module>lib-persistence-in-memory</module>
+    <module>lib-persistence-in-db</module>
   </modules>
-    
+
  </project>

@@ -55,3 +55,4 @@ org.eclipse.jdt.core.prefs
 hcs-sxc-examples/settlement-demo/h2data/settlement-demo.mv.db
 hcs-sxc-examples/settlement-demo/h2data/settlement-demo.trace.db
 /nbactions.xml
+hcs-sxc-examples/settlement-demo/h2data/libdb.mv.db

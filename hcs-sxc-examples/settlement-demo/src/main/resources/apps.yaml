@@ -16,7 +16,7 @@ appClients:
     roles: "BUYER,SELLER"
   - clientName: "Farouk"
     clientKey: "302a300506032b65700321009d7fd3c252c4c5dec0d8d91f12e2b3dadcf33a2620d440409388bff387358b5e"
-    roles: "AUDITOR"
+    roles: "ARBITER,AUDITOR"
   - clientName: "Grace"
     clientKey: "302a300506032b6570032100dfc5cedd58ea4a0340fe35fbc26e98572fd40f081d749b202ffc4ed5d3b46ffa"
     roles: "DEMO"

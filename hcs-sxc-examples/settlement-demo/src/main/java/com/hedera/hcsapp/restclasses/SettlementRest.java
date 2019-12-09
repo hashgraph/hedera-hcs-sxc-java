@@ -27,6 +27,7 @@ public final class SettlementRest {
     private String createdTime;
     private String topicId;
     private String displayStatus;
+    private String paymentChannelName;
     
     private List<CreditRest> credits = new ArrayList<CreditRest>();
     private List<String> threadIds = new ArrayList<String>();
@@ -43,7 +44,8 @@ public final class SettlementRest {
         this.createdDate = settlement.getCreatedDate();
         this.createdTime = settlement.getCreatedTime();
         this.topicId = appData.getHCSLib().getTopicIds().get(appData.getTopicIndex()).toString();
-        this.displayStatus = States.valueOf(this.status).getDisplay().replace("Settlement ", ""); 
+        this.displayStatus = States.valueOf(this.status).getDisplay().replace("Settlement ", "");
+        this.paymentChannelName = settlement.getPaymentChannelName();
 
         List<SettlementItem> settlementItemsFromDB = settlementItemRepository.findAllSettlementItems(settlement.getThreadId());
         List<String> threadIds = new ArrayList<String>();

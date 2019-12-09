@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcsapp.AppData;
+import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.entities.Settlement;
 import com.hedera.hcsapp.repository.CreditRepository;
@@ -27,6 +28,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.codec.binary.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -61,7 +64,7 @@ public class AuditController {
             threads.put(credit.getThreadId(), new AuditThreadId (
                     credit.getThreadId()
                     , "Credit"
-                    , credit.getStatus()
+                    , States.valueOf(credit.getStatus()).getDisplay().replace("Credit ", "")
                     , appData.getHCSLib().getTopicIds().get(appData.getTopicIndex()).toString()
                     , credit.getCreatedDate()
                     , credit.getCreatedTime()
@@ -73,7 +76,7 @@ public class AuditController {
             threads.put(settlement.getThreadId(), new AuditThreadId (
                     settlement.getThreadId()
                     , "Settlement"
-                    , settlement.getStatus()
+                    , States.valueOf(settlement.getStatus()).getDisplay().replace("Settlement ", "")
                     , appData.getHCSLib().getTopicIds().get(appData.getTopicIndex()).toString()
                     , settlement.getCreatedDate()
                     , settlement.getCreatedTime()
@@ -151,7 +154,8 @@ public class AuditController {
                     AuditHCSMessage auditHCSMessage = new AuditHCSMessage(appData);
                     auditHCSMessage.setConsensusTimeStampSeconds(mirrorResponse.getValue().getConsensusTimestamp().getSeconds());
                     auditHCSMessage.setConsensusTimeStampNanos(mirrorResponse.getValue().getConsensusTimestamp().getNanos());
-                    auditHCSMessage.setRunningHash(mirrorResponse.getValue().getRunningHash().toStringUtf8());
+                    byte[] runningHash = mirrorResponse.getValue().getRunningHash().toByteArray();
+                    auditHCSMessage.setRunningHash(Hex.encodeHexString(runningHash));
                     auditHCSMessage.setSequenceNumber(mirrorResponse.getValue().getSequenceNumber());
                     
                     auditHCSMessage.setPart(chunk.getChunkIndex() + " of " + chunk.getChunksCount());

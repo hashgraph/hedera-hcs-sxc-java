@@ -816,8 +816,8 @@
                 var tableBody = clonedPanelTemplate.getElementById("settlement-table-body");
                 var tableBodyTemplate = clonedPanelTemplate.getElementById("settlement-table-body-template");
 
-                var responseSettlements = await fetch(`settlements/${userName}`);
-                var responseSettlementsL = await responseSettlements.json();
+                 responseSettlements = await fetch(`settlements/${userName}`);
+                 responseSettlementsL = await responseSettlements.json();
                 
                 for(z=0; z < responseSettlementsL.length ; z++){
                     i_Settlements = responseSettlementsL[z];

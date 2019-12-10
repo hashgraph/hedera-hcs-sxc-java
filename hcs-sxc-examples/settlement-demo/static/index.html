@@ -1166,8 +1166,9 @@
                 $settleNowDialog.querySelector("#settle-now-payer").value= payerName;
                 $settleNowDialog.querySelector("#settle-now-dialog #settle-now-recipient").value= recipientName;
                 $settleNowDialog.querySelector("#settle-now-dialog #settle-now-net-value").value= netValue;
-                additionalNotes = $settleNowDialog.querySelector("#settle-now-additional-notes").value;
+                
                 clickFunction = function(){
+                    additionalNotes = $settleNowDialog.querySelector("#settle-now-additional-notes").value;
                     //alert(thisUserPays + " " + otherUserPays);
                     settleNowDialog.close();
                     

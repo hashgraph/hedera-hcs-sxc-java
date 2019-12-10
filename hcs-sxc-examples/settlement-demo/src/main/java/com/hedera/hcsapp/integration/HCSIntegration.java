@@ -23,8 +23,10 @@ import com.hedera.hcsapp.notifications.NotificationMessage;
 import com.hedera.hcsapp.repository.CreditRepository;
 import com.hedera.hcsapp.repository.SettlementItemRepository;
 import com.hedera.hcsapp.repository.SettlementRepository;
+import com.hedera.hcslib.HCSLib;
 import com.hedera.hcslib.callback.OnHCSMessageCallback;
 import com.hedera.hcslib.consensus.HCSResponse;
+import com.hedera.hcslib.interfaces.LibMessagePersistence;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
 import lombok.extern.log4j.Log4j2;
 import proto.CreditBPM;
@@ -246,6 +248,9 @@ public class HCSIntegration {
 
             } else if (settlementBPM.hasSettlePaymentAck()) {
 
+            } else if (settlementBPM.hasAdminDelete()) {
+                deleteData();
+                notify("admin", "admin", "admin", "admin");
             } else {
                 log.error ("Unrecognized application message");
             }
@@ -278,5 +283,16 @@ public class HCSIntegration {
                     );
                 }
         );
+    }
+    
+    private void deleteData() {
+        HCSLib hcsLib = appData.getHCSLib();
+        LibMessagePersistence persistence = hcsLib.getMessagePersistence();
+
+        persistence.clear();
+        
+        creditRepository.deleteAll();
+        settlementRepository.deleteAll();
+        settlementItemRepository.deleteAll();
     }
 }

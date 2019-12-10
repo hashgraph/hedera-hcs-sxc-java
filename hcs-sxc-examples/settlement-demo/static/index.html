@@ -330,6 +330,7 @@
                                 <div  style="display:flex; flex-direction: column; margin-left: 64px;">
                                     <div style="display: flex; ">
                                         <div style="padding: 16px"><b>Application Message ID:</b></div>
+
                                         <div style="padding: 16px" id="audit-thread-message-id">0.0.1010-1575314109-166076700</div>
                                     </div>
                                     <div style="padding: 16px; padding-top:8px" id="audit-thread-message-text">threadId: \"1575314119-166076700\"\ncredit ...</div>
@@ -924,6 +925,7 @@
                 for(z=0; z < i_UserCredits.length ; z++){
                     clonedRow = tableBodyTemplate.content.cloneNode(true);
                     if(i_UserCredits[z].status === 'CREDIT_AGREED' ){
+
                         clonedPanelTemplate.getElementById("settle-now-button").removeAttribute("disabled");
                         clonedRow.getElementById("settle-check").style.visibility="visible";
                         clonedRow.getElementById("checkbox-1").checked="true";

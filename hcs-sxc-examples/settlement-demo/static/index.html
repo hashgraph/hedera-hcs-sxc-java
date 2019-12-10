@@ -682,8 +682,7 @@
                     document.getElementById("main-panel-holder").innerHTML = "";
                     switch(location.hash){
                         case '#credits-and-debits':
-                            
-                            document.title='Credits and Debits';
+                            document.title= thisuserName + ' - Credits and Debits';
                             document.querySelectorAll("#lhs-menu .mdc-list-item").forEach(i=>i.classList.remove('mdc-list-item--activated'));
                             document.querySelector("#lhs-menu .credits-and-debits").classList.add("mdc-list-item--activated");
                             document.getElementById("header-title").innerHTML = 'Outstanding Credits and Debits';
@@ -693,7 +692,7 @@
                             }
                             break;
                         case '#settlements':
-                            document.title='Settlements';
+                            document.title= thisuserName + ' - Settlements';
                             document.querySelectorAll("#lhs-menu .mdc-list-item").forEach(i=>i.classList.remove('mdc-list-item--activated'));
                             document.querySelector("#lhs-menu .settlements").classList.add("mdc-list-item--activated");
                             
@@ -703,17 +702,14 @@
                                 await renderSettlementsPanel(userName);
                             }
                             break;
-                           
                         case '#audit':
-                            document.title='Audit';
+                            document.title=thisuserName + ' - Audit';
                             document.querySelectorAll("#lhs-menu .mdc-list-item").forEach(i=>i.classList.remove('mdc-list-item--activated'));
                             document.querySelector("#lhs-menu .audit").classList.add("mdc-list-item--activated");
-                            
                             document.getElementById("header-title").innerHTML = 'Audit';
                             renderAuditIndexTable();
                             break;
                         default:// do nothing
-                         
                     }
                     styleButtons();
                 }

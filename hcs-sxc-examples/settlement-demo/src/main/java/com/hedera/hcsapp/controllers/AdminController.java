@@ -4,6 +4,8 @@ package com.hedera.hcsapp.controllers;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.protobuf.ByteString;
+import com.hedera.hashgraph.sdk.HederaException;
+import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.Utils;
@@ -16,6 +18,7 @@ import com.hedera.hcsapp.repository.CreditRepository;
 import com.hedera.hcsapp.repository.SettlementItemRepository;
 import com.hedera.hcsapp.repository.SettlementRepository;
 import com.hedera.hcslib.HCSLib;
+import com.hedera.hcslib.consensus.OutboundHCSMessage;
 import com.hedera.hcslib.interfaces.LibMessagePersistence;
 import com.hedera.hcslib.proto.java.AccountID;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
@@ -24,6 +27,7 @@ import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages.MirrorGetTopicMes
 import com.hedera.hcslib.proto.java.ApplicationMessageId;
 import com.hedera.hcslib.proto.java.Timestamp;
 
+import proto.AdminDeleteBPM;
 import proto.CreditBPM;
 import proto.SettlementBPM;
 
@@ -267,18 +271,19 @@ public class AdminController {
     }
 
     @GetMapping(value = "/admin/deletedata", produces = "application/json")
-    public ResponseEntity<List<Credit>> deleteData() throws FileNotFoundException, IOException {
+    public ResponseEntity<List<Credit>> deleteData() throws HederaNetworkException, IllegalArgumentException, HederaException, Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
 
-        HCSLib hcsLib = appData.getHCSLib();
-        LibMessagePersistence persistence = hcsLib.getMessagePersistence();
-
-        persistence.clear();
-        
-        creditRepository.deleteAll();
-        settlementRepository.deleteAll();
-        settlementItemRepository.deleteAll();
+        AdminDeleteBPM adminDeleteBPM = AdminDeleteBPM.newBuilder().build();
+        SettlementBPM settlementBPM = SettlementBPM.newBuilder()
+                .setThreadId("admin")
+                .setAdminDelete(adminDeleteBPM)
+                .build();
+        new OutboundHCSMessage(appData.getHCSLib())
+            .overrideEncryptedMessages(false)
+            .overrideMessageSignature(false)
+            .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
         
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }

@@ -77,11 +77,8 @@ public class SettlementsController {
             SettlementRest settlementResponse = new SettlementRest(settlementfromDB, appData, settlementItemRepository, creditRepository);
             settlementsList.add(settlementResponse);
         }
-        if (settlementsList.size() != 0) {
-            return new ResponseEntity<>(settlementsList, headers, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(headers, HttpStatus.OK);
-        }
+        return new ResponseEntity<>(settlementsList, headers, HttpStatus.OK);
+        
     }
     @PostMapping(value = "/settlements", consumes = "application/json", produces = "application/json")
     public ResponseEntity<SettlementRest> settlementNew(@RequestBody SettlementProposal settleProposal) throws Exception {

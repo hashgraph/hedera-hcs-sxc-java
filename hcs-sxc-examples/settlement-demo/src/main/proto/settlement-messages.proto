@@ -325,6 +325,10 @@ message SettleCompleteAckBPM {
 //    ApplicationMessageId settleCompleteMessageId = 2;
 }
 
+// Message to signal a deletion of all data from local persistent storage, this is purely for demonstration purposes.
+message AdminDeleteBPM {
+}
+
 // Represents a Settlement-specific Business Process Message
 // The message within will be encapsulated within an ApplicationMessage
 // See: https://github.com/hashgraph/hedera-hcs-sxc/blob/master/hcs-sxc-proto/src/main/proto/Messages.proto
@@ -350,6 +354,7 @@ message SettlementBPM {
         SettlePaidAckBPM settlePaymentAck = 13;
         SettleCompleteBPM settleComplete = 14;
         SettleCompleteAckBPM settleCompleteAck = 15;
+        AdminDeleteBPM adminDelete = 16;
     }
 }
 

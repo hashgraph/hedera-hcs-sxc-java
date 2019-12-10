@@ -550,6 +550,9 @@
                     -->Create Settlement Request<!--
                     --></h2>
                     <div class="mdc-dialog__content" id="my-dialog-content" >
+                        <p class="warning" style="color:red; visibility: hidden">
+                            You can not settle this amount because you are a net receiver.
+                        </p>
                         
                         <div style="display:fex; flex-direction: column">
                             <form id="new-credit-dialog-form">
@@ -596,7 +599,7 @@
                                 
                                 <div class="mdc-text-field mdc-text-field--full-width">
                                     <input type="text"
-                                           id="new-credit-additional-notes"
+                                           id="settle-now-additional-notes"
                                            required minlength=4
                                            id="my-text-field" class="mdc-text-field__input">
                                     <label class="mdc-floating-label" for="settle-now-additional-notes">
@@ -1127,6 +1130,10 @@
                 settleNowDialog  = new mdc.dialog.MDCDialog(document.getElementById('settle-now-dialog'));
                 event.preventDefault();
                 $settleNowDialog = document.getElementById('settle-now-dialog');
+                
+                $settleNowDialog.querySelector("#settle-now-additional-notes").removeAttribute("disabled");
+                $settleNowDialog.querySelector("#settle-now-send").removeAttribute("disabled");
+                $settleNowDialog.querySelector(".warning").style.visibility='hidden';
                 /*
                  * Calculate the net amount.
                  */
@@ -1154,12 +1161,12 @@
                 recipientName = thisUserPays < otherUserPays? thisuserName : otherUserId;
                 netValue = Math.abs(thisUserPays - otherUserPays);
                 
-                settlenowDialog =document.querySelector("#settle-now-dialog");
-                settlenowDialog.querySelector("#settle-now-thread-ids").value=threadIds;
-                settlenowDialog.querySelector("#settle-now-payer").value= payerName;
-                settlenowDialog.querySelector("#settle-now-dialog #settle-now-recipient").value= recipientName;
-                settlenowDialog.querySelector("#settle-now-dialog #settle-now-net-value").value= netValue;
-                additionalNotes = settlenowDialog.querySelector("#new-credit-additional-notes").value;
+              
+                $settleNowDialog.querySelector("#settle-now-thread-ids").value=threadIds;
+                $settleNowDialog.querySelector("#settle-now-payer").value= payerName;
+                $settleNowDialog.querySelector("#settle-now-dialog #settle-now-recipient").value= recipientName;
+                $settleNowDialog.querySelector("#settle-now-dialog #settle-now-net-value").value= netValue;
+                additionalNotes = $settleNowDialog.querySelector("#settle-now-additional-notes").value;
                 clickFunction = function(){
                     //alert(thisUserPays + " " + otherUserPays);
                     settleNowDialog.close();
@@ -1200,9 +1207,11 @@
                     
                 };
                 if (payerName === thisuserName) {
-                    settlenowDialog.querySelector("#settle-now-dialog #settle-now-send").onclick =  clickFunction;
+                    $settleNowDialog.querySelector("#settle-now-send").onclick =  clickFunction;
                 }   else {
-                    settlenowDialog.querySelector("#settle-now-dialog #settle-now-send").setAttribute("disabled","disabled");
+                    $settleNowDialog.querySelector("#settle-now-additional-notes").setAttribute("disabled","disabled");
+                    $settleNowDialog.querySelector("#settle-now-send").setAttribute("disabled","disabled");
+                    $settleNowDialog.querySelector(".warning").style.visibility='visible';
                 }
                 
                 settleNowDialog.open();

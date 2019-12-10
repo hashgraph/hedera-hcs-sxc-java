@@ -28,6 +28,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.codec.binary.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,19 +112,18 @@ public class AuditController {
         
         Map<String, ApplicationMessage> applicationMessages = persistence.getApplicationMessages();
         
-        for (Map.Entry<String, ApplicationMessage> applicationMessage : applicationMessages.entrySet()) {
-            String applicationMessageId = applicationMessage.getKey();
-            SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessage.getValue().getBusinessProcessMessage());
-            
-            if (settlementBPM.getThreadId().contentEquals(threadId)) {
-                AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
-                auditApplicationMessage.setApplicationMessageId(applicationMessageId);
-                auditApplicationMessage.setMessage(settlementBPM.toString());
-                auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
-            }            
-            
+        SortedSet<String> applicationMessageIds = new TreeSet<>(applicationMessages.keySet());
+        for (String applicationMessageId : applicationMessageIds) { 
+           SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessages.get(applicationMessageId).getBusinessProcessMessage());
+           
+           if (settlementBPM.getThreadId().contentEquals(threadId)) {
+               AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
+               auditApplicationMessage.setApplicationMessageId(applicationMessageId);
+               auditApplicationMessage.setMessage(settlementBPM.toString());
+               auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
+           }            
         }
-
+        
         return new ResponseEntity<>(auditApplicationMessages, headers, HttpStatus.OK);
     }
     

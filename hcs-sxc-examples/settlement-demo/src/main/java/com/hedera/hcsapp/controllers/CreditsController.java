@@ -93,15 +93,20 @@ public class CreditsController {
                 .build();
 
         try {
+            if ( ! credit.getStatus().contentEquals(States.CREDIT_AGREED.name())) {
+                // avoiding race condition
+                credit.setStatus(States.CREDIT_AGREED_PENDING.name());
+                credit = creditRepository.save(credit);
+            } else {
+                log.info("Credit state is already CREDIT_AGREED");
+            }
+
             TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib())
                   .overrideEncryptedMessages(false)
                   .overrideMessageSignature(false)
                   .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
 
             log.info("Message sent successfully.");
-
-            credit.setStatus(States.CREDIT_AGREED_PENDING.name());
-            credit = creditRepository.save(credit);
 
             CreditRest creditRest = new CreditRest(credit, appData);
             
@@ -157,7 +162,17 @@ public class CreditsController {
             credit.setCreatedTime(Utils.TimestampToTime(seconds, nanos));
             credit.setApplicationMessageId(Utils.TransactionIdToString(transactionId));
             credit.setThreadId(threadId);
-            credit.setStatus(States.CREDIT_PROPOSED_PENDING.name());
+            
+            credit = creditRepository.save(credit);
+            
+            credit = creditRepository.findById(threadId).get();
+            if ((credit.getStatus() == null) || ( ! credit.getStatus().contentEquals(States.CREDIT_PROPOSED.name()))) {
+                // avoiding race condition
+                credit.setStatus(States.CREDIT_PROPOSED_PENDING.name());
+                credit = creditRepository.save(credit);
+            } else {
+                log.info("Credit state is already CREDIT_PROPOSED");
+            }
             
             credit = creditRepository.save(credit);
             new OutboundHCSMessage(appData.getHCSLib())

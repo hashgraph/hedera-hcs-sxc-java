@@ -125,7 +125,6 @@ public class SettlementsController {
             settlement.setNetValue(settleProposal.getNetValue());
             settlement.setPayerName(settleProposal.getPayerName());
             settlement.setRecipientName(settleProposal.getRecipientName());
-            settlement.setStatus(States.SETTLEMENT_PROPOSED_PENDING.name());
             settlement.setThreadId(threadId);
             settlement.setApplicationMessageId(Utils.TransactionIdToString(transactionId));
             settlement.setCreatedDate(Utils.TimestampToDate(seconds, nanos));
@@ -133,6 +132,14 @@ public class SettlementsController {
 
             settlement = settlementRepository.save(settlement);
 
+            settlement = settlementRepository.findById(threadId).get();
+            if ((settlement.getStatus() == null) || ( ! settlement.getStatus().contentEquals(States.SETTLEMENT_PROPOSED.name()))) {
+                settlement.setStatus(States.SETTLEMENT_PROPOSED_PENDING.name());
+                settlement = settlementRepository.save(settlement);
+            } else {
+                log.info("Settlement state is already SETTLEMENT_PROPOSED");
+            }
+            
             // now settlement items
             for (String settledThreadId : settleProposal.getThreadIds()) {
                 SettlementItem settlementItem = new SettlementItem();
@@ -192,7 +199,12 @@ public class SettlementsController {
                     .build();
 
             try {
-                settlement.get().setStatus(States.SETTLEMENT_AGREED_PENDING.name());
+                if ( ! settlement.get().getStatus().contentEquals(States.SETTLEMENT_AGREED.name())) {
+                    settlement.get().setStatus(States.SETTLEMENT_AGREED_PENDING.name());
+                } else {
+                    log.info("Settlement state is already SETTLEMENT_AGREED");
+                }
+                
                 Settlement newSettlement = settlementRepository.save(settlement.get());
 
                 TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib())
@@ -246,9 +258,13 @@ public class SettlementsController {
                     .build();
 
             try {
-                settlement.get().setStatus(States.SETTLE_INIT_PENDING.name());
-                Settlement newSettlement = settlementRepository.save(settlement.get());
+                if ( ! settlement.get().getStatus().contentEquals(States.SETTLE_INIT_AWAIT_ACK.name())) {
+                    settlement.get().setStatus(States.SETTLE_INIT_PENDING.name());
+                } else {
+                    log.info("Settlement state is already SETTLE_INIT_AWAIT_ACK");
+                }
 
+                Settlement newSettlement = settlementRepository.save(settlement.get());
                 
                 TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib())
                       .overrideEncryptedMessages(false)
@@ -300,8 +316,12 @@ public class SettlementsController {
                     .build();
 
             try {
-                
-                settlement.get().setStatus(States.SETTLE_INIT_ACK_PENDING.name());
+                if ( ! settlement.get().getStatus().contentEquals(States.SETTLE_INIT_ACK.name())) {
+                    settlement.get().setStatus(States.SETTLE_INIT_ACK_PENDING.name());
+                } else {
+                    log.info("Settlement state is already SETTLE_INIT_ACK");
+                }
+
                 Settlement newSettlement = settlementRepository.save(settlement.get());
 
                 TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib())

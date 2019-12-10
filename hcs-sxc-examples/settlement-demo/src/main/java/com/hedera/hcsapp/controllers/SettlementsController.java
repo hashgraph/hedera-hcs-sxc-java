@@ -192,6 +192,9 @@ public class SettlementsController {
                     .build();
 
             try {
+                settlement.get().setStatus(States.SETTLEMENT_AGREED_PENDING.name());
+                Settlement newSettlement = settlementRepository.save(settlement.get());
+
                 TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib())
                       .overrideEncryptedMessages(false)
                       .overrideMessageSignature(false)
@@ -199,9 +202,7 @@ public class SettlementsController {
 
                 log.info("Message sent successfully.");
                 
-                settlement.get().setStatus(States.SETTLEMENT_AGREED_PENDING.name());
-                Settlement newSettlement = settlementRepository.save(settlement.get());
-
+                
                 SettlementRest settlementResponse = new SettlementRest(newSettlement, appData, settlementItemRepository, creditRepository);
                 return new ResponseEntity<>(settlementResponse, headers, HttpStatus.OK);
 
@@ -245,6 +246,10 @@ public class SettlementsController {
                     .build();
 
             try {
+                settlement.get().setStatus(States.SETTLE_INIT_PENDING.name());
+                Settlement newSettlement = settlementRepository.save(settlement.get());
+
+                
                 TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib())
                       .overrideEncryptedMessages(false)
                       .overrideMessageSignature(false)
@@ -252,9 +257,7 @@ public class SettlementsController {
 
                 log.info("Message sent successfully.");
                 
-                settlement.get().setStatus(States.SETTLE_INIT_PENDING.name());
-                Settlement newSettlement = settlementRepository.save(settlement.get());
-
+           
                 SettlementRest settlementResponse = new SettlementRest(newSettlement, appData, settlementItemRepository, creditRepository);
                 return new ResponseEntity<>(settlementResponse, headers, HttpStatus.OK);
 
@@ -297,6 +300,10 @@ public class SettlementsController {
                     .build();
 
             try {
+                
+                settlement.get().setStatus(States.SETTLE_INIT_ACK_PENDING.name());
+                Settlement newSettlement = settlementRepository.save(settlement.get());
+
                 TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib())
                       .overrideEncryptedMessages(false)
                       .overrideMessageSignature(false)
@@ -304,9 +311,6 @@ public class SettlementsController {
 
                 log.info("Message sent successfully.");
                 
-                settlement.get().setStatus(States.SETTLE_INIT_ACK_PENDING.name());
-                Settlement newSettlement = settlementRepository.save(settlement.get());
-
                 SettlementRest settlementResponse = new SettlementRest(newSettlement, appData, settlementItemRepository, creditRepository);
                 return new ResponseEntity<>(settlementResponse, headers, HttpStatus.OK);
 

@@ -303,6 +303,7 @@ public class SettlementsController {
                 
                 settlement.get().setStatus(States.SETTLE_INIT_ACK_PENDING.name());
                 Settlement newSettlement = settlementRepository.save(settlement.get());
+                
 
                 TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib())
                       .overrideEncryptedMessages(false)

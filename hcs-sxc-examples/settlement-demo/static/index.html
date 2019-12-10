@@ -872,6 +872,10 @@
                         clonedCreditRow.getElementById("reference").innerHTML = credit.reference;
                         clonedCreditRow.getElementById("amount-net").innerHTML = credit.amount;
                         clonedCreditRow.getElementById("notes").innerHTML = credit.additionalNotes;
+                        
+                        clonedCreditRow.getElementById("date").innerHTML = credit.createdDate;
+                        clonedCreditRow.getElementById("time").innerHTML = credit.createdTime;
+                        clonedCreditRow.getElementById("status").innerHTML =  credit.displayStatus;
                         //clonedCreditRow.getElementById("net-value").innerHTML = "";
 
 
@@ -1149,6 +1153,7 @@
                 payerName = thisUserPays > otherUserPays? thisuserName : otherUserId;
                 recipientName = thisUserPays < otherUserPays? thisuserName : otherUserId;
                 netValue = Math.abs(thisUserPays - otherUserPays);
+                
                 settlenowDialog =document.querySelector("#settle-now-dialog");
                 settlenowDialog.querySelector("#settle-now-thread-ids").value=threadIds;
                 settlenowDialog.querySelector("#settle-now-payer").value= payerName;
@@ -1194,8 +1199,11 @@
                     
                     
                 };
-                settlenowDialog.querySelector("#settle-now-dialog #settle-now-send").onclick =  clickFunction;
-                
+                if (payerName === thisuserName) {
+                    settlenowDialog.querySelector("#settle-now-dialog #settle-now-send").onclick =  clickFunction;
+                }   else {
+                    settlenowDialog.querySelector("#settle-now-dialog #settle-now-send").setAttribute("disabled","disabled");
+                }
                 
                 settleNowDialog.open();
                 return false;

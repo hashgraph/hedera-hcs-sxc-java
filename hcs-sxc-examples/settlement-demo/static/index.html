@@ -74,33 +74,33 @@
                         </section>
                     </div>           
                 </header>
-                <div class="mdc-list  mdc-top-app-bar--fixed-adjust">
+                <div  id="lhs-menu" class="mdc-list  mdc-top-app-bar--fixed-adjust">
 
-                    <a class="mdc-list-item mdc-list-item--activated" href="#overview">
+<!--                    <a class="mdc-list-item mdc-list-item--activated" href="#overview">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">home</i>
                         <span class="mdc-list-item__text">Overview</span>
-                    </a>
-                    <a class="mdc-list-item" href="#credits-and-debits" aria-current="page">
+                    </a>-->
+                    <a class="credits-and-debits mdc-list-item" href="#credits-and-debits" aria-current="page">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">money</i>
                         <span class="mdc-list-item__text">Credits and Debits</span>
                     </a>
-                    <a class="mdc-list-item " href="#settlements" aria-current="page">
+                    <a class="settlements mdc-list-item " href="#settlements" aria-current="page">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">verified_user</i>
                         <span class="mdc-list-item__text">Settlements</span>
                     </a>
-                    <a class="mdc-list-item" href="#addresses" aria-current="page">
+<!--                    <a class="mdc-list-item" href="#addresses" aria-current="page">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">group</i>
                         <span class="mdc-list-item__text">Addresses</span>
-                    </a>
-                    <a class="mdc-list-item" href="#audit" aria-current="page">
+                    </a>-->
+                    <a class="audit mdc-list-item" href="#audit" aria-current="page">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">remove_red_eye</i>
                         <span class="mdc-list-item__text">Audit</span>
                     </a>
                     <div role="separator" class="mdc-list-divider"></div>
-                    <a class="mdc-list-item" href="#" aria-current="page">
+<!--                    <a class="mdc-list-item" href="#" aria-current="page">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">account_box</i>
                         <span class="mdc-list-item__text">Account</span>
-                    </a>
+                    </a>-->
                 </div>
             </div>
         </aside>
@@ -682,7 +682,10 @@
                     document.getElementById("main-panel-holder").innerHTML = "";
                     switch(location.hash){
                         case '#credits-and-debits':
+                            
                             document.title='Credits and Debits';
+                            document.querySelectorAll("#lhs-menu .mdc-list-item").forEach(i=>i.classList.remove('mdc-list-item--activated'));
+                            document.querySelector("#lhs-menu .credits-and-debits").classList.add("mdc-list-item--activated");
                             document.getElementById("header-title").innerHTML = 'Outstanding Credits and Debits';
                             for(i=0; i < addressBook.length; i++){
                                 var userName = addressBook[i].name;
@@ -691,6 +694,9 @@
                             break;
                         case '#settlements':
                             document.title='Settlements';
+                            document.querySelectorAll("#lhs-menu .mdc-list-item").forEach(i=>i.classList.remove('mdc-list-item--activated'));
+                            document.querySelector("#lhs-menu .settlements").classList.add("mdc-list-item--activated");
+                            
                             document.getElementById("header-title").innerHTML = 'Settlements';
                             for(i=0; i < addressBook.length; i++){
                                 var userName = addressBook[i].name;
@@ -700,6 +706,9 @@
                            
                         case '#audit':
                             document.title='Audit';
+                            document.querySelectorAll("#lhs-menu .mdc-list-item").forEach(i=>i.classList.remove('mdc-list-item--activated'));
+                            document.querySelector("#lhs-menu .audit").classList.add("mdc-list-item--activated");
+                            
                             document.getElementById("header-title").innerHTML = 'Audit';
                             renderAuditIndexTable();
                             break;

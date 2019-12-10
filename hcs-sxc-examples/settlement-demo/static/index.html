@@ -923,7 +923,7 @@
                 
                 for(z=0; z < i_UserCredits.length ; z++){
                     clonedRow = tableBodyTemplate.content.cloneNode(true);
-                    if(i_UserCredits[z].status === 'CREDIT_AGREED' && i_UserCredits[z].payerName===thisuserName ){
+                    if(i_UserCredits[z].status === 'CREDIT_AGREED' ){
                         clonedPanelTemplate.getElementById("settle-now-button").removeAttribute("disabled");
                         clonedRow.getElementById("settle-check").style.visibility="visible";
                         clonedRow.getElementById("checkbox-1").checked="true";

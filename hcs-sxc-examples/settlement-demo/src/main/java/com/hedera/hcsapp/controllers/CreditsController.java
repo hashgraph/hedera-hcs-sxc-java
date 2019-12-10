@@ -98,7 +98,7 @@ public class CreditsController {
                 credit.setStatus(States.CREDIT_AGREED_PENDING.name());
                 credit = creditRepository.save(credit);
             } else {
-                log.info("Credit state is already CREDIT_AGREED");
+                log.error("Credit state is already CREDIT_AGREED");
             }
 
             TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib())
@@ -171,7 +171,7 @@ public class CreditsController {
                 credit.setStatus(States.CREDIT_PROPOSED_PENDING.name());
                 credit = creditRepository.save(credit);
             } else {
-                log.info("Credit state is already CREDIT_PROPOSED");
+                log.error("Credit state is already CREDIT_PROPOSED");
             }
             
             credit = creditRepository.save(credit);

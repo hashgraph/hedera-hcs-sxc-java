@@ -137,7 +137,7 @@ public class SettlementsController {
                 settlement.setStatus(States.SETTLEMENT_PROPOSED_PENDING.name());
                 settlement = settlementRepository.save(settlement);
             } else {
-                log.info("Settlement state is already SETTLEMENT_PROPOSED");
+                log.error("Settlement state is already SETTLEMENT_PROPOSED");
             }
             
             // now settlement items
@@ -202,7 +202,7 @@ public class SettlementsController {
                 if ( ! settlement.get().getStatus().contentEquals(States.SETTLEMENT_AGREED.name())) {
                     settlement.get().setStatus(States.SETTLEMENT_AGREED_PENDING.name());
                 } else {
-                    log.info("Settlement state is already SETTLEMENT_AGREED");
+                    log.error("Settlement state is already SETTLEMENT_AGREED");
                 }
                 
                 Settlement newSettlement = settlementRepository.save(settlement.get());
@@ -261,7 +261,7 @@ public class SettlementsController {
                 if ( ! settlement.get().getStatus().contentEquals(States.SETTLE_INIT_AWAIT_ACK.name())) {
                     settlement.get().setStatus(States.SETTLE_INIT_PENDING.name());
                 } else {
-                    log.info("Settlement state is already SETTLE_INIT_AWAIT_ACK");
+                    log.error("Settlement state is already SETTLE_INIT_AWAIT_ACK");
                 }
 
                 Settlement newSettlement = settlementRepository.save(settlement.get());
@@ -319,7 +319,7 @@ public class SettlementsController {
                 if ( ! settlement.get().getStatus().contentEquals(States.SETTLE_INIT_ACK.name())) {
                     settlement.get().setStatus(States.SETTLE_INIT_ACK_PENDING.name());
                 } else {
-                    log.info("Settlement state is already SETTLE_INIT_ACK");
+                    log.error("Settlement state is already SETTLE_INIT_ACK");
                 }
 
                 Settlement newSettlement = settlementRepository.save(settlement.get());

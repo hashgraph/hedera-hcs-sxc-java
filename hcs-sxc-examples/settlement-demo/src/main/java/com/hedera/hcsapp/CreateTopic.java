@@ -15,7 +15,7 @@ import lombok.extern.log4j.Log4j2;
 public class CreateTopic {
 
 //    public static void main(String[] args) throws FileNotFoundException, IOException, HederaNetworkException, IllegalArgumentException, HederaException {
-//        HCSLib hcsLib = new HCSLib();
+//        HCSLib hcsLib = new HCSLib(0L);
 //        // create topics on HCS
 //        CreateHCSTopic createHCSTopic = new CreateHCSTopic(hcsLib);
 //        TopicId topicId = createHCSTopic.execute();

@@ -776,7 +776,7 @@
                 responseJSON.auditApplicationMessages.forEach(async m=>{
                     let response = await fetch('audit/'+threadId+"/"+m.applicationMessageId);
                     let responseJSON = await  response.json();
-                    
+                    responseJSON = responseJSON.auditHCSMessages;
                     clonedTemplate = document.getElementById("audit-thread-template").content.cloneNode(true);
                     clonedTemplate.querySelector("#audit-thread-message-id").innerHTML=m.applicationMessageId;
                     clonedTemplate.querySelector("#audit-thread-message-text").innerHTML=syntaxHighlight(m.message);//.substring(0,180)+"...";

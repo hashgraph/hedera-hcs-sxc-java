@@ -4,8 +4,6 @@ package com.hedera.hcsapp.controllers;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.HederaException;
-import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.Utils;
@@ -24,6 +22,9 @@ import com.hedera.hcslib.proto.java.AccountID;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
 import com.hedera.hcslib.proto.java.ApplicationMessageChunk;
 import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages.MirrorGetTopicMessagesResponse;
+
+import lombok.extern.log4j.Log4j2;
+
 import com.hedera.hcslib.proto.java.ApplicationMessageId;
 import com.hedera.hcslib.proto.java.Timestamp;
 
@@ -39,7 +40,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-
+@Log4j2
 @RestController
 public class AdminController {
 
@@ -271,7 +272,7 @@ public class AdminController {
     }
 
     @GetMapping(value = "/admin/deletedata", produces = "application/json")
-    public ResponseEntity<List<Credit>> deleteData() throws HederaNetworkException, IllegalArgumentException, HederaException, Exception {
+    public ResponseEntity<List<Credit>> deleteData() {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
 
@@ -280,10 +281,15 @@ public class AdminController {
                 .setThreadId("admin")
                 .setAdminDelete(adminDeleteBPM)
                 .build();
-        new OutboundHCSMessage(appData.getHCSLib())
-            .overrideEncryptedMessages(false)
-            .overrideMessageSignature(false)
-            .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
+        try {
+            new OutboundHCSMessage(appData.getHCSLib())
+                .overrideEncryptedMessages(false)
+                .overrideMessageSignature(false)
+                .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
+        } catch (Exception e) {
+            log.error(e);
+            return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }

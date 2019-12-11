@@ -81,7 +81,7 @@ public class SettlementsController {
         
     }
     @PostMapping(value = "/settlements", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<SettlementRest> settlementNew(@RequestBody SettlementProposal settleProposal) throws Exception {
+    public ResponseEntity<SettlementRest> settlementNew(@RequestBody SettlementProposal settleProposal) {
         log.debug("POST to /settlements/");
 
         HttpHeaders headers = new HttpHeaders();
@@ -155,14 +155,16 @@ public class SettlementsController {
             SettlementRest settlementResponse = new SettlementRest(settlement, appData, settlementItemRepository, creditRepository);
             return new ResponseEntity<>(settlementResponse, headers, HttpStatus.OK);
         } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
-            // TODO Auto-generated catch block
+            log.error(e);
+            return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
             log.error(e);
             return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     
     @PostMapping(value = "/settlements/ack/{threadId}", produces = "application/json")
-    public ResponseEntity<SettlementRest> settleProposeAck(@PathVariable String threadId) throws Exception {
+    public ResponseEntity<SettlementRest> settleProposeAck(@PathVariable String threadId) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");    
 
@@ -218,6 +220,9 @@ public class SettlementsController {
             } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
                 log.error(e);
                 return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+            } catch (Exception e) {
+                log.error(e);
+                return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
             return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -225,7 +230,7 @@ public class SettlementsController {
     }
 
     @PostMapping(value = "/settlements/proposechannel", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<SettlementRest> settleProposeChannel(@RequestBody SettlementChannelProposal settlementChannelProposal) throws Exception {
+    public ResponseEntity<SettlementRest> settleProposeChannel(@RequestBody SettlementChannelProposal settlementChannelProposal) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");    
 
@@ -277,6 +282,9 @@ public class SettlementsController {
             } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
                 log.error(e);
                 return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+            } catch (Exception e) {
+                log.error(e);
+                return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
             return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -284,7 +292,7 @@ public class SettlementsController {
     }
 
     @PostMapping(value = "/settlements/proposechannel/ack/{threadId}", produces = "application/json")
-    public ResponseEntity<SettlementRest> settleProposeChannelAck(@PathVariable String threadId) throws Exception {
+    public ResponseEntity<SettlementRest> settleProposeChannelAck(@PathVariable String threadId) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");    
 
@@ -332,6 +340,9 @@ public class SettlementsController {
                 return new ResponseEntity<>(settlementResponse, headers, HttpStatus.OK);
 
             } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
+                log.error(e);
+                return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+            } catch (Exception e) {
                 log.error(e);
                 return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
             }

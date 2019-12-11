@@ -709,7 +709,16 @@
                             document.getElementById("header-title").innerHTML = 'Audit';
                             renderAuditIndexTable();
                             break;
-                        default:// do nothing
+                        default:
+                            document.title= thisuserName + ' - Credits and Debits';
+                            document.querySelectorAll("#lhs-menu .mdc-list-item").forEach(i=>i.classList.remove('mdc-list-item--activated'));
+                            document.querySelector("#lhs-menu .credits-and-debits").classList.add("mdc-list-item--activated");
+                            document.getElementById("header-title").innerHTML = 'Outstanding Credits and Debits';
+                            for(i=0; i < addressBook.length; i++){
+                                var userName = addressBook[i].name;
+                                await renderCreditsPanel(userName);
+                            }
+                            break;
                     }
                     styleButtons();
                 }

@@ -19,8 +19,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -80,7 +78,7 @@ public final class OnHCSMessageCallback {
                         log.info("Connected to message queue");
                     }
                     catch (JMSException ex) {
-                        ex.printStackTrace();
+                        log.error(ex);
                         log.info("Unable to connect to message queue - sleeping 5s");
                         TimeUnit.SECONDS.sleep(5);
                     }
@@ -90,7 +88,7 @@ public final class OnHCSMessageCallback {
 
                 connection.start();
 
-                Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                Session session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
 
                 TopicSubscriber subscriber = session.createDurableSubscriber(topic, "subscriber-hcsCatchAllTopics-in-lib");
 
@@ -100,9 +98,12 @@ public final class OnHCSMessageCallback {
                         try {
                             // notify subscribed observer from App.java
                             if (messageFromJMS instanceof ActiveMQTextMessage) {
+                                log.info("Got message from queue - notifying");
                                 OnHCSMessageCallback.this.notifyObservers(((ActiveMQTextMessage)messageFromJMS).getText().getBytes(), null);
                                 messageFromJMS.acknowledge();
+                                log.info("Got message from queue - acknowledged");
                             } else if (messageFromJMS instanceof ActiveMQObjectMessage) {
+                                log.info("Got message from queue - persisting");
                                 HCSRelayMessage rlm = (HCSRelayMessage)((ActiveMQObjectMessage) messageFromJMS).getObject();
                                 hcsLib.getMessagePersistence().storeMirrorResponse(rlm.getTopicMessagesResponse());
                                 
@@ -116,12 +117,13 @@ public final class OnHCSMessageCallback {
                                     OnHCSMessageCallback.this.notifyObservers( messageEnvelopeOptional.get().toByteArray(), messageEnvelopeOptional.get().getApplicationMessageId());
                                     messageFromJMS.acknowledge();
                                 }
+                                log.info("Got message from queue - acknowledged");
                             }
                             
                         } catch (JMSException ex) {
                             log.error(ex);
                         } catch (InvalidProtocolBufferException ex) {
-                            Logger.getLogger(OnHCSMessageCallback.class.getName()).log(Level.SEVERE, null, ex);
+                            log.error(ex);
                         }
                     }
 

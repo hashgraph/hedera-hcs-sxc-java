@@ -7,6 +7,7 @@ import com.hedera.hcslib.callback.OnHCSMessageCallback;
 import com.hedera.hcslib.consensus.OutboundHCSMessage;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.Scanner;
 
@@ -14,6 +15,7 @@ import java.util.Scanner;
  * Hello world!
  *
  */
+@Log4j2
 public final class App {
     
     public static void main(String[] args) throws Exception {
@@ -68,7 +70,7 @@ public final class App {
 
                 System.out.println("Message sent successfully.");
             } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
-                e.printStackTrace();
+                log.error(e);
             }
         }            
     }

@@ -1,5 +1,6 @@
 package com.hedera.hcsrelay.config;
 
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -8,10 +9,12 @@ import java.io.InputStream;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
+import lombok.extern.log4j.Log4j2;
+
 /**
  * Manages configuration
  */
-
+@Log4j2
 public final class Config {
     private YAMLConfig yamlConfig = new YAMLConfig();
     
@@ -25,10 +28,10 @@ public final class Config {
             try {
                 inputStream = new FileInputStream(configFile.getCanonicalPath());
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                log.error(e);
                 throw new Exception ("Unable to locate ./config.yaml file");
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e);
                 throw new Exception ("Error reading ./config.yaml file");
             }
         } else {

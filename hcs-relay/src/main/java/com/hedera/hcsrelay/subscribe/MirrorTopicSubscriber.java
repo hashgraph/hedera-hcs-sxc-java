@@ -29,9 +29,10 @@ public final class MirrorTopicSubscriber extends Thread {
         @Override
         public void run() {
             try {
+                log.info("SusbcriberCloseHook - closing");
                 this.subscriber.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error(e);
             }
         }
     }
@@ -44,9 +45,10 @@ public final class MirrorTopicSubscriber extends Thread {
     
     public Runnable closeSubscription() {
         try {
+            log.error("Closing subscription to mirror node");
             this.subscriber.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e);
         }
         return null;
     }
@@ -56,26 +58,29 @@ public final class MirrorTopicSubscriber extends Thread {
         
         try (TopicSubscriber subscriber = new TopicSubscriber(this.mirrorAddress, this.mirrorPort))
         {
+            log.info("Adding shutdown hook");
             Runtime.getRuntime().addShutdownHook(new SusbcriberCloseHook(subscriber));
             this.subscriber = subscriber;
         
             while (retry) {
                 try {
-                    log.info("Mirror Subscribing to topic number " + this.topicId.getTopicNum() + " on mirror node: " + this.mirrorAddress + ":" + this.mirrorPort);
-                    subscriber.subscribe(this.topicId, (tm) -> {
+                    log.info("Relay Subscribing to topic number " + this.topicId.getTopicNum() + " on mirror node: " + this.mirrorAddress + ":" + this.mirrorPort);
+                    subscriber.subscribe(this.topicId, tm -> {
+                        log.info("Got mirror message, calling handler");
                         MirrorMessageHandler.onMirrorMessage(tm, this.topicId);   
                     });
+                    log.info("Relay Subscribed to topic number " + this.topicId.getTopicNum() + " on mirror node: " + this.mirrorAddress + ":" + this.mirrorPort);
                 } catch (io.grpc.StatusRuntimeException e) {
                     log.info("Unable to connect to mirror node: " + mirrorAddress + ":" + mirrorPort + " topic: " + topicId.getTopicNum() + " - retrying in 3s");
-                    e.printStackTrace();
+                    log.error(e);
                     TimeUnit.SECONDS.sleep(3);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error(e);
                     retry = false;
                 }
             }
         } catch (Exception e1) {
-            e1.printStackTrace();
+            log.error(e1);
         }
     }        
     

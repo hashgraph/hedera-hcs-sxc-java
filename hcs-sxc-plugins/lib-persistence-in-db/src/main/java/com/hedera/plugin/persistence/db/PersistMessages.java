@@ -73,7 +73,7 @@ public class PersistMessages
             if (dbTransaction != null) {
                 dbTransaction.rollback();
             }
-            e.printStackTrace();
+            log.error(e);
         }
     }
     
@@ -85,8 +85,7 @@ public class PersistMessages
                     .getSingleResult();
             return MirrorGetTopicMessagesResponse.parseFrom(mirrorResponse.getMirrorTopicMessageResponse());
         } catch (InvalidProtocolBufferException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error(e);
         }
         return null;
     }
@@ -101,8 +100,7 @@ public class PersistMessages
                     try {
                         responseList.put(mirrorResponse.getTimestamp(), MirrorGetTopicMessagesResponse.parseFrom(mirrorResponse.getMirrorTopicMessageResponse()));
                     } catch (InvalidProtocolBufferException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        log.error(e);
                     }
             });
         }
@@ -138,7 +136,7 @@ public class PersistMessages
             if (dbTransaction != null) {
                 dbTransaction.rollback();
             }
-            e.printStackTrace();
+            log.error(e);
         }
     }
     
@@ -181,8 +179,7 @@ public class PersistMessages
           
             return tx;
         } catch (InvalidProtocolBufferException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error(e);
         }
         return null;
         
@@ -228,8 +225,7 @@ public class PersistMessages
                     
                     responseList.put(hcsTransaction.getTransactionId(), tx);
                 } catch (InvalidProtocolBufferException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    log.error(e);
                 }
             });
             
@@ -271,7 +267,7 @@ public class PersistMessages
             if (dbTransaction != null) {
                 dbTransaction.rollback();
             }
-            e.printStackTrace();
+            log.error(e);
         }
     }
 
@@ -283,8 +279,7 @@ public class PersistMessages
                     .getSingleResult();
             return ApplicationMessage.parseFrom(applicationMessage.getApplicationMessage());
         } catch (InvalidProtocolBufferException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error(e);
         }
         return null;
     }
@@ -302,8 +297,7 @@ public class PersistMessages
                 try {
                     responseList.put(applicationMessage.getApplicationMessageId(), ApplicationMessage.parseFrom(applicationMessage.getApplicationMessage()));
                 } catch (InvalidProtocolBufferException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    log.error(e);
                 }
             });
         }

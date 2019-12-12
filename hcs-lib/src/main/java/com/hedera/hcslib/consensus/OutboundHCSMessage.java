@@ -123,36 +123,45 @@ public final class OutboundHCSMessage {
         List<ApplicationMessageChunk> parts = chunk(firstTransactionId, message);
         // send each part to the network
         
-        Client client = new Client(this.nodeMap);
-        client.setOperator(
-                this.operatorAccountId,
-                 this.ed25519PrivateKey
-        );
-
-        client.setMaxTransactionFee(this.hcsTransactionFee);
-        
-        TransactionId transactionId = firstTransactionId;
-        for (ApplicationMessageChunk messageChunk : parts) {
-            
-            SubmitMessageTransaction tx = new SubmitMessageTransaction(client)
-                    .setMessage(messageChunk.toByteArray())
-                    .setTopicId(this.topicIds.get(topicIndex))
-                .setTransactionId(transactionId);
-               
-            // persist the transaction
-            this.persistence.storeTransaction(transactionId, tx);
-            
-            TransactionReceipt receipt = tx.executeForReceipt();
-            
-            transactionId = new TransactionId(this.operatorAccountId);
-            /*
-            log.info("status is {} "
-                    + "sequence no is {}"
-                    ,receipt.getStatus()
-                    ,receipt.getTopicSequenceNumber()
+        try (Client client = new Client(this.nodeMap)) {
+            client.setOperator(
+                    this.operatorAccountId,
+                     this.ed25519PrivateKey
             );
-            */
+
+            client.setMaxTransactionFee(this.hcsTransactionFee);
             
+            TransactionId transactionId = firstTransactionId;
+            int count = 1;
+            for (ApplicationMessageChunk messageChunk : parts) {
+                log.info("Sending message part " + count + " of " + parts.size());
+                count++;
+                SubmitMessageTransaction tx = new SubmitMessageTransaction(client)
+                        .setMessage(messageChunk.toByteArray())
+                        .setTopicId(this.topicIds.get(topicIndex))
+                    .setTransactionId(transactionId);
+                   
+                // persist the transaction
+                this.persistence.storeTransaction(transactionId, tx);
+                
+                log.info("Executing transaction");
+                TransactionReceipt receipt = tx.executeForReceipt();
+                
+                transactionId = new TransactionId(this.operatorAccountId);
+
+                log.info("status is {} "
+                        + "sequence no is {}"
+                        ,receipt.getStatus()
+                        ,receipt.getTopicSequenceNumber()
+                );
+                
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (TimeoutException e) {
+            // do nothing
+        } catch (Exception e) {
+            shellHelper.printError(e.getMessage());
         }
         
         return firstTransactionId;

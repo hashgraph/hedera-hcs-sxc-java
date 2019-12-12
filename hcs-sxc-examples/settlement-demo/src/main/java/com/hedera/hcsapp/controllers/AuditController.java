@@ -22,6 +22,7 @@ import com.hedera.hcslib.proto.java.ApplicationMessageChunk;
 import com.hedera.hcslib.proto.java.ApplicationMessageId;
 import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages.MirrorGetTopicMessagesResponse;
 
+import lombok.extern.log4j.Log4j2;
 import proto.SettlementBPM;
 
 import java.io.FileNotFoundException;
@@ -39,6 +40,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+@Log4j2
 @RestController
 public class AuditController {
 
@@ -166,7 +168,7 @@ public class AuditController {
                     auditHCSMessages.getAuditHCSMessages().add(auditHCSMessage);
                 }
             } catch (InvalidProtocolBufferException e) {
-                e.printStackTrace();
+                log.error(e);
             }
         }
 

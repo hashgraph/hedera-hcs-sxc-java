@@ -6,6 +6,9 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 public class HibernateUtil {
     private static StandardServiceRegistry registry;
     private static SessionFactory sessionFactory;
@@ -26,7 +29,7 @@ public class HibernateUtil {
                 sessionFactory = metadata.getSessionFactoryBuilder().build();
 
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error(e);
                 if (registry != null) {
                     StandardServiceRegistryBuilder.destroy(registry);
                 }

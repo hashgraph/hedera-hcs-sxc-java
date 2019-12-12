@@ -61,19 +61,6 @@ public class HCSIntegration {
     }
 
     public void processHCSMessage(HCSResponse hcsResponse) {
-        if (this.stompSession == null) {
-            WebSocketClient client = new StandardWebSocketClient();
-            WebSocketStompClient stompClient = new WebSocketStompClient(client);        
-            stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-            
-            StompSessionHandler sessionHandler = new CustomStompSessionHandler(); 
-            try {
-                this.stompSession = stompClient.connect("ws://localhost:8080/notifications", sessionHandler).get();
-            } catch (InterruptedException | ExecutionException e) {
-                log.error(e);
-            }
-        }
-
         try {
             ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(hcsResponse.getMessage());
 
@@ -260,6 +247,18 @@ public class HCSIntegration {
     }
     
     private void notify(String context, String payer, String recipient, String threadId) {
+        if ((this.stompSession == null) || ( ! this.stompSession.isConnected())) {
+            WebSocketClient client = new StandardWebSocketClient();
+            WebSocketStompClient stompClient = new WebSocketStompClient(client);        
+            stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+            StompSessionHandler sessionHandler = new CustomStompSessionHandler(); 
+            try {
+                this.stompSession = stompClient.connect("ws://localhost:8080/notifications", sessionHandler).get();
+            } catch (InterruptedException | ExecutionException e) {
+                log.error(e);
+            }
+        }
+
         if (this.stompSession != null) {
             NotificationMessage notificationMessage = new NotificationMessage();
             notificationMessage.setContext(context);

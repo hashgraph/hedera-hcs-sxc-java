@@ -90,7 +90,7 @@ public final class OnHCSMessageCallback {
 
                 connection.start();
 
-                Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                Session session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
 
                 TopicSubscriber subscriber = session.createDurableSubscriber(topic, "subscriber-hcsCatchAllTopics-in-lib");
 

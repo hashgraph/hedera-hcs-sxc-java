@@ -83,7 +83,7 @@ public class QueueTopicOperations {
 
             connection.start();
 
-            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            Session session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
 
             MessageProducer messageProducer = session.createProducer(topic);
 
@@ -139,7 +139,7 @@ public class QueueTopicOperations {
 
             connection.start();
 
-            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            Session session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
 
             MessageProducer messageProducer = session.createProducer(topic);
 

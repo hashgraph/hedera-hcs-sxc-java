@@ -30,8 +30,15 @@ public class AddressBookController {
     public List<AddressBook> addressbookBuyerSeller() throws FileNotFoundException, IOException {
 //        AppData appData = new AppData();
         log.debug("/addressbook/buyerorseller");
-        return addressBookRepository.findAllBuyersSellersButMe(appData.getUserName(),"BUYER,SELLER");
+        return addressBookRepository.findAllWithRoleButMe(appData.getUserName(),"BUYER,SELLER");
     }
+    
+    @GetMapping(value = "/addressbook/paychannel", produces = "application/json")
+    public List<AddressBook> addressbookPaychannel() throws FileNotFoundException, IOException {
+        log.debug("/addressbook/paychannel");
+        return addressBookRepository.findAllWithRoleButMe(appData.getUserName(),"PAYCHANNEL");
+    }
+    
     @GetMapping(value = "/addressbook", produces = "application/json")
     public List<AddressBook> addressbookAll() throws FileNotFoundException, IOException {
 //        AppData appData = new AppData();

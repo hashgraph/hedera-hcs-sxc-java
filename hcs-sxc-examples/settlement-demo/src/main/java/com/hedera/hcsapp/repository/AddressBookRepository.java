@@ -16,6 +16,6 @@ public interface AddressBookRepository extends CrudRepository<AddressBook, Strin
     AddressBook findUserByName(@Param("userName") String userName);
     
     @Query("SELECT ab FROM AddressBook ab WHERE ab.name <> :userName AND roles LIKE CONCAT('%',:role,'%')")
-    List<AddressBook> findAllBuyersSellersButMe(@Param("userName") String userName, @Param("role") String role);
+    List<AddressBook> findAllWithRoleButMe(@Param("userName") String userName, @Param("role") String role);
 }
 

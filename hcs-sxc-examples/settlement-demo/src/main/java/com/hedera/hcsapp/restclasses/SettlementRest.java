@@ -23,8 +23,7 @@ public final class SettlementRest {
     private long netValue;
     private String currency;
     private String status;
-    private String createdDate;
-    private String createdTime;
+    private String createdDateTime;
     private String topicId;
     private String displayStatus;
     private String paymentChannelName;
@@ -41,8 +40,7 @@ public final class SettlementRest {
         this.netValue = settlement.getNetValue();
         this.currency = settlement.getCurrency();
         this.status = settlement.getStatus();
-        this.createdDate = settlement.getCreatedDate();
-        this.createdTime = settlement.getCreatedTime();
+        this.createdDateTime = settlement.getCreatedDate() + " " + settlement.getCreatedTime();
         this.topicId = appData.getHCSLib().getTopicIds().get(appData.getTopicIndex()).toString();
         if (this.status.startsWith("Settlement ")) {
             this.displayStatus = States.valueOf(this.status).getDisplay().replaceFirst("Settlement ", "");

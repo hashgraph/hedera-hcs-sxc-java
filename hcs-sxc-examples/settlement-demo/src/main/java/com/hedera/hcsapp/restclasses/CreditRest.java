@@ -19,8 +19,7 @@ public final class CreditRest {
     private String additionalNotes;
     private String status;
     private String displayStatus;
-    private String createdDate;
-    private String createdTime;
+    private String createdDateTime;
     private String topicId;
     
     public CreditRest(Credit credit, AppData appData) {
@@ -33,8 +32,7 @@ public final class CreditRest {
         this.currency = credit.getCurrency();
         this.additionalNotes = credit.getAdditionalNotes();
         this.status = credit.getStatus();
-        this.createdDate = credit.getCreatedDate();
-        this.createdTime = credit.getCreatedTime();
+        this.createdDateTime = credit.getCreatedDate() + " " + credit.getCreatedTime();
         this.topicId = appData.getHCSLib().getTopicIds().get(appData.getTopicIndex()).toString();
         if (this.status.startsWith("Credit ")) {
             this.displayStatus = States.valueOf(this.status).getDisplay().replaceFirst("Credit ", "");

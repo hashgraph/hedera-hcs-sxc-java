@@ -1593,7 +1593,13 @@
                                     messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
                                   );
                              styleButtons();
+                        } else if (location.hash === '#audits'){
+                            await renderAuditIndexTable()(
+                                    messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
+                                  );
+                             styleButtons();
                         }
+                        
                         break;
                     case "settlements":
                         if(location.hash === '#settlements'){
@@ -1603,6 +1609,29 @@
                             styleButtons();
                         } else if (location.hash === '#credits-and-debits'){
                             await renderCreditsPanel(
+                                    messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
+                                  );
+                             styleButtons();
+                        } else if (location.hash === '#audits'){
+                            await renderAuditIndexTable()(
+                                    messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
+                                  );
+                             styleButtons();
+                        }
+                        break;
+                    case "audits":
+                        if(location.hash === '#settlements'){
+                            await renderSettlementsPanel(
+                                   messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
+                                   );
+                            styleButtons();
+                        } else if (location.hash === '#credits-and-debits'){
+                            await renderCreditsPanel(
+                                    messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
+                                  );
+                             styleButtons();
+                        } else if (location.hash === '#audits'){
+                            await renderAuditIndexTable()(
                                     messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
                                   );
                              styleButtons();

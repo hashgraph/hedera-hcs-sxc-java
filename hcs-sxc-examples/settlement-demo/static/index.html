@@ -166,8 +166,7 @@
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recipient</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Reference</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Amount</th>
-                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Date</th>
-                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Time</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">DateTime</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Status</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Actions</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Notes</th>
@@ -199,8 +198,7 @@
                                                     <td id="recipient"      class="mdc-data-table__cell">Bob</td>
                                                     <td id="reference"      class="mdc-data-table__cell">A77U312</td>
                                                     <td id="amount"         class="mdc-data-table__cell" data-amount="120" data-currency="USD">$120</td>
-                                                    <td id="date"           class="mdc-data-table__cell">13 Nov</td>
-                                                    <td id="time"           class="mdc-data-table__cell">09:31</td>
+                                                    <td id="date-time"           class="mdc-data-table__cell">13 Nov 9:21</td>
                                                     <td id="status"         class="mdc-data-table__cell">Pending</td>
                                                     <td id="action"         class="mdc-data-table__cell"></td>
                                                     <td id="notes"          class="mdc-data-table__cell">1 x XYZ Service</td>
@@ -256,8 +254,7 @@
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recipient</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Reference</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Amount (USD)</th>
-                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Date</th>
-                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Time</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">DateTime</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Status</th>
                                                 <!--<th class="mdc-data-table__header-cell" role="columnheader" scope="col">Channel</th>-->
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Actions</th>
@@ -274,8 +271,7 @@
                                                     <td id="recipient"      class="mdc-data-table__cell">Bob</td>
                                                     <td id="reference"      class="mdc-data-table__cell">A77U312</td>
                                                     <td id="amount-net"     class="mdc-data-table__cell" style="text-align: right" data-amount="120" data-currency="USD">$120</td>
-                                                    <td id="date"           class="mdc-data-table__cell">13 Nov</td>
-                                                    <td id="time"           class="mdc-data-table__cell">09:31</td>
+                                                    <td id="date-time"           class="mdc-data-table__cell">13 Nov</td>
                                                     <td id="status"         class="mdc-data-table__cell">Pending</td>
                                                     <!--<td id="channel-name"   class="mdc-data-table__cell"></td>-->
                                                     <td id="action"         class="mdc-data-table__cell"></td>
@@ -965,8 +961,7 @@
                     
                     clonedRow.getElementById("amount-net").innerHTML = "Net " + i_Settlements.netValue;
                 
-                    clonedRow.getElementById("date").innerHTML = i_Settlements.createdDate;
-                    clonedRow.getElementById("time").innerHTML = i_Settlements.createdTime;
+                    clonedRow.getElementById("date-time").innerHTML = i_Settlements.createdDateTime;
                     clonedRow.getElementById("status").innerHTML =  i_Settlements.displayStatus + (i_Settlements.paymentChannelName===""?"":" (with "+ i_Settlements.paymentChannelName +")");
                     //clonedRow.getElementById("status").style.textTransform = "capitalize";
                     
@@ -1018,8 +1013,7 @@
                         clonedCreditRow.getElementById("amount-net").innerHTML = credit.amount;
                         clonedCreditRow.getElementById("notes").innerHTML = credit.additionalNotes;
                         
-                        clonedCreditRow.getElementById("date").innerHTML = credit.createdDate;
-                        clonedCreditRow.getElementById("time").innerHTML = credit.createdTime;
+                        clonedCreditRow.getElementById("date-time").innerHTML = credit.createdDateTime;
                         clonedCreditRow.getElementById("status").innerHTML =  credit.displayStatus;
                         //clonedCreditRow.getElementById("net-value").innerHTML = "";
 
@@ -1090,8 +1084,7 @@
                     clonedRow.getElementById("amount").setAttribute("data-currency", i_UserCredits[z].currency );
 
 
-                    clonedRow.getElementById("date").innerHTML = i_UserCredits[z].createdDate;
-                    clonedRow.getElementById("time").innerHTML = i_UserCredits[z].createdTime;
+                    clonedRow.getElementById("date-time").innerHTML = i_UserCredits[z].createdDateTime;
                     clonedRow.getElementById("status").innerHTML =  i_UserCredits[z].displayStatus;
                     //clonedRow.getElementById("status").innerHTML =  i_UserCredits[z].status.toLowerCase().replace(/_/g," ");
                     //clonedRow.getElementById("status").style.textTransform = "capitalize";

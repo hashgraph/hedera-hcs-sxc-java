@@ -20,4 +20,10 @@ appClients:
   - clientName: "Grace"
     clientKey: "302a300506032b6570032100dfc5cedd58ea4a0340fe35fbc26e98572fd40f081d749b202ffc4ed5d3b46ffa"
     roles: "DEMO"
+  - clientName: "Harry"
+    clientKey: "302a300506032b6570032100611824b08eb56cce4b84b9bf785bdea3a9429a52084dd7fdd39dc7ce3857a3cc"
+    roles: "PAYCHANNEL"
+  - clientName: "William"
+    clientKey: "302a300506032b6570032100611824b08eb56cce4b84b9bf785bdea3a9429a52084dd7fdd39dc7ce3857a3cd"
+    roles: "PAYCHANNEL"
     

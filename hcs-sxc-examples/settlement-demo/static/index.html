@@ -247,7 +247,7 @@
                                  style="overflow-x: scroll"
                                  >
                                 <div class="mdc-data-table" style="width:100%">
-                                    <table class="mdc-data-table__table" aria-label="Dessert calories">
+                                    <table class="mdc-data-table__table" aria-label="">
                                         <thead>
                                             <tr class="mdc-data-table__header-row">
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col"></th>
@@ -259,6 +259,7 @@
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Date</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Time</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Status</th>
+                                                <!--<th class="mdc-data-table__header-cell" role="columnheader" scope="col">Channel</th>-->
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Actions</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Notes</th>
                                             </tr>
@@ -276,6 +277,7 @@
                                                     <td id="date"           class="mdc-data-table__cell">13 Nov</td>
                                                     <td id="time"           class="mdc-data-table__cell">09:31</td>
                                                     <td id="status"         class="mdc-data-table__cell">Pending</td>
+                                                    <!--<td id="channel-name"   class="mdc-data-table__cell"></td>-->
                                                     <td id="action"         class="mdc-data-table__cell"></td>
                                                     <td id="notes"          class="mdc-data-table__cell">1 x XYZ Service</td>
                                                 </tr>
@@ -705,6 +707,48 @@
             </div>
         </div><div class="mdc-dialog-scrim"></div>
         
+        <div id="confirm-pay-channel-dialog" 
+            class="mdc-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="my-dialog-title"
+            aria-describedby="my-dialog-content">
+            <div class="mdc-dialog__container">
+
+                <div class="mdc-dialog__surface" >
+                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
+                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
+                    -->Confirm Payment Channel<!--
+                    --></h2>
+                    <div class="mdc-dialog__content" id="my-dialog-content" >
+                       Accept this payment channel
+                    </div>
+                    <div class="mdc-text-field mdc-text-field--full-width">
+                        <input type="text"
+                               id="channel-name"
+                               value="{{paychannel}}"
+                               disabled
+                               class="mdc-text-field__input">
+                        <label class="mdc-floating-label" for="thread-id">
+                            Proposed payment channel
+                        </label>
+                    </div>
+                  
+                    <footer class="mdc-dialog__actions" style="padding:24px">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+                            <span class="mdc-button__label">Cancel</span>
+                        </button>
+                        <button type="button" 
+                                id="confirm-channel-send"
+                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
+                        >
+                            <span class="mdc-button__label">Confirm</span>
+                        </button>
+                    </footer>
+                </div>
+            </div>
+        </div><div class="mdc-dialog-scrim"></div>
+        
       
         <div id="snackbar" class="mdc-snackbar">
                 <div class="mdc-snackbar__surface">
@@ -920,35 +964,38 @@
                     clonedRow.getElementById("reference").innerHTML = "";
                     
                     clonedRow.getElementById("amount-net").innerHTML = "Net " + i_Settlements.netValue;
-                    /*
-                    clonedRow.getElementById("amount").innerHTML = i_Settlements.currency + ' '+ i_Settlements.amount;
-                    clonedRow.getElementById("amount").setAttribute("data-amount", i_Settlements.amount );
-                    clonedRow.getElementById("amount").setAttribute("data-currency", i_Settlements.currency );
-                    */
-
+                
                     clonedRow.getElementById("date").innerHTML = i_Settlements.createdDate;
                     clonedRow.getElementById("time").innerHTML = i_Settlements.createdTime;
-                    clonedRow.getElementById("status").innerHTML =  i_Settlements.displayStatus;
-                    clonedRow.getElementById("status").style.textTransform = "capitalize";
-
+                    clonedRow.getElementById("status").innerHTML =  i_Settlements.displayStatus + (i_Settlements.paymentChannelName===""?"":" (with "+ i_Settlements.paymentChannelName +")");
+                    //clonedRow.getElementById("status").style.textTransform = "capitalize";
+                    
+                    
                     
                     if(i_Settlements.payerName === userName &&  i_Settlements.status === 'SETTLEMENT_PROPOSED'){ //SETTLEMENT_PROPOSED
-                      let threadId = i_Settlements.threadId;
-                      newButton = document.createElement("button");
-                      newButton.innerHTML = "Accept";
-                      newButton.classList.add("mdc-button");
-                      newButton.classList.add("mdc-button--outlined");
-                      newButton.addEventListener("click", function(){openConfirmSettlementDialog(threadId,userName);});
-                      clonedRow.getElementById("action").appendChild(newButton);
-                    } else if(i_Settlements.payerName === thisuserName  &&  i_Settlements.status === 'SETTLEMENT_AGREED'){
-                    let threadId = i_Settlements.threadId;
-                      newButton = document.createElement("button");
-                      newButton.innerHTML = "Prop Paychannel";
-                      newButton.classList.add("mdc-button");
-                      newButton.classList.add("mdc-button--outlined");
-                      newButton.addEventListener("click", function(){openSelectPaychannelDialog(threadId,userName);});
-                      clonedRow.getElementById("action").appendChild(newButton);
-            
+                        let threadId = i_Settlements.threadId;
+                        newButton = document.createElement("button");
+                        newButton.innerHTML = "Accept";
+                        newButton.classList.add("mdc-button");
+                        newButton.classList.add("mdc-button--outlined");
+                        newButton.addEventListener("click", function(){openConfirmSettlementDialog(threadId,userName);});
+                        clonedRow.getElementById("action").appendChild(newButton);
+                    } else if (i_Settlements.payerName === thisuserName  &&  i_Settlements.status === 'SETTLEMENT_AGREED'){
+                        let threadId = i_Settlements.threadId;
+                        newButton = document.createElement("button");
+                        newButton.innerHTML = "Prop Paychannel";
+                        newButton.classList.add("mdc-button");
+                        newButton.classList.add("mdc-button--outlined");
+                        newButton.addEventListener("click", function(){openSelectPaychannelDialog(threadId,userName);});
+                        clonedRow.getElementById("action").appendChild(newButton);
+                    } else if (i_Settlements.payerName === userName  &&  i_Settlements.status === 'SETTLE_INIT_AWAIT_ACK'){
+                        let threadId = i_Settlements.threadId;
+                        newButton = document.createElement("button");
+                        newButton.innerHTML = "Accept";
+                        newButton.classList.add("mdc-button");
+                        newButton.classList.add("mdc-button--outlined");
+                        newButton.addEventListener("click", function(){openAcceptPaychannelDialog(threadId,userName,i_Settlements.paymentChannelName );});
+                        clonedRow.getElementById("action").appendChild(newButton);
                     }
                   
                     clonedRow.getElementById("notes").innerHTML = i_Settlements.additionalNotes;
@@ -1250,6 +1297,44 @@
                 return false;
             }
             
+        
+            function openAcceptPaychannelDialog (threadId, otherUserId,channelName){
+                event.preventDefault();
+                confirmChannelDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-pay-channel-dialog'));
+
+                $confirmChannelDialog = document.getElementById('confirm-pay-channel-dialog');
+                $confirmChannelDialog.querySelector("#channel-name").value=channelName;
+                clickFunction = function(){
+                   
+                    showSnackBarMessage("sending confirmation " + threadId + " ...");
+                    confirmChannelDialog.close();
+
+                    el = document.getElementById(otherUserId);
+                    el.style.opacity=0.4;
+                    el.style.pointerEvents =  'none';
+                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
+
+                    fetch('settlements/proposechannel/ack/'+threadId, {
+                            method: 'post',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(function(response) {
+                            return response.json();
+                        }).then(function(data) {
+                            showSnackBarMessage("confirmation sent");
+
+                        }).catch(function(res){
+                            alert(res);
+                        });
+        
+                };
+                $confirmChannelDialog.querySelector("#confirm-channel-send").onclick = clickFunction;
+                confirmChannelDialog.open();
+                return false;
+        
+            }
         
             
             function openConfirmCreditDialog(threadId,otherUserId) {

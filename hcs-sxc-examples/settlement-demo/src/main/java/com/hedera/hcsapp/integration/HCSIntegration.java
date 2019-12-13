@@ -30,6 +30,8 @@ import com.hedera.hcslib.interfaces.LibMessagePersistence;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
 import lombok.extern.log4j.Log4j2;
 import proto.CreditBPM;
+import proto.PaymentInitAckBPM;
+import proto.PaymentInitBPM;
 import proto.SettleInitBPM;
 import proto.SettleProposeBPM;
 import proto.SettlementBPM;
@@ -220,9 +222,51 @@ public class HCSIntegration {
                         }
                 );
             } else if (settlementBPM.hasPaymentInit()) {
+                
+                String priorState1 = States.PAYMENT_INIT_PENDING.name();
+                String priorState2 = States.SETTLE_INIT_ACK.name();
+                String nextState = States.PAYMENT_INIT_AWAIT_ACK.name();
 
+                PaymentInitBPM paymentInitBPM = settlementBPM.getPaymentInit();
+                // update the settlement state
+                settlementRepository.findById(threadId).ifPresent(
+                        (settlement) -> {
+                            if ((settlement.getStatus().equals(priorState1)) || (settlement.getStatus().equals(priorState2))) {
+                                settlement.setStatus(nextState);
+                                settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                                settlement.setAdditionalNotes(paymentInitBPM.getAdditionalNotes());
+                                settlement.setPayerAccountDetails(paymentInitBPM.getPayerAccountDetails());
+                                settlement.setRecipientAccountDetails(paymentInitBPM.getRecipientAccountDetails());
+                                
+                                settlementRepository.save(settlement);
+                                // update the credits too
+                                updateCreditStateForSettlementItems(threadId, nextState);
+                                notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
+                            } else {
+                                log.error("Settlement status should be " + priorState1 + " or " + priorState2 + ", found : " + settlement.getStatus());
+                            }
+                        }
+                );
             } else if (settlementBPM.hasPaymentInitAck()) {
+                String priorState1 = States.PAYMENT_INIT_ACK_PENDING.name();
+                String priorState2 = States.PAYMENT_INIT_AWAIT_ACK.name();
+                String nextState = States.PAYMENT_INIT_ACK.name();
 
+                PaymentInitAckBPM paymentInitAckBPM = settlementBPM.getPaymentInitAck();
+                // update the settlement state
+                settlementRepository.findById(threadId).ifPresent(
+                        (settlement) -> {
+                            if ((settlement.getStatus().equals(priorState1)) || (settlement.getStatus().equals(priorState2))) {
+                                settlement.setStatus(nextState);
+                                settlementRepository.save(settlement);
+                                // update the credits too
+                                updateCreditStateForSettlementItems(threadId, nextState);
+                                notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
+                            } else {
+                                log.error("Settlement status should be " + priorState1 + " or " + priorState2 + ", found : " + settlement.getStatus());
+                            }
+                        }
+                );
             } else if (settlementBPM.hasPaymentSent()) {
 
             } else if (settlementBPM.hasPaymentSentAck()) {

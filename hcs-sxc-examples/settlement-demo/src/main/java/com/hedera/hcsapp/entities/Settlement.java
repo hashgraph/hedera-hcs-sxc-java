@@ -23,4 +23,6 @@ public final class Settlement {
     private String createdDate;
     private String createdTime;
     private String paymentChannelName;
+    private String payerAccountDetails;
+    private String recipientAccountDetails;
 }

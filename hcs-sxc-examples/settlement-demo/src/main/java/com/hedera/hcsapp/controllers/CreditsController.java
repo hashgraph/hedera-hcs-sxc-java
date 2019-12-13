@@ -73,7 +73,7 @@ public class CreditsController {
         return new ResponseEntity<>(restResponse, headers, HttpStatus.OK);
     }
 
-    @Transactional
+//    @Transactional
     @PostMapping(value = "/credits/ack/{threadId}", produces = "application/json")
     public ResponseEntity<CreditRest> creditAck(@PathVariable String threadId) throws Exception {
         HttpHeaders headers = new HttpHeaders();
@@ -117,7 +117,7 @@ public class CreditsController {
         }
     }
 
-    @Transactional
+//    @Transactional
     @PostMapping(value = "/credits", consumes = "application/json", produces = "application/json")
     public ResponseEntity<CreditRest> creditNew(@RequestBody CreditProposal creditCreate) throws Exception {
         HttpHeaders headers = new HttpHeaders();

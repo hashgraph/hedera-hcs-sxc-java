@@ -44,7 +44,11 @@ public final class SettlementRest {
         this.createdDate = settlement.getCreatedDate();
         this.createdTime = settlement.getCreatedTime();
         this.topicId = appData.getHCSLib().getTopicIds().get(appData.getTopicIndex()).toString();
-        this.displayStatus = States.valueOf(this.status).getDisplay().replace("Settlement ", "");
+        if (this.status.startsWith("Settlement ")) {
+            this.displayStatus = States.valueOf(this.status).getDisplay().replaceFirst("Settlement ", "");
+        } else {
+            this.displayStatus = States.valueOf(this.status).getDisplay();
+        }
         this.paymentChannelName = settlement.getPaymentChannelName();
 
         List<SettlementItem> settlementItemsFromDB = settlementItemRepository.findAllSettlementItems(settlement.getThreadId());

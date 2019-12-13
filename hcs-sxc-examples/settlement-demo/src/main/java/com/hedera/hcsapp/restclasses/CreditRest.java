@@ -36,6 +36,10 @@ public final class CreditRest {
         this.createdDate = credit.getCreatedDate();
         this.createdTime = credit.getCreatedTime();
         this.topicId = appData.getHCSLib().getTopicIds().get(appData.getTopicIndex()).toString();
-        this.displayStatus = States.valueOf(this.status).getDisplay().replace("Credit ", ""); 
+        if (this.status.startsWith("Credit ")) {
+            this.displayStatus = States.valueOf(this.status).getDisplay().replaceFirst("Credit ", "");
+        } else {
+            this.displayStatus = States.valueOf(this.status).getDisplay();
+        }
     }
 }

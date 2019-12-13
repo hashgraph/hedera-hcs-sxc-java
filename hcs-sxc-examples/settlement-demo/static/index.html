@@ -962,7 +962,7 @@
                     clonedRow.getElementById("amount-net").innerHTML = "Net " + i_Settlements.netValue;
                 
                     clonedRow.getElementById("date-time").innerHTML = i_Settlements.createdDateTime;
-                    clonedRow.getElementById("status").innerHTML =  i_Settlements.displayStatus + (i_Settlements.paymentChannelName===""?"":" (with "+ i_Settlements.paymentChannelName +")");
+                    clonedRow.getElementById("status").innerHTML =  i_Settlements.displayStatus + (i_Settlements.paymentChannelName===null?"":" (with "+ i_Settlements.paymentChannelName +")");
                     //clonedRow.getElementById("status").style.textTransform = "capitalize";
                     
                     

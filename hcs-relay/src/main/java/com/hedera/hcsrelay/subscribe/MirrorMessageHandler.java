@@ -24,7 +24,7 @@ public final class MirrorMessageHandler {
             log.info("  Message: "+ messagesResponse.getMessage().toStringUtf8());
             
             QueueTopicOperations.addMessage(config, messagesResponse, topicId);
-            
+            log.info("Message added to queue");
         } catch (Exception ex) {
             log.error(ex);
         }

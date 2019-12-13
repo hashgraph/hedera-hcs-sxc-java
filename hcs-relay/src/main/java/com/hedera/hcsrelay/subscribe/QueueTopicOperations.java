@@ -90,12 +90,14 @@ public class QueueTopicOperations {
             r = true;
             
         } catch (Exception e) {
-            e.printStackTrace();;
+            log.error(e);
         } finally {
             if (connection != null) {
+                log.info("blockingCreateJmsTopic - Closing JMS connection");
                 connection.close();
             }
             if (initialContext != null) {
+                log.info("blockingCreateJmsTopic- Closing JMS initial context");
                 initialContext.close();
             }
         }
@@ -108,6 +110,7 @@ public class QueueTopicOperations {
         InitialContext initialContext = null;
         
         try {
+            log.info("Sending message to queue");
             Queue queueConfig = config.getConfig().getQueue();
             Hashtable<String, Object> props = new Hashtable<>();
             props.put(Context.INITIAL_CONTEXT_FACTORY, queueConfig.getInitialContextFactory());
@@ -154,14 +157,18 @@ public class QueueTopicOperations {
             ObjectMessage objectMessage = session.createObjectMessage(relayMessage);
            
             messageProducer.send(objectMessage);
+
+            log.info("Sent message to queue");
         
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e);
         } finally {
             if (connection != null) {
+                log.info("addMessage - Closing JMS connection");
                 connection.close();
             }
             if (initialContext != null) {
+                log.info("addMessage- Closing JMS initial context");
                 initialContext.close();
             }
         }

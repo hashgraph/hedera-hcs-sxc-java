@@ -132,8 +132,10 @@ public final class OutboundHCSMessage {
         client.setMaxTransactionFee(this.hcsTransactionFee);
         
         TransactionId transactionId = firstTransactionId;
+        int count = 1;
         for (ApplicationMessageChunk messageChunk : parts) {
-            
+            log.info("Sending message part " + count + " of " + parts.size());
+            count++;
             SubmitMessageTransaction tx = new SubmitMessageTransaction(client)
                     .setMessage(messageChunk.toByteArray())
                     .setTopicId(this.topicIds.get(topicIndex))
@@ -142,16 +144,16 @@ public final class OutboundHCSMessage {
             // persist the transaction
             this.persistence.storeTransaction(transactionId, tx);
             
+            log.info("Executing transaction");
             TransactionReceipt receipt = tx.executeForReceipt();
             
             transactionId = new TransactionId(this.operatorAccountId);
-            /*
+
             log.info("status is {} "
                     + "sequence no is {}"
                     ,receipt.getStatus()
                     ,receipt.getTopicSequenceNumber()
             );
-            */
             
         }
         

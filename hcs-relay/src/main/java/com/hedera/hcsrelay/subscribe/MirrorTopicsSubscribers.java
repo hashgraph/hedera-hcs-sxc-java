@@ -24,6 +24,7 @@ public final class MirrorTopicsSubscribers {
                 subscriberThread.start();
             }
         } else {
+            log.error("Queue topic subscription error");
             throw new Exception("Queue topic subscription error");
         }
     }

@@ -11,26 +11,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hedera.hashgraph.sdk.HederaException;
-import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.Utils;
-import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.entities.Settlement;
 import com.hedera.hcsapp.entities.SettlementItem;
 import com.hedera.hcsapp.entities.SettlementItemId;
 import com.hedera.hcsapp.repository.CreditRepository;
 import com.hedera.hcsapp.repository.SettlementItemRepository;
 import com.hedera.hcsapp.repository.SettlementRepository;
-import com.hedera.hcsapp.restclasses.CreditRest;
 import com.hedera.hcsapp.restclasses.SettlementChannelProposal;
 import com.hedera.hcsapp.restclasses.SettlementProposal;
 import com.hedera.hcsapp.restclasses.SettlementRest;
@@ -80,8 +77,10 @@ public class SettlementsController {
         return new ResponseEntity<>(settlementsList, headers, HttpStatus.OK);
         
     }
+
+    @Transactional
     @PostMapping(value = "/settlements", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<SettlementRest> settlementNew(@RequestBody SettlementProposal settleProposal) {
+    public ResponseEntity<SettlementRest> settlementNew(@RequestBody SettlementProposal settleProposal) throws Exception {
         log.debug("POST to /settlements/");
 
         HttpHeaders headers = new HttpHeaders();
@@ -101,6 +100,8 @@ public class SettlementsController {
                 .setAdditionalNotes(settleProposal.getAdditionalNotes())
                 .setPayerName(settleProposal.getPayerName())
                 .setRecipientName(settleProposal.getRecipientName())
+                .setCreatedDate(Utils.TimestampToDate(seconds, nanos))
+                .setCreatedTime(Utils.TimestampToTime(seconds, nanos))
                 .setNetValue(value);
         
         for (String proposedThreadId : settleProposal.getThreadIds()) {
@@ -154,17 +155,15 @@ public class SettlementsController {
 
             SettlementRest settlementResponse = new SettlementRest(settlement, appData, settlementItemRepository, creditRepository);
             return new ResponseEntity<>(settlementResponse, headers, HttpStatus.OK);
-        } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
-            log.error(e);
-            return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             log.error(e);
-            return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw e;
         }
     }
     
+    @Transactional
     @PostMapping(value = "/settlements/ack/{threadId}", produces = "application/json")
-    public ResponseEntity<SettlementRest> settleProposeAck(@PathVariable String threadId) {
+    public ResponseEntity<SettlementRest> settleProposeAck(@PathVariable String threadId) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");    
 
@@ -217,20 +216,18 @@ public class SettlementsController {
                 SettlementRest settlementResponse = new SettlementRest(newSettlement, appData, settlementItemRepository, creditRepository);
                 return new ResponseEntity<>(settlementResponse, headers, HttpStatus.OK);
 
-            } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
-                log.error(e);
-                return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (Exception e) {
                 log.error(e);
-                return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+                throw e;
             }
         } else {
             return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    @Transactional
     @PostMapping(value = "/settlements/proposechannel", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<SettlementRest> settleProposeChannel(@RequestBody SettlementChannelProposal settlementChannelProposal) {
+    public ResponseEntity<SettlementRest> settleProposeChannel(@RequestBody SettlementChannelProposal settlementChannelProposal) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");    
 
@@ -279,20 +276,18 @@ public class SettlementsController {
                 SettlementRest settlementResponse = new SettlementRest(newSettlement, appData, settlementItemRepository, creditRepository);
                 return new ResponseEntity<>(settlementResponse, headers, HttpStatus.OK);
 
-            } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
-                log.error(e);
-                return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (Exception e) {
                 log.error(e);
-                return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+                throw e;
             }
         } else {
             return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    @Transactional
     @PostMapping(value = "/settlements/proposechannel/ack/{threadId}", produces = "application/json")
-    public ResponseEntity<SettlementRest> settleProposeChannelAck(@PathVariable String threadId) {
+    public ResponseEntity<SettlementRest> settleProposeChannelAck(@PathVariable String threadId) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");    
 
@@ -339,12 +334,9 @@ public class SettlementsController {
                 SettlementRest settlementResponse = new SettlementRest(newSettlement, appData, settlementItemRepository, creditRepository);
                 return new ResponseEntity<>(settlementResponse, headers, HttpStatus.OK);
 
-            } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
-                log.error(e);
-                return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (Exception e) {
                 log.error(e);
-                return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+                throw e;
             }
         } else {
             return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);

@@ -27,6 +27,8 @@ public final class SettlementRest {
     private String topicId;
     private String displayStatus;
     private String paymentChannelName;
+    private String payerAccountDetails;
+    private String recipientAccountDetails;
     
     private List<CreditRest> credits = new ArrayList<CreditRest>();
     private List<String> threadIds = new ArrayList<String>();
@@ -48,7 +50,9 @@ public final class SettlementRest {
             this.displayStatus = States.valueOf(this.status).getDisplay();
         }
         this.paymentChannelName = settlement.getPaymentChannelName();
-
+        this.payerAccountDetails = settlement.getPayerAccountDetails();
+        this.recipientAccountDetails = settlement.getRecipientAccountDetails();
+        
         List<SettlementItem> settlementItemsFromDB = settlementItemRepository.findAllSettlementItems(settlement.getThreadId());
         List<String> threadIds = new ArrayList<String>();
         for (SettlementItem settlementItem : settlementItemsFromDB) {

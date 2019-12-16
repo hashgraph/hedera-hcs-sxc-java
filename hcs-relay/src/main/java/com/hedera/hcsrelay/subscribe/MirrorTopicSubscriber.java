@@ -76,6 +76,7 @@ public final class MirrorTopicSubscriber extends Thread {
                     TimeUnit.SECONDS.sleep(3);
                 } catch (Exception e) {
                     log.error(e);
+                    log.error("****** EXITING RELAY SUBSRIBING THREAD");
                     retry = false;
                 }
             }

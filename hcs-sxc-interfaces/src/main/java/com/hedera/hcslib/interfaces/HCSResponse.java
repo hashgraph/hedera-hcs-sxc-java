@@ -1,4 +1,4 @@
-package com.hedera.hcslib.consensus;
+package com.hedera.hcslib.interfaces;
 
 import com.hedera.hcslib.proto.java.ApplicationMessageId;
 

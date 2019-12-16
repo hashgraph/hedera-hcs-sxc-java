@@ -117,4 +117,3 @@ volumes:
 networks:
   backing-services:
     driver: bridge
-

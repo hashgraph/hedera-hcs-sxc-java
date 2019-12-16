@@ -3,7 +3,8 @@ package com.hedera.hcslib.callback;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcslib.HCSLib;
-import com.hedera.hcslib.consensus.HCSResponse;
+import com.hedera.hcslib.interfaces.HCSCallBackInterface;
+import com.hedera.hcslib.interfaces.HCSResponse;
 import com.hedera.hcslib.interfaces.LibMessagePersistence;
 import com.hedera.hcslib.messages.HCSRelayMessage;
 import com.hedera.hcslib.plugins.Plugins;
@@ -39,7 +40,6 @@ import org.apache.activemq.artemis.jms.client.ActiveMQTextMessage;
  */
 @Log4j2
 public final class OnHCSMessageCallback {
-    
  
     private final List<HCSCallBackInterface> observers = new ArrayList<>();
 

@@ -1,6 +1,4 @@
-package com.hedera.hcslib.callback;
-
-import com.hedera.hcslib.consensus.HCSResponse;
+package com.hedera.hcslib.interfaces;
 
 /**
  * 

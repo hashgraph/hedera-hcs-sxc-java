@@ -25,7 +25,7 @@ import com.hedera.hcsapp.repository.SettlementItemRepository;
 import com.hedera.hcsapp.repository.SettlementRepository;
 import com.hedera.hcslib.HCSLib;
 import com.hedera.hcslib.callback.OnHCSMessageCallback;
-import com.hedera.hcslib.consensus.HCSResponse;
+import com.hedera.hcslib.interfaces.HCSResponse;
 import com.hedera.hcslib.interfaces.LibMessagePersistence;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
 import lombok.extern.log4j.Log4j2;

@@ -29,6 +29,7 @@ import com.hedera.hcsapp.repository.SettlementItemRepository;
 import com.hedera.hcsapp.repository.SettlementRepository;
 import com.hedera.hcsapp.restclasses.PaymentSent;
 import com.hedera.hcsapp.restclasses.SettlementChannelProposal;
+import com.hedera.hcsapp.restclasses.SettlementPaidOrComplete;
 import com.hedera.hcsapp.restclasses.SettlementPaymentInit;
 import com.hedera.hcsapp.restclasses.SettlementProposal;
 import com.hedera.hcsapp.restclasses.SettlementRest;
@@ -40,8 +41,12 @@ import proto.PaymentInitAckBPM;
 import proto.PaymentInitBPM;
 import proto.PaymentSentAckBPM;
 import proto.PaymentSentBPM;
+import proto.SettleCompleteAckBPM;
+import proto.SettleCompleteBPM;
 import proto.SettleInitAckBPM;
 import proto.SettleInitBPM;
+import proto.SettlePaidAckBPM;
+import proto.SettlePaidBPM;
 import proto.SettleProposeAckBPM;
 import proto.SettleProposeBPM;
 import proto.SettlementBPM;
@@ -204,8 +209,10 @@ public class SettlementsController {
             settlement.get().setPaymentChannelName(settlementChannelProposal.getPaymentChannelName());
 
             SettleInitBPM.Builder settleInitBPM = SettleInitBPM.newBuilder()
-                    .setAdditionalNotes(settlementChannelProposal.getAdditionalNotes()).setNetValue(moneyFromSettlement(settlement.get()))
-                    .setPayerName(settlement.get().getPayerName()).setRecipientName(settlement.get().getRecipientName())
+                    .setAdditionalNotes(settlementChannelProposal.getAdditionalNotes())
+                    .setNetValue(moneyFromSettlement(settlement.get()))
+                    .setPayerName(settlement.get().getPayerName())
+                    .setRecipientName(settlement.get().getRecipientName())
                     .setPaymentChannelName(settlementChannelProposal.getPaymentChannelName());
 
             SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId).setSettleInit(settleInitBPM)
@@ -227,8 +234,10 @@ public class SettlementsController {
         if (settlement.isPresent()) {
 
             SettleInitBPM.Builder settleInitBPM = SettleInitBPM.newBuilder()
-                    .setAdditionalNotes(settlement.get().getAdditionalNotes()).setNetValue(moneyFromSettlement(settlement.get()))
-                    .setPayerName(settlement.get().getPayerName()).setRecipientName(settlement.get().getRecipientName())
+                    .setAdditionalNotes(settlement.get().getAdditionalNotes())
+                    .setNetValue(moneyFromSettlement(settlement.get()))
+                    .setPayerName(settlement.get().getPayerName())
+                    .setRecipientName(settlement.get().getRecipientName())
                     .setPaymentChannelName(settlement.get().getPaymentChannelName());
 
             SettleInitAckBPM.Builder settleInitAckBPM = SettleInitAckBPM.newBuilder().setSettleInit(settleInitBPM);
@@ -255,10 +264,12 @@ public class SettlementsController {
         if (settlement.isPresent()) {
 
             PaymentInitBPM.Builder paymentInitBPM = PaymentInitBPM.newBuilder()
-                    .setPayerName(settlement.get().getPayerName()).setRecipientName(settlement.get().getRecipientName())
+                    .setPayerName(settlement.get().getPayerName())
+                    .setRecipientName(settlement.get().getRecipientName())
                     .setPayerAccountDetails(settlementPaymentInit.getPayerAccountDetails())
                     .setRecipientAccountDetails(settlementPaymentInit.getRecipientAccountDetails())
-                    .setAdditionalNotes(settlementPaymentInit.getAdditionalNotes()).setNetValue(moneyFromSettlement(settlement.get()));
+                    .setAdditionalNotes(settlementPaymentInit.getAdditionalNotes())
+                    .setNetValue(moneyFromSettlement(settlement.get()));
 
             SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
                     .setPaymentInit(paymentInitBPM).build();
@@ -278,10 +289,12 @@ public class SettlementsController {
         if (settlement.isPresent()) {
 
             PaymentInitBPM.Builder paymentInitBPM = PaymentInitBPM.newBuilder()
-                    .setPayerName(settlement.get().getPayerName()).setRecipientName(settlement.get().getRecipientName())
+                    .setPayerName(settlement.get().getPayerName())
+                    .setRecipientName(settlement.get().getRecipientName())
                     .setPayerAccountDetails(settlement.get().getPayerAccountDetails())
                     .setRecipientAccountDetails(settlement.get().getRecipientAccountDetails())
-                    .setAdditionalNotes(settlement.get().getAdditionalNotes()).setNetValue(moneyFromSettlement(settlement.get()));
+                    .setAdditionalNotes(settlement.get().getAdditionalNotes())
+                    .setNetValue(moneyFromSettlement(settlement.get()));
 
             PaymentInitAckBPM.Builder paymentInitAckBPM = PaymentInitAckBPM.newBuilder().setPaymentInit(paymentInitBPM);
 
@@ -306,11 +319,13 @@ public class SettlementsController {
         if (settlement.isPresent()) {
 
             PaymentSentBPM.Builder paymentSentBPM = PaymentSentBPM.newBuilder()
-                    .setPayerName(settlement.get().getPayerName()).setRecipientName(settlement.get().getRecipientName())
+                    .setPayerName(settlement.get().getPayerName())
+                    .setRecipientName(settlement.get().getRecipientName())
                     .setPayerAccountDetails(settlement.get().getPayerAccountDetails())
                     .setRecipientAccountDetails(settlement.get().getRecipientAccountDetails())
                     .setAdditionalNotes(paymentSent.getAdditionalNotes())
-                    .setPaymentReference(paymentSent.getPaymentReference()).setNetValue(moneyFromSettlement(settlement.get()));
+                    .setPaymentReference(paymentSent.getPaymentReference())
+                    .setNetValue(moneyFromSettlement(settlement.get()));
 
             SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
                     .setPaymentSent(paymentSentBPM).build();
@@ -331,11 +346,13 @@ public class SettlementsController {
         if (settlement.isPresent()) {
 
             PaymentSentBPM.Builder paymentSentBPM = PaymentSentBPM.newBuilder()
-                    .setPayerName(settlement.get().getPayerName()).setRecipientName(settlement.get().getRecipientName())
+                    .setPayerName(settlement.get().getPayerName())
+                    .setRecipientName(settlement.get().getRecipientName())
                     .setPayerAccountDetails(settlement.get().getPayerAccountDetails())
                     .setRecipientAccountDetails(settlement.get().getRecipientAccountDetails())
                     .setAdditionalNotes(settlement.get().getAdditionalNotes())
-                    .setPaymentReference(settlement.get().getPaymentReference()).setNetValue(moneyFromSettlement(settlement.get()));
+                    .setPaymentReference(settlement.get().getPaymentReference())
+                    .setNetValue(moneyFromSettlement(settlement.get()));
 
             PaymentSentAckBPM.Builder paymentSentAckBPM = PaymentSentAckBPM.newBuilder().setPaymentSent(paymentSentBPM);
 
@@ -348,6 +365,113 @@ public class SettlementsController {
         }
     }
 
+//  @Transactional
+    @PostMapping(value = "/settlements/paid", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<SettlementRest> paid(@RequestBody SettlementPaidOrComplete settlementPaid) throws Exception {
+
+        String threadId = settlementPaid.getThreadId();
+
+        Optional<Settlement> settlement = settlementRepository.findById(threadId);
+
+        if (settlement.isPresent()) {
+
+            SettlePaidBPM.Builder settlePaidBPM = SettlePaidBPM.newBuilder()
+                    .setPayerName(settlement.get().getPayerName())
+                    .setRecipientName(settlement.get().getRecipientName())
+                    .setAdditionalNotes(settlementPaid.getAdditionalNotes())
+                    .setPaymentReference(settlement.get().getPaymentReference())
+                    .setNetValue(moneyFromSettlement(settlement.get()));
+
+            SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
+                    .setSettlePayment(settlePaidBPM).build();
+
+            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAID_AWAIT_ACK);
+        } else {
+            return serverError();
+        }
+
+    }
+
+  //@Transactional
+    @PostMapping(value = "/settlements/paid/ack/{threadId}", produces = "application/json")
+    public ResponseEntity<SettlementRest> paidAck(@PathVariable String threadId) throws Exception {
+
+        Optional<Settlement> settlement = settlementRepository.findById(threadId);
+
+        if (settlement.isPresent()) {
+
+            SettlePaidBPM.Builder settlePaidBPM = SettlePaidBPM.newBuilder()
+                    .setPayerName(settlement.get().getPayerName())
+                    .setRecipientName(settlement.get().getRecipientName())
+                    .setAdditionalNotes(settlement.get().getAdditionalNotes())
+                    .setPaymentReference(settlement.get().getPaymentReference())
+                    .setNetValue(moneyFromSettlement(settlement.get()));
+
+            SettlePaidAckBPM.Builder settlePaidAckBPM = SettlePaidAckBPM.newBuilder()
+                    .setSettlePaid(settlePaidBPM);
+            
+            SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
+                    .setSettlePaymentAck(settlePaidAckBPM).build();
+
+            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAID_ACK);
+        } else {
+            return serverError();
+        }
+    }
+
+//  @Transactional
+    @PostMapping(value = "/settlements/complete", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<SettlementRest> complete(@RequestBody SettlementPaidOrComplete settlementPaid) throws Exception {
+        
+        String threadId = settlementPaid.getThreadId();
+
+        Optional<Settlement> settlement = settlementRepository.findById(threadId);
+
+        if (settlement.isPresent()) {
+
+            SettleCompleteBPM.Builder settleCompleteBPM = SettleCompleteBPM.newBuilder()
+                    .setPayerName(settlement.get().getPayerName())
+                    .setRecipientName(settlement.get().getRecipientName())
+                    .setAdditionalNotes(settlementPaid.getAdditionalNotes())
+                    .setPaymentReference(settlement.get().getPaymentReference())
+                    .setNetValue(moneyFromSettlement(settlement.get()));
+
+            SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
+                    .setSettleComplete(settleCompleteBPM).build();
+
+            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_COMP_AWAIT_ACK);
+        } else {
+            return serverError();
+        }
+
+    }
+
+  //@Transactional
+    @PostMapping(value = "/settlements/complete/ack/{threadId}", produces = "application/json")
+    public ResponseEntity<SettlementRest> completeAck(@PathVariable String threadId) throws Exception {
+
+        Optional<Settlement> settlement = settlementRepository.findById(threadId);
+
+        if (settlement.isPresent()) {
+
+            SettleCompleteBPM.Builder settleCompleteBPM = SettleCompleteBPM.newBuilder()
+                    .setPayerName(settlement.get().getPayerName())
+                    .setRecipientName(settlement.get().getRecipientName())
+                    .setAdditionalNotes(settlement.get().getAdditionalNotes())
+                    .setPaymentReference(settlement.get().getPaymentReference())
+                    .setNetValue(moneyFromSettlement(settlement.get()));
+
+            SettleCompleteAckBPM.Builder settleCompleteAckBPM = SettleCompleteAckBPM.newBuilder()
+                    .setSettlePaid(settleCompleteBPM);
+            
+            SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
+                    .setSettleCompleteAck(settleCompleteAckBPM).build();
+
+            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_COMPLETE_ACK);
+        } else {
+            return serverError();
+        }
+    }
     private ResponseEntity<SettlementRest> saveAndSendSettlement(SettlementBPM settlementBPM, Settlement settlement,
             States newState) throws Exception {
         

@@ -4,6 +4,7 @@ public class AppClient {
     private String clientName = "";
     private String clientKey = "";
     private String roles = "";
+    private String paymentAccountDetails = "";
     
     public String getClientName() {
         return this.clientName;
@@ -22,5 +23,11 @@ public class AppClient {
     }
     public void setRoles(String roles) {
         this.roles = roles;
+    }
+    public String getPaymentAccountDetails() {
+        return this.paymentAccountDetails;
+    }
+    public void setPaymentAccountDetails(String paymentAccountDetails) {
+        this.paymentAccountDetails = paymentAccountDetails;
     }
 }

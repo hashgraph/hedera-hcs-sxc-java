@@ -31,8 +31,8 @@ public enum States {
     ,SETTLE_PAID_ACK_PENDING("Settlement Payment Acknowldegded (Pending)")
     ,SETTLE_PAID_ACK("Settlement Payment Acknowldegded")
 
-    ,SETTLE_COMPLETE_AWAIT_ACK_PENDING("Settlement Receipt Requested (Pending)")
-    ,SETTLE_COMPLETE_AWAIT_ACK("Settlement Receipt Requested")
+    ,SETTLE_COMP_AWAIT_ACK_PENDING("Settlement Receipt Requested (Pending)")
+    ,SETTLE_COMP_AWAIT_ACK("Settlement Receipt Requested")
     ,SETTLE_COMPLETE_ACK_PENDING("Settlement Receipt Confirmed (Pending)")
     ,SETTLE_COMPLETE_ACK("Settlement Receipt Confirmed");
     

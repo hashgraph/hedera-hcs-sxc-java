@@ -1,5 +1,6 @@
 package com.hedera.hcsapp.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -19,6 +20,7 @@ public final class Settlement {
     private String additionalNotes;
     private long netValue;
     private String currency;
+    @Column(length = 40)
     private String status;
     private String createdDate;
     private String createdTime;

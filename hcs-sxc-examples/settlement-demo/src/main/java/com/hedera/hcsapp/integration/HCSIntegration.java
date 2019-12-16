@@ -33,7 +33,9 @@ import proto.CreditBPM;
 import proto.PaymentInitAckBPM;
 import proto.PaymentInitBPM;
 import proto.PaymentSentBPM;
+import proto.SettleCompleteBPM;
 import proto.SettleInitBPM;
+import proto.SettlePaidBPM;
 import proto.SettleProposeBPM;
 import proto.SettlementBPM;
 
@@ -215,15 +217,56 @@ public class HCSIntegration {
 
             } else if (settlementBPM.hasPaymentSentAck()) {
                 updateSettlement(threadId, States.PAYMENT_SENT_AWAIT_ACK, States.PAYMENT_SENT_ACK);
-
-            } else if (settlementBPM.hasSettleComplete()) {
-
-            } else if (settlementBPM.hasSettleCompleteAck()) {
-
             } else if (settlementBPM.hasSettlePayment()) {
+                String priorState = States.PAYMENT_SENT_ACK.name();
+                String nextState = States.SETTLE_PAID_AWAIT_ACK.name();
 
+                SettlePaidBPM settlePaidBPM = settlementBPM.getSettlePayment();
+                // update the settlement state
+                settlementRepository.findById(threadId).ifPresent(
+                        (settlement) -> {
+                            if ((settlement.getStatus().equals(nextState + "_PENDING")) || (settlement.getStatus().equals(priorState))) {
+                                settlement.setStatus(nextState);
+                                settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                                settlement.setAdditionalNotes(settlePaidBPM.getAdditionalNotes());
+                                settlement.setPaymentReference(settlePaidBPM.getPaymentReference());
+                                
+                                settlementRepository.save(settlement);
+                                // update the credits too
+                                updateCreditStateForSettlementItems(threadId, nextState);
+                                notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
+                            } else {
+                                log.error("Settlement status should be " + nextState + "_PENDING" + " or " + priorState + ", found : " + settlement.getStatus());
+                            }
+                        }
+                );
             } else if (settlementBPM.hasSettlePaymentAck()) {
+                updateSettlement(threadId, States.SETTLE_PAID_AWAIT_ACK, States.SETTLE_PAID_ACK);
+            } else if (settlementBPM.hasSettleComplete()) {
+                String priorState = States.SETTLE_PAID_ACK.name();
+                String nextState = States.SETTLE_COMP_AWAIT_ACK.name();
 
+                SettleCompleteBPM settleCompleteBPM = settlementBPM.getSettleComplete();
+                // update the settlement state
+                settlementRepository.findById(threadId).ifPresent(
+                        (settlement) -> {
+                            if ((settlement.getStatus().equals(nextState + "_PENDING")) || (settlement.getStatus().equals(priorState))) {
+                                settlement.setStatus(nextState);
+                                settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                                settlement.setAdditionalNotes(settleCompleteBPM.getAdditionalNotes());
+                                settlement.setPaymentReference(settleCompleteBPM.getPaymentReference());
+                                
+                                settlementRepository.save(settlement);
+                                // update the credits too
+                                updateCreditStateForSettlementItems(threadId, nextState);
+                                notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
+                            } else {
+                                log.error("Settlement status should be " + nextState + "_PENDING" + " or " + priorState + ", found : " + settlement.getStatus());
+                            }
+                        }
+                );
+            } else if (settlementBPM.hasSettleCompleteAck()) {
+                updateSettlement(threadId, States.SETTLE_COMP_AWAIT_ACK, States.SETTLE_COMPLETE_ACK);
             } else if (settlementBPM.hasAdminDelete()) {
                 deleteData();
                 notify("admin", "admin", "admin", "admin");

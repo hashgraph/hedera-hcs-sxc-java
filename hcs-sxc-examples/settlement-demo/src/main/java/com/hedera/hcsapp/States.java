@@ -16,10 +16,10 @@ public enum States {
     ,SETTLE_INIT_ACK_PENDING("Credit Settlement Payment Channel Agreed (Pending)")
     ,SETTLE_INIT_ACK("Credit Settlement Payment Channel Agreed")
 
-    ,PAYMENT_INIT_AWAIT_ACK_PENDING("Settlement Payment Channel Proposed (Pending)")
-    ,PAYMENT_INIT_AWAIT_ACK("Settlement Payment Channel Proposed")
-    ,PAYMENT_INIT_ACK_PENDING("Settlement Payment Channel Agreed (Pending)")
-    ,PAYMENT_INIT_ACK("Settlement Payment Channel Agreed")
+    ,PAYMENT_INIT_AWAIT_ACK_PENDING("Payment Proposed (Pending)")
+    ,PAYMENT_INIT_AWAIT_ACK("Payment Proposed")
+    ,PAYMENT_INIT_ACK_PENDING("Payment Agreed (Pending)")
+    ,PAYMENT_INIT_ACK("Payment Agreed")
 
     ,PAYMENT_SENT_AWAIT_ACK_PENDING("Settlement Payment Proposed (Pending)")
     ,PAYMENT_SENT_AWAIT_ACK("Settlement Payment Proposed")

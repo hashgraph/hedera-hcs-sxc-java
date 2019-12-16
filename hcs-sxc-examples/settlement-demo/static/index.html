@@ -92,11 +92,17 @@
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">group</i>
                         <span class="mdc-list-item__text">Addresses</span>
                     </a>-->
+                    
+                    <a class="audit mdc-list-item" href="#audit" aria-current="page">
+                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">attach_money</i>
+                        <span class="mdc-list-item__text">Payments</span>
+                    </a>
                     <a class="audit mdc-list-item" href="#audit" aria-current="page">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">remove_red_eye</i>
                         <span class="mdc-list-item__text">Audit</span>
                     </a>
-                    <div role="separator" class="mdc-list-divider"></div>
+                    
+<div role="separator" class="mdc-list-divider"></div>
 <!--                    <a class="mdc-list-item" href="#" aria-current="page">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">account_box</i>
                         <span class="mdc-list-item__text">Account</span>
@@ -703,6 +709,81 @@
             </div>
         </div><div class="mdc-dialog-scrim"></div>
         
+        
+        <div id="pay-dialog" 
+           
+            class="mdc-dialog"
+             role="alertdialog"
+             aria-modal="true"
+             aria-labelledby="my-dialog-title"
+             aria-describedby="my-dialog-content">
+            <div class="mdc-dialog__container">
+                <div class="mdc-dialog__surface" >
+                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
+                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
+                    -->Payment details<!--
+                    --></h2>
+                    <div class="mdc-dialog__content" id="my-dialog-content" >
+                       <br/>
+                        
+                        <div style="display:fex; flex-direction: column">
+                            
+                            <form id="pay-dialog-form">
+                                
+                                
+                                <div class="mdc-text-field mdc-text-field--full-width">
+                                    <input type="text"
+                                           id="pay-payer-details"
+                                           value="{payerDetails}"
+                                           disabled
+                                           id="my-text-field" class="mdc-text-field__input">
+                                    <label class="mdc-floating-label" for="pay-payer-details">
+                                        Payer Account Details
+                                    </label>
+                                </div>
+                                <div class="mdc-text-field mdc-text-field--full-width">
+                                    <input type="text"
+                                           id="pay-recipient-details"
+                                           value="{recipientDetails}"
+                                           disabled
+                                           id="my-text-field" class="mdc-text-field__input">
+                                    <label class="mdc-floating-label" for="pay-recipient-details">
+                                        Recipient Account Details
+                                    </label>
+                                </div>
+                                <div class="mdc-text-field mdc-text-field--full-width">
+                                    <input type="text"
+                                           id="pay-additional-notes"
+                                           required minlength=4
+                                           id="my-text-field" class="mdc-text-field__input">
+                                    <label class="mdc-floating-label" for="pay-additional-notes">
+                                        Additional Notes
+                                    </label>
+                                </div>
+                                
+                                <div class="mdc-text-field-helper-line">
+                                    <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
+                                        Field is required and must be at least 4 characters long
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <footer class="mdc-dialog__actions" style="padding:24px">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+                            <span class="mdc-button__label">Cancel</span>
+                        </button>
+                        <button id="pay-now-send" type="button" 
+                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
+                        >
+                            <span class="mdc-button__label">Send Now</span>
+                        </button>
+                    </footer>
+                </div>
+
+            </div>
+        </div><div class="mdc-dialog-scrim"></div>
+        
         <div id="confirm-pay-channel-dialog" 
             class="mdc-dialog"
             role="alertdialog"
@@ -766,13 +847,16 @@
         
         <script>
             thisuserName = "";
-            buyerSellers = [];
+            allAddresses = [];
+            buyerSellersAddress= [];
             paymentChannels = [];
             
             document.addEventListener("DOMContentLoaded", init);
             
             async function init ()  {
                 //location.hash ='';
+                wAddressBook =  await fetch('addressbook-everything/');
+                allAddresses = await wAddressBook.json();
                 let responseWhoami =  await fetch('addressbook/me/');
                 let whoami = await responseWhoami.json();
                 thisuserName =  whoami.name;
@@ -785,9 +869,9 @@
                 paymentChannels  = await responsePaymentChannel.json(); 
                 
                 
-                let responseAddressBook = await fetch('addressbook/buyerseller/');
-                let addressBook  = await responseAddressBook.json(); 
-                buyerSellers = addressBook;
+                responseAddressBookBs = await fetch('addressbook/buyerseller/');
+                addressBookBs  = await responseAddressBookBs.json(); 
+                buyerSellersAddress = addressBookBs;
                 switch(location.hash){
                     case "#audit-detail": 
                         location.hash="audit";
@@ -806,8 +890,8 @@
                             document.querySelectorAll("#lhs-menu .mdc-list-item").forEach(i=>i.classList.remove('mdc-list-item--activated'));
                             document.querySelector("#lhs-menu .credits-and-debits").classList.add("mdc-list-item--activated");
                             document.getElementById("header-title").innerHTML = 'Outstanding Credits and Debits';
-                            for(i=0; i < addressBook.length; i++){
-                                var userName = addressBook[i].name;
+                            for(i=0; i < buyerSellersAddress.length; i++){
+                                var userName = buyerSellersAddress[i].name;
                                 await renderCreditsPanel(userName);
                             }
                             break;
@@ -817,8 +901,8 @@
                             document.querySelector("#lhs-menu .settlements").classList.add("mdc-list-item--activated");
                             
                             document.getElementById("header-title").innerHTML = 'Settlements';
-                            for(i=0; i < addressBook.length; i++){
-                                var userName = addressBook[i].name;
+                            for(i=0; i < buyerSellersAddress.length; i++){
+                                var userName = buyerSellersAddress[i].name;
                                 await renderSettlementsPanel(userName);
                             }
                             break;
@@ -935,9 +1019,6 @@
                 var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
                 clonedPanelTemplate.querySelector(".panel").id=userName;    
                 clonedPanelTemplate.getElementById("settlements-user").innerHTML = userName;
-                
-              
-
 
                 var tableBody = clonedPanelTemplate.getElementById("settlement-table-body");
                 var tableBodyTemplate = clonedPanelTemplate.getElementById("settlement-table-body-template");
@@ -962,7 +1043,7 @@
                     clonedRow.getElementById("amount-net").innerHTML = "Net " + i_Settlements.netValue;
                 
                     clonedRow.getElementById("date-time").innerHTML = i_Settlements.createdDateTime;
-                    clonedRow.getElementById("status").innerHTML =  i_Settlements.displayStatus + (i_Settlements.paymentChannelName===""?"":" (with "+ i_Settlements.paymentChannelName +")");
+                    clonedRow.getElementById("status").innerHTML =  i_Settlements.displayStatus + (i_Settlements.paymentChannelName===null?"":" (with "+ i_Settlements.paymentChannelName +")");
                     //clonedRow.getElementById("status").style.textTransform = "capitalize";
                     
                     
@@ -990,6 +1071,14 @@
                         newButton.classList.add("mdc-button");
                         newButton.classList.add("mdc-button--outlined");
                         newButton.addEventListener("click", function(){openAcceptPaychannelDialog(threadId,userName,i_Settlements.paymentChannelName );});
+                        clonedRow.getElementById("action").appendChild(newButton);
+                    } else if (i_Settlements.payerName === thisuserName  &&  i_Settlements.status === 'SETTLE_INIT_ACK'){
+                        let threadId = i_Settlements.threadId;
+                        newButton = document.createElement("button");
+                        newButton.innerHTML = "Init Pay";
+                        newButton.classList.add("mdc-button");
+                        newButton.classList.add("mdc-button--outlined");
+                        newButton.addEventListener("click", function(){openPayDialog(threadId,userName,i_Settlements.paymentChannelName );});
                         clonedRow.getElementById("action").appendChild(newButton);
                     }
                   
@@ -1184,12 +1273,7 @@
             function openSelectPaychannelDialog(threadId, userName) {
                 $paychannelDialog = document.getElementById('select-paychannel-dialog');
                 paychannelDialog  = new mdc.dialog.MDCDialog($paychannelDialog);
-                
-                
                 event.preventDefault(); 
-                
-          
-              
                 $paychannelDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
                     e.parentElement.classList.remove('mdc-text-field--invalid');
                     e.value='';}
@@ -1236,57 +1320,60 @@
                     }).catch(function(res){
                         alert(res);
                     });
-                }
-                
-                /*
-                $newCreditDialog.querySelector("#send-new-credit-dialog-submit").onclick =  function(){
-                        $newCreditDialog = document.getElementById('new-credit-dialog');
-                 
-                        isFormValid = true;
-                        ls = $newCreditDialog.querySelectorAll(".mdc-text-field input");
-
-                        for (i=0; i< ls.length; i++ ){
-                             if (! ls[i].checkValidity()){ls[i].focus();isFormValid=false;break;  }
-
-                        }
-                        if(isFormValid){
-                            postBody = `{
-                                          "payerName"       : "${thisuserName}"
-                                        , "recipientName"   : "${document.getElementById('new-credit-recipient').value}"  
-                                        , "reference"       : "${document.getElementById('new-credit-service-reference').value}"
-                                        , "amount"          : ${document.getElementById('new-credit-amount').value * 1}
-                                        , "currency"        : "USD"
-                                        , "additionalNotes" :"${document.getElementById('new-credit-additional-notes').value}"
-                                        }`;
-
-                            newCreditDialog.close();
-                            el = document.getElementById(recipient);
-                            el.style.opacity=0.4;
-                            el.style.pointerEvents =  'none';
-                            el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
-
-                            showSnackBarMessage("sending new credit to HH Network ...");
-                            fetch('credits', {
-                                method: 'post',
-                                headers: {
-                                    'Accept': 'application/json',
-                                    'Content-Type': 'application/json'
-                                },
-                                body: postBody
-                            }).then(function(response) {
-                                return response.json();
-                            }).then(function(data) {
-                                showSnackBarMessage("New credit request sent");
-
-                            }).catch(function(res){
-                                alert(res);
-                            });
-                        }      
-                    
                 };
-                */
-               
+                
                 paychannelDialog.open();
+                return false;
+            }
+            
+            
+            function openPayDialog(threadId, userName) {
+                $payDialog = document.getElementById('pay-dialog');
+                payDialog  = new mdc.dialog.MDCDialog($payDialog);
+                event.preventDefault(); 
+                $payDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
+                    e.parentElement.classList.remove('mdc-text-field--invalid');
+                    e.value='';}
+                );
+                p = allAddresses.filter(a=>a.name===thisuserName)[0];
+                r = allAddresses.filter(a=>a.name===userName)[0];
+                payerAccountDetails = p.name + "- SortNo/AccNo: " + p.paymentAccountDetails;
+                $payDialog.querySelector("#pay-payer-details").value = payerAccountDetails;
+                recipientAccountDetails = r.name + "- SortNo/AccNo: " + r.paymentAccountDetails;
+                $payDialog.querySelector("#pay-recipient-details").value = recipientAccountDetails;
+                $payDialog.querySelector("#pay-now-send").onclick =  function(){
+                    postBody = `{
+                                 "threadId"          : "${threadId}"
+                                ,"payerAccountDetails" : "${payerAccountDetails}"
+                                ,"recipientAccountDetails" :"${recipientAccountDetails}"
+                                ,"additionalNotes" : "${$payDialog.querySelector("#pay-additional-notes").value}"
+                                }`;
+
+                    payDialog.close();
+                    el = document.getElementById(userName);
+                    el.style.opacity=0.4;
+                    el.style.pointerEvents =  'none';
+                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
+
+                    showSnackBarMessage("sending channel details to HH Network ...");
+                    fetch('/settlements/paymentInit', {
+                        method: 'post',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: postBody
+                    }).then(function(response) {
+                        return response.json();
+                    }).then(function(data) {
+                        showSnackBarMessage("Payment init sent");
+
+                    }).catch(function(res){
+                        alert(res);
+                    });
+                };
+                
+                payDialog.open();
                 return false;
             }
             

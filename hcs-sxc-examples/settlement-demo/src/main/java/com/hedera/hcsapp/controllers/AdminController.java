@@ -41,6 +41,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
+import proto.AdminStashDatabaseBPM;
+import proto.AdminStashPopDatabaseBPM;
 @Log4j2
 @RestController
 public class AdminController {
@@ -85,6 +87,53 @@ public class AdminController {
             throw e;
         }
         
+        return new ResponseEntity<>(headers, HttpStatus.OK);
+    }
+
+
+    @Transactional
+    @GetMapping(value = "/admin/stash-database", produces = "application/json")
+    public ResponseEntity<List<Credit>> stashDatabase() throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json");
+
+        AdminStashDatabaseBPM adminStashDatabaseBPM = AdminStashDatabaseBPM.newBuilder().build();
+        SettlementBPM settlementBPM = SettlementBPM.newBuilder()
+                .setThreadId("admin")
+                .setAdminStashDatabaseBPM(adminStashDatabaseBPM)
+                .build();
+        try {
+            new OutboundHCSMessage(appData.getHCSLib())
+                .overrideEncryptedMessages(false)
+                .overrideMessageSignature(false)
+                .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
+        } catch (Exception e) {
+            log.error(e);
+            throw e;
+        }
+        return new ResponseEntity<>(headers, HttpStatus.OK);
+    }
+    
+     @Transactional
+    @GetMapping(value = "/admin/stash-pop-database", produces = "application/json")
+    public ResponseEntity<List<Credit>> stashPopDatabase() throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json");
+
+         AdminStashPopDatabaseBPM adminStashPopDatabaseBPM = AdminStashPopDatabaseBPM.newBuilder().build();
+        SettlementBPM settlementBPM = SettlementBPM.newBuilder()
+                .setThreadId("admin")
+                .setAdminStashPopDatabaseBPM(adminStashPopDatabaseBPM)
+                .build();
+        try {
+            new OutboundHCSMessage(appData.getHCSLib())
+                .overrideEncryptedMessages(false)
+                .overrideMessageSignature(false)
+                .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
+        } catch (Exception e) {
+            log.error(e);
+            throw e;
+        }
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 }

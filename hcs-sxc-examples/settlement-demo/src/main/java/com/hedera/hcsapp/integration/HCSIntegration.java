@@ -28,7 +28,10 @@ import com.hedera.hcslib.callback.OnHCSMessageCallback;
 import com.hedera.hcslib.consensus.HCSResponse;
 import com.hedera.hcslib.interfaces.LibMessagePersistence;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.jpa.repository.Query;
 import proto.CreditBPM;
 import proto.PaymentInitAckBPM;
 import proto.PaymentInitBPM;
@@ -39,9 +42,17 @@ import proto.SettlePaidBPM;
 import proto.SettleProposeBPM;
 import proto.SettlementBPM;
 
+
+
 @Log4j2
 @Component
 public class HCSIntegration {
+    
+    @PersistenceContext
+    private EntityManager entityManager;
+
+ 
+    
 
     private AppData appData;
     
@@ -270,6 +281,14 @@ public class HCSIntegration {
             } else if (settlementBPM.hasAdminDelete()) {
                 deleteData();
                 notify("admin", "admin", "admin", "admin");
+            }  else if (settlementBPM.hasAdminStashDatabaseBPM()) {
+                stashData();
+             
+                notify("admin", "admin", "admin", "admin");
+            } else if (settlementBPM.hasAdminStashPopDatabaseBPM()) {
+                stashPopData();
+         
+                notify("admin", "admin", "admin", "admin");
             } else {
                 log.error ("Unrecognized application message");
             }
@@ -326,6 +345,17 @@ public class HCSIntegration {
         settlementRepository.deleteAll();
         settlementItemRepository.deleteAll();
     }
+    private void stashData(){
+        entityManager.createNativeQuery("SCRIPT TO 'stash'").getFirstResult();
+    }
+    
+    private void stashPopData(){
+        deleteData();
+        entityManager.createNativeQuery("RUNSCRIPT 'stash'").getFirstResult();
+        
+    }
+    
+   
     
     private void updateSettlement(String threadId, States priorState, States newState) {
         // update the settlement state

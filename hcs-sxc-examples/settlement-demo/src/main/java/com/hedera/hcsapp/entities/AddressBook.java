@@ -15,4 +15,5 @@ public class AddressBook {
     private String name;
     private String publicKey;
     private String roles;
+    private String paymentAccountDetails;
 }

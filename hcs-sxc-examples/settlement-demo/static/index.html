@@ -93,10 +93,11 @@
                         <span class="mdc-list-item__text">Addresses</span>
                     </a>-->
                     
-                    <a class="audit mdc-list-item" href="#audit" aria-current="page">
+                    <!--<a class="audit mdc-list-item" href="#audit" aria-current="page">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">attach_money</i>
                         <span class="mdc-list-item__text">Payments</span>
                     </a>
+                    -->
                     <a class="audit mdc-list-item" href="#audit" aria-current="page">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">remove_red_eye</i>
                         <span class="mdc-list-item__text">Audit</span>
@@ -1125,7 +1126,7 @@
                     } else if (i_Settlements.payerName === userName  &&  i_Settlements.status === 'PAYMENT_INIT_AWAIT_ACK'){
                         let threadId = i_Settlements.threadId;
                         newButton = document.createElement("button");
-                        newButton.innerHTML = "Accept Pay";
+                        newButton.innerHTML = "Accept Pay Prop";
                         newButton.classList.add("mdc-button");
                         newButton.classList.add("mdc-button--outlined");
                         newButton.addEventListener("click", function(){openAcceptPaymentDialog(threadId,userName );});
@@ -1487,7 +1488,7 @@
                     el.style.pointerEvents =  'none';
                     el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
 
-                    fetch('settlements/paymentSent/ack/'+threadId, {
+                    fetch('settlements/paymentInit/ack/'+threadId, {
                             method: 'post',
                             headers: {
                                 'Accept': 'application/json',

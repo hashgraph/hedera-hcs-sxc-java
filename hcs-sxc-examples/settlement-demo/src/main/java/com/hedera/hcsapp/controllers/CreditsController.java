@@ -2,8 +2,6 @@ package com.hedera.hcsapp.controllers;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hedera.hashgraph.sdk.HederaException;
-import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.States;
@@ -31,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -74,8 +73,9 @@ public class CreditsController {
         return new ResponseEntity<>(restResponse, headers, HttpStatus.OK);
     }
 
+//    @Transactional
     @PostMapping(value = "/credits/ack/{threadId}", produces = "application/json")
-    public ResponseEntity<CreditRest> creditAck(@PathVariable String threadId) {
+    public ResponseEntity<CreditRest> creditAck(@PathVariable String threadId) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
 
@@ -111,17 +111,15 @@ public class CreditsController {
             CreditRest creditRest = new CreditRest(credit, appData);
             
             return new ResponseEntity<>(creditRest, headers, HttpStatus.OK);
-        } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
-            log.error(e);
-            return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             log.error(e);
-            return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw e;
         }
     }
 
+//    @Transactional
     @PostMapping(value = "/credits", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<CreditRest> creditNew(@RequestBody CreditProposal creditCreate) {
+    public ResponseEntity<CreditRest> creditNew(@RequestBody CreditProposal creditCreate) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
 
@@ -187,12 +185,9 @@ public class CreditsController {
 
             CreditRest creditRest = new CreditRest(credit, appData);
             return new ResponseEntity<>(creditRest, headers, HttpStatus.OK);
-        } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
-            log.error(e);
-            return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             log.error(e);
-            return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw e;
         }
     }
 }

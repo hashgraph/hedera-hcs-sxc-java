@@ -90,7 +90,7 @@ public final class OutboundHCSMessage {
         this.ed25519PrivateKey = ed25519PrivateKey;
         return this;
     }
-    
+
     public OutboundHCSMessage withFirstTransactionId(TransactionId transactionId) {
         this.transactionId = transactionId;
         return this;
@@ -125,7 +125,7 @@ public final class OutboundHCSMessage {
         //break up
         List<ApplicationMessageChunk> parts = chunk(firstTransactionId, message);
         // send each part to the network
-        
+
         try (Client client = new Client(this.nodeMap)) {
             client.setOperator(
                     this.operatorAccountId,
@@ -133,7 +133,7 @@ public final class OutboundHCSMessage {
             );
 
             client.setMaxTransactionFee(this.hcsTransactionFee);
-            
+
             TransactionId transactionId = firstTransactionId;
             int count = 1;
             for (ApplicationMessageChunk messageChunk : parts) {
@@ -143,15 +143,15 @@ public final class OutboundHCSMessage {
                     .setMessage(messageChunk.toByteArray())
                     .setTopicId(this.topicIds.get(topicIndex))
                     .setTransactionId(transactionId);
-                   
+
                 // persist the transaction
                 this.persistence.storeTransaction(transactionId, tx);
-                
+
                 log.info("Executing transaction");
                 TransactionId txId = tx.execute(client);
-                
+
                 TransactionReceipt receipt = txId.getReceipt(client, Duration.ofSeconds(30));
-                
+
                 transactionId = new TransactionId(this.operatorAccountId);
 
                 log.info("status is {} "
@@ -159,7 +159,7 @@ public final class OutboundHCSMessage {
                         ,receipt.status
                         ,receipt.getConsensusTopicSequenceNumber()
                 );
-                
+
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -168,7 +168,7 @@ public final class OutboundHCSMessage {
         } catch (Exception e) {
             log.error(e);
         }
-        
+
         return firstTransactionId;
     }
 
@@ -194,9 +194,9 @@ public final class OutboundHCSMessage {
                 .setApplicationMessageId(transactionID)
                 .setBusinessProcessMessage(ByteString.copyFrom(originalMessage))
                 .build();
-        
+
         List<ApplicationMessageChunk> parts = new ArrayList<>();
-        
+
         //TransactionID transactionID = messageEnvelope.getMessageEnvelopeId();
         byte[] amByteArray = applicationMessage.toByteArray();
         final int amByteArrayLength = amByteArray.length;
@@ -205,7 +205,7 @@ public final class OutboundHCSMessage {
         int totalParts = (int) Math.ceil((double) amByteArrayLength / chunkSize);
         // chunk and send to network
         for (int i = 0, partId = 1; i < amByteArrayLength; i += chunkSize, partId++) {
-            
+
             byte[] amMessageChunk = Arrays.copyOfRange(
                     amByteArray,
                     i,
@@ -218,7 +218,7 @@ public final class OutboundHCSMessage {
                     .setChunksCount(totalParts)
                     .setMessageChunk(ByteString.copyFrom(amMessageChunk))
                     .build();
-            
+
             parts.add(applicationMessageChunk);
         }
         return parts;

@@ -9,6 +9,9 @@ import org.springframework.data.repository.query.Param;
 import com.hedera.hcsapp.entities.AddressBook;
 
 public interface AddressBookRepository extends CrudRepository<AddressBook, String> {
+    @Query("SELECT ab FROM AddressBook ab")
+    List<AddressBook> findAllUsers();
+    
     @Query("SELECT ab FROM AddressBook ab WHERE ab.name <> :userName")
     List<AddressBook> findAllUsersButMe(@Param("userName") String userName);
 
@@ -16,6 +19,6 @@ public interface AddressBookRepository extends CrudRepository<AddressBook, Strin
     AddressBook findUserByName(@Param("userName") String userName);
     
     @Query("SELECT ab FROM AddressBook ab WHERE ab.name <> :userName AND roles LIKE CONCAT('%',:role,'%')")
-    List<AddressBook> findAllBuyersSellersButMe(@Param("userName") String userName, @Param("role") String role);
+    List<AddressBook> findAllWithRoleButMe(@Param("userName") String userName, @Param("role") String role);
 }
 

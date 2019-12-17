@@ -76,10 +76,10 @@
                 </header>
                 <div  id="lhs-menu" class="mdc-list  mdc-top-app-bar--fixed-adjust">
 
-<!--                    <a class="mdc-list-item mdc-list-item--activated" href="#overview">
+                    <a class="mdc-list-item mdc-list-item--activated" href="#overview">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">home</i>
                         <span class="mdc-list-item__text">Overview</span>
-                    </a>-->
+                    </a>
                     <a class="credits-and-debits mdc-list-item" href="#credits-and-debits" aria-current="page">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">money</i>
                         <span class="mdc-list-item__text">Credits and Debits</span>
@@ -92,11 +92,17 @@
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">group</i>
                         <span class="mdc-list-item__text">Addresses</span>
                     </a>-->
+                    
+                    <a class="audit mdc-list-item" href="#audit" aria-current="page">
+                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">attach_money</i>
+                        <span class="mdc-list-item__text">Payments</span>
+                    </a>
                     <a class="audit mdc-list-item" href="#audit" aria-current="page">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">remove_red_eye</i>
                         <span class="mdc-list-item__text">Audit</span>
                     </a>
-                    <div role="separator" class="mdc-list-divider"></div>
+                    
+<div role="separator" class="mdc-list-divider"></div>
 <!--                    <a class="mdc-list-item" href="#" aria-current="page">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">account_box</i>
                         <span class="mdc-list-item__text">Account</span>
@@ -166,8 +172,7 @@
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recipient</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Reference</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Amount</th>
-                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Date</th>
-                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Time</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">DateTime</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Status</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Actions</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Notes</th>
@@ -199,8 +204,7 @@
                                                     <td id="recipient"      class="mdc-data-table__cell">Bob</td>
                                                     <td id="reference"      class="mdc-data-table__cell">A77U312</td>
                                                     <td id="amount"         class="mdc-data-table__cell" data-amount="120" data-currency="USD">$120</td>
-                                                    <td id="date"           class="mdc-data-table__cell">13 Nov</td>
-                                                    <td id="time"           class="mdc-data-table__cell">09:31</td>
+                                                    <td id="date-time"           class="mdc-data-table__cell">13 Nov 9:21</td>
                                                     <td id="status"         class="mdc-data-table__cell">Pending</td>
                                                     <td id="action"         class="mdc-data-table__cell"></td>
                                                     <td id="notes"          class="mdc-data-table__cell">1 x XYZ Service</td>
@@ -247,7 +251,7 @@
                                  style="overflow-x: scroll"
                                  >
                                 <div class="mdc-data-table" style="width:100%">
-                                    <table class="mdc-data-table__table" aria-label="Dessert calories">
+                                    <table class="mdc-data-table__table" aria-label="">
                                         <thead>
                                             <tr class="mdc-data-table__header-row">
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col"></th>
@@ -256,9 +260,9 @@
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recipient</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Reference</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Amount (USD)</th>
-                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Date</th>
-                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Time</th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">DateTime</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Status</th>
+                                                <!--<th class="mdc-data-table__header-cell" role="columnheader" scope="col">Channel</th>-->
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Actions</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Notes</th>
                                             </tr>
@@ -273,9 +277,9 @@
                                                     <td id="recipient"      class="mdc-data-table__cell">Bob</td>
                                                     <td id="reference"      class="mdc-data-table__cell">A77U312</td>
                                                     <td id="amount-net"     class="mdc-data-table__cell" style="text-align: right" data-amount="120" data-currency="USD">$120</td>
-                                                    <td id="date"           class="mdc-data-table__cell">13 Nov</td>
-                                                    <td id="time"           class="mdc-data-table__cell">09:31</td>
+                                                    <td id="date-time"           class="mdc-data-table__cell">13 Nov</td>
                                                     <td id="status"         class="mdc-data-table__cell">Pending</td>
+                                                    <!--<td id="channel-name"   class="mdc-data-table__cell"></td>-->
                                                     <td id="action"         class="mdc-data-table__cell"></td>
                                                     <td id="notes"          class="mdc-data-table__cell">1 x XYZ Service</td>
                                                 </tr>
@@ -343,6 +347,8 @@
                         </details>
                     </div>
                 </template>
+                
+                
                 <div 
                     id="main-panel-holder"
                     class="flippanel mdc-top-app-bar--fixed-adjust mdc-typography--body2"
@@ -630,6 +636,196 @@
             </div>
         </div><div class="mdc-dialog-scrim"></div>
         
+        <div id="select-paychannel-dialog" 
+           
+            class="mdc-dialog"
+             role="alertdialog"
+             aria-modal="true"
+             aria-labelledby="my-dialog-title"
+             aria-describedby="my-dialog-content">
+            <div class="mdc-dialog__container">
+                <div class="mdc-dialog__surface" >
+                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
+                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
+                    -->Select a payment channel<!--
+                    --></h2>
+                    <div class="mdc-dialog__content" id="my-dialog-content" >
+                       <br/>
+                        
+                        <div style="display:fex; flex-direction: column">
+                            
+                            <form id="select-paychannel-dialog-form">
+                                <div class="mdc-select">
+                                    <div class="mdc-select__anchor " style="width: 100%;">
+                                      <i class="mdc-select__dropdown-icon"></i>
+                                      <div class="mdc-select__selected-text" data-value="Doris">Doris</div>
+                                      <span class="mdc-floating-label">Select channel</span>
+                                      <div class="mdc-line-ripple"></div>
+                                    </div>
+
+                                    <div class="mdc-select__menu mdc-menu mdc-menu-surface" style="width: 100%;">
+                                        <template id="mdc-list-item-template">
+                                                <li class="mdc-list-item" data-value="Doris">
+                                                  Doris
+                                                </li>
+                                        </template>  
+                                        <ul id="channel-name" class="mdc-list" data-value="Doris">
+
+                                        </ul>
+                                    </div>
+                                 </div>
+                
+                                <br/>
+                                <div class="mdc-text-field mdc-text-field--full-width">
+                                    <input type="text"
+                                           id="channel-additional-notes"
+                                           required minlength=4
+                                           id="my-text-field" class="mdc-text-field__input">
+                                    <label class="mdc-floating-label" for="settle-now-additional-notes">
+                                        Additional Notes
+                                    </label>
+                                </div>
+                                
+                                <div class="mdc-text-field-helper-line">
+                                    <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
+                                        Field is required and must be at least 4 characters long
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <footer class="mdc-dialog__actions" style="padding:24px">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+                            <span class="mdc-button__label">Cancel</span>
+                        </button>
+                        <button id="channel-now-send" type="button" 
+                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
+                        >
+                            <span class="mdc-button__label">Send Now</span>
+                        </button>
+                    </footer>
+                </div>
+
+            </div>
+        </div><div class="mdc-dialog-scrim"></div>
+        
+        
+        <div id="pay-dialog" 
+           
+            class="mdc-dialog"
+             role="alertdialog"
+             aria-modal="true"
+             aria-labelledby="my-dialog-title"
+             aria-describedby="my-dialog-content">
+            <div class="mdc-dialog__container">
+                <div class="mdc-dialog__surface" >
+                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
+                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
+                    -->Payment details<!--
+                    --></h2>
+                    <div class="mdc-dialog__content" id="my-dialog-content" >
+                       <br/>
+                        
+                        <div style="display:fex; flex-direction: column">
+                            
+                            <form id="pay-dialog-form">
+                                
+                                
+                                <div class="mdc-text-field mdc-text-field--full-width">
+                                    <input type="text"
+                                           id="pay-payer-details"
+                                           value="{payerDetails}"
+                                           disabled
+                                           id="my-text-field" class="mdc-text-field__input">
+                                    <label class="mdc-floating-label" for="pay-payer-details">
+                                        Payer Account Details
+                                    </label>
+                                </div>
+                                <div class="mdc-text-field mdc-text-field--full-width">
+                                    <input type="text"
+                                           id="pay-recipient-details"
+                                           value="{recipientDetails}"
+                                           disabled
+                                           id="my-text-field" class="mdc-text-field__input">
+                                    <label class="mdc-floating-label" for="pay-recipient-details">
+                                        Recipient Account Details
+                                    </label>
+                                </div>
+                                <div class="mdc-text-field mdc-text-field--full-width">
+                                    <input type="text"
+                                           id="pay-additional-notes"
+                                           required minlength=4
+                                           id="my-text-field" class="mdc-text-field__input">
+                                    <label class="mdc-floating-label" for="pay-additional-notes">
+                                        Additional Notes
+                                    </label>
+                                </div>
+                                
+                                <div class="mdc-text-field-helper-line">
+                                    <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
+                                        Field is required and must be at least 4 characters long
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <footer class="mdc-dialog__actions" style="padding:24px">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+                            <span class="mdc-button__label">Cancel</span>
+                        </button>
+                        <button id="pay-now-send" type="button" 
+                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
+                        >
+                            <span class="mdc-button__label">Send Now</span>
+                        </button>
+                    </footer>
+                </div>
+
+            </div>
+        </div><div class="mdc-dialog-scrim"></div>
+        
+        <div id="confirm-pay-channel-dialog" 
+            class="mdc-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="my-dialog-title"
+            aria-describedby="my-dialog-content">
+            <div class="mdc-dialog__container">
+
+                <div class="mdc-dialog__surface" >
+                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
+                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
+                    -->Confirm Payment Channel<!--
+                    --></h2>
+                    <div class="mdc-dialog__content" id="my-dialog-content" >
+                       Accept this payment channel
+                    </div>
+                    <div class="mdc-text-field mdc-text-field--full-width">
+                        <input type="text"
+                               id="channel-name"
+                               value="{{paychannel}}"
+                               disabled
+                               class="mdc-text-field__input">
+                        <label class="mdc-floating-label" for="thread-id">
+                            Proposed payment channel
+                        </label>
+                    </div>
+                  
+                    <footer class="mdc-dialog__actions" style="padding:24px">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+                            <span class="mdc-button__label">Cancel</span>
+                        </button>
+                        <button type="button" 
+                                id="confirm-channel-send"
+                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
+                        >
+                            <span class="mdc-button__label">Confirm</span>
+                        </button>
+                    </footer>
+                </div>
+            </div>
+        </div><div class="mdc-dialog-scrim"></div>
+        
       
         <div id="snackbar" class="mdc-snackbar">
                 <div class="mdc-snackbar__surface">
@@ -651,11 +847,16 @@
         
         <script>
             thisuserName = "";
+            allAddresses = [];
+            buyerSellersAddress= [];
+            paymentChannels = [];
             
             document.addEventListener("DOMContentLoaded", init);
             
             async function init ()  {
                 //location.hash ='';
+                wAddressBook =  await fetch('addressbook-everything/');
+                allAddresses = await wAddressBook.json();
                 let responseWhoami =  await fetch('addressbook/me/');
                 let whoami = await responseWhoami.json();
                 thisuserName =  whoami.name;
@@ -664,10 +865,13 @@
                 document.getElementById("this-pk").innerHTML=whoami.publicKey;
                 document.getElementById("this-pk").title=whoami.publicKey;
                 
+                responsePaymentChannel = await fetch('addressbook/paychannel/');
+                paymentChannels  = await responsePaymentChannel.json(); 
                 
                 
-                let responseAddressBook = await fetch('addressbook/buyerseller/');
-                let addressBook  = await responseAddressBook.json(); 
+                responseAddressBookBs = await fetch('addressbook/buyerseller/');
+                addressBookBs  = await responseAddressBookBs.json(); 
+                buyerSellersAddress = addressBookBs;
                 switch(location.hash){
                     case "#audit-detail": 
                         location.hash="audit";
@@ -686,8 +890,8 @@
                             document.querySelectorAll("#lhs-menu .mdc-list-item").forEach(i=>i.classList.remove('mdc-list-item--activated'));
                             document.querySelector("#lhs-menu .credits-and-debits").classList.add("mdc-list-item--activated");
                             document.getElementById("header-title").innerHTML = 'Outstanding Credits and Debits';
-                            for(i=0; i < addressBook.length; i++){
-                                var userName = addressBook[i].name;
+                            for(i=0; i < buyerSellersAddress.length; i++){
+                                var userName = buyerSellersAddress[i].name;
                                 await renderCreditsPanel(userName);
                             }
                             break;
@@ -697,8 +901,8 @@
                             document.querySelector("#lhs-menu .settlements").classList.add("mdc-list-item--activated");
                             
                             document.getElementById("header-title").innerHTML = 'Settlements';
-                            for(i=0; i < addressBook.length; i++){
-                                var userName = addressBook[i].name;
+                            for(i=0; i < buyerSellersAddress.length; i++){
+                                var userName = buyerSellersAddress[i].name;
                                 await renderSettlementsPanel(userName);
                             }
                             break;
@@ -710,16 +914,7 @@
                             renderAuditIndexTable();
                             break;
                         case '#audit-detail':break;
-                        default:
-                            document.title= thisuserName + ' - Credits and Debits';
-                            document.querySelectorAll("#lhs-menu .mdc-list-item").forEach(i=>i.classList.remove('mdc-list-item--activated'));
-                            document.querySelector("#lhs-menu .credits-and-debits").classList.add("mdc-list-item--activated");
-                            document.getElementById("header-title").innerHTML = 'Outstanding Credits and Debits';
-                            for(i=0; i < addressBook.length; i++){
-                                var userName = addressBook[i].name;
-                                await renderCreditsPanel(userName);
-                            }
-                            break;
+                        default://
                     }
                     styleButtons();
                 }
@@ -824,15 +1019,12 @@
                 var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
                 clonedPanelTemplate.querySelector(".panel").id=userName;    
                 clonedPanelTemplate.getElementById("settlements-user").innerHTML = userName;
-                
-              
-
 
                 var tableBody = clonedPanelTemplate.getElementById("settlement-table-body");
                 var tableBodyTemplate = clonedPanelTemplate.getElementById("settlement-table-body-template");
 
-                 responseSettlements = await fetch(`settlements/${userName}`);
-                 responseSettlementsL = await responseSettlements.json();
+                var responseSettlements = await fetch(`settlements/${userName}`);
+                var responseSettlementsL = await responseSettlements.json();
                 
                 for(z=0; z < responseSettlementsL.length ; z++){
                     i_Settlements = responseSettlementsL[z];
@@ -849,26 +1041,45 @@
                     clonedRow.getElementById("reference").innerHTML = "";
                     
                     clonedRow.getElementById("amount-net").innerHTML = "Net " + i_Settlements.netValue;
-                    /*
-                    clonedRow.getElementById("amount").innerHTML = i_Settlements.currency + ' '+ i_Settlements.amount;
-                    clonedRow.getElementById("amount").setAttribute("data-amount", i_Settlements.amount );
-                    clonedRow.getElementById("amount").setAttribute("data-currency", i_Settlements.currency );
-                    */
-
-                    clonedRow.getElementById("date").innerHTML = i_Settlements.createdDate;
-                    clonedRow.getElementById("time").innerHTML = i_Settlements.createdTime;
-                    clonedRow.getElementById("status").innerHTML =  i_Settlements.displayStatus;
-                    clonedRow.getElementById("status").style.textTransform = "capitalize";
-
+                
+                    clonedRow.getElementById("date-time").innerHTML = i_Settlements.createdDateTime;
+                    clonedRow.getElementById("status").innerHTML =  i_Settlements.displayStatus + (i_Settlements.paymentChannelName===null?"":" (with "+ i_Settlements.paymentChannelName +")");
+                    //clonedRow.getElementById("status").style.textTransform = "capitalize";
+                    
+                    
                     
                     if(i_Settlements.payerName === userName &&  i_Settlements.status === 'SETTLEMENT_PROPOSED'){ //SETTLEMENT_PROPOSED
-                      let threadId = i_Settlements.threadId;
-                      newButton = document.createElement("button");
-                      newButton.innerHTML = "Accept";
-                      newButton.classList.add("mdc-button");
-                      newButton.classList.add("mdc-button--outlined");
-                      newButton.addEventListener("click", function(){openConfirmSettlementDialog(threadId,userName);});
-                      clonedRow.getElementById("action").appendChild(newButton);
+                        let threadId = i_Settlements.threadId;
+                        newButton = document.createElement("button");
+                        newButton.innerHTML = "Accept";
+                        newButton.classList.add("mdc-button");
+                        newButton.classList.add("mdc-button--outlined");
+                        newButton.addEventListener("click", function(){openConfirmSettlementDialog(threadId,userName);});
+                        clonedRow.getElementById("action").appendChild(newButton);
+                    } else if (i_Settlements.payerName === thisuserName  &&  i_Settlements.status === 'SETTLEMENT_AGREED'){
+                        let threadId = i_Settlements.threadId;
+                        newButton = document.createElement("button");
+                        newButton.innerHTML = "Prop Paychannel";
+                        newButton.classList.add("mdc-button");
+                        newButton.classList.add("mdc-button--outlined");
+                        newButton.addEventListener("click", function(){openSelectPaychannelDialog(threadId,userName);});
+                        clonedRow.getElementById("action").appendChild(newButton);
+                    } else if (i_Settlements.payerName === userName  &&  i_Settlements.status === 'SETTLE_INIT_AWAIT_ACK'){
+                        let threadId = i_Settlements.threadId;
+                        newButton = document.createElement("button");
+                        newButton.innerHTML = "Accept";
+                        newButton.classList.add("mdc-button");
+                        newButton.classList.add("mdc-button--outlined");
+                        newButton.addEventListener("click", function(){openAcceptPaychannelDialog(threadId,userName,i_Settlements.paymentChannelName );});
+                        clonedRow.getElementById("action").appendChild(newButton);
+                    } else if (i_Settlements.payerName === thisuserName  &&  i_Settlements.status === 'SETTLE_INIT_ACK'){
+                        let threadId = i_Settlements.threadId;
+                        newButton = document.createElement("button");
+                        newButton.innerHTML = "Init Pay";
+                        newButton.classList.add("mdc-button");
+                        newButton.classList.add("mdc-button--outlined");
+                        newButton.addEventListener("click", function(){openPayDialog(threadId,userName,i_Settlements.paymentChannelName );});
+                        clonedRow.getElementById("action").appendChild(newButton);
                     }
                   
                     clonedRow.getElementById("notes").innerHTML = i_Settlements.additionalNotes;
@@ -891,8 +1102,7 @@
                         clonedCreditRow.getElementById("amount-net").innerHTML = credit.amount;
                         clonedCreditRow.getElementById("notes").innerHTML = credit.additionalNotes;
                         
-                        clonedCreditRow.getElementById("date").innerHTML = credit.createdDate;
-                        clonedCreditRow.getElementById("time").innerHTML = credit.createdTime;
+                        clonedCreditRow.getElementById("date-time").innerHTML = credit.createdDateTime;
                         clonedCreditRow.getElementById("status").innerHTML =  credit.displayStatus;
                         //clonedCreditRow.getElementById("net-value").innerHTML = "";
 
@@ -963,8 +1173,7 @@
                     clonedRow.getElementById("amount").setAttribute("data-currency", i_UserCredits[z].currency );
 
 
-                    clonedRow.getElementById("date").innerHTML = i_UserCredits[z].createdDate;
-                    clonedRow.getElementById("time").innerHTML = i_UserCredits[z].createdTime;
+                    clonedRow.getElementById("date-time").innerHTML = i_UserCredits[z].createdDateTime;
                     clonedRow.getElementById("status").innerHTML =  i_UserCredits[z].displayStatus;
                     //clonedRow.getElementById("status").innerHTML =  i_UserCredits[z].status.toLowerCase().replace(/_/g," ");
                     //clonedRow.getElementById("status").style.textTransform = "capitalize";
@@ -991,7 +1200,8 @@
                 }
 
             }
-           
+            
+            
             function openNewCreditDialog(recipient) {
                 
                 /* Functions for the new credit dialog. () */
@@ -1059,6 +1269,158 @@
                 return false;
             }
             
+           
+            function openSelectPaychannelDialog(threadId, userName) {
+                $paychannelDialog = document.getElementById('select-paychannel-dialog');
+                paychannelDialog  = new mdc.dialog.MDCDialog($paychannelDialog);
+                event.preventDefault(); 
+                $paychannelDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
+                    e.parentElement.classList.remove('mdc-text-field--invalid');
+                    e.value='';}
+                );
+                mdcList =  $paychannelDialog.querySelector(".mdc-list");
+                paymentChannels.forEach(c => {
+                    clonedListItem = $paychannelDialog.querySelector("#mdc-list-item-template").content.cloneNode(true);
+                    clonedListItem.querySelector("li").innerHTML=c.name;
+                    clonedListItem.querySelector("li").setAttribute("data-value",c.name);
+                    mdcList.appendChild(clonedListItem);
+                });
+                
+                let selectedPaymentChannelName=paymentChannels[0].name;
+                //$paychannelDialog.querySelector(".mdc-list").classList.add("mdc-list-item--selected");
+                $paychannelDialog.querySelector(".mdc-list").setAttribute("data-value",selectedPaymentChannelName);                
+                $paychannelDialog.querySelector(".mdc-select__selected-text").innerHTML=selectedPaymentChannelName;
+                
+                const mdcSelect  =  new mdc.select.MDCSelect( $paychannelDialog.querySelector(".mdc-select"));
+                
+                mdcSelect.listen('MDCSelect:change', () => {
+                    selectedPaymentChannelName = mdcSelect.value;
+                  });
+                $paychannelDialog.querySelector("#channel-now-send").onclick =  function(){
+                
+                    postBody = `{
+                                 "threadId"          : "${threadId}"
+                                , "paymentChannelName" :"${selectedPaymentChannelName}"
+                                , "additionalNotes" :"${$paychannelDialog.querySelector('#channel-additional-notes').value}"
+                                }`;
+
+                    paychannelDialog.close();
+                    el = document.getElementById(userName);
+                    el.style.opacity=0.4;
+                    el.style.pointerEvents =  'none';
+                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
+
+                    showSnackBarMessage("sending channel details to HH Network ...");
+                    fetch('/settlements/proposechannel', {
+                        method: 'post',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: postBody
+                    }).then(function(response) {
+                        return response.json();
+                    }).then(function(data) {
+                        showSnackBarMessage("New channel proposal sent");
+
+                    }).catch(function(res){
+                        alert(res);
+                    });
+                };
+                
+                paychannelDialog.open();
+                return false;
+            }
+            
+            
+            function openPayDialog(threadId, userName) {
+                $payDialog = document.getElementById('pay-dialog');
+                payDialog  = new mdc.dialog.MDCDialog($payDialog);
+                event.preventDefault(); 
+                $payDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
+                    e.parentElement.classList.remove('mdc-text-field--invalid');
+                    e.value='';}
+                );
+                p = allAddresses.filter(a=>a.name===thisuserName)[0];
+                r = allAddresses.filter(a=>a.name===userName)[0];
+                payerAccountDetails = p.name + "- SortNo/AccNo: " + p.paymentAccountDetails;
+                $payDialog.querySelector("#pay-payer-details").value = payerAccountDetails;
+                recipientAccountDetails = r.name + "- SortNo/AccNo: " + r.paymentAccountDetails;
+                $payDialog.querySelector("#pay-recipient-details").value = recipientAccountDetails;
+                $payDialog.querySelector("#pay-now-send").onclick =  function(){
+                    postBody = `{
+                                 "threadId"          : "${threadId}"
+                                ,"payerAccountDetails" : "${payerAccountDetails}"
+                                ,"recipientAccountDetails" :"${recipientAccountDetails}"
+                                ,"additionalNotes" : "${$payDialog.querySelector("#pay-additional-notes").value}"
+                                }`;
+
+                    payDialog.close();
+                    el = document.getElementById(userName);
+                    el.style.opacity=0.4;
+                    el.style.pointerEvents =  'none';
+                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
+
+                    showSnackBarMessage("sending channel details to HH Network ...");
+                    fetch('/settlements/paymentInit', {
+                        method: 'post',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: postBody
+                    }).then(function(response) {
+                        return response.json();
+                    }).then(function(data) {
+                        showSnackBarMessage("Payment init sent");
+
+                    }).catch(function(res){
+                        alert(res);
+                    });
+                };
+                
+                payDialog.open();
+                return false;
+            }
+            
+        
+            function openAcceptPaychannelDialog (threadId, otherUserId,channelName){
+                event.preventDefault();
+                confirmChannelDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-pay-channel-dialog'));
+
+                $confirmChannelDialog = document.getElementById('confirm-pay-channel-dialog');
+                $confirmChannelDialog.querySelector("#channel-name").value=channelName;
+                clickFunction = function(){
+                   
+                    showSnackBarMessage("sending confirmation " + threadId + " ...");
+                    confirmChannelDialog.close();
+
+                    el = document.getElementById(otherUserId);
+                    el.style.opacity=0.4;
+                    el.style.pointerEvents =  'none';
+                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
+
+                    fetch('settlements/proposechannel/ack/'+threadId, {
+                            method: 'post',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(function(response) {
+                            return response.json();
+                        }).then(function(data) {
+                            showSnackBarMessage("confirmation sent");
+
+                        }).catch(function(res){
+                            alert(res);
+                        });
+        
+                };
+                $confirmChannelDialog.querySelector("#confirm-channel-send").onclick = clickFunction;
+                confirmChannelDialog.open();
+                return false;
+        
+            }
         
             
             function openConfirmCreditDialog(threadId,otherUserId) {
@@ -1250,7 +1612,7 @@
                 leftDrawer.open = !leftDrawer.open;
             });
             
-            
+           
             styleButtons();
             styleTextFields();
             styleTextFieldIcons();
@@ -1317,7 +1679,13 @@
                                     messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
                                   );
                              styleButtons();
+                        } else if (location.hash === '#audits'){
+                            await renderAuditIndexTable()(
+                                    messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
+                                  );
+                             styleButtons();
                         }
+                        
                         break;
                     case "settlements":
                         if(location.hash === '#settlements'){
@@ -1327,6 +1695,29 @@
                             styleButtons();
                         } else if (location.hash === '#credits-and-debits'){
                             await renderCreditsPanel(
+                                    messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
+                                  );
+                             styleButtons();
+                        } else if (location.hash === '#audits'){
+                            await renderAuditIndexTable()(
+                                    messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
+                                  );
+                             styleButtons();
+                        }
+                        break;
+                    case "audits":
+                        if(location.hash === '#settlements'){
+                            await renderSettlementsPanel(
+                                   messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
+                                   );
+                            styleButtons();
+                        } else if (location.hash === '#credits-and-debits'){
+                            await renderCreditsPanel(
+                                    messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
+                                  );
+                             styleButtons();
+                        } else if (location.hash === '#audits'){
+                            await renderAuditIndexTable()(
                                     messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
                                   );
                              styleButtons();

@@ -17,10 +17,10 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public final class Config {
     private YAMLConfig yamlConfig = new YAMLConfig();
-    
+
     public Config() throws Exception {
         Yaml yaml = new Yaml(new Constructor(YAMLConfig.class));
-        
+
         InputStream inputStream;
         File configFile = new File("./relay-config.yaml");
         if (configFile.exists()) {

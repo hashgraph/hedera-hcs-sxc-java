@@ -31,13 +31,13 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 @Log4j2
-public class PersistMessages 
+public class PersistMessages
         implements LibMessagePersistence{
-    
+
     private Map<ApplicationMessageId, List<ApplicationMessageChunk>> partialMessages;
-    
+
     private MessagePersistenceLevel persistenceLevel = null;
-    
+
     public PersistMessages() throws IOException{
         partialMessages = new HashMap<>();
     }
@@ -49,13 +49,13 @@ public class PersistMessages
 //    1: timestamp, hash, signature and content for my messages (those I sent or those sent to me)
 //    2: 1+ timestamps, hashes and signatures for all messages (regardless of sender/recipient), and content only for my messages
 //    3: timestamp, hash, signature and contents for all messages
-//  
+//
     // Mirror responses
     @Override
     public void storeMirrorResponse(ConsensusMessage mirrorTopicMessageResponse) {
 
         MirrorResponse mirrorResponse = new MirrorResponse();
-        
+
         mirrorResponse.setMessage(mirrorTopicMessageResponse.message);
         mirrorResponse.setRunningHash(mirrorTopicMessageResponse.runningHash);
         mirrorResponse.setSequenceNumber(mirrorTopicMessageResponse.sequenceNumber);
@@ -63,7 +63,7 @@ public class PersistMessages
         mirrorResponse.setTimestamp(mirrorResponse.getTimestamp().toString());
         mirrorResponse.setTimestampSeconds(mirrorTopicMessageResponse.consensusTimestamp.getEpochSecond());
         mirrorResponse.setTimestampNanos(mirrorTopicMessageResponse.consensusTimestamp.getNano());
-        
+
         Transaction dbTransaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             // start a transaction
@@ -81,15 +81,15 @@ public class PersistMessages
             log.error(e);
         }
     }
-    
-    @Override 
+
+    @Override
     public LibConsensusMessage getMirrorResponse(String timestamp) {
-                
+
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             MirrorResponse mirrorResponse = session.createQuery("from MirrorResponse mr where mr.timestamp = :timestamp", MirrorResponse.class)
                     .setParameter("timestamp", timestamp)
                     .getSingleResult();
-            
+
             LibConsensusMessage libConsensusMessage = new LibConsensusMessage();
             libConsensusMessage.setConsensusTimeStampSeconds(mirrorResponse.getTimestampSeconds());
             libConsensusMessage.setConsensusTimeStampNanos(mirrorResponse.getTimestampNanos());
@@ -101,11 +101,11 @@ public class PersistMessages
             return libConsensusMessage;
         }
     }
-        
-    @Override 
+
+    @Override
     public Map<String, LibConsensusMessage> getMirrorResponses() {
         Map<String, LibConsensusMessage> responseList = new HashMap<>();
-        
+
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             List < MirrorResponse > mirrorResponses = session.createQuery("from MirrorResponse", MirrorResponse.class).list();
             mirrorResponses.forEach(mirrorResponse -> {
@@ -120,7 +120,7 @@ public class PersistMessages
                 responseList.put(mirrorResponse.getTimestamp(), libConsensusMessage);
             });
         }
-        
+
         return responseList;
      }
 
@@ -132,12 +132,12 @@ public class PersistMessages
                 + "." + transactionId.accountId.account
                 + "-" + transactionId.validStart.getEpochSecond()
                 + "-" + transactionId.validStart.getNano();
-        
+
         HCSTransaction hcsTransaction = new HCSTransaction();
 
         hcsTransaction.setBodyBytes(submitMessageTransaction.build().toBytes(false));
         hcsTransaction.setTransactionId(txId);
-        
+
         Transaction dbTransaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             // start a transaction
@@ -155,20 +155,20 @@ public class PersistMessages
             log.error(e);
         }
     }
-    
-    @Override 
+
+    @Override
     public ConsensusMessageSubmitTransaction getSubmittedTransaction(String transactionId) {
-        
+
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             HCSTransaction hcsTransaction = session.createQuery("from HCSTransaction t where t.transactionId = :transactionId", HCSTransaction.class)
                     .setParameter("transactionId", transactionId)
                     .getSingleResult();
-            
+
             TransactionBody body = TransactionBody.parseFrom(hcsTransaction.getBodyBytes());
 
             Client client = null;
             ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction();
-            
+
             tx.setMemo(body.getMemo());
             tx.setMessage(body.getConsensusSubmitMessage().getMessage().toByteArray());
             AccountId accountId = new AccountId(body.getNodeAccountID().getShardNum()
@@ -176,32 +176,32 @@ public class PersistMessages
                     ,body.getNodeAccountID().getAccountNum()
             );
             tx.setNodeAccountId(accountId);
-            
+
             ConsensusTopicId topicId = new ConsensusTopicId(body.getConsensusSubmitMessage().getTopicID().getShardNum()
                     ,body.getConsensusSubmitMessage().getTopicID().getRealmNum()
                     ,body.getConsensusSubmitMessage().getTopicID().getTopicNum()
             );
-            
+
             tx.setTopicId(topicId);
-            
+
             tx.setMaxTransactionFee(body.getTransactionFee());
-            
+
             Instant start = Instant.ofEpochSecond(body.getTransactionID().getTransactionValidStart().getSeconds(), body.getTransactionID().getTransactionValidStart().getNanos());
             TransactionId txId = new TransactionId(accountId, start);
             tx.setTransactionId(txId);
             Duration validDuration = Duration.ofSeconds(body.getTransactionValidDuration().getSeconds());
-            
+
             tx.setTransactionValidDuration(validDuration);
-          
+
             return tx;
         } catch (InvalidProtocolBufferException e) {
             log.error(e);
         }
         return null;
-        
+
     }
 
-    @Override 
+    @Override
     public Map<String, ConsensusMessageSubmitTransaction> getSubmittedTransactions() {
         Map<String, ConsensusMessageSubmitTransaction> responseList = new HashMap<>();
 
@@ -209,7 +209,7 @@ public class PersistMessages
 
             List<HCSTransaction> hcsTransactions = session.createQuery("from HCSTransaction", HCSTransaction.class)
                     .list();
-            
+
             hcsTransactions.forEach(hcsTransaction -> {
                 try {
                     ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction();
@@ -222,34 +222,34 @@ public class PersistMessages
                             ,body.getNodeAccountID().getAccountNum()
                     );
                     tx.setNodeAccountId(accountId);
-                    
+
                     ConsensusTopicId topicId = new ConsensusTopicId(body.getConsensusSubmitMessage().getTopicID().getShardNum()
                             ,body.getConsensusSubmitMessage().getTopicID().getRealmNum()
                             ,body.getConsensusSubmitMessage().getTopicID().getTopicNum()
                     );
-                    
+
                     tx.setTopicId(topicId);
-                    
+
                     tx.setMaxTransactionFee(body.getTransactionFee());
-                    
+
                     Instant start = Instant.ofEpochSecond(body.getTransactionID().getTransactionValidStart().getSeconds(), body.getTransactionID().getTransactionValidStart().getNanos());
                     TransactionId txId = new TransactionId(accountId, start);
                     tx.setTransactionId(txId);
                     Duration validDuration = Duration.ofSeconds(body.getTransactionValidDuration().getSeconds());
-                    
+
                     tx.setTransactionValidDuration(validDuration);
-                    
+
                     responseList.put(hcsTransaction.getTransactionId(), tx);
                 } catch (InvalidProtocolBufferException e) {
                     log.error(e);
                 }
             });
-            
+
         }
         return responseList;
 
     }
-    
+
     @Override
     public List<ApplicationMessageChunk> getParts(ApplicationMessageId applicationMessageId) {
         return this.partialMessages.get(applicationMessageId);
@@ -267,7 +267,7 @@ public class PersistMessages
 
         hcsApplicationMessage.setApplicationMessageId(appMessageId);
         hcsApplicationMessage.setApplicationMessage(applicationMessage.toByteArray());
-        
+
         Transaction dbTransaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             // start a transaction
@@ -300,15 +300,15 @@ public class PersistMessages
         return null;
     }
 
-    
+
     @Override
     public Map<String, ApplicationMessage> getApplicationMessages() {
         Map<String, ApplicationMessage> responseList = new HashMap<>();
-        
+
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             List<HCSApplicationMessage> applicationMessages = session.createQuery("from HCSApplicationMessage", HCSApplicationMessage.class)
                     .list();
-            
+
             applicationMessages.forEach(applicationMessage -> {
                 try {
                     responseList.put(applicationMessage.getApplicationMessageId(), ApplicationMessage.parseFrom(applicationMessage.getApplicationMessage()));
@@ -317,7 +317,7 @@ public class PersistMessages
                 }
             });
         }
-            
+
         return responseList;
     }
 
@@ -326,7 +326,7 @@ public class PersistMessages
         // always keep data to allow for reassembly of messages,
         // part messages can be deleted once full messages have been reconstituted
         // see removeParts
-        this.partialMessages.put(applicationMessageId, l);            
+        this.partialMessages.put(applicationMessageId, l);
     }
 
     @Override
@@ -351,13 +351,13 @@ public class PersistMessages
     public Instant getLastConsensusTimestamp() {
 
         Instant lastConsensusTimestamp = Instant.EPOCH;
-        
+
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             MirrorResponse mirrorResponse = session.createQuery("from MirrorResponse mr where mr.timestamp = MAX(timestamp)", MirrorResponse.class)
                     .getSingleResult();
             lastConsensusTimestamp = Instant.ofEpochSecond(mirrorResponse.getTimestampSeconds(), mirrorResponse.getTimestampNanos());
         }
-           
+
         return lastConsensusTimestamp;
     }
 

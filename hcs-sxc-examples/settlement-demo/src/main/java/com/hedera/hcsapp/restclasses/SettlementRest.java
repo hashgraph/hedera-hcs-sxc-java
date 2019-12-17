@@ -23,11 +23,13 @@ public final class SettlementRest {
     private long netValue;
     private String currency;
     private String status;
-    private String createdDate;
-    private String createdTime;
+    private String createdDateTime;
     private String topicId;
     private String displayStatus;
     private String paymentChannelName;
+    private String payerAccountDetails;
+    private String recipientAccountDetails;
+    private String paymentReference;
     
     private List<CreditRest> credits = new ArrayList<CreditRest>();
     private List<String> threadIds = new ArrayList<String>();
@@ -41,12 +43,18 @@ public final class SettlementRest {
         this.netValue = settlement.getNetValue();
         this.currency = settlement.getCurrency();
         this.status = settlement.getStatus();
-        this.createdDate = settlement.getCreatedDate();
-        this.createdTime = settlement.getCreatedTime();
+        this.createdDateTime = settlement.getCreatedDate() + " " + settlement.getCreatedTime();
         this.topicId = appData.getHCSLib().getTopicIds().get(appData.getTopicIndex()).toString();
-        this.displayStatus = States.valueOf(this.status).getDisplay().replace("Settlement ", "");
+        if (this.status.startsWith("Settlement ")) {
+            this.displayStatus = States.valueOf(this.status).getDisplay().replaceFirst("Settlement ", "");
+        } else {
+            this.displayStatus = States.valueOf(this.status).getDisplay();
+        }
         this.paymentChannelName = settlement.getPaymentChannelName();
-
+        this.payerAccountDetails = settlement.getPayerAccountDetails();
+        this.recipientAccountDetails = settlement.getRecipientAccountDetails();
+        this.paymentReference = settlement.getPaymentReference();
+        
         List<SettlementItem> settlementItemsFromDB = settlementItemRepository.findAllSettlementItems(settlement.getThreadId());
         List<String> threadIds = new ArrayList<String>();
         for (SettlementItem settlementItem : settlementItemsFromDB) {

@@ -23,16 +23,16 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * 
+ *
  * Implements callback registration and notification capabilities to support apps
  *
  */
 @Log4j2
 public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
- 
+
     private final List<HCSCallBackToAppInterface> observers = new ArrayList<>();
     private HCSLib hcsLib;
-    
+
     public OnHCSMessageCallback (HCSLib hcsLib) throws Exception {
         this.hcsLib = hcsLib;
         // load persistence implementation at runtime
@@ -42,7 +42,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
         // load mirror callback implementation at runtime
         Class<?> callbackClass = Plugins.find("com.hedera.plugin.mirror.*", "com.hedera.hcslib.interfaces.MirrorSubscriptionInterface", true);
         MirrorSubscriptionInterface mirrorSubscription = ((MirrorSubscriptionInterface)callbackClass.newInstance());
-        
+
         if (hcsLib.getCatchupHistory()) {
             Optional<Instant> lastConsensusTimestamp = Optional.of(hcsLib.getMessagePersistence().getLastConsensusTimestamp());
             lastConsensusTimestamp.get().plusNanos(1);
@@ -72,28 +72,28 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
         hcsLib.getMessagePersistence().storeMirrorResponse(consensusMessage);
     }
     public void partialMessage(ApplicationMessageChunk messagePart) throws InvalidProtocolBufferException {
-        
-        Optional<ApplicationMessage> messageEnvelopeOptional = 
+
+        Optional<ApplicationMessage> messageEnvelopeOptional =
                 pushUntilCompleteMessage(messagePart, hcsLib.getMessagePersistence());
-        
+
         if (messageEnvelopeOptional.isPresent()){
             hcsLib.getMessagePersistence().storeApplicationMessage(messageEnvelopeOptional.get().getApplicationMessageId(), messageEnvelopeOptional.get());
             notifyObservers( messageEnvelopeOptional.get().toByteArray(), messageEnvelopeOptional.get().getApplicationMessageId());
         }
     }
-    
+
     /**
      * Adds ApplicationMessageChunk into memory and returns
      * a fully combined / assembled ApplicationMessage if all parts are present
      * @param messageChunk a chunked message received from the queue
-     * @param persistence the memory. The object is side-effected with each 
-     * function invocation. 
-     * @return a fully combined / assembled ApplicationMessage if all parts present, 
+     * @param persistence the memory. The object is side-effected with each
+     * function invocation.
+     * @return a fully combined / assembled ApplicationMessage if all parts present,
      * nothing otherwise.
-     * @throws InvalidProtocolBufferException 
+     * @throws InvalidProtocolBufferException
      */
     static Optional<ApplicationMessage> pushUntilCompleteMessage(ApplicationMessageChunk messageChunk, LibMessagePersistence persistence) throws InvalidProtocolBufferException {
-            
+
         ApplicationMessageId applicationMessageId = messageChunk.getApplicationMessageId();
         //look up db to find parts received already
         List<ApplicationMessageChunk> chunkList = persistence.getParts(applicationMessageId);
@@ -104,7 +104,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
             chunkList.add(messageChunk);
         }
         persistence.putParts(applicationMessageId, chunkList);
-        
+
         if (messageChunk.getChunksCount() == 1){
                 ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(messageChunk.getMessageChunk());
                 return  Optional.of( applicationMessage);
@@ -120,7 +120,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                 ApplicationMessage messageEnvelope = ApplicationMessage.parseFrom(merged);
                 return  Optional.of(messageEnvelope);
         } else { // not all parts received yet
-            return Optional.empty(); 
+            return Optional.empty();
         }
     }
 }

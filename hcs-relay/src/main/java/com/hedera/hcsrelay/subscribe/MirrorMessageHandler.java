@@ -26,27 +26,27 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public final class MirrorMessageHandler {
-   
-    
+
+
     public static void onMirrorMessage(ConsensusMessage messagesResponse, ConsensusTopicId topicId) {
         try {
             Config config = new Config();
-            
+
             log.info("Got message from mirror node");
             log.info(messagesResponse.toString());
-            
+
             addMessage(config, messagesResponse, topicId);
             log.info("Message added to queue");
         } catch (Exception ex) {
             log.error(ex);
         }
     }
-    
+
     private static void addMessage(Config config, ConsensusMessage messagesResponse, ConsensusTopicId topicId) throws JMSException, NamingException {
         long topicNum = topicId.topic;
         Connection connection = null;
         InitialContext initialContext = null;
-        
+
         try {
             log.info("Sending message to queue");
             Queue queueConfig = config.getConfig().getQueue();
@@ -73,7 +73,7 @@ public final class MirrorMessageHandler {
                     log.info("Is Artemis up? Setup your host file so that the host identified in'"+tcpConnectionFactory+"' points to 127.0.0.1 if running outside of docker");
                     TimeUnit.SECONDS.sleep(6000);
                 }
-                
+
             } while (scanning);
 
             connection.setClientID("topic-setup-relay:"+topicNum);
@@ -85,20 +85,20 @@ public final class MirrorMessageHandler {
             MessageProducer messageProducer = session.createProducer(topic);
 
             HCSRelayMessage relayMessage = new HCSRelayMessage(messagesResponse);
-            
+
             ObjectMessage objectMessage = session.createObjectMessage(relayMessage);
-           
+
             messageProducer.send(objectMessage);
-            
+
             // store last consensus timestamp
             try(BufferedWriter br = new BufferedWriter(new FileWriter(config.getConfig().getLastConsensusTimeFile()))) {
                 long seconds = relayMessage.getConsensusTimestamp().getEpochSecond();
                 int nanos = relayMessage.getConsensusTimestamp().getNano();
                 br.write(seconds + "-" + nanos);
             }
-            
+
             log.info("Sent message to queue");
-        
+
         } catch (Exception e) {
             log.error(e);
         } finally {

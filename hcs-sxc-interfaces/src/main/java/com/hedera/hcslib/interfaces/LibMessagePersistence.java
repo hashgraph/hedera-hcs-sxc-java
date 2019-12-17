@@ -2,17 +2,16 @@ package com.hedera.hcslib.interfaces;
 
 
 import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.consensus.SubmitMessageTransaction;
-import com.hedera.hashgraph.sdk.proto.Timestamp;
+import com.hedera.hashgraph.sdk.consensus.ConsensusMessage;
+import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
 import com.hedera.hcslib.proto.java.ApplicationMessageChunk;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
 import com.hedera.hcslib.proto.java.ApplicationMessageId;
-import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages;
-import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages.MirrorGetTopicMessagesResponse;
 
 public interface LibMessagePersistence {
     // message chunking persistence
@@ -21,19 +20,25 @@ public interface LibMessagePersistence {
     public void removeParts(ApplicationMessageId messageEnvelopeId);
     
     // mirror message persistence
-    void storeMirrorResponse(MirrorGetTopicMessages.MirrorGetTopicMessagesResponse mirrorTopicMessageResponse);
-    public MirrorGetTopicMessagesResponse getMirrorResponse(String timestamp);
-    public Map<String, MirrorGetTopicMessagesResponse> getMirrorResponses();
+    void storeMirrorResponse(ConsensusMessage mirrorTopicMessageResponse);
+    public LibConsensusMessage getMirrorResponse(String timestamp);
+    public Map<String, LibConsensusMessage> getMirrorResponses();
 
     // HCS transaction persistence
-    void storeTransaction(TransactionId transactionId, SubmitMessageTransaction submitMessageTransaction);
-    public SubmitMessageTransaction getSubmittedTransaction(String transactionId);
-    public Map<String, SubmitMessageTransaction> getSubmittedTransactions();
+    void storeTransaction(TransactionId transactionId, ConsensusMessageSubmitTransaction submitMessageTransaction);
+    public ConsensusMessageSubmitTransaction getSubmittedTransaction(String transactionId);
+    public Map<String, ConsensusMessageSubmitTransaction> getSubmittedTransactions();
     
     // application message persistence
     public void storeApplicationMessage(ApplicationMessageId applicationMessageId, ApplicationMessage applicationMessage);
     public Map<String, ApplicationMessage> getApplicationMessages();
     public ApplicationMessage getApplicationMessage(String applicationMessageId);
+    
+    // consensus timestamp
+    public Instant getLastConsensusTimestamp();
+    
+    // persistence level
+    public void setPersistenceLevel(MessagePersistenceLevel persistenceLevel);
     
     // clear all data
     public void clear();

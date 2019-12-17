@@ -3,7 +3,7 @@ package com.hedera.hcslib.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.hedera.hashgraph.sdk.consensus.TopicId;
+import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hcslib.interfaces.MessagePersistenceLevel;
 
 public final class AppNet {
@@ -13,7 +13,14 @@ public final class AppNet {
     private int rotateKeyFrequency = 0;
     private MessagePersistenceLevel persistenceLevel = MessagePersistenceLevel.NONE;
     private List<Topic> topics = new ArrayList<Topic>();
+    private boolean catchupHistory = false;
 
+    public boolean getCatchupHistory() {
+        return this.catchupHistory;
+    }
+    public void setCatchupHistory(boolean catchupHistory) {
+        this.catchupHistory = catchupHistory;
+    }
     public boolean getSignMessages() {
         return signMessages;
     }
@@ -45,14 +52,14 @@ public final class AppNet {
         this.topics = topics;
     }
     /** 
-     * Returns a list of TopicIds
-     * @return List<TopicId> 
+     * Returns a list of ConsensusTopicId
+     * @return List<ConsensusTopicId> 
      */
-    public List<TopicId> getTopicIds() {
-        List<TopicId> topicIds = new ArrayList<TopicId>();
+    public List<ConsensusTopicId> getTopicIds() {
+        List<ConsensusTopicId> topicIds = new ArrayList<ConsensusTopicId>();
         
         for (Topic topic : this.topics) {
-            topicIds.add(TopicId.fromString(topic.getTopic()));
+            topicIds.add(topic.getConsensusTopicId());
         }
         
         return topicIds;

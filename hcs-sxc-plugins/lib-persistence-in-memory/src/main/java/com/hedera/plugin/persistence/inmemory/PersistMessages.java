@@ -1,20 +1,19 @@
 package com.hedera.plugin.persistence.inmemory;
 
 import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.consensus.SubmitMessageTransaction;
-import com.hedera.hashgraph.sdk.proto.Timestamp;
+import com.hedera.hashgraph.sdk.consensus.ConsensusMessage;
+import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
+import com.hedera.hcslib.interfaces.LibConsensusMessage;
 import com.hedera.hcslib.interfaces.LibMessagePersistence;
 import com.hedera.hcslib.interfaces.MessagePersistenceLevel;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
 import com.hedera.hcslib.proto.java.ApplicationMessageChunk;
 import com.hedera.hcslib.proto.java.ApplicationMessageId;
-import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages;
-import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages.MirrorGetTopicMessagesResponse;
-import com.hedera.plugin.persistence.config.Config;
 
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,21 +23,21 @@ public class PersistMessages
         implements LibMessagePersistence{
     
     private Map<ApplicationMessageId, List<ApplicationMessageChunk>> partialMessages;
-    private Map<String, SubmitMessageTransaction> transactions;
-    private Map<String, MirrorGetTopicMessagesResponse> mirrorTopicMessages;
+    private Map<String, ConsensusMessageSubmitTransaction> transactions;
+    private Map<String, LibConsensusMessage> mirrorTopicMessages;
     private Map<String, ApplicationMessage> applicationMessages;
     
-    private Config config = null;
-    private MessagePersistenceLevel persistenceLevel = null;
+    private MessagePersistenceLevel persistenceLevel = MessagePersistenceLevel.FULL;
     
     public PersistMessages() throws IOException{
-        config = new Config();
-        persistenceLevel = config.getConfig().getPersistenceLevel();
         partialMessages = new HashMap<>();
         transactions = new HashMap<>();
         mirrorTopicMessages = new HashMap<>();
         applicationMessages = new HashMap<>();
-
+    }
+    
+    public void setPersistenceLevel(MessagePersistenceLevel persistenceLevel) {
+        this.persistenceLevel = persistenceLevel;
     }
 
 //    0: none
@@ -48,42 +47,43 @@ public class PersistMessages
 //  
     // Mirror responses
     @Override
-    public void storeMirrorResponse(MirrorGetTopicMessagesResponse mirrorTopicMessageResponse) {
-        String timestamp = mirrorTopicMessageResponse.getConsensusTimestamp().getSeconds() + "." + mirrorTopicMessageResponse.getConsensusTimestamp().getNanos();
-        mirrorTopicMessages.put(timestamp, mirrorTopicMessageResponse);
-        log.info("storeMirrorResponse " + timestamp + "-" + mirrorTopicMessageResponse);
+    public void storeMirrorResponse(ConsensusMessage mirrorTopicMessageResponse) {
+        
+        LibConsensusMessage libConsensusMessage = new LibConsensusMessage(mirrorTopicMessageResponse);
+        mirrorTopicMessages.put(mirrorTopicMessageResponse.consensusTimestamp.toString(), libConsensusMessage);
+        log.info("storeMirrorResponse " + mirrorTopicMessageResponse.consensusTimestamp.toString() + "-" + mirrorTopicMessageResponse);
     }
     
     @Override 
-    public MirrorGetTopicMessagesResponse getMirrorResponse(String timestamp) {
+    public LibConsensusMessage getMirrorResponse(String timestamp) {
         return mirrorTopicMessages.get(timestamp);
     }
         
     @Override 
-    public Map<String, MirrorGetTopicMessagesResponse> getMirrorResponses() {
+    public Map<String, LibConsensusMessage> getMirrorResponses() {
         return mirrorTopicMessages;
     }
 
     // Transactions
     @Override
-    public void storeTransaction(TransactionId transactionId, SubmitMessageTransaction submitMessageTransaction) {
-        String txId = transactionId.getAccountId().getShardNum()
-                + "." + transactionId.getAccountId().getRealmNum()
-                + "." + transactionId.getAccountId().getAccountNum()
-                + "-" + transactionId.getValidStart().getEpochSecond()
-                + "-" + transactionId.getValidStart().getNano();
+    public void storeTransaction(TransactionId transactionId, ConsensusMessageSubmitTransaction submitMessageTransaction) {
+        String txId = transactionId.accountId.shard
+                + "." + transactionId.accountId.realm
+                + "." + transactionId.accountId.account
+                + "-" + transactionId.validStart.getEpochSecond()
+                + "-" + transactionId.validStart.getNano();
         
         transactions.put(txId, submitMessageTransaction);
         log.info("storeTransaction " + txId + "-" + submitMessageTransaction);
     }
     
     @Override 
-    public SubmitMessageTransaction getSubmittedTransaction(String transactionId) {
+    public ConsensusMessageSubmitTransaction getSubmittedTransaction(String transactionId) {
         return transactions.get(transactionId);
     }
 
     @Override 
-    public Map<String, SubmitMessageTransaction> getSubmittedTransactions() {
+    public Map<String, ConsensusMessageSubmitTransaction> getSubmittedTransactions() {
         return transactions;
     }
     
@@ -139,6 +139,23 @@ public class PersistMessages
                 this.partialMessages.remove(applicationMessageId);
                 break;
         }
+    }
+    
+    @Override
+    public Instant getLastConsensusTimestamp() {
+
+        Instant lastConsensusTimestamp = Instant.EPOCH;
+        for (Map.Entry<String, LibConsensusMessage> mirrorTopicMessage : mirrorTopicMessages.entrySet()) {
+            long seconds = mirrorTopicMessage.getValue().getConsensusTimeStampSeconds();
+            int nanos = mirrorTopicMessage.getValue().getConsensusTimeStampNanos();
+            
+            if (lastConsensusTimestamp.getEpochSecond() < seconds) {
+                lastConsensusTimestamp = Instant.ofEpochSecond(seconds, nanos);
+            } else if ((lastConsensusTimestamp.getEpochSecond() == seconds) && (lastConsensusTimestamp.getNano() < nanos)) {
+                lastConsensusTimestamp = Instant.ofEpochSecond(seconds, nanos);
+            }
+        }
+        return lastConsensusTimestamp;
     }
 
     @Override

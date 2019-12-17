@@ -13,8 +13,8 @@ queue:
 HCSTransactionFee: 100000000
 
 nodes:
-  - address: 35.222.103.151:50211
-    account: 0.0.3
+  - address: 34.66.214.12:50211
+    account: 0.0.4
 # Commented out due to bug in java SDK
 #  - address: 1.testnet.hedera.com:50211
 #    account: 0.0.4
@@ -22,5 +22,4 @@ nodes:
 #    account: 0.0.5
 #  - address: 3.testnet.hedera.com:50211
 #    account: 0.0.6
-    
     

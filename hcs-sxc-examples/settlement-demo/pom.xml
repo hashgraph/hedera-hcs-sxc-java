@@ -152,6 +152,12 @@
                                     <tag>${project.version}</tag>
                                 </tags>
                             </to>
+                            <container>
+                                <jvmFlags>
+                                  <jvmFlag>-Dcom.hedera.hashgraph.sdk.experimental=true</jvmFlag>
+                                </jvmFlags>
+                                <mainClass>com.hedera.hcsapp.Application</mainClass>                            
+                            </container>
                             <extraDirectories>
                                 <paths>
                                     <path>.</path>

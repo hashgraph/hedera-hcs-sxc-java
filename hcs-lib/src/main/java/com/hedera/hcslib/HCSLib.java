@@ -8,11 +8,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.consensus.TopicId;
+import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcslib.config.Config;
 import com.hedera.hcslib.config.Environment;
 import com.hedera.hcslib.interfaces.LibMessagePersistence;
+import com.hedera.hcslib.interfaces.MessagePersistenceLevel;
 
 public final class HCSLib {
 
@@ -23,12 +24,12 @@ public final class HCSLib {
     private Map<AccountId, String> nodeMap = new HashMap<AccountId, String>();
     private AccountId operatorAccountId = new AccountId(0, 0, 0); 
     private Ed25519PrivateKey ed25519PrivateKey;
-    private List<TopicId> topicIds = new ArrayList<TopicId>();
-    private String tcpConnectionFactory = "";
-    private String initialContextFactory = "";
+    private List<ConsensusTopicId> topicIds = new ArrayList<ConsensusTopicId>();
     private long hcsTransactionFee = 0;
     private long applicationId = 0;
     private static LibMessagePersistence persistence;
+    private boolean catchupHistory;
+    private MessagePersistenceLevel messagePersistenceLevel;
 
     /**
      * Constructor for HCS Lib
@@ -46,8 +47,8 @@ public final class HCSLib {
         this.operatorAccountId = environment.getOperatorAccountId();
         this.ed25519PrivateKey = environment.getOperatorKey();
         this.topicIds = config.getConfig().getAppNet().getTopicIds();
-        this.tcpConnectionFactory = config.getConfig().getQueue().getTcpConnectionFactory();
-        this.initialContextFactory = config.getConfig().getQueue().getInitialContextFactory();
+        this.catchupHistory = config.getConfig().getAppNet().getCatchupHistory();
+        this.messagePersistenceLevel = config.getConfig().getAppNet().getPersistenceLevel();
         this.hcsTransactionFee = config.getConfig().getHCSTransactionFee();
         this.applicationId = applicationId;
     }
@@ -76,7 +77,7 @@ public final class HCSLib {
         this.ed25519PrivateKey = ed25519PrivateKey;
         return this;
     }
-    public HCSLib withTopicList(List<TopicId> topicIds) {
+    public HCSLib withTopicList(List<ConsensusTopicId> topicIds) {
         this.topicIds = topicIds;
         return this;
     }
@@ -101,14 +102,8 @@ public final class HCSLib {
     public Ed25519PrivateKey getEd25519PrivateKey() {
         return this.ed25519PrivateKey;
     } 
-    public List<TopicId> getTopicIds() {
+    public List<ConsensusTopicId> getTopicIds() {
         return this.topicIds;
-    }
-    public String getTCPConnectionFactory() {
-        return tcpConnectionFactory;
-    }
-    public String getInitialContextFactory() {
-        return initialContextFactory;
     }
     public long getHCSTransactionFee() {
         return this.hcsTransactionFee;
@@ -116,9 +111,12 @@ public final class HCSLib {
     public long getApplicationId() {
         return this.applicationId;
     }
-    
+    public boolean getCatchupHistory() {
+        return this.catchupHistory;
+    }
     public void setMessagePersistence(LibMessagePersistence persistence) {
         HCSLib.persistence = persistence;
+        HCSLib.persistence.setPersistenceLevel(this.messagePersistenceLevel);
     }
 
     public LibMessagePersistence getMessagePersistence() {

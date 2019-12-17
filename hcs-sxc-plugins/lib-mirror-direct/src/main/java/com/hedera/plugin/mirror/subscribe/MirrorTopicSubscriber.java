@@ -80,14 +80,17 @@ public final class MirrorTopicSubscriber extends Thread {
     
                         Subscription subscription;
                         if (this.subscribeFrom.isPresent()) {
+                            this.subscribeFrom = Optional.of(this.subscribeFrom.get().plusNanos(1));
                             subscription = subscriber.subscribe(this.topicId, this.subscribeFrom.get(), tm -> {
                                 log.info("Got mirror message, calling handler");
+                                this.subscribeFrom = Optional.of(tm.consensusTimestamp.plusNanos(1));
                                 onMirrorMessage(tm, this.onHCSMessageCallback);   
                             });
                             
                         } else {
                             subscription = subscriber.subscribe(this.topicId, tm -> {
                                 log.info("Got mirror message, calling handler");
+                                this.subscribeFrom = Optional.of(tm.consensusTimestamp.plusNanos(1));
                                 onMirrorMessage(tm, this.onHCSMessageCallback);   
                             });
                         }

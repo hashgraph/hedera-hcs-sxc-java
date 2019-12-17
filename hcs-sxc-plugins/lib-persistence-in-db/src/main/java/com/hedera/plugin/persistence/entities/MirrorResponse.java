@@ -12,6 +12,7 @@ import lombok.Data;
 public class MirrorResponse {
     @Id
     private String timestamp;
+    private Long timestampNS;
     private Long timestampSeconds;
     private int timestampNanos;
     private byte[] message;

@@ -45,7 +45,6 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
 
         if (hcsLib.getCatchupHistory()) {
             Optional<Instant> lastConsensusTimestamp = Optional.of(hcsLib.getMessagePersistence().getLastConsensusTimestamp());
-            lastConsensusTimestamp.get().plusNanos(1);
             mirrorSubscription.init(this, this.hcsLib.getApplicationId(), lastConsensusTimestamp);
         } else {
             mirrorSubscription.init(this, this.hcsLib.getApplicationId(), Optional.empty());

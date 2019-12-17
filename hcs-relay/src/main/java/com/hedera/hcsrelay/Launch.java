@@ -37,25 +37,6 @@ public final class Launch {
             throw new Exception("hcs-relay: mirrorAddress format is incorrect, should be address:port");
         }
         
-        Optional<Instant> lastConsensusTimestamp = Optional.empty(); 
-      
-        if (config.getConfig().getCatchupHistory()) {
-            // catchup history
-            lastConsensusTimestamp = Optional.of(Instant.EPOCH);
-            
-            File consensusTimeFile = new File(config.getConfig().getLastConsensusTimeFile());
-            if (consensusTimeFile.exists()) {
-                try(BufferedReader br = new BufferedReader(new FileReader(config.getConfig().getLastConsensusTimeFile()))) {
-                    StringBuilder sb = new StringBuilder();
-                    String line = br.readLine();
-
-                    String[] lastStoredConsensusTimestamp = line.split("-");
-                    lastConsensusTimestamp = Optional.of(Instant.ofEpochSecond(Long.parseLong(lastStoredConsensusTimestamp[0]), Integer.parseInt(lastStoredConsensusTimestamp[1])));
-                    lastConsensusTimestamp.get().plusNanos(1);
-                }
-            }
-        }
-        
         log.info("Relay topics to subscribe to from mirror and queue");
         boolean blockingSetupJmsTopic = blockingCreateJmsTopic(config);
         System.out.println("Queue in relay is set up:" + blockingSetupJmsTopic);
@@ -63,7 +44,13 @@ public final class Launch {
             for (ConsensusTopicId topic : config.getConfig().getTopicIds()) {
                 log.info("Processing topic num: " + topic.topic);
                 // subscribe to topic with mirror node
-                MirrorTopicSubscriber subscriber = new MirrorTopicSubscriber(mirrorDetails[0], Integer.parseInt(mirrorDetails[1]), topic, lastConsensusTimestamp);
+                MirrorTopicSubscriber subscriber = new MirrorTopicSubscriber(
+                        mirrorDetails[0]
+                        , Integer.parseInt(mirrorDetails[1])
+                        , topic
+                        , config.getConfig().getCatchupHistory()
+                        , config.getConfig().getLastConsensusTimeFile()
+                );
                 Thread subscriberThread = new Thread(subscriber);
                 subscriberThread.start();
             }

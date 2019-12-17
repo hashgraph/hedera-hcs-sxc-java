@@ -59,3 +59,4 @@ hcs-sxc-examples/settlement-demo/h2data/libdb.mv.db
 hcs-sxc-plugins/lib-persistence-in-db/target
 hcs-sxc-plugins/lib-mirror-direct/target
 hcs-sxc-plugins/lib-mirror-queue-artemis/target
+hcs-sxc-examples/settlement-demo/h2data/libdb.trace.db

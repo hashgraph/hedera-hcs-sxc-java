@@ -1,5 +1,8 @@
 package com.hedera.hcsrelay.subscribe;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
@@ -23,7 +26,8 @@ public final class MirrorTopicSubscriber extends Thread {
     private String mirrorAddress = "";
     private int mirrorPort = 0;
     private ConsensusTopicId topicId;
-    private Optional<Instant> subscribeFrom;
+    private boolean catchupHistory = false;
+    private String consensusFile = "";
 
     public class SusbcriberCloseHook extends Thread {
         private Subscription subscription;
@@ -41,11 +45,12 @@ public final class MirrorTopicSubscriber extends Thread {
         }
     }
 
-    public MirrorTopicSubscriber(String mirrorAddress, int mirrorPort, ConsensusTopicId topicId, Optional<Instant> subscribeFrom) {
+    public MirrorTopicSubscriber(String mirrorAddress, int mirrorPort, ConsensusTopicId topicId, boolean catchupHistory, String consensusFile) {
         this.mirrorAddress = mirrorAddress;
         this.mirrorPort = mirrorPort;
         this.topicId = topicId;
-        this.subscribeFrom = subscribeFrom;
+        this.catchupHistory = catchupHistory;
+        this.consensusFile = consensusFile;
     }
 
     public void run() {
@@ -70,11 +75,30 @@ public final class MirrorTopicSubscriber extends Thread {
                 while (retry) {
                     try {
 
+                        Optional<Instant> lastConsensusTimestamp = Optional.empty(); 
+                        
+                        if (this.catchupHistory) {
+                            // catchup history
+                            lastConsensusTimestamp = Optional.of(Instant.EPOCH);
+                            
+                            File consensusTimeFile = new File(this.consensusFile);
+                            if (consensusTimeFile.exists()) {
+                                try(BufferedReader br = new BufferedReader(new FileReader(this.consensusFile))) {
+                                    StringBuilder sb = new StringBuilder();
+                                    String line = br.readLine();
+
+                                    String[] lastStoredConsensusTimestamp = line.split("-");
+                                    lastConsensusTimestamp = Optional.of(Instant.ofEpochSecond(Long.parseLong(lastStoredConsensusTimestamp[0]), Integer.parseInt(lastStoredConsensusTimestamp[1])));
+                                    lastConsensusTimestamp.get().plusNanos(1);
+                                }
+                            }
+                        }
+                        
                         log.info("Relay Subscribing to topic number " + this.topicId.toString() + " on mirror node: " + this.mirrorAddress + ":" + this.mirrorPort);
 
                         Subscription subscription;
-                        if (this.subscribeFrom.isPresent()) {
-                            subscription = subscriber.subscribe(this.topicId, this.subscribeFrom.get(), tm -> {
+                        if (lastConsensusTimestamp.isPresent()) {
+                            subscription = subscriber.subscribe(this.topicId, lastConsensusTimestamp.get(), tm -> {
                                 log.info("Got mirror message, calling handler");
                                 MirrorMessageHandler.onMirrorMessage(tm, this.topicId);
                             });

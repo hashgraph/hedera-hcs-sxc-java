@@ -25,7 +25,7 @@ jobs:
 #HCS lib
       - run:
           name: Running maven (validate, compile, test, package)
-          command: mvn package
+          command: mvn package -Dcom.hedera.hashgraph.sdk.experimental=true
       # - save_cache:
       #     key: maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
       #     paths:

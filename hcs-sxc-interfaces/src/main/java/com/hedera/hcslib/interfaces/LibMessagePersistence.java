@@ -37,4 +37,4 @@ public interface LibMessagePersistence {
     
     // clear all data
     public void clear();
-}
+  }

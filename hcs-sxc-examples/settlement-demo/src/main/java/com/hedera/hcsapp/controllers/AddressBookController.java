@@ -39,6 +39,12 @@ public class AddressBookController {
         return addressBookRepository.findAllWithRoleButMe(appData.getUserName(),"PAYCHANNEL");
     }
     
+    @GetMapping(value = "/addressbook-everything", produces = "application/json")
+    public List<AddressBook> addressbookEverything() throws FileNotFoundException, IOException {
+//        AppData appData = new AppData();
+        return addressBookRepository.findAllUsers();
+    }
+    
     @GetMapping(value = "/addressbook", produces = "application/json")
     public List<AddressBook> addressbookAll() throws FileNotFoundException, IOException {
 //        AppData appData = new AppData();
@@ -47,7 +53,6 @@ public class AddressBookController {
     }
     @GetMapping(value = "/addressbook/me", produces = "application/json")
     public AddressBook addressbookMe() throws FileNotFoundException, IOException {
-//        AppData appData = new AppData();
         log.debug("/addressbook");
         return addressBookRepository.findById(appData.getUserName()).get();
     }

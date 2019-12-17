@@ -27,7 +27,7 @@ public class OnHCSMessageCallbackTest {
     LibMessagePersistence persistence;
     
     @BeforeEach
-    public void steup() throws IOException{
+    public void setup() throws IOException{
         
         //Optional<Module> findModule = ModuleLayer.boot().findModule("abcde");
         //findModule.get().getResourceAsStream("xyz");

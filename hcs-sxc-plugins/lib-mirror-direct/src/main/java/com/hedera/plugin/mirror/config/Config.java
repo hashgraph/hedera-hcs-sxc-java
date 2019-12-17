@@ -1,4 +1,4 @@
-package com.hedera.hcsrelay.config;
+package com.hedera.plugin.mirror.config;
 
 
 import java.io.File;
@@ -22,22 +22,22 @@ public final class Config {
         Yaml yaml = new Yaml(new Constructor(YAMLConfig.class));
         
         InputStream inputStream;
-        File configFile = new File("./relay-config.yaml");
+        File configFile = new File("./mirror-config.yaml");
         if (configFile.exists()) {
             // config file exists outside of jar, use it
             try {
                 inputStream = new FileInputStream(configFile.getCanonicalPath());
             } catch (FileNotFoundException e) {
                 log.error(e);
-                throw new Exception ("Unable to locate ./relay-config.yaml file");
+                throw new Exception ("Unable to locate ./mirror-config.yaml file");
             } catch (IOException e) {
                 log.error(e);
-                throw new Exception ("Error reading ./relay-config.yaml file");
+                throw new Exception ("Error reading ./mirror-config.yaml file");
             }
         } else {
             inputStream = this.getClass()
                     .getClassLoader()
-                    .getResourceAsStream("relay-config.yaml");
+                    .getResourceAsStream("mirror-config.yaml");
 
         }
         yamlConfig = yaml.load(inputStream);

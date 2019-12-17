@@ -1,7 +1,5 @@
 package com.hedera.plugin.mirror.subscribe;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.time.Instant;
 import java.util.Hashtable;
 import java.util.Optional;
@@ -39,7 +37,7 @@ import lombok.extern.log4j.Log4j2;
 public class MirrorSubscribe implements MirrorSubscriptionInterface {
 
     @Override
-    public void init(HCSCallBackFromMirror onHCSMessageCallback, long applicationId, Optional<Instant> lastConsensusTimestamp) throws FileNotFoundException, IOException {
+    public void init(HCSCallBackFromMirror onHCSMessageCallback, long applicationId, Optional<Instant> lastConsensusTimestamp) throws Exception {
         Config  config = new Config();
         log.info("lib-mirror-queue-artemis init");
         String contextFactory = config.getConfig().getQueue().getInitialContextFactory();

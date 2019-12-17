@@ -73,11 +73,25 @@
             <artifactId>hcs-sxc-interfaces</artifactId>
             <version>${hcslib.version}</version>
         </dependency>
+
+        <!-- PLUGINS -->
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>lib-persistence-in-memory</artifactId>
-            <version>${hcslib.version}</version>
+            <version>0.0.3-SNAPSHOT</version>
         </dependency>
+        
+        <dependency>
+            <groupId>com.hedera</groupId>
+            <artifactId>lib-mirror-direct</artifactId>
+            <version>0.0.3-SNAPSHOT</version>
+        </dependency>
+<!--         <dependency>
+            <groupId>com.hedera</groupId>
+            <artifactId>lib-mirror-queue-artemis</artifactId>
+            <version>0.0.3-SNAPSHOT</version>
+        </dependency>
+ -->        
     </dependencies>
 
     <build>

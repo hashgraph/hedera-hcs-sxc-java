@@ -658,18 +658,18 @@
                                 <div class="mdc-select">
                                     <div class="mdc-select__anchor " style="width: 100%;">
                                       <i class="mdc-select__dropdown-icon"></i>
-                                      <div class="mdc-select__selected-text"></div>
+                                      <div class="mdc-select__selected-text" data-value="Doris">Doris</div>
                                       <span class="mdc-floating-label">Select channel</span>
                                       <div class="mdc-line-ripple"></div>
                                     </div>
 
                                     <div class="mdc-select__menu mdc-menu mdc-menu-surface" style="width: 100%;">
                                         <template id="mdc-list-item-template">
-                                                <li class="mdc-list-item" data-value="Diana">
-                                                  Diana
+                                                <li class="mdc-list-item" data-value="Doris">
+                                                  Doris
                                                 </li>
                                         </template>  
-                                        <ul id="channel-name" class="mdc-list" data-value="Diana">
+                                        <ul id="channel-name" class="mdc-list" data-value="Doris">
 
                                         </ul>
                                     </div>
@@ -1278,7 +1278,6 @@
                     e.parentElement.classList.remove('mdc-text-field--invalid');
                     e.value='';}
                 );
-                const mdcSelect  =  new mdc.select.MDCSelect( $paychannelDialog.querySelector(".mdc-select"));
                 mdcList =  $paychannelDialog.querySelector(".mdc-list");
                 paymentChannels.forEach(c => {
                     clonedListItem = $paychannelDialog.querySelector("#mdc-list-item-template").content.cloneNode(true);
@@ -1286,7 +1285,14 @@
                     clonedListItem.querySelector("li").setAttribute("data-value",c.name);
                     mdcList.appendChild(clonedListItem);
                 });
-                selectedPaymentChannelName=paymentChannels[0];
+                
+                let selectedPaymentChannelName=paymentChannels[0].name;
+                //$paychannelDialog.querySelector(".mdc-list").classList.add("mdc-list-item--selected");
+                $paychannelDialog.querySelector(".mdc-list").setAttribute("data-value",selectedPaymentChannelName);                
+                $paychannelDialog.querySelector(".mdc-select__selected-text").innerHTML=selectedPaymentChannelName;
+                
+                const mdcSelect  =  new mdc.select.MDCSelect( $paychannelDialog.querySelector(".mdc-select"));
+                
                 mdcSelect.listen('MDCSelect:change', () => {
                     selectedPaymentChannelName = mdcSelect.value;
                   });

@@ -329,6 +329,15 @@ message SettleCompleteAckBPM {
 message AdminDeleteBPM {
 }
 
+// Message to signal stashing (creating copy) of database, this is purely for demonstration purposes.
+message AdminStashDatabaseBPM {
+}
+
+// Message to signal popping a stashed database and replacing the existing one, this is purely for demonstration purposes.
+message AdminStashPopDatabaseBPM {
+}
+
+
 // Represents a Settlement-specific Business Process Message
 // The message within will be encapsulated within an ApplicationMessage
 // See: https://github.com/hashgraph/hedera-hcs-sxc/blob/master/hcs-sxc-proto/src/main/proto/Messages.proto
@@ -355,6 +364,8 @@ message SettlementBPM {
         SettleCompleteBPM settleComplete = 14;
         SettleCompleteAckBPM settleCompleteAck = 15;
         AdminDeleteBPM adminDelete = 16;
+        AdminStashDatabaseBPM adminStashDatabaseBPM = 17;
+        AdminStashPopDatabaseBPM adminStashPopDatabaseBPM = 18;
     }
 }
 

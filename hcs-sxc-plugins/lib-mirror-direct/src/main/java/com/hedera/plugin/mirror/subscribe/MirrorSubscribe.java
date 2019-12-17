@@ -23,7 +23,7 @@ public class MirrorSubscribe implements MirrorSubscriptionInterface {
         String mirrorAddress = config.getConfig().getMirrorAddress();
         String[] mirrorDetails = mirrorAddress.split(":");
         if (mirrorDetails.length != 2) {
-            throw new Exception("hcs-relay: mirrorAddress format is incorrect, should be address:port");
+            throw new Exception("mirrorAddress format is incorrect, should be address:port");
         }
 
         log.info("Subscribing to mirror node");

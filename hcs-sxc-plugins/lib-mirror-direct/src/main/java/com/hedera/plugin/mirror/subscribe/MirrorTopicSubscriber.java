@@ -76,7 +76,7 @@ public final class MirrorTopicSubscriber extends Thread {
                 while (retry) {
                     try {
                         
-                        log.info("Relay Subscribing to topic number " + this.topicId.toString() + " on mirror node: " + this.mirrorAddress + ":" + this.mirrorPort);
+                        log.info("App Subscribing to topic number " + this.topicId.toString() + " on mirror node: " + this.mirrorAddress + ":" + this.mirrorPort);
     
                         Subscription subscription;
                         if (this.subscribeFrom.isPresent()) {

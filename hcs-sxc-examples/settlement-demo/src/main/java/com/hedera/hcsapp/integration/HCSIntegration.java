@@ -23,6 +23,7 @@ import com.hedera.hcsapp.notifications.NotificationMessage;
 import com.hedera.hcsapp.repository.CreditRepository;
 import com.hedera.hcsapp.repository.SettlementItemRepository;
 import com.hedera.hcsapp.repository.SettlementRepository;
+import com.hedera.hcsapp.repository.Util;
 import com.hedera.hcslib.HCSLib;
 import com.hedera.hcslib.callback.OnHCSMessageCallback;
 import com.hedera.hcslib.consensus.HCSResponse;
@@ -32,6 +33,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import proto.CreditBPM;
 import proto.PaymentInitAckBPM;
 import proto.PaymentInitBPM;
@@ -48,14 +50,14 @@ import proto.SettlementBPM;
 @Component
 public class HCSIntegration {
     
-    @PersistenceContext
-    private EntityManager entityManager;
 
- 
     
 
     private AppData appData;
     
+    @Autowired
+    private Util repositoryUtil;
+            
     @Autowired
     private CreditRepository creditRepository;
 
@@ -345,14 +347,13 @@ public class HCSIntegration {
         settlementRepository.deleteAll();
         settlementItemRepository.deleteAll();
     }
+    
     private void stashData(){
-        entityManager.createNativeQuery("SCRIPT TO 'stash'").getFirstResult();
+        repositoryUtil.stashData();
     }
     
     private void stashPopData(){
-        deleteData();
-        entityManager.createNativeQuery("RUNSCRIPT 'stash'").getFirstResult();
-        
+        repositoryUtil.stashPopData();
     }
     
    

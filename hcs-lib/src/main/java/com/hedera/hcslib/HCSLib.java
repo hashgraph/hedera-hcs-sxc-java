@@ -10,8 +10,10 @@ import java.util.Map;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
+import com.hedera.hcslib.config.AppNet;
 import com.hedera.hcslib.config.Config;
 import com.hedera.hcslib.config.Environment;
+import com.hedera.hcslib.config.YAMLConfig;
 import com.hedera.hcslib.interfaces.LibMessagePersistence;
 import com.hedera.hcslib.interfaces.MessagePersistenceLevel;
 
@@ -30,6 +32,7 @@ public final class HCSLib {
     private static LibMessagePersistence persistence;
     private boolean catchupHistory;
     private MessagePersistenceLevel messagePersistenceLevel;
+    private String mirrorAddress;
 
     /**
      * Constructor for HCS Lib
@@ -38,18 +41,24 @@ public final class HCSLib {
      */
     public HCSLib(long applicationId) throws FileNotFoundException, IOException {
         Config config = new Config();
+        YAMLConfig yamlConfig = config.getConfig();
         Environment environment = new Environment();
+
+        this.nodeMap = yamlConfig.getNodesMap();
+        this.mirrorAddress = yamlConfig.getMirrorAddress();
+        this.hcsTransactionFee = yamlConfig.getHCSTransactionFee();
         
-        this.signMessages = config.getConfig().getAppNet().getSignMessages();
-        this.encryptMessages = config.getConfig().getAppNet().getEncryptMessages();
-        this.rotateKeys = config.getConfig().getAppNet().getRotateKeys();
-        this.nodeMap = config.getConfig().getNodesMap();
+        AppNet appnet = yamlConfig.getAppNet();
+        this.signMessages = appnet.getSignMessages();
+        this.encryptMessages = appnet.getEncryptMessages();
+        this.rotateKeys = appnet.getRotateKeys();
+        this.topicIds = appnet.getTopicIds();
+        this.catchupHistory = appnet.getCatchupHistory();
+        this.messagePersistenceLevel = appnet.getPersistenceLevel();
+
         this.operatorAccountId = environment.getOperatorAccountId();
         this.ed25519PrivateKey = environment.getOperatorKey();
-        this.topicIds = config.getConfig().getAppNet().getTopicIds();
-        this.catchupHistory = config.getConfig().getAppNet().getCatchupHistory();
-        this.messagePersistenceLevel = config.getConfig().getAppNet().getPersistenceLevel();
-        this.hcsTransactionFee = config.getConfig().getHCSTransactionFee();
+
         this.applicationId = applicationId;
     }
     public HCSLib withMessageSignature(boolean signMessages) {
@@ -110,6 +119,9 @@ public final class HCSLib {
     }
     public long getApplicationId() {
         return this.applicationId;
+    }
+    public String getMirrorAddress() {
+        return this.mirrorAddress;
     }
     public boolean getCatchupHistory() {
         return this.catchupHistory;

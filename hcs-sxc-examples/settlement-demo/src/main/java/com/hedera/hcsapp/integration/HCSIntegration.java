@@ -50,9 +50,6 @@ import proto.SettlementBPM;
 @Component
 public class HCSIntegration {
     
-
-    
-
     private AppData appData;
     
     @Autowired

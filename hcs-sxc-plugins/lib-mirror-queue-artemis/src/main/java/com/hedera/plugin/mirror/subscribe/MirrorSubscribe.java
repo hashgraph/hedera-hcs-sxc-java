@@ -2,6 +2,7 @@ package com.hedera.plugin.mirror.subscribe;
 
 import java.time.Instant;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -37,7 +38,7 @@ import lombok.extern.log4j.Log4j2;
 public class MirrorSubscribe implements MirrorSubscriptionInterface {
 
     @Override
-    public void init(HCSCallBackFromMirror onHCSMessageCallback, long applicationId, Optional<Instant> lastConsensusTimestamp) throws Exception {
+    public void init(HCSCallBackFromMirror onHCSMessageCallback, long applicationId, Optional<Instant> lastConsensusTimestamp, String mirrorAddress, List<ConsensusTopicId> topicIds) throws Exception {
         Config  config = new Config();
         log.info("lib-mirror-queue-artemis init");
         String contextFactory = config.getConfig().getQueue().getInitialContextFactory();

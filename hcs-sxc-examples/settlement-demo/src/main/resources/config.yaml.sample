@@ -7,8 +7,10 @@ appNet:
     - topic: 0.0.1044
   persistenceLevel: "FULL"
   catchupHistory: true
-
+  
 HCSTransactionFee: 100000000
+
+mirrorAddress: "34.66.214.12:6552"
 
 nodes:
   - address: 34.66.214.12:50211
@@ -20,4 +22,3 @@ nodes:
 #    account: 0.0.5
 #  - address: 3.testnet.hedera.com:50211
 #    account: 0.0.6
-    

@@ -12,7 +12,14 @@ public final class YAMLConfig {
     private List<Node> nodes = new ArrayList<Node>();
     private AppNet appNet = new AppNet();
     private Long HCSTransactionFee = 0L;
-    
+    private String mirrorAddress;
+
+    public String getMirrorAddress() {
+        return this.mirrorAddress;
+    }
+    public void setMirrorAddress(String mirrorAddress) {
+        this.mirrorAddress = mirrorAddress;
+    }
     public List<Node> getNodes() {
         return this.nodes;
     }

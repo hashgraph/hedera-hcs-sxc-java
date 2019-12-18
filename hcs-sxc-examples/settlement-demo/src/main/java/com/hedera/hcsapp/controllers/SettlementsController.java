@@ -351,7 +351,7 @@ public class SettlementsController {
                     .setPayerAccountDetails(settlement.get().getPayerAccountDetails())
                     .setRecipientAccountDetails(settlement.get().getRecipientAccountDetails())
                     .setAdditionalNotes(settlement.get().getAdditionalNotes())
-                    //.setPaymentReference(settlement.get().getPaymentReference())
+                    .setPaymentReference(settlement.get().getPaymentReference())
                     .setNetValue(moneyFromSettlement(settlement.get()));
 
             PaymentSentAckBPM.Builder paymentSentAckBPM = PaymentSentAckBPM.newBuilder().setPaymentSent(paymentSentBPM);

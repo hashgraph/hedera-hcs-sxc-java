@@ -785,6 +785,82 @@
             </div>
         </div><div class="mdc-dialog-scrim"></div>
         
+        
+         <div id="pay-sent-dialog" 
+           
+            class="mdc-dialog"
+             role="alertdialog"
+             aria-modal="true"
+             aria-labelledby="my-dialog-title"
+             aria-describedby="my-dialog-content">
+            <div class="mdc-dialog__container">
+                <div class="mdc-dialog__surface" >
+                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
+                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
+                    -->Payment Sent<!--
+                    --></h2>
+                    <div class="mdc-dialog__content" id="my-dialog-content" >
+                       <br/>
+                        
+                        <div style="display:fex; flex-direction: column">
+                            
+                            <form id="pay-sent-dialog-form">
+                                
+                                
+                                <div class="mdc-text-field mdc-text-field--full-width">
+                                    <input type="text"
+                                           id="thread-id"
+                                           value="{threadId}"
+                                           disabled
+                                           id="my-text-field" class="mdc-text-field__input">
+                                    <label class="mdc-floating-label" for="pay-payer-details">
+                                        threadId
+                                    </label>
+                                </div>
+                                <div class="mdc-text-field mdc-text-field--full-width">
+                                    <input type="text"
+                                           id="pay-sent-reference"
+                                           value="{paymentReference}"
+                                         
+                                           id="my-text-field" class="mdc-text-field__input">
+                                    <label class="mdc-floating-label" for="pay-sent-reference">
+                                        Reference
+                                    </label>
+                                </div>
+                               
+                                <div class="mdc-text-field mdc-text-field--full-width">
+                                    <input type="text"
+                                           id="pay-sent-additional-notes"
+                                           required minlength=4
+                                           id="my-text-field" class="mdc-text-field__input">
+                                    <label class="mdc-floating-label" for="pay-sent-additional-notes">
+                                        Additional Notes
+                                    </label>
+                                </div>
+                                
+                                <div class="mdc-text-field-helper-line">
+                                    <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
+                                        Field is required and must be at least 4 characters long
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <footer class="mdc-dialog__actions" style="padding:24px">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+                            <span class="mdc-button__label">Cancel</span>
+                        </button>
+                        <button id="pay-sent-send" type="button" 
+                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
+                        >
+                            <span class="mdc-button__label">Send Now</span>
+                        </button>
+                    </footer>
+                </div>
+
+            </div>
+        </div><div class="mdc-dialog-scrim"></div>
+        
         <div id="confirm-pay-channel-dialog" 
             class="mdc-dialog"
             role="alertdialog"
@@ -860,6 +936,48 @@
                         </button>
                         <button type="button" 
                                 id="confirm-payment-send"
+                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
+                        >
+                            <span class="mdc-button__label">Confirm</span>
+                        </button>
+                    </footer>
+                </div>
+            </div>
+        </div><div class="mdc-dialog-scrim"></div>
+        
+        <div id="confirm-payment-sent-dialog" 
+            class="mdc-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="my-dialog-title"
+            aria-describedby="my-dialog-content">
+            <div class="mdc-dialog__container">
+
+                <div class="mdc-dialog__surface" >
+                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
+                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
+                    -->Confirm Payment Sent<!--
+                    --></h2>
+                    <div class="mdc-dialog__content" id="my-dialog-content" >
+                       Confirm Paymet Sent
+                    </div>
+                    <div class="mdc-text-field mdc-text-field--full-width">
+                        <input type="text"
+                               id="thread-id"
+                               value="{{threadId}}"
+                               disabled
+                               class="mdc-text-field__input">
+                        <label class="mdc-floating-label" for="thread-id">
+                            Thread Id
+                        </label>
+                    </div>
+                  
+                    <footer class="mdc-dialog__actions" style="padding:24px">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+                            <span class="mdc-button__label">Cancel</span>
+                        </button>
+                        <button type="button" 
+                                id="confirm-payment-sent-send"
                                 class="mdc-button mdc-button--raised  mdc-dialog__button" 
                         >
                             <span class="mdc-button__label">Confirm</span>
@@ -1131,7 +1249,25 @@
                         newButton.classList.add("mdc-button--outlined");
                         newButton.addEventListener("click", function(){openAcceptPaymentDialog(threadId,userName );});
                         clonedRow.getElementById("action").appendChild(newButton);
+                    } else if (i_Settlements.payerName === thisuserName  &&  i_Settlements.status === 'PAYMENT_INIT_ACK'){
+                        let threadId = i_Settlements.threadId;
+                        newButton = document.createElement("button");
+                        newButton.innerHTML = "Pay Sent";
+                        newButton.classList.add("mdc-button");
+                        newButton.classList.add("mdc-button--outlined");
+                        newButton.addEventListener("click", function(){openPaySentDialog(threadId,userName,i_Settlements.paymentChannelName );});
+                        clonedRow.getElementById("action").appendChild(newButton);
+                    } else if (i_Settlements.payerName === userName  &&  i_Settlements.status === 'PAYMENT_SENT_AWAIT_ACK'){
+                        let threadId = i_Settlements.threadId;
+                        newButton = document.createElement("button");
+                        newButton.innerHTML = "Accept Pay Sent";
+                        newButton.classList.add("mdc-button");
+                        newButton.classList.add("mdc-button--outlined");
+                        newButton.addEventListener("click", function(){openAcceptPaymentSentDialog(threadId,userName );});
+                        clonedRow.getElementById("action").appendChild(newButton);
                     }
+                    
+                    
                   
                     clonedRow.getElementById("notes").innerHTML = i_Settlements.additionalNotes;
                     tableBody.appendChild(clonedRow);
@@ -1383,6 +1519,51 @@
                 return false;
             }
             
+            function openPaySentDialog(threadId, userName) {
+                $paySentDialog = document.getElementById('pay-sent-dialog');
+                paySentDialog  = new mdc.dialog.MDCDialog($paySentDialog);
+                event.preventDefault(); 
+                $paySentDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
+                    e.parentElement.classList.remove('mdc-text-field--invalid');
+                    e.value='';}
+                );
+                $paySentDialog.querySelector("#thread-id").value=threadId;
+                $paySentDialog.querySelector("#pay-sent-send").onclick =  function(){
+                    postBody = `{
+                                 "threadId"          : "${threadId}"
+                                ,"paymentReference" :  "${$paySentDialog.querySelector('#pay-sent-reference').value}"
+                                ,"additionalNotes" :   "${$paySentDialog.querySelector('#pay-sent-additional-notes').value}"
+                                }`;
+
+                    paySentDialog.close();
+                    el = document.getElementById(userName);
+                    el.style.opacity=0.4;
+                    el.style.pointerEvents =  'none';
+                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
+
+                    showSnackBarMessage("sending channel details to HH Network ...");
+                    fetch('/settlements/paymentSent', {
+                        method: 'post',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: postBody
+                    }).then(function(response) {
+                        return response.json();
+                    }).then(function(data) {
+                        showSnackBarMessage("Payment sent  sent");
+
+                    }).catch(function(res){
+                        alert(res);
+                    });
+                };
+                
+                paySentDialog.open();
+                return false;
+            }
+    
+            
             
             function openPayDialog(threadId, userName) {
                 $payDialog = document.getElementById('pay-dialog');
@@ -1509,7 +1690,45 @@
                 return false;
             }
 
-                
+            
+            function openAcceptPaymentSentDialog (threadId, otherUserId){
+                event.preventDefault();
+                confirmPaymentSentDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-payment-sent-dialog'));
+
+                $confirmPaymentSentDialog = document.getElementById('confirm-payment-sent-dialog');
+                $confirmPaymentSentDialog.querySelector("#thread-id").value=threadId;
+                clickFunction = function(){
+                   
+                    showSnackBarMessage("sending confirmation " + threadId + " ...");
+                    confirmPaymentSentDialog.close();
+
+                    el = document.getElementById(otherUserId);
+                    el.style.opacity=0.4;
+                    el.style.pointerEvents =  'none';
+                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
+
+                    fetch('settlements/paymentSent/ack/'+threadId, {
+                            method: 'post',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(function(response) {
+                            return response.json();
+                        }).then(function(data) {
+                            showSnackBarMessage("confirmation sent");
+
+                        }).catch(function(res){
+                            alert(res);
+                        });
+        
+                };
+                $confirmPaymentSentDialog.querySelector("#confirm-payment-sent-send").onclick = clickFunction;
+                confirmPaymentSentDialog.open();
+                return false;
+            }
+
+            
             function openConfirmCreditDialog(threadId,otherUserId) {
                 event.preventDefault();
                 confirmCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-credit-dialog'));

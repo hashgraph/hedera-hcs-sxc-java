@@ -68,7 +68,7 @@ public class AuditController {
             threads.put(credit.getThreadId(), new AuditThreadId (
                     credit.getThreadId()
                     , "Credit"
-                    , States.valueOf(credit.getStatus()).getDisplay().replace("Credit ", "")
+                    , States.valueOf(credit.getStatus()).getDisplayForCredit()
                     , appData.getHCSLib().getTopicIds().get(appData.getTopicIndex()).toString()
                     , credit.getCreatedDate()
                     , credit.getCreatedTime()
@@ -80,7 +80,7 @@ public class AuditController {
             threads.put(settlement.getThreadId(), new AuditThreadId (
                     settlement.getThreadId()
                     , "Settlement"
-                    , States.valueOf(settlement.getStatus()).getDisplay().replace("Settlement ", "")
+                    , States.valueOf(settlement.getStatus()).getDisplayForSettlement()
                     , appData.getHCSLib().getTopicIds().get(appData.getTopicIndex()).toString()
                     , settlement.getCreatedDate()
                     , settlement.getCreatedTime()

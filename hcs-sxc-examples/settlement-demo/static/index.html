@@ -711,7 +711,7 @@
         </div><div class="mdc-dialog-scrim"></div>
         
         
-        <div id="pay-dialog" 
+        <div id="init-pay-dialog" 
            
             class="mdc-dialog"
              role="alertdialog"
@@ -722,7 +722,7 @@
                 <div class="mdc-dialog__surface" >
                     <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
                     <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
-                    -->Payment details<!--
+                    -->Initialize payment<!--
                     --></h2>
                     <div class="mdc-dialog__content" id="my-dialog-content" >
                        <br/>
@@ -734,30 +734,30 @@
                                 
                                 <div class="mdc-text-field mdc-text-field--full-width">
                                     <input type="text"
-                                           id="pay-payer-details"
+                                           id="init-pay-payer-details"
                                            value="{payerDetails}"
                                            disabled
                                            id="my-text-field" class="mdc-text-field__input">
-                                    <label class="mdc-floating-label" for="pay-payer-details">
+                                    <label class="mdc-floating-label" for="init-pay-payer-details">
                                         Payer Account Details
                                     </label>
                                 </div>
                                 <div class="mdc-text-field mdc-text-field--full-width">
                                     <input type="text"
-                                           id="pay-recipient-details"
+                                           id="init-pay-recipient-details"
                                            value="{recipientDetails}"
                                            disabled
                                            id="my-text-field" class="mdc-text-field__input">
-                                    <label class="mdc-floating-label" for="pay-recipient-details">
+                                    <label class="mdc-floating-label" for="init-pay-recipient-details">
                                         Recipient Account Details
                                     </label>
                                 </div>
                                 <div class="mdc-text-field mdc-text-field--full-width">
                                     <input type="text"
-                                           id="pay-additional-notes"
+                                           id="init-pay-additional-notes"
                                            required minlength=4
                                            id="my-text-field" class="mdc-text-field__input">
-                                    <label class="mdc-floating-label" for="pay-additional-notes">
+                                    <label class="mdc-floating-label" for="init-pay-additional-notes">
                                         Additional Notes
                                     </label>
                                 </div>
@@ -774,7 +774,7 @@
                         <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
                             <span class="mdc-button__label">Cancel</span>
                         </button>
-                        <button id="pay-now-send" type="button" 
+                        <button id="init-pay-now-send" type="button" 
                                 class="mdc-button mdc-button--raised  mdc-dialog__button" 
                         >
                             <span class="mdc-button__label">Send Now</span>
@@ -1239,7 +1239,7 @@
                         newButton.innerHTML = "Init Pay";
                         newButton.classList.add("mdc-button");
                         newButton.classList.add("mdc-button--outlined");
-                        newButton.addEventListener("click", function(){openPayDialog(threadId,userName,i_Settlements.paymentChannelName );});
+                        newButton.addEventListener("click", function(){openInitPayDialog(threadId,userName,i_Settlements.paymentChannelName );});
                         clonedRow.getElementById("action").appendChild(newButton);
                     } else if (i_Settlements.payerName === userName  &&  i_Settlements.status === 'PAYMENT_INIT_AWAIT_ACK'){
                         let threadId = i_Settlements.threadId;
@@ -1264,6 +1264,14 @@
                         newButton.classList.add("mdc-button");
                         newButton.classList.add("mdc-button--outlined");
                         newButton.addEventListener("click", function(){openAcceptPaymentSentDialog(threadId,userName );});
+                        clonedRow.getElementById("action").appendChild(newButton);
+                    }  else if (i_Settlements.payerName === userName  &&  i_Settlements.status === 'PAYMENT_SENT_ACK'){
+                        let threadId = i_Settlements.threadId;
+                        newButton = document.createElement("button");
+                        newButton.innerHTML = "Settlement Payment Made";
+                        newButton.classList.add("mdc-button");
+                        newButton.classList.add("mdc-button--outlined");
+                        newButton.addEventListener("click", function(){openSettlementPaymentMadeDialog(threadId,userName,i_Settlements.paymentChannelName );});
                         clonedRow.getElementById("action").appendChild(newButton);
                     }
                     
@@ -1565,29 +1573,29 @@
     
             
             
-            function openPayDialog(threadId, userName) {
-                $payDialog = document.getElementById('pay-dialog');
-                payDialog  = new mdc.dialog.MDCDialog($payDialog);
+            function openInitPayDialog(threadId, userName) {
+                $initPayDialog = document.getElementById('init-pay-dialog');
+                initPayDialog  = new mdc.dialog.MDCDialog($initPayDialog);
                 event.preventDefault(); 
-                $payDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
+                $initPayDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
                     e.parentElement.classList.remove('mdc-text-field--invalid');
                     e.value='';}
                 );
                 p = allAddresses.filter(a=>a.name===thisuserName)[0];
                 r = allAddresses.filter(a=>a.name===userName)[0];
                 payerAccountDetails = p.name + "- SortNo/AccNo: " + p.paymentAccountDetails;
-                $payDialog.querySelector("#pay-payer-details").value = payerAccountDetails;
+                $initPayDialog.querySelector("#init-pay-payer-details").value = payerAccountDetails;
                 recipientAccountDetails = r.name + "- SortNo/AccNo: " + r.paymentAccountDetails;
-                $payDialog.querySelector("#pay-recipient-details").value = recipientAccountDetails;
-                $payDialog.querySelector("#pay-now-send").onclick =  function(){
+                $initPayDialog.querySelector("#init-pay-recipient-details").value = recipientAccountDetails;
+                $initPayDialog.querySelector("#init-pay-now-send").onclick =  function(){
                     postBody = `{
                                  "threadId"          : "${threadId}"
                                 ,"payerAccountDetails" : "${payerAccountDetails}"
                                 ,"recipientAccountDetails" :"${recipientAccountDetails}"
-                                ,"additionalNotes" : "${$payDialog.querySelector("#pay-additional-notes").value}"
+                                ,"additionalNotes" : "${$initPayDialog.querySelector("#init-pay-additional-notes").value}"
                                 }`;
 
-                    payDialog.close();
+                    initPayDialog.close();
                     el = document.getElementById(userName);
                     el.style.opacity=0.4;
                     el.style.pointerEvents =  'none';
@@ -1611,7 +1619,7 @@
                     });
                 };
                 
-                payDialog.open();
+                initPayDialog.open();
                 return false;
             }
             

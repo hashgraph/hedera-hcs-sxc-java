@@ -15,6 +15,8 @@ import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hcslib.interfaces.HCSCallBackFromMirror;
 import com.hedera.hcslib.proto.java.ApplicationMessageChunk;
 
+import kotlin.Unit;
+
 /**
  * 
  * Class to manage Mirror node topic subscribers
@@ -59,57 +61,62 @@ public final class MirrorTopicSubscriber extends Thread {
     }
     
     private void subscribe() {
-        boolean retry = true;
+//        while (true) {
+            try (ConsensusClient subscriber = new ConsensusClient(this.mirrorAddress+ ":" + this.mirrorPort)
+                    .setErrorHandler(e -> {
+//                        log.error(e);
+                        log.info("Sleeping 3s before attempting connection again");
+                        Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(3));
+                        subscribe();
+                    })
+                    
+            )
+            {
+                try {
+                    
+                    log.info("App Subscribing to topic number " + this.topicId.toString() + " on mirror node: " + this.mirrorAddress + ":" + this.mirrorPort);
 
-        try (ConsensusClient subscriber = new ConsensusClient(this.mirrorAddress+ ":" + this.mirrorPort)
-                .setErrorHandler(e -> {
-                    log.error(e);
-                    log.info("Sleeping 3s before attempting connection again");
-                    Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(3));
-                    subscribe();
-                })
-                
-        )
-        {
-//            this.subscriber = subscriber;
-            if (subscriber != null) {
-                while (retry) {
-                    try {
-                        
-                        log.info("App Subscribing to topic number " + this.topicId.toString() + " on mirror node: " + this.mirrorAddress + ":" + this.mirrorPort);
-    
-                        Subscription subscription;
-                        if (this.subscribeFrom.isPresent()) {
-                            this.subscribeFrom = Optional.of(this.subscribeFrom.get().plusNanos(1));
-                            subscription = subscriber.subscribe(this.topicId, this.subscribeFrom.get(), tm -> {
-                                log.info("Got mirror message, calling handler");
-                                this.subscribeFrom = Optional.of(tm.consensusTimestamp.plusNanos(1));
-                                onMirrorMessage(tm, this.onHCSMessageCallback);   
-                            });
-                            
-                        } else {
-                            subscription = subscriber.subscribe(this.topicId, tm -> {
-                                log.info("Got mirror message, calling handler");
-                                this.subscribeFrom = Optional.of(tm.consensusTimestamp.plusNanos(1));
-                                onMirrorMessage(tm, this.onHCSMessageCallback);   
-                            });
-                        }
-                        
+                    if (this.subscribeFrom.isPresent()) {
+                        this.subscribeFrom = Optional.of(this.subscribeFrom.get().plusNanos(1));
+                        Subscription subscription = subscriber.subscribe(this.topicId, this.subscribeFrom.get(), tm -> {
+                            log.info("Got mirror message, calling handler");
+                            this.subscribeFrom = Optional.of(tm.consensusTimestamp.plusNanos(1));
+                            onMirrorMessage(tm, this.onHCSMessageCallback);   
+                        });
                         log.info("Adding shutdown hook to subscription");
                         Runtime.getRuntime().addShutdownHook(new SusbcriberCloseHook(subscription));
-    
-                        for (; ;) {
-                            Thread.sleep(2500);
-                        }
-                    } catch (Exception e) {
-                        log.error(e);
-                        retry = false;
+                        log.info("Sleeping 2 minutes");
+                        Uninterruptibles.sleepUninterruptibly(Duration.ofMinutes(2));
+//                        Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(10));
+                        log.info("Unsusbscribing");
+                        subscription.unsubscribe();
+                        log.info("Unsusbscribed");
+                    } else {
+                        Subscription subscription = subscriber.subscribe(this.topicId, tm -> {
+                            log.info("Got mirror message, calling handler");
+                            this.subscribeFrom = Optional.of(tm.consensusTimestamp.plusNanos(1));
+                            onMirrorMessage(tm, this.onHCSMessageCallback);   
+                        });
+                        log.info("Adding shutdown hook to subscription");
+                        Runtime.getRuntime().addShutdownHook(new SusbcriberCloseHook(subscription));
+                        log.info("Sleeping 2 minutes");
+                        Uninterruptibles.sleepUninterruptibly(Duration.ofMinutes(2));
+//                        Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(10));
+                        log.info("Unsusbscribing");
+                        subscription.unsubscribe();
+                        log.info("Unsusbscribed");
                     }
+                } catch (Exception e) {
+                    log.error(e);
+                    log.info("Sleeping 10s before attempting connection again");
+                    Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(10));
                 }
-            }    
-        } catch (Exception e1) {
-            log.error(e1);
-        }
+            } catch (Exception e1) {
+                log.error(e1);
+                log.info("Sleeping 11s before attempting connection again");
+                Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(11));
+            }
+//        }
     }
     void onMirrorMessage(ConsensusMessage messagesResponse, HCSCallBackFromMirror onHCSMessageCallback) {
           log.info("Got message from mirror - persisting");

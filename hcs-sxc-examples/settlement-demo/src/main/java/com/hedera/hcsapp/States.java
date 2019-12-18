@@ -21,11 +21,11 @@ public enum States {
     ,PAYMENT_INIT_ACK_PENDING("Payment Agreed (Pending)")
     ,PAYMENT_INIT_ACK("Payment Agreed")
 
-    ,PAYMENT_SENT_AWAIT_ACK_PENDING("Settlement Payment Proposed (Pending)")
-    ,PAYMENT_SENT_AWAIT_ACK("Settlement Payment Proposed")
-    ,PAYMENT_SENT_ACK_PENDING("Settlement Payment Agreed (Pending)")
-    ,PAYMENT_SENT_ACK("Settlement Payment Agreed")
-
+    ,PAYMENT_SENT_AWAIT_ACK_PENDING("Payment Sent (Pending)")
+    ,PAYMENT_SENT_AWAIT_ACK("Payment Sent")
+    ,PAYMENT_SENT_ACK_PENDING("Payment Sent Agreed (Pending)")
+    ,PAYMENT_SENT_ACK("Payment Sent Agreed")
+    //==
     ,SETTLE_PAID_AWAIT_ACK_PENDING("Settlement Payment Made (Pending)")
     ,SETTLE_PAID_AWAIT_ACK("Settlement Payment Made")
     ,SETTLE_PAID_ACK_PENDING("Settlement Payment Acknowldegded (Pending)")

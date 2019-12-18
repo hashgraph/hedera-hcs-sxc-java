@@ -945,6 +945,48 @@
             </div>
         </div><div class="mdc-dialog-scrim"></div>
         
+        <div id="confirm-payment-sent-dialog" 
+            class="mdc-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="my-dialog-title"
+            aria-describedby="my-dialog-content">
+            <div class="mdc-dialog__container">
+
+                <div class="mdc-dialog__surface" >
+                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
+                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
+                    -->Confirm Payment Sent<!--
+                    --></h2>
+                    <div class="mdc-dialog__content" id="my-dialog-content" >
+                       Confirm Paymet Sent
+                    </div>
+                    <div class="mdc-text-field mdc-text-field--full-width">
+                        <input type="text"
+                               id="thread-id"
+                               value="{{threadId}}"
+                               disabled
+                               class="mdc-text-field__input">
+                        <label class="mdc-floating-label" for="thread-id">
+                            Thread Id
+                        </label>
+                    </div>
+                  
+                    <footer class="mdc-dialog__actions" style="padding:24px">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+                            <span class="mdc-button__label">Cancel</span>
+                        </button>
+                        <button type="button" 
+                                id="confirm-payment-sent-send"
+                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
+                        >
+                            <span class="mdc-button__label">Confirm</span>
+                        </button>
+                    </footer>
+                </div>
+            </div>
+        </div><div class="mdc-dialog-scrim"></div>
+        
       
         <div id="snackbar" class="mdc-snackbar">
                 <div class="mdc-snackbar__surface">
@@ -1214,6 +1256,14 @@
                         newButton.classList.add("mdc-button");
                         newButton.classList.add("mdc-button--outlined");
                         newButton.addEventListener("click", function(){openPaySentDialog(threadId,userName,i_Settlements.paymentChannelName );});
+                        clonedRow.getElementById("action").appendChild(newButton);
+                    } else if (i_Settlements.payerName === userName  &&  i_Settlements.status === 'PAYMENT_SENT_AWAIT_ACK'){
+                        let threadId = i_Settlements.threadId;
+                        newButton = document.createElement("button");
+                        newButton.innerHTML = "Accept Pay Sent";
+                        newButton.classList.add("mdc-button");
+                        newButton.classList.add("mdc-button--outlined");
+                        newButton.addEventListener("click", function(){openAcceptPaymentSentDialog(threadId,userName );});
                         clonedRow.getElementById("action").appendChild(newButton);
                     }
                     
@@ -1640,7 +1690,45 @@
                 return false;
             }
 
-                
+            
+            function openAcceptPaymentSentDialog (threadId, otherUserId){
+                event.preventDefault();
+                confirmPaymentSentDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-payment-sent-dialog'));
+
+                $confirmPaymentSentDialog = document.getElementById('confirm-payment-sent-dialog');
+                $confirmPaymentSentDialog.querySelector("#thread-id").value=threadId;
+                clickFunction = function(){
+                   
+                    showSnackBarMessage("sending confirmation " + threadId + " ...");
+                    confirmPaymentSentDialog.close();
+
+                    el = document.getElementById(otherUserId);
+                    el.style.opacity=0.4;
+                    el.style.pointerEvents =  'none';
+                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
+
+                    fetch('settlements/paymentSent/ack/'+threadId, {
+                            method: 'post',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(function(response) {
+                            return response.json();
+                        }).then(function(data) {
+                            showSnackBarMessage("confirmation sent");
+
+                        }).catch(function(res){
+                            alert(res);
+                        });
+        
+                };
+                $confirmPaymentSentDialog.querySelector("#confirm-payment-sent-send").onclick = clickFunction;
+                confirmPaymentSentDialog.open();
+                return false;
+            }
+
+            
             function openConfirmCreditDialog(threadId,otherUserId) {
                 event.preventDefault();
                 confirmCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-credit-dialog'));

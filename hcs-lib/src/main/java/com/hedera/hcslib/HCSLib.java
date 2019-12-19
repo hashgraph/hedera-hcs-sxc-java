@@ -13,6 +13,7 @@ import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcslib.config.AppNet;
 import com.hedera.hcslib.config.Config;
 import com.hedera.hcslib.config.Environment;
+import com.hedera.hcslib.config.MirrorNode;
 import com.hedera.hcslib.config.YAMLConfig;
 import com.hedera.hcslib.interfaces.LibMessagePersistence;
 import com.hedera.hcslib.interfaces.MessagePersistenceLevel;
@@ -33,6 +34,7 @@ public final class HCSLib {
     private boolean catchupHistory;
     private MessagePersistenceLevel messagePersistenceLevel;
     private String mirrorAddress;
+    private int reconnectDelay = 0;
 
     /**
      * Constructor for HCS Lib
@@ -45,8 +47,11 @@ public final class HCSLib {
         Environment environment = new Environment();
 
         this.nodeMap = yamlConfig.getNodesMap();
-        this.mirrorAddress = yamlConfig.getMirrorAddress();
         this.hcsTransactionFee = yamlConfig.getHCSTransactionFee();
+
+        MirrorNode mirrorNode = yamlConfig.getMirrorNode();
+        this.mirrorAddress = mirrorNode.getAddress();
+        this.reconnectDelay = mirrorNode.getReconnectDelay();
         
         AppNet appnet = yamlConfig.getAppNet();
         this.signMessages = appnet.getSignMessages();
@@ -125,6 +130,9 @@ public final class HCSLib {
     }
     public boolean getCatchupHistory() {
         return this.catchupHistory;
+    }
+    public int getMirrorReconnectDelay() {
+        return this.reconnectDelay;
     }
     public void setMessagePersistence(LibMessagePersistence persistence) {
         HCSLib.persistence = persistence;

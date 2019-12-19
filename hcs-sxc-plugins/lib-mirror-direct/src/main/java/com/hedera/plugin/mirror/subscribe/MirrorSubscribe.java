@@ -14,7 +14,7 @@ import lombok.extern.log4j.Log4j2;
 public class MirrorSubscribe implements MirrorSubscriptionInterface {
 
     @Override
-    public void init(HCSCallBackFromMirror onHCSMessageCallback, long applicationId, Optional<Instant> lastConsensusTimestamp, String mirrorAddress, List<ConsensusTopicId> topicIds) throws Exception {
+    public void init(HCSCallBackFromMirror onHCSMessageCallback, long applicationId, Optional<Instant> lastConsensusTimestamp, String mirrorAddress, List<ConsensusTopicId> topicIds, int mirrorReconnectDelay) throws Exception {
         log.info("lib-mirror-direct init");
         // subscribe
         
@@ -27,7 +27,7 @@ public class MirrorSubscribe implements MirrorSubscriptionInterface {
         for (ConsensusTopicId topic : topicIds) {
             log.info("Processing topic num: " + topic.toString());
             // subscribe to topic with mirror node
-            MirrorTopicSubscriber subscriber = new MirrorTopicSubscriber(mirrorDetails[0], Integer.parseInt(mirrorDetails[1]), topic, lastConsensusTimestamp, onHCSMessageCallback);
+            MirrorTopicSubscriber subscriber = new MirrorTopicSubscriber(mirrorDetails[0], Integer.parseInt(mirrorDetails[1]), topic, lastConsensusTimestamp, onHCSMessageCallback, mirrorReconnectDelay);
             Thread subscriberThread = new Thread(subscriber);
             subscriberThread.start();
         }

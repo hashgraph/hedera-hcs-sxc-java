@@ -1,11 +1,6 @@
 package com.hedera.hcsrelay;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.time.Instant;
 import java.util.Hashtable;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import javax.jms.Connection;
@@ -50,6 +45,7 @@ public final class Launch {
                         , topic
                         , config.getConfig().getCatchupHistory()
                         , config.getConfig().getLastConsensusTimeFile()
+                        , config.getConfig().getMirorReconnectDelay()
                 );
                 Thread subscriberThread = new Thread(subscriber);
                 subscriberThread.start();

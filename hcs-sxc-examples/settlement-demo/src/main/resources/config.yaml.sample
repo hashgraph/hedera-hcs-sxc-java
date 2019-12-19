@@ -10,7 +10,10 @@ appNet:
   
 HCSTransactionFee: 100000000
 
-mirrorAddress: "34.66.214.12:6552"
+mirrorNode:
+  address: "34.66.214.12:6552"
+  # automatically disconnect/reconnect from mirror node every reconnectDelay seconds
+  reconnectDelay: 10  
 
 nodes:
   - address: 34.66.214.12:50211

@@ -388,12 +388,19 @@ public class PersistMessages
         partialMessages = new HashMap<>();
 
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            session.createQuery("delete from MirrorResponse")
-                .executeUpdate();
-            session.createQuery("delete from HCSTransaction")
-                .executeUpdate();
-            session.createQuery("delete from HCSApplicationMessage")
-                .executeUpdate();
+            Query q = session.createQuery("delete MirrorResponse");
+            q.executeUpdate();
+            q = session.createQuery("delete HCSTransaction");
+            q.executeUpdate();
+            q = session.createQuery("delete HCSApplicationMessage");
+            q.executeUpdate();
+            
+//            session.createQuery("delete from MirrorResponse")
+//                .executeUpdate();
+//            session.createQuery("delete from HCSTransaction")
+//                .executeUpdate();
+//            session.createQuery("delete from HCSApplicationMessage")
+//                .executeUpdate();
         }
     }
 }

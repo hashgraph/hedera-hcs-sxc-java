@@ -17,27 +17,27 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public final class Config {
     private YAMLConfig yamlConfig = new YAMLConfig();
-    
+
     public Config() throws Exception {
         Yaml yaml = new Yaml(new Constructor(YAMLConfig.class));
-        
+
         InputStream inputStream;
-        File configFile = new File("./config.yaml");
+        File configFile = new File("./relay-config.yaml");
         if (configFile.exists()) {
             // config file exists outside of jar, use it
             try {
                 inputStream = new FileInputStream(configFile.getCanonicalPath());
             } catch (FileNotFoundException e) {
                 log.error(e);
-                throw new Exception ("Unable to locate ./config.yaml file");
+                throw new Exception ("Unable to locate ./relay-config.yaml file");
             } catch (IOException e) {
                 log.error(e);
-                throw new Exception ("Error reading ./config.yaml file");
+                throw new Exception ("Error reading ./relay-config.yaml file");
             }
         } else {
             inputStream = this.getClass()
                     .getClassLoader()
-                    .getResourceAsStream("config.yaml");
+                    .getResourceAsStream("relay-config.yaml");
 
         }
         yamlConfig = yaml.load(inputStream);

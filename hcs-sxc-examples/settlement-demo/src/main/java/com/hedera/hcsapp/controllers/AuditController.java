@@ -16,11 +16,11 @@ import com.hedera.hcsapp.restclasses.AuditHCSMessages;
 import com.hedera.hcsapp.restclasses.AuditThreadId;
 import com.hedera.hcsapp.restclasses.AuditThreadIds;
 import com.hedera.hcslib.HCSLib;
+import com.hedera.hcslib.interfaces.LibConsensusMessage;
 import com.hedera.hcslib.interfaces.LibMessagePersistence;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
 import com.hedera.hcslib.proto.java.ApplicationMessageChunk;
 import com.hedera.hcslib.proto.java.ApplicationMessageId;
-import com.hedera.mirror.api.proto.java.MirrorGetTopicMessages.MirrorGetTopicMessagesResponse;
 
 import lombok.extern.log4j.Log4j2;
 import proto.SettlementBPM;
@@ -138,9 +138,9 @@ public class AuditController {
         HCSLib hcsLib = appData.getHCSLib();
         LibMessagePersistence persistence = hcsLib.getMessagePersistence();
 
-        Map<String, MirrorGetTopicMessagesResponse> mirrorResponses = persistence.getMirrorResponses();
+        Map<String, LibConsensusMessage> mirrorResponses = persistence.getMirrorResponses();
 
-        for (Map.Entry<String, MirrorGetTopicMessagesResponse> mirrorResponse : mirrorResponses.entrySet()) {
+        for (Map.Entry<String, LibConsensusMessage> mirrorResponse : mirrorResponses.entrySet()) {
             
             try {
                 ApplicationMessageChunk chunk = ApplicationMessageChunk.parseFrom(mirrorResponse.getValue().getMessage());
@@ -155,9 +155,9 @@ public class AuditController {
                 
                 if (appMessageId.contentEquals(applicationMessageId)) {
                     AuditHCSMessage auditHCSMessage = new AuditHCSMessage(appData);
-                    auditHCSMessage.setConsensusTimeStampSeconds(mirrorResponse.getValue().getConsensusTimestamp().getSeconds());
-                    auditHCSMessage.setConsensusTimeStampNanos(mirrorResponse.getValue().getConsensusTimestamp().getNanos());
-                    byte[] runningHash = mirrorResponse.getValue().getRunningHash().toByteArray();
+                    auditHCSMessage.setConsensusTimeStampSeconds(mirrorResponse.getValue().getConsensusTimeStampSeconds());
+                    auditHCSMessage.setConsensusTimeStampNanos(mirrorResponse.getValue().getConsensusTimeStampNanos());
+                    byte[] runningHash = mirrorResponse.getValue().getRunningHash();
                     auditHCSMessage.setRunningHash(Hex.encodeHexString(runningHash));
                     auditHCSMessage.setSequenceNumber(mirrorResponse.getValue().getSequenceNumber());
                     

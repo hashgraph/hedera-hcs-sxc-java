@@ -279,11 +279,8 @@ public class PersistMessages
 
         Transaction dbTransaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            // start a transaction
             dbTransaction = session.beginTransaction();
-            // save the student objects
             session.save(hcsApplicationMessage);
-            // commit transaction
             dbTransaction.commit();
 
             log.info("storeApplicationMessage " + appMessageId + "-" + applicationMessage);
@@ -388,19 +385,11 @@ public class PersistMessages
         partialMessages = new HashMap<>();
 
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Query q = session.createQuery("delete MirrorResponse");
-            q.executeUpdate();
-            q = session.createQuery("delete HCSTransaction");
-            q.executeUpdate();
-            q = session.createQuery("delete HCSApplicationMessage");
-            q.executeUpdate();
-            
-//            session.createQuery("delete from MirrorResponse")
-//                .executeUpdate();
-//            session.createQuery("delete from HCSTransaction")
-//                .executeUpdate();
-//            session.createQuery("delete from HCSApplicationMessage")
-//                .executeUpdate();
+            session.beginTransaction();
+            session.createQuery("delete MirrorResponse").executeUpdate();
+            session.createQuery("delete HCSTransaction").executeUpdate();
+            session.createQuery("delete HCSApplicationMessage").executeUpdate();
+            session.getTransaction().commit();
         }
     }
 }

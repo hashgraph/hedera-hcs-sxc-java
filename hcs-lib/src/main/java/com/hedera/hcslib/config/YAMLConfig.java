@@ -11,9 +11,15 @@ public final class YAMLConfig {
 
     private List<Node> nodes = new ArrayList<Node>();
     private AppNet appNet = new AppNet();
-    private Queue queue = new Queue();
     private Long HCSTransactionFee = 0L;
-    
+    private MirrorNode mirrorNode = new MirrorNode();
+
+    public MirrorNode getMirrorNode() {
+        return this.mirrorNode;
+    }
+    public void setMirrorNode(MirrorNode mirrorNode) {
+        this.mirrorNode = mirrorNode;
+    }
     public List<Node> getNodes() {
         return this.nodes;
     }
@@ -25,12 +31,6 @@ public final class YAMLConfig {
     }
     public void setAppNet(AppNet appNet) {
         this.appNet = appNet;
-    }
-    public Queue getQueue() {
-        return this.queue;
-    }
-    public void setQueue(Queue queue) {
-        this.queue = queue;
     }
     public long getHCSTransactionFee() {
         return this.HCSTransactionFee;

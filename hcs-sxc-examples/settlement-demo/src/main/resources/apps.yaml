@@ -11,7 +11,7 @@ appClients:
     clientKey: "302a300506032b6570032100832601520d346c051bc0c7aea4b9e566b0881f59d394e371293b3fc812cbfb36"
     roles: "BUYER,SELLER"
     paymentAccountDetails: "22-11-14 70925098"
-  - clientName: "Diana"
+  - clientName: "Worldpay"
     clientKey: "302a300506032b6570032100611824b08eb56cce4b84b9bf785bdea3a9429a52084dd7fdd39dc7ce3857a3cb"
     roles: "PAYCHANNEL"
     paymentAccountDetails: "12-52-23 26789524"

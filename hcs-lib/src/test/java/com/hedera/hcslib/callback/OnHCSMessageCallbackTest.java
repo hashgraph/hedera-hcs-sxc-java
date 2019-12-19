@@ -5,6 +5,7 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hcslib.consensus.OutboundHCSMessage;
 import com.hedera.hcslib.interfaces.LibMessagePersistence;
+import com.hedera.hcslib.interfaces.MessagePersistenceLevel;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
 import com.hedera.hcslib.proto.java.ApplicationMessageChunk;
 import com.hedera.plugin.persistence.inmemory.PersistMessages;
@@ -26,7 +27,7 @@ public class OnHCSMessageCallbackTest {
     LibMessagePersistence persistence;
     
     @BeforeEach
-    public void steup() throws IOException{
+    public void setup() throws IOException{
         
         //Optional<Module> findModule = ModuleLayer.boot().findModule("abcde");
         //findModule.get().getResourceAsStream("xyz");

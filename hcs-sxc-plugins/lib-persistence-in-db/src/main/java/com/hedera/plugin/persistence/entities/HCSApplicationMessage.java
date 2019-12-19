@@ -13,4 +13,5 @@ public class HCSApplicationMessage {
     @Id
     private String applicationMessageId;
     private byte[] applicationMessage;
+    
 }

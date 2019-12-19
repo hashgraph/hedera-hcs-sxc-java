@@ -1,10 +1,13 @@
 package com.hedera.hcslib.consensus;
 
 import com.google.protobuf.ByteString;
+
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaException;
@@ -12,8 +15,8 @@ import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.consensus.SubmitMessageTransaction;
-import com.hedera.hashgraph.sdk.consensus.TopicId;
+import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
+import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcslib.HCSLib;
 import com.hedera.hcslib.interfaces.LibMessagePersistence;
@@ -37,7 +40,7 @@ public final class OutboundHCSMessage {
     private Map<AccountId, String> nodeMap = new HashMap<AccountId, String>();
     private AccountId operatorAccountId = new AccountId(0, 0, 0);
     private Ed25519PrivateKey ed25519PrivateKey;
-    private List<TopicId> topicIds = new ArrayList<TopicId>();
+    private List<ConsensusTopicId> topicIds = new ArrayList<ConsensusTopicId>();
     private long hcsTransactionFee = 0L;
     private TransactionId transactionId = null;
     private LibMessagePersistence persistence;
@@ -87,7 +90,7 @@ public final class OutboundHCSMessage {
         this.ed25519PrivateKey = ed25519PrivateKey;
         return this;
     }
-    
+
     public OutboundHCSMessage withFirstTransactionId(TransactionId transactionId) {
         this.transactionId = transactionId;
         return this;
@@ -122,41 +125,50 @@ public final class OutboundHCSMessage {
         //break up
         List<ApplicationMessageChunk> parts = chunk(firstTransactionId, message);
         // send each part to the network
-        
-        Client client = new Client(this.nodeMap);
-        client.setOperator(
-                this.operatorAccountId,
-                 this.ed25519PrivateKey
-        );
 
-        client.setMaxTransactionFee(this.hcsTransactionFee);
-        
-        TransactionId transactionId = firstTransactionId;
-        int count = 1;
-        for (ApplicationMessageChunk messageChunk : parts) {
-            log.info("Sending message part " + count + " of " + parts.size());
-            count++;
-            SubmitMessageTransaction tx = new SubmitMessageTransaction(client)
+        try (Client client = new Client(this.nodeMap)) {
+            client.setOperator(
+                    this.operatorAccountId,
+                     this.ed25519PrivateKey
+            );
+
+            client.setMaxTransactionFee(this.hcsTransactionFee);
+
+            TransactionId transactionId = firstTransactionId;
+            int count = 1;
+            for (ApplicationMessageChunk messageChunk : parts) {
+                log.info("Sending message part " + count + " of " + parts.size());
+                count++;
+                ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction()
                     .setMessage(messageChunk.toByteArray())
                     .setTopicId(this.topicIds.get(topicIndex))
-                .setTransactionId(transactionId);
-               
-            // persist the transaction
-            this.persistence.storeTransaction(transactionId, tx);
-            
-            log.info("Executing transaction");
-            TransactionReceipt receipt = tx.executeForReceipt();
-            
-            transactionId = new TransactionId(this.operatorAccountId);
+                    .setTransactionId(transactionId);
 
-            log.info("status is {} "
-                    + "sequence no is {}"
-                    ,receipt.getStatus()
-                    ,receipt.getTopicSequenceNumber()
-            );
-            
+                // persist the transaction
+                this.persistence.storeTransaction(transactionId, tx);
+
+                log.info("Executing transaction");
+                TransactionId txId = tx.execute(client);
+
+                TransactionReceipt receipt = txId.getReceipt(client, Duration.ofSeconds(30));
+
+                transactionId = new TransactionId(this.operatorAccountId);
+
+                log.info("status is {} "
+                        + "sequence no is {}"
+                        ,receipt.status
+                        ,receipt.getConsensusTopicSequenceNumber()
+                );
+
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (TimeoutException e) {
+            // do nothing
+        } catch (Exception e) {
+            log.error(e);
         }
-        
+
         return firstTransactionId;
     }
 
@@ -164,14 +176,14 @@ public final class OutboundHCSMessage {
 
         ApplicationMessageId transactionID = ApplicationMessageId.newBuilder()
                 .setAccountID(AccountID.newBuilder()
-                        .setShardNum(transactionId.getAccountId().getShardNum())
-                        .setRealmNum(transactionId.getAccountId().getRealmNum())
-                        .setAccountNum(transactionId.getAccountId().getAccountNum())
+                        .setShardNum(transactionId.accountId.shard)
+                        .setRealmNum(transactionId.accountId.realm)
+                        .setAccountNum(transactionId.accountId.account)
                         .build()
                 )
                 .setValidStart(Timestamp.newBuilder()
-                        .setSeconds(transactionId.getValidStart().getEpochSecond())
-                        .setNanos(transactionId.getValidStart().getNano())
+                        .setSeconds(transactionId.validStart.getEpochSecond())
+                        .setNanos(transactionId.validStart.getNano())
                         .build()
                 ).build();
 
@@ -182,9 +194,9 @@ public final class OutboundHCSMessage {
                 .setApplicationMessageId(transactionID)
                 .setBusinessProcessMessage(ByteString.copyFrom(originalMessage))
                 .build();
-        
+
         List<ApplicationMessageChunk> parts = new ArrayList<>();
-        
+
         //TransactionID transactionID = messageEnvelope.getMessageEnvelopeId();
         byte[] amByteArray = applicationMessage.toByteArray();
         final int amByteArrayLength = amByteArray.length;
@@ -193,7 +205,7 @@ public final class OutboundHCSMessage {
         int totalParts = (int) Math.ceil((double) amByteArrayLength / chunkSize);
         // chunk and send to network
         for (int i = 0, partId = 1; i < amByteArrayLength; i += chunkSize, partId++) {
-            
+
             byte[] amMessageChunk = Arrays.copyOfRange(
                     amByteArray,
                     i,
@@ -206,7 +218,7 @@ public final class OutboundHCSMessage {
                     .setChunksCount(totalParts)
                     .setMessageChunk(ByteString.copyFrom(amMessageChunk))
                     .build();
-            
+
             parts.add(applicationMessageChunk);
         }
         return parts;

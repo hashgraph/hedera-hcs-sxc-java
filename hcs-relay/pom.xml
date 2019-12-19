@@ -22,6 +22,16 @@
             <artifactId>hcs-lib</artifactId>
             <version>${hcslib.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty</artifactId>
+            <version>${grpc-netty.version}</version>
+        </dependency>
+      <dependency>
+          <groupId>org.apache.activemq</groupId>
+          <artifactId>artemis-jms-client-all</artifactId>
+          <version>${artemis-jms-client-all.version}</version>
+      </dependency>
     </dependencies>
     <profiles>
         <!-- profile which adds the possibility to build docker images Call 
@@ -45,6 +55,11 @@
                                     <tag>${project.version}</tag>
                                 </tags>
                             </to>
+                            <container>
+                                <jvmFlags>
+                                  <jvmFlag>-Dcom.hedera.hashgraph.sdk.experimental=true</jvmFlag>
+                                </jvmFlags>                            
+                            </container>
                             <extraDirectories>
                                 <paths>
                                     <path>src/main/resources</path>

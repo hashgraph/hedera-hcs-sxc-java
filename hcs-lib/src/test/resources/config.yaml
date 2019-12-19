@@ -7,11 +7,6 @@ appNet:
     - topic: 0.0.10
     - topic: 0.0.11
 
-queue:
-  initialContextFactory: "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
-  tcpConnectionFactory: "tcp://hcsqueue:61616"
-  
-
 HCSTransactionFee: 100000000
 
 nodes:

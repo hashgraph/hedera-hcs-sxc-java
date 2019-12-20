@@ -69,7 +69,7 @@ public class SettlementsController {
 
     HttpHeaders headers = new HttpHeaders();
 
-    public SettlementsController() throws FileNotFoundException, IOException {
+    public SettlementsController() throws Exception {
         appData = new AppData();
         headers.add("Content-Type", "application/json");
     }

@@ -15,8 +15,6 @@ import lombok.extern.log4j.Log4j2;
 import proto.AdminDeleteBPM;
 import proto.SettlementBPM;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -44,7 +42,7 @@ public class AdminController {
 
     private static AppData appData;
 
-    public AdminController() throws FileNotFoundException, IOException {
+    public AdminController() throws Exception {
 
         appData = new AppData();
     }

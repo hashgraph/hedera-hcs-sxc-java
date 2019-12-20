@@ -1,11 +1,13 @@
 package com.hedera.hcsapp;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.hedera.hcsapp.appconfig.AppClient;
-import com.hedera.hcsapp.appconfig.AppConfig;
+import com.hedera.hcsapp.dockercomposereader.DockerCompose;
+import com.hedera.hcsapp.dockercomposereader.DockerComposeReader;
+import com.hedera.hcsapp.dockercomposereader.Service;
 import com.hedera.hcslib.HCSLib;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -19,10 +21,9 @@ public final class AppData {
     private String publicKey = "";
     private String userName = "";
     private long appId = 0;
-    private AppConfig appConfig;
+    List<AppClient> appClients = new ArrayList<>();
 
-    public AppData() throws FileNotFoundException, IOException {
-        this.appConfig = new AppConfig();
+    public AppData() throws Exception {
         Dotenv dotEnv = Dotenv.configure().ignoreIfMissing().load();
 
         if (dotEnv.get("APP_ID").isEmpty()) {
@@ -30,12 +31,30 @@ public final class AppData {
             System.exit(0);
         }
 
+        DockerCompose dockerCompose = DockerComposeReader.parse();
+        
         this.appId = Long.parseLong(dotEnv.get("APP_ID"));
         AppData.hcsLib = new HCSLib(appId);
         this.privateKey = dotEnv.get("PK");
-        this.publicKey = appConfig.getConfig().getAppClients().get((int)appId).getClientKey();
-        this.userName = appConfig.getConfig().getAppClients().get((int)appId).getClientName();
+        this.publicKey = dotEnv.get("PUBKEY");
+        this.userName = dockerCompose.getNameForId(this.appId);
         this.topicIndex = 0;
+        
+        for (Map.Entry<String, Service> service : dockerCompose.getServices().entrySet()) {
+            Service dockerService = service.getValue();
+            if (dockerService.getEnvironment() != null) {
+                if (dockerService.getEnvironment().containsKey("APP_ID")) {
+                    AppClient appClient = new AppClient();
+                    appClient.setClientKey(dockerService.getEnvironment().get("PUBKEY"));
+                    appClient.setClientName(dockerService.getContainer_name());
+                    appClient.setPaymentAccountDetails(dockerService.getEnvironment().get("PAYMENT_ACCOUNT_DETAILS"));
+                    appClient.setRoles(dockerService.getEnvironment().get("ROLES"));
+                    
+                    this.appClients.add(appClient);
+                }
+            }
+        }
+        
     }
     
     public HCSLib getHCSLib() { 
@@ -57,6 +76,6 @@ public final class AppData {
         return this.topicIndex;
     }
     public List<AppClient> getAppClients() {
-        return this.appConfig.getConfig().getAppClients();
+        return this.appClients;
     }
 }

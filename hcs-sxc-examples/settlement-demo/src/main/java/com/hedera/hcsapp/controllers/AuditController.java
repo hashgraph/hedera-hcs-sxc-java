@@ -52,7 +52,7 @@ public class AuditController {
 
     private static AppData appData;
 
-    public AuditController() throws FileNotFoundException, IOException {
+    public AuditController() throws Exception {
 
         appData = new AppData();
     }

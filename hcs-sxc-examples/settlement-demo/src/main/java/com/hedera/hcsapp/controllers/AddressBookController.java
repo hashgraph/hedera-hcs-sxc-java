@@ -2,15 +2,24 @@ package com.hedera.hcsapp.controllers;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hedera.hcsapp.AppData;
+import com.hedera.hcsapp.dockercomposereader.DockerCompose;
+import com.hedera.hcsapp.dockercomposereader.DockerComposeReader;
+import com.hedera.hcsapp.dockercomposereader.Service;
 import com.hedera.hcsapp.entities.AddressBook;
 import com.hedera.hcsapp.repository.AddressBookRepository;
+import com.hedera.hcsapp.restclasses.AddressBookRest;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
@@ -19,7 +28,7 @@ public class AddressBookController {
 
     private static AppData appData;
     
-    public AddressBookController() throws FileNotFoundException, IOException {
+    public AddressBookController() throws Exception {
         appData = new AppData();
     }
 
@@ -32,7 +41,45 @@ public class AddressBookController {
         log.debug("/addressbook/buyerorseller");
         return addressBookRepository.findAllWithRoleButMe(appData.getUserName(),"BUYER,SELLER");
     }
-    
+
+    @GetMapping(value = "/addressbook/appusers", produces = "application/json")
+    public ResponseEntity<List<AddressBookRest>> addressbookAppUsers() throws Exception {
+        log.debug("/addressbook/appusers");
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json");
+
+        List<AddressBookRest> restResponse = new ArrayList<AddressBookRest>();
+        
+        DockerCompose dockerCompose = DockerComposeReader.parse();
+        
+        for (Map.Entry<String, Service> dockerService : dockerCompose.getServices().entrySet()) {
+            Service service = dockerService.getValue();
+            if ((null != service.getEnvironment()) && (service.getEnvironment().containsKey("APP_ID"))) {
+                
+                String name = service.getContainer_name();
+                String publicKey = service.getEnvironment().get("PUBKEY");
+                String roles = service.getEnvironment().get("ROLES");
+                String paymentAccountDetails = service.getEnvironment().get("PAYMENT_ACCOUNT_DETAILS");
+                String[] publicPort = service.getPorts().get(0).split(":");
+                int port = Integer.parseInt(publicPort[0]);
+                
+                restResponse.add(new AddressBookRest(name, publicKey, roles, paymentAccountDetails, port));
+            }
+            
+        }
+        
+//        List<AddressBook> addressBookList = new ArrayList<AddressBook>();
+//
+//        addressBookList = addressBookRepository.findAllUsers();
+//        
+//        for (AddressBook addressBook : addressBookList) {
+//            restResponse.add(new AddressBookRest(addressBook, index));
+//            index += 1;
+//        }
+//
+        return new ResponseEntity<>(restResponse, headers, HttpStatus.OK);
+    }
+
     @GetMapping(value = "/addressbook/paychannel", produces = "application/json")
     public List<AddressBook> addressbookPaychannel() throws FileNotFoundException, IOException {
         log.debug("/addressbook/paychannel");

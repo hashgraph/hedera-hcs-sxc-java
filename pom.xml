@@ -11,7 +11,7 @@
         <version>0.0.3-SNAPSHOT</version>
 
     <name>hcs-sxc</name>
-    <description>HCS Secure Comms Extension</description>
+    <description>HCS Secure eXchange Communication</description>
 
     <ciManagement>
         <system>CircleCI</system>

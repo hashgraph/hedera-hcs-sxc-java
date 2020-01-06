@@ -41,20 +41,31 @@ services:
        ports:
          - 8081:8080
        networks: [backing-services]
+       
+    # diana:
+    #    image: hederahashgraph/settlement-demo:latest
+    #    restart: on-failure
+    #    environment:
+    #      - APP_ID=3
+    #      - PK=302e020100300506032b65700422042058ffbba6e0884177e5b12d92b8c2a0206cb5a5a5bd8883454e692800e9d7720f
+    #    tty: true
+    #    ports:
+    #      - 8084:8080
+    #    networks: [backing-services] 
 
-    # bob:
-    #   depends_on:
-    #     - hcsqueue
-    #     - hcs-relay
-    #   image: hederahashgraph/settlement-demo:latest
-    #   restart: on-failure
-    #   environment:
-    #     - APP_ID=1
-    #     - PK=302e020100300506032b6570042204203d0c9e6ae0e498b84733a4d2834bf7175499aba40b406bb987e74f7f4f08616d
-    #   tty: true
-    #   ports:
-    #     - 8082:8080
-    #   networks: [backing-services]
+    bob:
+      depends_on:
+        - hcsqueue
+        - hcs-relay
+      image: hederahashgraph/settlement-demo:latest
+      restart: on-failure
+      environment:
+        - APP_ID=1
+        - PK=302e020100300506032b6570042204203d0c9e6ae0e498b84733a4d2834bf7175499aba40b406bb987e74f7f4f08616d
+      tty: true
+      ports:
+        - 8082:8080
+      networks: [backing-services]
 
     # carlos:
     #     image: hederahashgraph/settlement-demo:latest
@@ -67,16 +78,7 @@ services:
     #       - 8083:8080
     #     networks: [backing-services]
 
-     # diana:
-     #   image: hederahashgraph/settlement-demo:latest
-     #   restart: on-failure
-     #   environment:
-     #     - APP_ID=3
-     #     - PK=302e020100300506032b65700422042058ffbba6e0884177e5b12d92b8c2a0206cb5a5a5bd8883454e692800e9d7720f
-     #   tty: true
-     #   ports:
-     #     - 8084:8080
-     #   networks: [backing-services]
+     
 
      # erica:
      #   image: hederahashgraph/settlement-demo:latest

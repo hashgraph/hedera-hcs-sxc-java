@@ -23,7 +23,7 @@ public final class DockerComposeReader {
             Yaml yaml = new Yaml(new Constructor(DockerCompose.class),representer);
             return yaml.load(inputStream);
         } else {
-            throw new Exception("Docker compose file not found.");
+            throw new Exception("Docker compose (./docker-compose.yml) file not found.");
         }
     }
 }

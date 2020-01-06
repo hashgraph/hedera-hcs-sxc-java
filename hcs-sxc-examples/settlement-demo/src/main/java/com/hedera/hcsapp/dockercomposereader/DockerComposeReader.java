@@ -12,7 +12,7 @@ import org.yaml.snakeyaml.representer.Representer;
  */
 
 public final class DockerComposeReader {
-    
+
     public static DockerCompose parse() throws Exception {
         InputStream inputStream;
         File configFile = new File("./docker-compose.yml");

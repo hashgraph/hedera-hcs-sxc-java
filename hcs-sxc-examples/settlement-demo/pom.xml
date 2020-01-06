@@ -173,11 +173,15 @@
                                 <mainClass>com.hedera.hcsapp.Application</mainClass>
                             </container>
                             <extraDirectories>
-                                <paths>
+                               <paths>
+                                <path>src/main/resources</path>
+                                <path>static</path>
+                              </paths>
+
+<!--                                         <paths>
                                     <path>.</path>
-
-
                                 </paths>
+ --> 
                             </extraDirectories>
                             <mainClass>com.hedera.simple-message-demo.HCSLibCallBackSetup</mainClass>
                         </configuration>

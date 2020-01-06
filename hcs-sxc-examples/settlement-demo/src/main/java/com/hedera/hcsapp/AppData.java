@@ -29,8 +29,8 @@ public final class AppData {
             log.error("APPID environment variable is not set - exiting");
             System.exit(0);
         }
-
         this.appId = Long.parseLong(dotEnv.get("APP_ID"));
+        
         AppData.hcsLib = new HCSLib(appId);
         this.privateKey = dotEnv.get("PK");
         this.publicKey = appConfig.getConfig().getAppClients().get((int)appId).getClientKey();

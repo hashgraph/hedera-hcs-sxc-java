@@ -73,11 +73,26 @@
             <artifactId>hcs-sxc-interfaces</artifactId>
             <version>${hcslib.version}</version>
         </dependency>
+
+        <!-- PLUGINS -->
+         <dependency>
+            <groupId>com.hedera</groupId>
+            <artifactId>lib-persistence-in-db</artifactId>
+            <version>0.0.3-SNAPSHOT</version>
+        </dependency>
+
+<!--    <dependency> <groupId>com.hedera</groupId> 
+            <artifactId>lib-persistence-in-memory</artifactId> 
+            <version>0.0.3-SNAPSHOT</version> 
+        </dependency>
+ -->    
         <dependency>
             <groupId>com.hedera</groupId>
-            <artifactId>lib-persistence-in-memory</artifactId>
-            <version>${hcslib.version}</version>
+            <artifactId>lib-mirror-direct</artifactId>
+            <version>0.0.3-SNAPSHOT</version>
         </dependency>
+        <!-- <dependency> <groupId>com.hedera</groupId> <artifactId>lib-mirror-queue-artemis</artifactId> 
+            <version>0.0.3-SNAPSHOT</version> </dependency> -->
     </dependencies>
 
     <build>
@@ -89,6 +104,7 @@
             </extension>
         </extensions>
         <plugins>
+         
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -145,18 +161,24 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <version>${jib.version}</version>
                         <configuration>
-                      
+
                             <to>
                                 <image>hederahashgraph/settlement-demo:latest</image>
                                 <tags>
                                     <tag>${project.version}</tag>
                                 </tags>
                             </to>
+                            <container>
+                                <jvmFlags>
+                                    <jvmFlag>-Dcom.hedera.hashgraph.sdk.experimental=true</jvmFlag>
+                                </jvmFlags>
+                                <mainClass>com.hedera.hcsapp.Application</mainClass>
+                            </container>
                             <extraDirectories>
                                 <paths>
                                     <path>.</path>
-                                    
-                                    
+
+
                                 </paths>
                             </extraDirectories>
                             <mainClass>com.hedera.simple-message-demo.HCSLibCallBackSetup</mainClass>
@@ -166,6 +188,28 @@
                                 <phase>install</phase>
                                 <goals>
                                     <goal>dockerBuild</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>fatjar</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <version>1.5.2.RELEASE</version>
+                        <configuration>
+                            <mainClass>com.hedera.hcsapp.Application</mainClass>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>repackage</goal>
                                 </goals>
                             </execution>
                         </executions>

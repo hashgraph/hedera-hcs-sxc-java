@@ -16,6 +16,8 @@
   <modules>
     <module>lib-persistence-in-memory</module>
     <module>lib-persistence-in-db</module>
+    <module>lib-mirror-direct</module>
+    <module>lib-mirror-queue-artemis</module>
   </modules>
 
  </project>

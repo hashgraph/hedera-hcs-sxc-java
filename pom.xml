@@ -46,7 +46,7 @@
         <maven.compiler.target>10</maven.compiler.target>
         <java.version>10</java.version>
         <snakeyaml.version>1.21</snakeyaml.version>
-        <hedera-sdk.version>0.5.2.2-SNAPSHOT</hedera-sdk.version>
+        <hedera-sdk.version>0.9.0-beta-3</hedera-sdk.version>
         <junit-jupiter.version>5.5.2</junit-jupiter.version>
         <jib.version>1.7.0</jib.version>
         <artemis-jms-client-all.version>2.10.1</artemis-jms-client-all.version>
@@ -73,6 +73,7 @@
         <protobuf-maven-plugin.version>0.5.1</protobuf-maven-plugin.version>
         <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
         <h2.version>1.4.199</h2.version>
+        <grpc-netty.version>1.24.1</grpc-netty.version>
     </properties>
 
     <dependencies>
@@ -120,11 +121,6 @@
           <groupId>org.apache.commons</groupId>
           <artifactId>commons-lang3</artifactId>
           <version>${commons-lang3.version}</version>
-      </dependency>
-      <dependency>
-          <groupId>org.apache.activemq</groupId>
-          <artifactId>artemis-jms-client-all</artifactId>
-          <version>${artemis-jms-client-all.version}</version>
       </dependency>
       <dependency>
           <groupId>org.junit.jupiter</groupId>

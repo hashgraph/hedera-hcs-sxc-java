@@ -1,8 +1,0 @@
-mirrorAddress: "35.222.103.151:6551"
-topics:
-  - topic: "0.0.1004"
-
-queue:
-  initialContextFactory: "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
-  tcpConnectionFactory: "tcp://hcsqueue:61616"
-    

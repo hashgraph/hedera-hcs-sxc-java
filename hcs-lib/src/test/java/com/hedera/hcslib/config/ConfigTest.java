@@ -22,7 +22,6 @@ public class ConfigTest extends AbstractConfigTest {
     private static List<Node> nodeList;
     private static Map<AccountId, String> nodeMap;
     private static long hcsTransactionFee;
-    private static Queue queue;
 
     @BeforeEach
     public void init() throws FileNotFoundException, IOException {
@@ -32,7 +31,6 @@ public class ConfigTest extends AbstractConfigTest {
         nodeList = yamlConfig.getNodes();
         nodeMap = yamlConfig.getNodesMap();
         hcsTransactionFee = yamlConfig.getHCSTransactionFee();
-        queue = yamlConfig.getQueue();
     }
 
     @Test
@@ -45,8 +43,8 @@ public class ConfigTest extends AbstractConfigTest {
                  () -> assertEquals(2, appNet.getTopics().size()),
                  () -> assertEquals("0.0.10", appNet.getTopics().get(0).getTopic()),
                  () -> assertEquals("0.0.11", appNet.getTopics().get(1).getTopic()),
-                 () -> assertTopicId(0, 0, 10, appNet.getTopicIds().get(0)),
-                 () -> assertTopicId(0, 0, 11, appNet.getTopicIds().get(1)),
+//                 () -> assertTopicId(0, 0, 10, appNet.getTopicIds().get(0)),
+//                 () -> assertTopicId(0, 0, 11, appNet.getTopicIds().get(1)),
                  () -> assertEquals(2, nodeList.size()),
                  () -> assertEquals("0.testnet.hedera.com:50211", nodeList.get(0).getAddress()),
                  () -> assertEquals("0.0.3", nodeList.get(0).getAccount()),
@@ -55,9 +53,7 @@ public class ConfigTest extends AbstractConfigTest {
                  () -> assertEquals(2, nodeMap.size()),
                  () -> assertEquals("0.testnet.hedera.com:50211", nodeMap.get(AccountId.fromString("0.0.3"))),
                  () -> assertEquals("1.testnet.hedera.com:50211", nodeMap.get(AccountId.fromString("0.0.4"))),
-                 () -> assertEquals(100000000, hcsTransactionFee),
-                 () -> assertEquals("tcp://hcsqueue:61616", queue.getTcpConnectionFactory()),
-                 () -> assertEquals("org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory", queue.getInitialContextFactory())
+                 () -> assertEquals(100000000, hcsTransactionFee)
          );
     }
 }

@@ -25,7 +25,7 @@ public final class AppData {
 
     public AppData() throws Exception {
         Dotenv dotEnv = Dotenv.configure().ignoreIfMissing().load();
-        
+
         if ((dotEnv.get("APP_ID") == null) || (dotEnv.get("APP_ID").isEmpty())) {
             // no environment variables found in environment or ./.env, try ./src/main/resource/.env
             dotEnv = Dotenv.configure().directory("./src/main/resources").ignoreIfMissing().load();
@@ -45,14 +45,14 @@ public final class AppData {
         }
 
         DockerCompose dockerCompose = DockerComposeReader.parse();
-        
+
         this.appId = Long.parseLong(dotEnv.get("APP_ID"));
         AppData.hcsLib = new HCSLib(appId);
         this.privateKey = dotEnv.get("OPERATOR_KEY");
         this.publicKey = dockerCompose.getPublicKeyForId(this.appId);
         this.userName = dockerCompose.getNameForId(this.appId);
         this.topicIndex = 0;
-        
+
         for (Map.Entry<String, Service> service : dockerCompose.getServices().entrySet()) {
             Service dockerService = service.getValue();
             if (dockerService.getEnvironment() != null) {
@@ -62,15 +62,15 @@ public final class AppData {
                     appClient.setClientName(dockerService.getContainer_name());
                     appClient.setPaymentAccountDetails(dockerService.getEnvironment().get("PAYMENT_ACCOUNT_DETAILS"));
                     appClient.setRoles(dockerService.getEnvironment().get("ROLES"));
-                    
+
                     this.appClients.add(appClient);
                 }
             }
         }
-        
+
     }
-    
-    public HCSLib getHCSLib() { 
+
+    public HCSLib getHCSLib() {
         return AppData.hcsLib;
     }
     public long getAppId() {

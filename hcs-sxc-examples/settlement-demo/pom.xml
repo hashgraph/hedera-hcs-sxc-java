@@ -81,11 +81,12 @@
             <version>0.0.3-SNAPSHOT</version>
         </dependency>
 
-<!--         <dependency> <groupId>com.hedera</groupId> 
+<!--    <dependency> <groupId>com.hedera</groupId> 
             <artifactId>lib-persistence-in-memory</artifactId> 
             <version>0.0.3-SNAPSHOT</version> 
         </dependency>
- -->        <dependency>
+ -->    
+        <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>lib-mirror-direct</artifactId>
             <version>0.0.3-SNAPSHOT</version>
@@ -103,6 +104,7 @@
             </extension>
         </extensions>
         <plugins>
+         
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

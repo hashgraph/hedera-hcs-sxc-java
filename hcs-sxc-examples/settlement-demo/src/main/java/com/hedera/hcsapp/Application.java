@@ -4,7 +4,6 @@ import com.hedera.hcsapp.appconfig.AppClient;
 import com.hedera.hcsapp.entities.AddressBook;
 import com.hedera.hcsapp.repository.AddressBookRepository;
 
-import java.util.Collections;
 
 import javax.annotation.Resource;
 import org.springframework.boot.CommandLineRunner;
@@ -35,7 +34,7 @@ public class Application {
 //                System.out.println(beanName);
 //            }
             AppData appData = new AppData();
-            
+           
             // delete the address book
             addressBookRepository.deleteAll();
             

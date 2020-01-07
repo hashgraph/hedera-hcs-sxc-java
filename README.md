@@ -142,7 +142,7 @@ A number of configuration files are necessary in order to provide the components
 
 The `relay-config.yaml` file contains the necessary configuration for the `hcs-relay` component and is found in `/src/main/resources` of the corresponding java project. A sample file is provided as a starting point.
 
-*Note: If a `relay-config.yaml` file is found in the root of the project, it will override the file from src/main/resources*
+*Note: If a `relay-config.yaml` file is found in the root of the project, it will override the file from `src/main/resources`*
 
 ```
 # Address of the mirror node's subscription end point
@@ -171,7 +171,7 @@ queue:
 
 The `queue-config.yaml` file contains the necessary configuration for the `lib-mirror-queue-artemis` component and is found in the `/src/main/resources` of the corresponding java project. A sample file is provided as a starting point.
 
-*Note: If a `queue-config.yaml` file is found in the root of the project, it will override the file from src/main/resources*
+*Note: If a `queue-config.yaml` file is found in the root of the project, it will override the file from `src/main/resources`*
 
 ```
 queue:
@@ -183,7 +183,7 @@ queue:
 
 Applications will vary in use cases, however the `hcs-lib` expects the application to provide a number of configurable parameters, these are defined in the `config.yaml` file which resides in the `/src/main/resources` folder of the application's project.
 
-*Note: If a `config.yaml` file is found in the root of the project, it will override the file from src/main/resources*
+*Note: If a `config.yaml` file is found in the root of the project, it will override the file from `src/main/resources`*
 
 ```
 appNet:
@@ -216,7 +216,6 @@ mirrorNode:
 nodes:
   - address: 34.66.214.12:50211
     account: 0.0.4
-# Commented out due to bug in java SDK
 #  - address: 1.testnet.hedera.com:50211
 #    account: 0.0.4
 #  - address: 2.testnet.hedera.com:50211
@@ -225,14 +224,18 @@ nodes:
 #    account: 0.0.6
 ```
 
-In addition to the `config.yaml` file, a `.env` file may be provided (or environment variables set) for the application to be able to submit transactions to Hedera. Again, a sample file is provided with the examples.
+In addition to the `config.yaml` file, a `.env` file may be provided (or environment variables set) for the application to be able to submit transactions to Hedera. Again, a sample file is provided with the examples (`dotenv.sample`).
 
 ```
 OPERATOR_KEY=
 OPERATOR_ID=0.0.2
+# APP Net
+APP_ID=0
 ```
 
 The `OPERATOR_KEY` is the private key of the account identified by `OPERATOR_ID`.
+
+*Note: When running in your java IDE or standalone in a command line, the host's environment variables take precedence over those in the `.env` file.
 
 ## Docker
 
@@ -323,9 +326,148 @@ These are merely sample lines of code, please refer to the example projects for 
     }
 ```
 
+## Compiling the project
+
+*Note: The project uses [lombok](https://projectlombok.org/) which is "a java library that automatically plugs into your editor and build tools, spicing up your java". Some IDEs require that a plug in is installed in order for lombok to work.
+
+### Pre-requisites
+
+- The project is built on java 10.
+- Docker and Docker-Compose
+
+### Compilation steps
+
+- Ensure the necessary configuration files are complete and accurate
+    - hcs-relay/src/main/resources/relay-config.yaml (use relay-config.yaml.sample as a starting point)
+    - hcs-sxc-plugins/lib-mirror-queue-artemis/src/main/resources/queue-config.yaml (use queue-config.yaml.sample as a starting point)
+    - hcs-sxc-examples/settlement-demo/src/main/resources/.env (use dotenv.sample as a starting point)
+    - hcs-sxc-examples/settlement-demo/src/main/resources/.config.yaml (use config.yaml.sample as a starting point)
+    - hcs-sxc-examples/settlement-demo/src/main/resources/docker-compose.yml
+    - hcs-sxc-examples/simple-message-demo/src/main/resources/apps.yaml (use apps.yaml.sample as a starting point)
+    - hcs-sxc-examples/simple-message-demo/src/main/resources/config.yaml (use config.yaml.sample as a starting point)
+    - hcs-sxc-examples/simple-message-demo/docker-compose.yml
+
+#### Compile docker images
+
+From the top of the project, issue the following command to compile docker images
+
+```shell
+mvn clean install -Dcom.hedera.hashgraph.sdk.experimental=true -Pdocker
+```
+
+#### Compile "fat" jars
+
+From the top of the project, issue the following command to create fat jars
+
+```shell
+mvn clean install -Dcom.hedera.hashgraph.sdk.experimental=true -Pfatjar
+```
+
+## Running the project in your IDE
+
+Note that you need to add the following to your VM Arguments `-Dcom.hedera.hashgraph.sdk.experimental=true`.
+
+You may also need to setup environment variables to match those in the `.env` and `docker-compose.yml` files.
+
 ## Examples
+
+The project comes with two examples to get you started, these are fully functional examples. The first `simple-message-demo` is a simple command line example where running two instances of the application side by side, you can witness that a message sent from one app is reflected in the other. The first app sends the message to Hedera and the second receives it via a subscription to a mirror node. The opposite also works. The second example `settlement-demo` is a more complex application which is based on spring boot with a web UI. Each instance of the application represents a participant in a settlement use case where participants can issue credit notes to each other, approve them, group them to reach a settlement amount, employ a third party to effect the payment and finally both original parties confirm the payment was completed. In addition to this, an audit log is provided so that the full history of messages between participants can be consulted.
 
 ### Simple-message-demo
 
+This is a simple messaging demo between two participants. All messages sent from one participant are pushed to the Hedera HCS service and each participant subscribes to a mirror node to receive the consensus messages.
+
+To run the demo, first create a new HCS topic using the SDK and edit the `src/main/resources/config.yaml` file to reflect the new topic id. This is to ensure that when you run the demo, you don't receive messages from someone else who you may be sharing a topic id with - although that could be fun.
+Also check other details such as the mirror node, hedera network, etc... are correct.
+
+You will also need to ensure the same topic id is reflected in `hcs-relay/src/main/resources/relay-config.yaml`
+
+Also create a `.env` file with the following information
+
+```
+OPERATOR_KEY=
+OPERATOR_ID=0.0.2
+```
+
+This demo uses the queue and relay components.
+
+Compile the project (see above) and open three console terminals and switch to the folder/directory containing the `simple-message-demo` example on your computer.
+
+In the first, run the docker images for the queue and relay.
+
+```shell
+docker-compose up
+```
+
+once the components are up and running
+
+```shell
+hcs-relay_1  | 2020-01-07 13:07:22 [Thread-1] INFO  MirrorTopicSubscriber:131 - Sleeping 30s
+hcs-relay_1  | 2020-01-07 13:07:52 [Thread-1] INFO  MirrorTopicSubscriber:131 - Sleeping 30s
+```
+
+switch to the second terminal window and type
+
+linux/mac: `./runapp.sh 0`, windows: `runapp.cmd 0`
+
+in the third terminal window, type
+
+linux/mac: `./runapp.sh 1`, windows: `runapp.cmd 1`
+
+both windows should show a prompt
+
+```
+****************************************
+** Welcome to a simple HCS demo
+** I am app: Player 1
+****************************************
+```
+
+typing text and pressing `[RETURN]` should result in the message appearing in the other application's window after a short consensus delay.
+
+Both applications see the sent message, this is because both applications subscribe to mirror node notifications on topic and the sender essentially receives its own messages as well as those from others.
+
 ### Settlement-demo
 
+This is a more complex application which is based on spring boot with a web UI. Each instance of the application represents a participant in a settlement use case where participants can issue credit notes to each other, approve them, group them to reach a settlement amount, employ a third party to effect the payment and finally both original parties confirm the payment was completed. In addition to this, an audit log is provided so that the full history of messages between participants can be consulted.
+
+To run the demo, first create a new HCS topic using the SDK and edit the `src/main/resources/config.yaml` file to reflect the new topic id. This is to ensure that when you run the demo, you don't receive messages from someone else who you may be sharing a topic id with - although that could be fun.
+Also check other details such as the mirror node, hedera network, etc... are correct.
+
+Also create a `.env` file with the following information
+
+```
+OPERATOR_KEY=
+OPERATOR_ID=0.0.2
+# APP Net
+APP_ID=0
+```
+
+This demo does not use the queue and relay components, although it's possible to enable them by modifying the `pom.xml` file of the `settlement-demo` project to include them, they will also need to run as docker containers.
+
+Compile the project (see above) and open a console terminal and switch to the folder/directory containing the `settlement-demo` example on your computer.
+
+Then switch to `src/main/resources` and run the docker images as follows
+
+```shell
+docker-compose -f docker-compose-direct.yml up --remove-orphans
+```
+
+once the components are up and running (this may take a while), you can navigate to the UIs of the respective application users. Note: An instance of the `settlement-demo` application is run for each of the users and offered up on a separate http port.
+
+You can see all the participants by navigating to one of the application's landing page
+
+http://localhost:8081/landing.html
+
+And from there, open a new page for each of the participants
+
+* Alice http://localhost:8081
+* Bob http://localhost:8082
+* Carlos http://localhost:8083
+* Worldpay http://localhost:8084
+* Erica http://localhost:8085
+* Farouk http://localhost:8086
+* Grace http://localhost:8087
+* Stripe http://localhost:8088
+
+Whenever a participant performs and action in the UI, this results in a HCS transaction containing an `application-message` which itself contains a `business-message` containing the user's intent. Once the transaction has reached consensus, it's broadcast to all participants since they all subscribe to the same topic on a mirror node.

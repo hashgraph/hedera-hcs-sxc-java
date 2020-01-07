@@ -22,6 +22,16 @@
             <artifactId>hcs-lib</artifactId>
             <version>${hcslib.version}</version>
         </dependency>
+        <dependency> 
+            <groupId>com.hedera</groupId> 
+            <artifactId>lib-persistence-in-memory</artifactId> 
+            <version>0.0.3-SNAPSHOT</version> 
+        </dependency>
+        <dependency> 
+            <groupId>com.hedera</groupId> 
+            <artifactId>lib-mirror-queue-artemis</artifactId> 
+            <version>0.0.3-SNAPSHOT</version> 
+        </dependency> 
     </dependencies>
     <build>
         <sourceDirectory>src</sourceDirectory>

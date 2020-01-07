@@ -31,9 +31,11 @@ public final class AppData {
             System.exit(0);
         }
 
+
         DockerCompose dockerCompose = DockerComposeReader.parse();
         
         this.appId = Long.parseLong(dotEnv.get("APP_ID"));
+        
         AppData.hcsLib = new HCSLib(appId);
         this.privateKey = dotEnv.get("PK");
         this.publicKey = dotEnv.get("PUBKEY");

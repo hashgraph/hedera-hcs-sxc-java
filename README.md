@@ -4,7 +4,7 @@
 
 # HCS-SXC
 
-The HCS SXC (Secure eXchange Communication) is a set of pre-built components that aim to provide additional functionality over and above HCS to make it easier and quicker to develop applications, particularly if they require secure communications between participants.
+The HCS SXC (Secure eXtension for Communications) is a set of pre-built components that aim to provide additional functionality over and above HCS to make it easier and quicker to develop applications, particularly if they require secure communications between participants.
 
 These components use the Hedera Java SDK to communicate with Hedera's HCS service and add a number of features (Italicised still in development/planning) as follows:
 

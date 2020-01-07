@@ -6,7 +6,7 @@
 
 The HCS SXC (Secure eXchange Communication) is a set of pre-built components that aim to provide additional functionality over and above HCS to make it easier and quicker to develop applications, particularly if they require secure communications between participants.
 
-These components use the Hedera Java SDK to communicate with Hedera's HCS service and add a number of features (Italicizised still in development/planning) as follows:
+These components use the Hedera Java SDK to communicate with Hedera's HCS service and add a number of features (Italicised still in development/planning) as follows:
 
 - Sending messages to Hedera's HCS service
     - *With optional message encryption* (subject to plug in development)
@@ -34,7 +34,7 @@ These components use the Hedera Java SDK to communicate with Hedera's HCS servic
 
 Looking through the java project, we have the following Maven components/artifacts.
 
-* HCS-SXC 
+* HCS-SXC
     * hcs-lib
     * hcs-relay
     * hcs-sxc-interfaces
@@ -60,7 +60,7 @@ This component subscribes to topic(s) from a mirror node and forwards messages t
 
 A set of standard interfaces or structures for the various components to communicate with each other. Listed below are those that are used in the context of plug-ins which have to satisfy particular interface requirements.
 
-* HCSCallBackFromMirror - so that an app can register with the `hcs-lib` for callbacks 
+* HCSCallBackFromMirror - so that an app can register with the `hcs-lib` for callbacks
 * HCSCallBackToAppInterface - so that the `hcs-lib` can call back to an app
 * MirrorSubscriptionInterface - so that plugins can be made to subscribe to mirror notifications
 * LibMessagePersistence - so that plugins can be used to persist data
@@ -106,7 +106,7 @@ for Artemis Message Queue
 
 ```
 <groupId>com.hedera</groupId>
-<artifactId>lib-mirror-queue-artemis</artifactId> 
+<artifactId>lib-mirror-queue-artemis</artifactId>
 <version>0.0.3-SNAPSHOT</version>
 ```
 
@@ -117,8 +117,8 @@ To choose whether to use the `in memory` or `in database` persistence plug in, i
 for in memory
 
 ```
-<groupId>com.hedera</groupId> 
-<artifactId>lib-persistence-in-memory</artifactId> 
+<groupId>com.hedera</groupId>
+<artifactId>lib-persistence-in-memory</artifactId>
 <version>0.0.3-SNAPSHOT</version>
 ```
 
@@ -154,7 +154,7 @@ mirrorReconnectDelay: 10
 # The topic IDs to subscribe to
 topics:
   - topic: "0.0.1044"
-  
+
 # Should relay catch up with message history on startup
 catchupHistory: true
 
@@ -202,7 +202,7 @@ appNet:
   persistenceLevel: "FULL"
   # Should history of messages be caught up
   catchupHistory: true
-  
+
 # Default HCS transaction fee in tinybar
 HCSTransactionFee: 100000000
 
@@ -235,7 +235,7 @@ APP_ID=0
 
 The `OPERATOR_KEY` is the private key of the account identified by `OPERATOR_ID`.
 
-*Note: When running in your java IDE or standalone in a command line, the host's environment variables take precedence over those in the `.env` file.
+*Note: When running in your java IDE or standalone in a command line, the host's environment variables take precedence over those in the `.env` file.*
 
 ## Docker
 
@@ -328,7 +328,7 @@ These are merely sample lines of code, please refer to the example projects for 
 
 ## Compiling the project
 
-*Note: The project uses [lombok](https://projectlombok.org/) which is "a java library that automatically plugs into your editor and build tools, spicing up your java". Some IDEs require that a plug in is installed in order for lombok to work.
+*Note: The project uses [lombok](https://projectlombok.org/) which is "a java library that automatically plugs into your editor and build tools, spicing up your java". Some IDEs require that a plug in is installed in order for lombok to work.*
 
 ### Pre-requisites
 

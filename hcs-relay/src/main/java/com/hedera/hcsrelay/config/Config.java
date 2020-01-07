@@ -26,6 +26,7 @@ public final class Config {
         if (configFile.exists()) {
             // config file exists outside of jar, use it
             try {
+                log.info("Loading config from ./relay-config.yaml");
                 inputStream = new FileInputStream(configFile.getCanonicalPath());
             } catch (FileNotFoundException e) {
                 log.error(e);
@@ -35,6 +36,7 @@ public final class Config {
                 throw new Exception ("Error reading ./relay-config.yaml file");
             }
         } else {
+            log.info("Loading config from ./src/main/resources/relay-config.yaml");
             inputStream = this.getClass()
                     .getClassLoader()
                     .getResourceAsStream("relay-config.yaml");

@@ -12,5 +12,12 @@ import lombok.Data;
 public class MirrorResponse {
     @Id
     private String timestamp;
-    private byte[] mirrorTopicMessageResponse;
+    private Long timestampNS;
+    private Long timestampSeconds;
+    private int timestampNanos;
+    private byte[] message;
+    private String topicId;
+    private byte[] runningHash;
+    private long sequenceNumber;
+    
 }

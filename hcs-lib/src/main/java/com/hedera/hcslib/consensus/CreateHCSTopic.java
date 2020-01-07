@@ -2,16 +2,19 @@ package com.hedera.hcslib.consensus;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
+import com.hedera.hashgraph.sdk.Transaction;
+import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.consensus.CreateTopicTransaction;
-import com.hedera.hashgraph.sdk.consensus.TopicId;
+import com.hedera.hashgraph.sdk.consensus.ConsensusTopicCreateTransaction;
+import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcslib.HCSLib;
 import com.hedera.hcslib.config.Config;
@@ -42,14 +45,14 @@ public final class CreateHCSTopic {
 
     /**
      * Creates a new topic on a Hedera network
-     * @return TopicId
+     * @return ConsensusTopicId
      * @throws HederaNetworkException
      * @throws IllegalArgumentException
      * @throws HederaException
      * @throws IOException 
      * @throws FileNotFoundException 
      */
-    public TopicId execute() throws HederaNetworkException, IllegalArgumentException, HederaException, FileNotFoundException, IOException {
+    public ConsensusTopicId execute() throws HederaNetworkException, IllegalArgumentException, HederaException, FileNotFoundException, IOException {
 
         Config config = new Config();
         Client client = new Client(this.nodeMap);
@@ -59,10 +62,11 @@ public final class CreateHCSTopic {
         );
         client.setMaxTransactionFee(config.getConfig().getHCSTransactionFee());
 
-        TransactionReceipt receipt = new CreateTopicTransaction(client)
-                .executeForReceipt();
-                
-        return receipt.getTopicId();
+        ConsensusTopicCreateTransaction tx = new ConsensusTopicCreateTransaction();
+        TransactionId txId = tx.execute(client);
+        TransactionReceipt receipt = txId.getReceipt(client, Duration.ofSeconds(30));
+        
+        return receipt.getConsensusTopicId();
     }
 
 }

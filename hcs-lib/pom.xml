@@ -16,7 +16,6 @@
     <name>hcs-lib</name>
     <description>HCS Library</description>
 
-
     <dependencies>
         <dependency>
             <groupId>com.hedera</groupId>
@@ -28,11 +27,19 @@
             <artifactId>hcs-sxc-interfaces</artifactId>
             <version>${hcslib.version}</version>
         </dependency>
+        
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty</artifactId>
+            <version>${grpc-netty.version}</version>
+        </dependency>
+        
+        <!-- PLUGINS for testing -->
         <dependency>
             <groupId>com.hedera</groupId>
-            <scope>test</scope>
             <artifactId>lib-persistence-in-memory</artifactId>
             <version>0.0.3-SNAPSHOT</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

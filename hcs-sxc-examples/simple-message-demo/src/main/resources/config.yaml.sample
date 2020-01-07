@@ -4,17 +4,20 @@ appNet:
   rotateKeys: false
   rotateKeyFrequency: 0
   topics:
-    - topic: 0.0.1004
+    - topic: 0.0.1044
   persistenceLevel: "FULL"
-
-queue:
-  tcpConnectionFactory: "tcp://localhost:61616"
-    
+  catchupHistory: true
+  
 HCSTransactionFee: 100000000
 
+mirrorNode:
+  address: "34.66.214.12:6552"
+  # automatically disconnect/reconnect from mirror node every reconnectDelay minutes
+  reconnectDelay: 10  
+
 nodes:
-  - address: 35.222.103.151:50211
-    account: 0.0.3
+  - address: 34.66.214.12:50211
+    account: 0.0.4
 # Commented out due to bug in java SDK
 #  - address: 1.testnet.hedera.com:50211
 #    account: 0.0.4
@@ -22,5 +25,3 @@ nodes:
 #    account: 0.0.5
 #  - address: 3.testnet.hedera.com:50211
 #    account: 0.0.6
-    
-    

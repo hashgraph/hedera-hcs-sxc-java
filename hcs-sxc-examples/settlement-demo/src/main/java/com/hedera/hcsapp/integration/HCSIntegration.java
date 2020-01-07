@@ -26,7 +26,7 @@ import com.hedera.hcsapp.repository.SettlementRepository;
 import com.hedera.hcsapp.repository.Util;
 import com.hedera.hcslib.HCSLib;
 import com.hedera.hcslib.callback.OnHCSMessageCallback;
-import com.hedera.hcslib.consensus.HCSResponse;
+import com.hedera.hcslib.interfaces.HCSResponse;
 import com.hedera.hcslib.interfaces.LibMessagePersistence;
 import com.hedera.hcslib.proto.java.ApplicationMessage;
 import javax.persistence.EntityManager;
@@ -50,9 +50,6 @@ import proto.SettlementBPM;
 @Component
 public class HCSIntegration {
     
-
-    
-
     private AppData appData;
     
     @Autowired

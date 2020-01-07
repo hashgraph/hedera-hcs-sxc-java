@@ -1,117 +1,182 @@
 version: '3.3'
 services:
-    hcsqueue:
-      image: vromero/activemq-artemis:2.10.1-alpine
-      restart: on-failure
-      ports:
-        # ui
-        - "8161:8161"
-        # jms
-        - "61616:61616"
-        #- 61616
-      networks: [backing-services]
-      volumes: [
-        "activemq-data:/var/lib/artemis/data"
-        , "activemq-data:/var/lib/artemis/etc"
-        , "activemq-data:/var/lib/artemis/etc-override"
-        , "activemq-data:/var/lib/artemis/lock"
-        , "activemq-data:/opt/jmx-exporter/etc-override"
-      ]
+  hcs-queue:
+    container_name: hcs-queue
+    image: vromero/activemq-artemis:2.10.1-alpine
+    restart: on-failure
+    ports:
+      # ui
+      - "8161:8161"
+      # jms
+      - "61616:61616"
+      #- 61616
+    networks:
+      - backing-services
+    volumes:
+      - "activemq-data:/var/lib/artemis/data"
+      - "activemq-data:/var/lib/artemis/etc"
+      - "activemq-data:/var/lib/artemis/etc-override"
+      - "activemq-data:/var/lib/artemis/lock"
+      - "activemq-data:/opt/jmx-exporter/etc-override"
 
-      environment: [
-        DISABLE_SECURITY=true
-        , ARTEMIS_USERNAME=hcsdemo
-        , ARTEMIS_PASSWORD=hcsdemo
-        , RESTORE_CONFIGURATION=true
-      ]
-    hcs-relay:
-      depends_on:
-        - hcsqueue
-      image: hederahashgraph/hcs-relay:latest
-      restart: on-failure
-      networks: [backing-services]
+    environment:
+      DISABLE_SECURITY: "true"
+      ARTEMIS_USERNAME: "hcsdemo"
+      ARTEMIS_PASSWORD: "hcsdemo"
+      RESTORE_CONFIGURATION: "true"
 
-    alice:
-       image: hederahashgraph/settlement-demo:latest
-       restart: on-failure
-       environment:
-         - APP_ID=0
-         - PK=302e020100300506032b6570042204201d9ea0540b427483eb74816ebe2372f0890c5059b20d94f32a7efbf457d2c4a2
-       tty: true
-       ports:
-         - 8081:8080
-       networks: [backing-services]
-       
-    # diana:
-    #    image: hederahashgraph/settlement-demo:latest
-    #    restart: on-failure
-    #    environment:
-    #      - APP_ID=3
-    #      - PK=302e020100300506032b65700422042058ffbba6e0884177e5b12d92b8c2a0206cb5a5a5bd8883454e692800e9d7720f
-    #    tty: true
-    #    ports:
-    #      - 8084:8080
-    #    networks: [backing-services] 
+  hcs-relay:
+    container_name: hcs-relay
+    depends_on:
+      - hcs-queue
+    image: hederahashgraph/hcs-relay:latest
+    restart: on-failure
+    networks:
+      - backing-services
 
-    bob:
-      depends_on:
-        - hcsqueue
-        - hcs-relay
-      image: hederahashgraph/settlement-demo:latest
-      restart: on-failure
-      environment:
-        - APP_ID=1
-        - PK=302e020100300506032b6570042204203d0c9e6ae0e498b84733a4d2834bf7175499aba40b406bb987e74f7f4f08616d
-      tty: true
-      ports:
-        - 8082:8080
-      networks: [backing-services]
+  alice:
+    container_name: alice
+    depends_on:
+      - hcs-queue
+      - hcs-relay
+    image: hederahashgraph/settlement-demo:latest
+    restart: on-failure
+    environment:
+      APP_ID: 0
+      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6b
+      ROLES: "BUYER,SELLER" 
+      PAYMENT_ACCOUNT_DETAILS: "10-11-12 80640665"
+    tty: true
+    ports:
+      - 8081:8080
+    networks:
+      - backing-services
 
-    # carlos:
-    #     image: hederahashgraph/settlement-demo:latest
-    #     restart: on-failure
-    #     environment:
-    #       - APP_ID=2
-    #       - PK=302e020100300506032b657004220420b88375ae4efc84b8786e8d3940f18c7ea75ac0b8d4637fcd000c584972b7596d
-    #     tty: true
-    #     ports:
-    #       - 8083:8080
-    #     networks: [backing-services]
+  bob:
+    container_name: bob
+    depends_on:
+      - hcs-queue
+      - hcs-relay
+    image: hederahashgraph/settlement-demo:latest
+    restart: on-failure
+    environment:
+      APP_ID: 1
+      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6a
+      ROLES: "BUYER,SELLER" 
+      PAYMENT_ACCOUNT_DETAILS: "13-01-32 79832564"
+    tty: true
+    ports:
+      - 8082:8080
+    networks:
+      - backing-services
 
-     
-
-     # erica:
-     #   image: hederahashgraph/settlement-demo:latest
-     #   restart: on-failure
-     #   environment:
-     #     - APP_ID=4
-     #     - PK=302e020100300506032b657004220420f647b58a13f81a7e10a861ff12263d0d567800189746e02f7ce26ac875d4e91e
-     #   tty: true
-     #   ports:
-     #     - 8085:8080
-     #   networks: [backing-services]
-
-     # farouk:
-     #   image: hederahashgraph/settlement-demo:latest
-     #   restart: on-failure
-     #   environment:
-     #     - APP_ID=5
-     #     - PK=302e020100300506032b657004220420dae692b57c6c8d5299dd333180b51f41c8c9c6291e9a5a6661d75cbb04d515ad
-     #   tty: true
-     #   ports:
-     #     - 8086:8080
-     #   networks: [backing-services]
-
-     # grace:
-     #   image: hederahashgraph/settlement-demo:latest
-     #   restart: on-failure
-     #   environment:
-     #     - APP_ID=6
-     #     - PK=302e020100300506032b6570042204209be605c289bf103fdd2c48f2c7b44bae0e59582a147914708d1780ed1bad6983
-     #   tty: true
-     #   ports:
-     #     - 8087:8080
-     #   networks: [backing-services]
+#  carlos:
+#    container_name: carlos
+#    depends_on:
+#      - hcs-queue
+#      - hcs-relay
+#    image: hederahashgraph/settlement-demo:latest
+#    restart: on-failure
+#    environment:
+#      APP_ID: 2
+#      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6c
+#      ROLES: "BUYER,SELLER" 
+#      PAYMENT_ACCOUNT_DETAILS: "22-11-14 70925098" 
+#    tty: true
+#    ports:
+#      - 8083:8080
+#    networks:
+#      - backing-services
+#
+#  worldpay:
+#    container_name: worldpay
+#    depends_on:
+#      - hcs-queue
+#      - hcs-relay
+#    image: hederahashgraph/settlement-demo:latest
+#    restart: on-failure
+#    environment:
+#      APP_ID: 3
+#      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6d
+#      ROLES: "PAYCHANNEL"
+#      PAYMENT_ACCOUNT_DETAILS: "12-52-23 26789524"
+#    tty: true
+#    ports:
+#      - 8084:8080
+#    networks:
+#      - backing-services
+#
+#  erica:
+#    container_name: erica
+#    depends_on:
+#      - hcs-queue
+#      - hcs-relay
+#    image: hederahashgraph/settlement-demo:latest
+#    restart: on-failure
+#    environment:
+#      APP_ID: 4
+#      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6e
+#      ROLES: "BUYER,SELLER"
+#      PAYMENT_ACCOUNT_DETAILS: "09-34-21 46324354"
+#    tty: true
+#    ports:
+#      - 8085:8080
+#    networks:
+#      - backing-services
+#
+#  farouk:
+#    container_name: farouk
+#    depends_on:
+#      - hcs-queue
+#      - hcs-relay
+#    image: hederahashgraph/settlement-demo:latest
+#    restart: on-failure
+#    environment:
+#      APP_ID: 5
+#      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6f
+#      ROLES: "ARBITER,AUDITOR"
+#      PAYMENT_ACCOUNT_DETAILS: "10-69-43 86535765"
+#    tty: true
+#    ports:
+#      - 8086:8080
+#    networks:
+#      - backing-services
+#
+#  grace:
+#    container_name: grace
+#    depends_on:
+#      - hcs-queue
+#      - hcs-relay
+#    image: hederahashgraph/settlement-demo:latest
+#    restart: on-failure
+#    environment:
+#      APP_ID: 6
+#      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab7a
+#      ROLES: "DEMO"
+#      PAYMENT_ACCOUNT_DETAILS: "10-32-52 55424452"
+#    tty: true
+#    ports:
+#      - 8087:8080
+#    networks:
+#      - backing-services
+#
+#  stripe:
+#    container_name: stripe
+#    depends_on:
+#      - hcs-queue
+#      - hcs-relay
+#    image: hederahashgraph/settlement-demo:latest
+#    restart: on-failure
+#    environment:
+#      APP_ID: 7
+#      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab7b
+#      ROLES: "PAYCHANNEL"
+#      PAYMENT_ACCOUNT_DETAILS: "10-21-33 98321542"
+#    tty: true
+#    ports:
+#      - 8088:8080
+#    networks:
+#      - backing-services
 
 volumes:
   activemq-data: {}
@@ -119,4 +184,3 @@ volumes:
 networks:
   backing-services:
     driver: bridge
-

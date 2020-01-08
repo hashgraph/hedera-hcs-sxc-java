@@ -8,11 +8,16 @@
         <version>0.0.3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>lib-mirror-queue-artemis</artifactId>
+  <artifactId>hcs-sxc-plugins-persistence-in-memory</artifactId>
 
-  <name>lib-mirror-queue-artemis</name>
-
+  <name>hcs-sxc-plugins-persistence-in-memory</name>
+  
     <dependencies>
+        <dependency>
+            <groupId>io.github.classgraph</groupId>
+            <artifactId>classgraph</artifactId>
+            <version>${classgraph.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-proto</artifactId>
@@ -23,11 +28,6 @@
             <artifactId>hcs-sxc-interfaces</artifactId>
             <version>${hcslib.version}</version>
         </dependency>
-      <dependency>
-          <groupId>org.apache.activemq</groupId>
-          <artifactId>artemis-jms-client-all</artifactId>
-          <version>${artemis-jms-client-all.version}</version>
-      </dependency>
     </dependencies>
-
+  
 </project>

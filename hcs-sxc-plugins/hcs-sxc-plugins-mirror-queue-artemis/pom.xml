@@ -8,9 +8,9 @@
         <version>0.0.3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>lib-mirror-direct</artifactId>
+  <artifactId>hcs-sxc-plugins-mirror-queue-artemis</artifactId>
 
-  <name>lib-mirror-direct</name>
+  <name>hcs-sxc-plugins-mirror-queue-artemis</name>
 
     <dependencies>
         <dependency>
@@ -23,6 +23,11 @@
             <artifactId>hcs-sxc-interfaces</artifactId>
             <version>${hcslib.version}</version>
         </dependency>
+      <dependency>
+          <groupId>org.apache.activemq</groupId>
+          <artifactId>artemis-jms-client-all</artifactId>
+          <version>${artemis-jms-client-all.version}</version>
+      </dependency>
     </dependencies>
 
 </project>

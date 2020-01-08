@@ -8,16 +8,11 @@
         <version>0.0.3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>lib-persistence-in-memory</artifactId>
+  <artifactId>hcs-sxc-plugins-mirror-direct</artifactId>
 
-  <name>lib-persistence-in-memory</name>
-  
+  <name>hcs-sxc-plugins-mirror-direct</name>
+
     <dependencies>
-        <dependency>
-            <groupId>io.github.classgraph</groupId>
-            <artifactId>classgraph</artifactId>
-            <version>${classgraph.version}</version>
-        </dependency>
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-proto</artifactId>
@@ -29,5 +24,5 @@
             <version>${hcslib.version}</version>
         </dependency>
     </dependencies>
-  
+
 </project>

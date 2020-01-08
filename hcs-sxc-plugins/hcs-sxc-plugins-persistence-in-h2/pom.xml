@@ -8,9 +8,9 @@
         <version>0.0.3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>lib-persistence-in-h2</artifactId>
+  <artifactId>hcs-sxc-plugins-persistence-in-h2</artifactId>
 
-  <name>lib-persistence-in-h2</name>
+  <name>hcs-sxc-plugins-persistence-in-h2</name>
 
     <dependencies>
         <dependency>

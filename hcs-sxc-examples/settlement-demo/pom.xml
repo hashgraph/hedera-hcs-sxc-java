@@ -88,10 +88,10 @@
  -->    
         <dependency>
             <groupId>com.hedera</groupId>
-            <artifactId>lib-mirror-direct</artifactId>
+            <artifactId>hcs-sxc-plugins-mirror-direct</artifactId>
             <version>0.0.3-SNAPSHOT</version>
         </dependency>
-        <!-- <dependency> <groupId>com.hedera</groupId> <artifactId>lib-mirror-queue-artemis</artifactId> 
+        <!-- <dependency> <groupId>com.hedera</groupId> <artifactId>hcs-sxc-plugins-mirror-queue-artemis</artifactId> 
             <version>0.0.3-SNAPSHOT</version> </dependency> -->
     </dependencies>
 

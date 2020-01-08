@@ -40,7 +40,7 @@ public class MirrorSubscribe implements MirrorSubscriptionInterface {
     @Override
     public void init(HCSCallBackFromMirror onHCSMessageCallback, long applicationId, Optional<Instant> lastConsensusTimestamp, String mirrorAddress, List<ConsensusTopicId> topicIds, int mirrorReconnectDelay) throws Exception {
         Config  config = new Config();
-        log.info("lib-mirror-queue-artemis init");
+        log.info("hcs-sxc-plugins-mirror-queue-artemis init");
         String contextFactory = config.getConfig().getQueue().getInitialContextFactory();
         String tcpConnectionFactory = config.getConfig().getQueue().getTcpConnectionFactory();
         Runnable runnable;

@@ -41,9 +41,11 @@
                             0
                         </div>
                     </div>
-                    <button 
+                    <button
+                        onclick="saveData()"
                         class="mdc-icon-button material-icons mdc-top-app-bar__action-item--unbounded" aria-label="Save Database">save</button>
                     <button 
+                        onclick="restoreData()"
                         class="mdc-icon-button material-icons mdc-top-app-bar__action-item--unbounded" aria-label="Restore Database">restore</button>
                   
                     <button 
@@ -2476,6 +2478,24 @@
                 restore = confirm("This will delete your data and restore test data");
                 if( restore){
                         await fetch('admin/deletedata');
+                        //await fetch('admin/createtestdata');
+                        await location.reload();
+                }
+            }
+            
+            async function saveData(){
+                restore = confirm("This will take a snapshot of your current database");
+                if( restore){
+                        await fetch('admin/stash-database');
+                        //await fetch('admin/createtestdata');
+                        await location.reload();
+                }
+            }
+            
+            async function restoreData(){
+                restore = confirm("This will restore the database from a previously taken snapshot");
+                if( restore){
+                        await fetch('admin/stash-pop-database');
                         //await fetch('admin/createtestdata');
                         await location.reload();
                 }

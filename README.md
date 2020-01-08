@@ -36,7 +36,7 @@ Looking through the java project, we have the following Maven components/artifac
 
 * HCS-SXC
     * hcs-sxc-lib
-    * hcs-relay
+    * hcs-sxc-relay
     * hcs-sxc-interfaces
     * hcs-sxc-examples
         * simple-message-demo
@@ -52,7 +52,7 @@ Looking through the java project, we have the following Maven components/artifac
 
 This component does the bulk of the work and is imported into a project (see example applications).
 
-### HCS-Relay
+### HCS-sxc-relay
 
 This component subscribes to topic(s) from a mirror node and forwards messages to a message queue. `AppNet` participants subscribe to the queue to receive messages.
 
@@ -67,7 +67,7 @@ A set of standard interfaces or structures for the various components to communi
 
 Defined in the `HCS-Interfaces` project, these are data structures that are shared between components.
 
-* HCSRelayMessage - a message from the `HCS-Relay` components
+* HCSRelayMessage - a message from the `hcs-sxc-relay` components
 * HCSResponse - a application message id and message
 * LibConsensusMessage - a (temporary) POJO for consensus messages (until these can be serialized)
 * MessagePersistenceLevel - a list of pre-defined persistence levels
@@ -78,7 +78,7 @@ This project contains a series of plugins to be used in conjunction with the lib
 The choice of a plug-in architecture is to enable additional plugins to be developed without needing to change the projects that may later depend on them and so to offer extensibility with a choice of options.
 
 * lib-mirror-direct - plugin to enable the `hcs-sxc-lib` to subscribe to mirror notifications directly
-* lib-mirror-queue-artemis - plugin to enable the `hcs-sxc-lib` to subscribe to mirror notifications via an Artemis Message Queue (which receives messages via the `hcs-relay` component)
+* lib-mirror-queue-artemis - plugin to enable the `hcs-sxc-lib` to subscribe to mirror notifications via an Artemis Message Queue (which receives messages via the `hcs-sxc-relay` component)
 * lib-persistence-in-h2 - plug in to provide data persistence in a database (H2)
 * lib-persistence-in-memory - plug in to provide data persistence in memory
 
@@ -92,7 +92,7 @@ This is not a java project, but a component which is started by way of a docker 
 
 ## Choosing which plugins to use
 
-To choose whether to use the `direct` or `hcs-relay+activeMQ` subscription method, include either the first or second dependency below in your application's `pom.xml`
+To choose whether to use the `direct` or `hcs-sxc-relay+activeMQ` subscription method, include either the first or second dependency below in your application's `pom.xml`
 
 for direct
 
@@ -110,7 +110,7 @@ for Artemis Message Queue
 <version>0.0.3-SNAPSHOT</version>
 ```
 
-If you choose Artemis Message Queue, you must run a `hcs-relay` to ensure the queue is given messages to persist on behalf of `AppNet` participants.
+If you choose Artemis Message Queue, you must run a `hcs-sxc-relay` to ensure the queue is given messages to persist on behalf of `AppNet` participants.
 
 To choose whether to use the `in memory` or `in database` persistence plug in, include either the first or second dependency below in your application's `pom.xml`
 
@@ -138,9 +138,9 @@ for in database
 
 A number of configuration files are necessary in order to provide the components the necessary information such as which TopicId(s) to use or subscribe to, etc... These files are listed and explained below.
 
-### HCS-relay
+### HCS-sxc-relay
 
-The `relay-config.yaml` file contains the necessary configuration for the `hcs-relay` component and is found in `/src/main/resources` of the corresponding java project. A sample file is provided as a starting point.
+The `relay-config.yaml` file contains the necessary configuration for the `hcs-sxc-relay` component and is found in `/src/main/resources` of the corresponding java project. A sample file is provided as a starting point.
 
 *Note: If a `relay-config.yaml` file is found in the root of the project, it will override the file from `src/main/resources`*
 
@@ -164,7 +164,7 @@ lastConsensusTimeFile: "./lastConsensusTime.txt"
 # Connection details to the Artemis MQ component
 queue:
   initialContextFactory: "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
-  tcpConnectionFactory: "tcp://hcsqueue:61616?jms.redeliveryPolicy.initialRedeliveryDelay=0&jms.redeliveryPolicy.backOffMultiplier=1&jms.redeliveryPolicy.maximumRedeliveries=5&jms.redeliveryPolicy.redeliveryDelay=500&jms.redeliveryPolicy.useExponentialBackOff=false"
+  tcpConnectionFactory: "tcp://hcs-sxc-queue:61616?jms.redeliveryPolicy.initialRedeliveryDelay=0&jms.redeliveryPolicy.backOffMultiplier=1&jms.redeliveryPolicy.maximumRedeliveries=5&jms.redeliveryPolicy.redeliveryDelay=500&jms.redeliveryPolicy.useExponentialBackOff=false"
 ```
 
 ### lib-mirror-queue-artemis
@@ -175,7 +175,7 @@ The `queue-config.yaml` file contains the necessary configuration for the `lib-m
 
 ```
 queue:
-  tcpConnectionFactory: "tcp://hcsqueue:61616?jms.redeliveryPolicy.initialRedeliveryDelay=0&jms.redeliveryPolicy.backOffMultiplier=1&jms.redeliveryPolicy.maximumRedeliveries=5&jms.redeliveryPolicy.redeliveryDelay=500&jms.redeliveryPolicy.useExponentialBackOff=false"
+  tcpConnectionFactory: "tcp://hcs-sxc-queue:61616?jms.redeliveryPolicy.initialRedeliveryDelay=0&jms.redeliveryPolicy.backOffMultiplier=1&jms.redeliveryPolicy.maximumRedeliveries=5&jms.redeliveryPolicy.redeliveryDelay=500&jms.redeliveryPolicy.useExponentialBackOff=false"
   initialContextFactory: "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
 ```
 
@@ -239,13 +239,13 @@ The `OPERATOR_KEY` is the private key of the account identified by `OPERATOR_ID`
 
 ## Docker
 
-Docker is a convenient way of starting a number of individual components, we use it extensively in the `settlement-demo` example, but also to start up the `hcs-relay` and `Artemis MQ` components when necessary. Below is an example `docker-compose.yml` file for this purpose. You may wish to extend it with your own application-specific images if necessary.
+Docker is a convenient way of starting a number of individual components, we use it extensively in the `settlement-demo` example, but also to start up the `hcs-sxc-relay` and `Artemis MQ` components when necessary. Below is an example `docker-compose.yml` file for this purpose. You may wish to extend it with your own application-specific images if necessary.
 
 ```
 version: '3.3'
 services:
-  hcs-queue:
-    container_name: hcs-queue
+  hcs-sxc-queue:
+    container_name: hcs-sxc-queue
     image: vromero/activemq-artemis:2.10.1-alpine
     restart: on-failure
     ports:
@@ -269,11 +269,11 @@ services:
       ARTEMIS_PASSWORD: hcsdemo
       RESTORE_CONFIGURATION: true
 
-  hcs-relay:
-    container_name: hcs-relay
+  hcs-sxc-relay:
+    container_name: hcs-sxc-relay
     depends_on:
-      - hcs-queue
-    image: hederahashgraph/hcs-relay:latest
+      - hcs-sxc-queue
+    image: hederahashgraph/hcs-sxc-relay:latest
     restart: on-failure
     networks:
       - backing-services
@@ -338,7 +338,7 @@ These are merely sample lines of code, please refer to the example projects for 
 ### Compilation steps
 
 - Ensure the necessary configuration files are complete and accurate
-    - hcs-relay/src/main/resources/relay-config.yaml (use relay-config.yaml.sample as a starting point)
+    - hcs-sxc-relay/src/main/resources/relay-config.yaml (use relay-config.yaml.sample as a starting point)
     - hcs-sxc-plugins/lib-mirror-queue-artemis/src/main/resources/queue-config.yaml (use queue-config.yaml.sample as a starting point)
     - hcs-sxc-examples/settlement-demo/src/main/resources/.env (use dotenv.sample as a starting point)
     - hcs-sxc-examples/settlement-demo/src/main/resources/.config.yaml (use config.yaml.sample as a starting point)
@@ -380,7 +380,7 @@ This is a simple messaging demo between two participants. All messages sent from
 To run the demo, first create a new HCS topic using the SDK and edit the `src/main/resources/config.yaml` file to reflect the new topic id. This is to ensure that when you run the demo, you don't receive messages from someone else who you may be sharing a topic id with - although that could be fun.
 Also check other details such as the mirror node, hedera network, etc... are correct.
 
-You will also need to ensure the same topic id is reflected in `hcs-relay/src/main/resources/relay-config.yaml`
+You will also need to ensure the same topic id is reflected in `hcs-sxc-relay/src/main/resources/relay-config.yaml`
 
 Also create a `.env` file with the following information
 
@@ -402,8 +402,8 @@ docker-compose up
 once the components are up and running
 
 ```shell
-hcs-relay_1  | 2020-01-07 13:07:22 [Thread-1] INFO  MirrorTopicSubscriber:131 - Sleeping 30s
-hcs-relay_1  | 2020-01-07 13:07:52 [Thread-1] INFO  MirrorTopicSubscriber:131 - Sleeping 30s
+hcs-sxc-relay_1  | 2020-01-07 13:07:22 [Thread-1] INFO  MirrorTopicSubscriber:131 - Sleeping 30s
+hcs-sxc-relay_1  | 2020-01-07 13:07:52 [Thread-1] INFO  MirrorTopicSubscriber:131 - Sleeping 30s
 ```
 
 switch to the second terminal window and type

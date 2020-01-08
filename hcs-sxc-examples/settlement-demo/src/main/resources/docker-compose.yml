@@ -1,7 +1,7 @@
 version: '3.3'
 services:
-  hcs-queue:
-    container_name: hcs-queue
+  hcs-sxc-queue:
+    container_name: hcs-sxc-queue
     image: vromero/activemq-artemis:2.10.1-alpine
     restart: on-failure
     ports:
@@ -25,11 +25,11 @@ services:
       ARTEMIS_PASSWORD: "hcsdemo"
       RESTORE_CONFIGURATION: "true"
 
-  hcs-relay:
-    container_name: hcs-relay
+  hcs-sxc-relay:
+    container_name: hcs-sxc-relay
     depends_on:
-      - hcs-queue
-    image: hederahashgraph/hcs-relay:latest
+      - hcs-sxc-queue
+    image: hederahashgraph/hcs-sxc-relay:latest
     restart: on-failure
     networks:
       - backing-services
@@ -37,8 +37,8 @@ services:
   alice:
     container_name: alice
     depends_on:
-      - hcs-queue
-      - hcs-relay
+      - hcs-sxc-queue
+      - hcs-sxc-relay
     image: hederahashgraph/settlement-demo:latest
     restart: on-failure
     environment:
@@ -55,8 +55,8 @@ services:
   bob:
     container_name: bob
     depends_on:
-      - hcs-queue
-      - hcs-relay
+      - hcs-sxc-queue
+      - hcs-sxc-relay
     image: hederahashgraph/settlement-demo:latest
     restart: on-failure
     environment:
@@ -73,8 +73,8 @@ services:
 #  carlos:
 #    container_name: carlos
 #    depends_on:
-#      - hcs-queue
-#      - hcs-relay
+#      - hcs-sxc-queue
+#      - hcs-sxc-relay
 #    image: hederahashgraph/settlement-demo:latest
 #    restart: on-failure
 #    environment:
@@ -91,8 +91,8 @@ services:
 #  worldpay:
 #    container_name: worldpay
 #    depends_on:
-#      - hcs-queue
-#      - hcs-relay
+#      - hcs-sxc-queue
+#      - hcs-sxc-relay
 #    image: hederahashgraph/settlement-demo:latest
 #    restart: on-failure
 #    environment:
@@ -109,8 +109,8 @@ services:
 #  erica:
 #    container_name: erica
 #    depends_on:
-#      - hcs-queue
-#      - hcs-relay
+#      - hcs-sxc-queue
+#      - hcs-sxc-relay
 #    image: hederahashgraph/settlement-demo:latest
 #    restart: on-failure
 #    environment:
@@ -127,8 +127,8 @@ services:
 #  farouk:
 #    container_name: farouk
 #    depends_on:
-#      - hcs-queue
-#      - hcs-relay
+#      - hcs-sxc-queue
+#      - hcs-sxc-relay
 #    image: hederahashgraph/settlement-demo:latest
 #    restart: on-failure
 #    environment:
@@ -145,8 +145,8 @@ services:
 #  grace:
 #    container_name: grace
 #    depends_on:
-#      - hcs-queue
-#      - hcs-relay
+#      - hcs-sxc-queue
+#      - hcs-sxc-relay
 #    image: hederahashgraph/settlement-demo:latest
 #    restart: on-failure
 #    environment:
@@ -163,8 +163,8 @@ services:
 #  stripe:
 #    container_name: stripe
 #    depends_on:
-#      - hcs-queue
-#      - hcs-relay
+#      - hcs-sxc-queue
+#      - hcs-sxc-relay
 #    image: hederahashgraph/settlement-demo:latest
 #    restart: on-failure
 #    environment:

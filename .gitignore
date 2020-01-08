@@ -27,10 +27,10 @@ hs_err_pid*
 .project
 .settings
 
-hcs-relay/target
-hcs-relay/bin
-hcs-relay/.project
-hcs-relay/.settings
+hcs-sxc-relay/target
+hcs-sxc-relay/bin
+hcs-sxc-relay/.project
+hcs-sxc-relay/.settings
 
 hcs-sxc-lib/.idea/
 hcs-sxc-lib/target/

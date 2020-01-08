@@ -263,7 +263,7 @@
   </build>
     <modules>
       <module>hcs-sxc-lib</module>
-      <module>hcs-relay</module>
+      <module>hcs-sxc-relay</module>
       <module>hcs-sxc-interfaces</module>
       <module>hcs-sxc-examples</module>
       <module>hcs-sxc-proto</module>

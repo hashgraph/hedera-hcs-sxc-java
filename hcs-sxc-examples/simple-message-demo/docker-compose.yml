@@ -1,6 +1,6 @@
 version: '3.3'
 services:
-    hcsqueue:
+    hcs-sxc-queue:
       image: vromero/activemq-artemis:2.10.1-alpine
       restart: on-failure
       ports:
@@ -23,10 +23,10 @@ services:
         , ARTEMIS_PASSWORD=hcsdemo
         , RESTORE_CONFIGURATION=true
       ]
-    hcs-relay:
+    hcs-sxc-relay:
         depends_on:
-          - hcsqueue
-        image: hederahashgraph/hcs-relay:latest
+          - hcs-sxc-queue
+        image: hederahashgraph/hcs-sxc-relay:latest
         restart: on-failure
         networks: [backing-services]
 

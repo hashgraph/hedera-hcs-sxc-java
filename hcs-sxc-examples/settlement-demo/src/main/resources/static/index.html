@@ -1394,6 +1394,7 @@
             allAddresses = [];
             buyerSellersAddress= [];
             paymentChannels = [];
+            notificationList = [];
             
             document.addEventListener("DOMContentLoaded", init);
             
@@ -2463,6 +2464,7 @@
                 }
                 document.getElementById("notification-badge").innerHTML = document.getElementById("notification-badge").innerHTML * 1.0 + 1;
                 document.getElementById("notification-badge").style.display="block";
+                notificationList.push(messageOutput);
              }
              
             function showSnackBarMessage(message){

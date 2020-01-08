@@ -389,7 +389,11 @@ OPERATOR_KEY=
 OPERATOR_ID=0.0.2
 ```
 
-This demo uses the queue and relay components.
+This demo uses the queue and relay components. For the apps to connect to the queue, an entry in your hosts file needs to be added as follows:
+
+```text
+127.0.0.1       hcs-sxc-queue
+```
 
 Compile the project (see above) and open three console terminals and switch to the folder/directory containing the `hcs-sxc-simple-message-demo` example on your computer.
 

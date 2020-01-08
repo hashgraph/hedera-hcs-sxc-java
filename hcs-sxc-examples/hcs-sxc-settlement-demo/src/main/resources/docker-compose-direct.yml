@@ -2,7 +2,7 @@ version: '3.3'
 services:
   alice:
     container_name: alice
-    image: hederahashgraph/settlement-demo:latest
+    image: hederahashgraph/hcs-sxc-settlement-demo:latest
     restart: on-failure
     environment:
       APP_ID: 0
@@ -15,7 +15,7 @@ services:
 
   bob:
     container_name: bob
-    image: hederahashgraph/settlement-demo:latest
+    image: hederahashgraph/hcs-sxc-settlement-demo:latest
     restart: on-failure
     environment:
       APP_ID: 1
@@ -28,7 +28,7 @@ services:
 
   carlos:
     container_name: carlos
-    image: hederahashgraph/settlement-demo:latest
+    image: hederahashgraph/hcs-sxc-settlement-demo:latest
     restart: on-failure
     environment:
       APP_ID: 2
@@ -41,7 +41,7 @@ services:
 
   worldpay:
     container_name: worldpay
-    image: hederahashgraph/settlement-demo:latest
+    image: hederahashgraph/hcs-sxc-settlement-demo:latest
     restart: on-failure
     environment:
       APP_ID: 3
@@ -54,7 +54,7 @@ services:
 
   erica:
     container_name: erica
-    image: hederahashgraph/settlement-demo:latest
+    image: hederahashgraph/hcs-sxc-settlement-demo:latest
     restart: on-failure
     environment:
       APP_ID: 4
@@ -67,7 +67,7 @@ services:
 
   farouk:
     container_name: farouk
-    image: hederahashgraph/settlement-demo:latest
+    image: hederahashgraph/hcs-sxc-settlement-demo:latest
     restart: on-failure
     environment:
       APP_ID: 5
@@ -80,7 +80,7 @@ services:
 
   grace:
     container_name: grace
-    image: hederahashgraph/settlement-demo:latest
+    image: hederahashgraph/hcs-sxc-settlement-demo:latest
     restart: on-failure
     environment:
       APP_ID: 6
@@ -93,7 +93,7 @@ services:
 
   stripe:
     container_name: stripe
-    image: hederahashgraph/settlement-demo:latest
+    image: hederahashgraph/hcs-sxc-settlement-demo:latest
     restart: on-failure
     environment:
       APP_ID: 7

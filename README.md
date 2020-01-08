@@ -43,10 +43,10 @@ Looking through the java project, we have the following Maven components/artifac
         * settlement-demo
     * hcs-sxc-proto
     * hcs-sxc-plugins
-        * lib-persistence-in-memory
-        * lib-persistence-in-h2
-        * lib-mirror-direct
-        * lib-mirror-queue-artemis
+        * hcs-sxc-plugins-persistence-in-memory
+        * hcs-sxc-plugins-persistence-in-h2
+        * hcs-sxc-plugins-mirror-direct
+        * hcs-sxc-plugins-mirror-queue-artemis
 
 ### HCS-sxc-lib
 
@@ -77,10 +77,10 @@ Defined in the `HCS-Interfaces` project, these are data structures that are shar
 This project contains a series of plugins to be used in conjunction with the lib, at the time of writing, the following plug-ins are available.
 The choice of a plug-in architecture is to enable additional plugins to be developed without needing to change the projects that may later depend on them and so to offer extensibility with a choice of options.
 
-* lib-mirror-direct - plugin to enable the `hcs-sxc-lib` to subscribe to mirror notifications directly
-* lib-mirror-queue-artemis - plugin to enable the `hcs-sxc-lib` to subscribe to mirror notifications via an Artemis Message Queue (which receives messages via the `hcs-sxc-relay` component)
-* lib-persistence-in-h2 - plug in to provide data persistence in a database (H2)
-* lib-persistence-in-memory - plug in to provide data persistence in memory
+* hcs-sxc-plugins-mirror-direct - plugin to enable the `hcs-sxc-lib` to subscribe to mirror notifications directly
+* hcs-sxc-plugins-mirror-queue-artemis - plugin to enable the `hcs-sxc-lib` to subscribe to mirror notifications via an Artemis Message Queue (which receives messages via the `hcs-sxc-relay` component)
+* hcs-sxc-plugins-persistence-in-h2 - plug in to provide data persistence in a database (H2)
+* hcs-sxc-plugins-persistence-in-memory - plug in to provide data persistence in memory
 
 ### HCS-SXC Proto
 
@@ -98,7 +98,7 @@ for direct
 
 ```
 <groupId>com.hedera</groupId>
-<artifactId>lib-mirror-direct</artifactId>
+<artifactId>hcs-sxc-plugins-mirror-direct</artifactId>
 <version>0.0.3-SNAPSHOT</version>
 ```
 
@@ -106,7 +106,7 @@ for Artemis Message Queue
 
 ```
 <groupId>com.hedera</groupId>
-<artifactId>lib-mirror-queue-artemis</artifactId>
+<artifactId>hcs-sxc-plugins-mirror-queue-artemis</artifactId>
 <version>0.0.3-SNAPSHOT</version>
 ```
 
@@ -118,7 +118,7 @@ for in memory
 
 ```
 <groupId>com.hedera</groupId>
-<artifactId>lib-persistence-in-memory</artifactId>
+<artifactId>hcs-sxc-plugins-persistence-in-memory</artifactId>
 <version>0.0.3-SNAPSHOT</version>
 ```
 
@@ -126,7 +126,7 @@ for in database
 
 ```
 <groupId>com.hedera</groupId>
-<artifactId>lib-persistence-in-h2</artifactId>
+<artifactId>hcs-sxc-plugins-persistence-in-h2</artifactId>
 <version>0.0.3-SNAPSHOT</version>
 ```
 
@@ -167,9 +167,9 @@ queue:
   tcpConnectionFactory: "tcp://hcs-sxc-queue:61616?jms.redeliveryPolicy.initialRedeliveryDelay=0&jms.redeliveryPolicy.backOffMultiplier=1&jms.redeliveryPolicy.maximumRedeliveries=5&jms.redeliveryPolicy.redeliveryDelay=500&jms.redeliveryPolicy.useExponentialBackOff=false"
 ```
 
-### lib-mirror-queue-artemis
+### hcs-sxc-plugins-mirror-queue-artemis
 
-The `queue-config.yaml` file contains the necessary configuration for the `lib-mirror-queue-artemis` component and is found in the `/src/main/resources` of the corresponding java project. A sample file is provided as a starting point.
+The `queue-config.yaml` file contains the necessary configuration for the `hcs-sxc-plugins-mirror-queue-artemis` component and is found in the `/src/main/resources` of the corresponding java project. A sample file is provided as a starting point.
 
 *Note: If a `queue-config.yaml` file is found in the root of the project, it will override the file from `src/main/resources`*
 
@@ -339,7 +339,7 @@ These are merely sample lines of code, please refer to the example projects for 
 
 - Ensure the necessary configuration files are complete and accurate
     - hcs-sxc-relay/src/main/resources/relay-config.yaml (use relay-config.yaml.sample as a starting point)
-    - hcs-sxc-plugins/lib-mirror-queue-artemis/src/main/resources/queue-config.yaml (use queue-config.yaml.sample as a starting point)
+    - hcs-sxc-plugins/hcs-sxc-plugins-mirror-queue-artemis/src/main/resources/queue-config.yaml (use queue-config.yaml.sample as a starting point)
     - hcs-sxc-examples/settlement-demo/src/main/resources/.env (use dotenv.sample as a starting point)
     - hcs-sxc-examples/settlement-demo/src/main/resources/.config.yaml (use config.yaml.sample as a starting point)
     - hcs-sxc-examples/settlement-demo/src/main/resources/docker-compose.yml

@@ -1438,6 +1438,8 @@
                             document.title= thisuserName + ' - Settlements';
                             document.querySelectorAll("#lhs-menu .mdc-list-item").forEach(i=>i.classList.remove('mdc-list-item--activated'));
                             document.querySelector("#lhs-menu .settlements").classList.add("mdc-list-item--activated");
+                            document.querySelector("#lhs-menu .settlements").classList.remove("bold-text-notification");
+                           
                             
                             document.getElementById("header-title").innerHTML = 'Settlements';
                             for(i=0; i < buyerSellersAddress.length; i++){
@@ -1800,7 +1802,6 @@
                 }
 
             }
-            
             
             
             

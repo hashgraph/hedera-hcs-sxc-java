@@ -185,7 +185,6 @@
                                 </paths>
  --> 
                             </extraDirectories>
-                            <mainClass>com.hedera.simple-message-demo.HCSLibCallBackSetup</mainClass>
                         </configuration>
                         <executions>
                             <execution>

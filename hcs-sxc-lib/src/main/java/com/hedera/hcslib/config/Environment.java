@@ -16,6 +16,9 @@ public final class Environment {
     public Environment() {
         this.dotEnv = Dotenv.configure().ignoreIfMissing().load();        
     }
+    public Environment(String fileName) {
+        this.dotEnv = Dotenv.configure().filename(fileName).ignoreIfMissing().load();        
+    }
 
     /** 
      * Returns an Ed25519PrivateKey from the OPERATOR_KEY environment variable

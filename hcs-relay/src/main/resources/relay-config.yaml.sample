@@ -1,11 +1,20 @@
+# Address of the mirror node's subscription end point
 mirrorAddress: "34.66.214.12:6552"
+
+# The frequency (in minutes) at which a subscription to mirror node is restarted
 mirrorReconnectDelay: 10  
+
+# The topic IDs to subscribe to
 topics:
   - topic: "0.0.1044"
+  
+# Should relay catch up with message history on startup
 catchupHistory: true
+
+# Keeps the consensus time of the last received message in this file
 lastConsensusTimeFile: "./lastConsensusTime.txt"
 
+# Connection details to the Artemis MQ component
 queue:
   initialContextFactory: "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
   tcpConnectionFactory: "tcp://hcsqueue:61616?jms.redeliveryPolicy.initialRedeliveryDelay=0&jms.redeliveryPolicy.backOffMultiplier=1&jms.redeliveryPolicy.maximumRedeliveries=5&jms.redeliveryPolicy.redeliveryDelay=500&jms.redeliveryPolicy.useExponentialBackOff=false"
-

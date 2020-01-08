@@ -163,7 +163,7 @@
                         <configuration>
 
                             <to>
-                                <image>hederahashgraph/settlement-demo:latest</image>
+                                <image>hederahashgraph/hcs-sxc-settlement-demo:latest</image>
                                 <tags>
                                     <tag>${project.version}</tag>
                                 </tags>

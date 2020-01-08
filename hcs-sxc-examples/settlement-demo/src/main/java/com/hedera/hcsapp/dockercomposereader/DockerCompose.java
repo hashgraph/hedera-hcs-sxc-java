@@ -32,4 +32,18 @@ public final class DockerCompose {
         }
         return name;
     }
+    public String getPublicKeyForId(long appId) {
+        String name = "not found";
+        for (Map.Entry<String, Service> service : this.services.entrySet()) {
+            Service dockerService = service.getValue();
+            if (dockerService.getEnvironment() != null) {
+                if (dockerService.getEnvironment().containsKey("PUBKEY")) {
+                    if (dockerService.getEnvironment().get("APP_ID").contentEquals(String.valueOf(appId))) {
+                        return dockerService.getContainer_name();
+                    }
+                }
+            }
+        }
+        return name;
+    }
 }

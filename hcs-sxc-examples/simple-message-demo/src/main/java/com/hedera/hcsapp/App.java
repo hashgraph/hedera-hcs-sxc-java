@@ -50,27 +50,30 @@ public final class App {
         while (true) {
             
             // wait for user input
-            System.out.println("Input a message to send to other parties:");
+            System.out.println("Input a message to send to other parties, type exit [RETURN] to exit the application"
+                    + ":");
             String userInput = scan.nextLine();
 
-            scan.close();
-            
-            
+           
             if (userInput.equals("exit")) {
                 scan.close();
                 System.exit(0);
             }
             
-            Boolean messageSuccess;
-            try {
-                new OutboundHCSMessage(hcsLib)
-                    .overrideEncryptedMessages(false)
-                    .overrideMessageSignature(false)
-                    .sendMessage(topicIndex, userInput.getBytes());
-
-                System.out.println("Message sent successfully.");
-            } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
-                log.error(e);
+            if (userInput.isEmpty()) {
+                System.out.println("Please input a message before pressing [RETURN].");
+            } else {
+                Boolean messageSuccess;
+                try {
+                    new OutboundHCSMessage(hcsLib)
+                        .overrideEncryptedMessages(false)
+                        .overrideMessageSignature(false)
+                        .sendMessage(topicIndex, userInput.getBytes());
+    
+                    System.out.println("Message sent successfully.");
+                } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
+                    log.error(e);
+                }
             }
         }            
     }

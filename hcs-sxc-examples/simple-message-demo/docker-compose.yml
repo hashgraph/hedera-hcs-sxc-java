@@ -30,26 +30,6 @@ services:
         restart: on-failure
         networks: [backing-services]
 
-#    player1:
-#      depends_on:
-#        - hcsqueue
-#      image: hederahashgraph/simple-message-demo:latest
-#      restart: always
-#      environment:
-#        - APPID=0
-#      tty: true
-#      networks: [backing-services]
-
-#    player2:
-#      depends_on:
-#        - hcsqueue
-#      image: hederahashgraph/simple-message-demo:latest
-#      restart: always
-#      environment:
-#        - APPID=1
-#      tty: true
-#      networks: [backing-services]
-
 volumes:
   activemq-data: {}
 

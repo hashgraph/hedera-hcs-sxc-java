@@ -7,7 +7,7 @@ services:
     environment:
       APP_ID: 0
       PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6b
-      ROLES: "BUYER,SELLER" 
+      ROLES: "BUYER,SELLER"
       PAYMENT_ACCOUNT_DETAILS: "10-11-12 80640665"
     tty: true
     ports:
@@ -20,86 +20,86 @@ services:
     environment:
       APP_ID: 1
       PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6a
-      ROLES: "BUYER,SELLER" 
+      ROLES: "BUYER,SELLER"
       PAYMENT_ACCOUNT_DETAILS: "13-01-32 79832564"
     tty: true
     ports:
       - 8082:8080
 
-  carlos:
-    container_name: carlos
-    image: hederahashgraph/settlement-demo:latest
-    restart: on-failure
-    environment:
-      APP_ID: 2
-      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6c
-      ROLES: "BUYER,SELLER" 
-      PAYMENT_ACCOUNT_DETAILS: "22-11-14 70925098" 
-    tty: true
-    ports:
-      - 8083:8080
-
-  worldpay:
-    container_name: worldpay
-    image: hederahashgraph/settlement-demo:latest
-    restart: on-failure
-    environment:
-      APP_ID: 3
-      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6d
-      ROLES: "PAYCHANNEL"
-      PAYMENT_ACCOUNT_DETAILS: "12-52-23 26789524"
-    tty: true
-    ports:
-      - 8084:8080
-
-  erica:
-    container_name: erica
-    image: hederahashgraph/settlement-demo:latest
-    restart: on-failure
-    environment:
-      APP_ID: 4
-      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6e
-      ROLES: "BUYER,SELLER"
-      PAYMENT_ACCOUNT_DETAILS: "09-34-21 46324354"
-    tty: true
-    ports:
-      - 8085:8080
-
-  farouk:
-    container_name: farouk
-    image: hederahashgraph/settlement-demo:latest
-    restart: on-failure
-    environment:
-      APP_ID: 5
-      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6f
-      ROLES: "ARBITER,AUDITOR"
-      PAYMENT_ACCOUNT_DETAILS: "10-69-43 86535765"
-    tty: true
-    ports:
-      - 8086:8080
-
-  grace:
-    container_name: grace
-    image: hederahashgraph/settlement-demo:latest
-    restart: on-failure
-    environment:
-      APP_ID: 6
-      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab7a
-      ROLES: "DEMO"
-      PAYMENT_ACCOUNT_DETAILS: "10-32-52 55424452"
-    tty: true
-    ports:
-      - 8087:8080
-
-  stripe:
-    container_name: stripe
-    image: hederahashgraph/settlement-demo:latest
-    restart: on-failure
-    environment:
-      APP_ID: 7
-      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab7b
-      ROLES: "PAYCHANNEL"
-      PAYMENT_ACCOUNT_DETAILS: "10-21-33 98321542"
-    tty: true
-    ports:
-      - 8088:8080
+#  carlos:
+#    container_name: carlos
+#    image: hederahashgraph/settlement-demo:latest
+#    restart: on-failure
+#    environment:
+#      APP_ID: 2
+#      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6c
+#      ROLES: "BUYER,SELLER"
+#      PAYMENT_ACCOUNT_DETAILS: "22-11-14 70925098"
+#    tty: true
+#    ports:
+#      - 8083:8080
+#
+#  worldpay:
+#    container_name: worldpay
+#    image: hederahashgraph/settlement-demo:latest
+#    restart: on-failure
+#    environment:
+#      APP_ID: 3
+#      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6d
+#      ROLES: "PAYCHANNEL"
+#      PAYMENT_ACCOUNT_DETAILS: "12-52-23 26789524"
+#    tty: true
+#    ports:
+#      - 8084:8080
+#
+#  erica:
+#    container_name: erica
+#    image: hederahashgraph/settlement-demo:latest
+#    restart: on-failure
+#    environment:
+#      APP_ID: 4
+#      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6e
+#      ROLES: "BUYER,SELLER"
+#      PAYMENT_ACCOUNT_DETAILS: "09-34-21 46324354"
+#    tty: true
+#    ports:
+#      - 8085:8080
+#
+#  farouk:
+#    container_name: farouk
+#    image: hederahashgraph/settlement-demo:latest
+#    restart: on-failure
+#    environment:
+#      APP_ID: 5
+#      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6f
+#      ROLES: "ARBITER,AUDITOR"
+#      PAYMENT_ACCOUNT_DETAILS: "10-69-43 86535765"
+#    tty: true
+#    ports:
+#      - 8086:8080
+#
+#  grace:
+#    container_name: grace
+#    image: hederahashgraph/settlement-demo:latest
+#    restart: on-failure
+#    environment:
+#      APP_ID: 6
+#      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab7a
+#      ROLES: "DEMO"
+#      PAYMENT_ACCOUNT_DETAILS: "10-32-52 55424452"
+#    tty: true
+#    ports:
+#      - 8087:8080
+#
+#  stripe:
+#    container_name: stripe
+#    image: hederahashgraph/settlement-demo:latest
+#    restart: on-failure
+#    environment:
+#      APP_ID: 7
+#      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab7b
+#      ROLES: "PAYCHANNEL"
+#      PAYMENT_ACCOUNT_DETAILS: "10-21-33 98321542"
+#    tty: true
+#    ports:
+#      - 8088:8080

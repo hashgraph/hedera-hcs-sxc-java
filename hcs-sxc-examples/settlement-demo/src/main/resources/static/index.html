@@ -150,12 +150,7 @@
                                             class="mdc-typography--headline6" style="flex-grow:1">
                                             {{username}}
                                         </span>
-                                        <button 
-                                            id="new-credit-button"
-                                            role="open-new-credit-button-dialog"
-                                            class="mdc-button mdc-button--unelevated">
-                                            new credit
-                                        </button>
+                                        
                                     </div>
                                 </div>
                             </summary>
@@ -167,7 +162,6 @@
                                         <thead>
                                             <tr class="mdc-data-table__header-row">
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col"><button id="settle-now-button" disabled class="mdc-button mdc-button--outlined">Settle</button></th>
-                                                
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">ThreadID</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Payer</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recipient</th>
@@ -215,14 +209,18 @@
                                     </table>
                                 </div>
                             </div>
-                            
+                            <div style="padding: 16px;text-align: right">
+                                <button 
+                                    id="new-credit-button"
+                                    role="open-new-credit-button-dialog"
+                                    class="mdc-button mdc-button--unelevated">
+                                    new credit
+                                </button>
+                            </div>
                         </details>
-                            
                     </div>
                 </template>
-                
                 <template id="settlements-panel" >
-                    
                     <div id="{{username}}" class="panel">
                         <div role="progressbar" class="mdc-linear-progress mdc-linear-progress--indeterminate	mdc-linear-progress--closed" aria-label="Example Progress Bar" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0">
                             <div class="mdc-linear-progress__buffering-dots"></div>
@@ -234,7 +232,6 @@
                               <span class="mdc-linear-progress__bar-inner"></span>
                             </div>
                         </div>      
-                        
                         <details>
                             <summary>
                                 <div class="message-container" style="margin-left:55px; margin-right: 16px;">
@@ -244,7 +241,6 @@
                                             class="mdc-typography--headline6" style="flex-grow:1">
                                             {{username}}
                                         </span>
-                                        
                                     </div>
                                 </div>
                             </summary>
@@ -376,7 +372,7 @@
                     --></h2>
                     <div class="mdc-dialog__content" id="my-dialog-content" >
                         
-                        <div style="display:fex; flex-direction: column">
+                        <div style="display:flex; flex-direction: column">
                             <form id="new-credit-dialog-form">
                                 <div class="mdc-text-field mdc-text-field--full-width">
                                     <input type="text" disabled id="new-credit-recipient"
@@ -454,7 +450,70 @@
 
             </div>
         </div><div class="mdc-dialog-scrim"></div>
+        <script>
+            function openNewCreditDialog(recipient) {
+                
+                /* Functions for the new credit dialog. () */
+                newCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('new-credit-dialog'));
+                event.preventDefault();
+                $newCreditDialog = document.getElementById('new-credit-dialog');
+                /*Clear styles and values to reuse fields*/
+                $newCreditDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
+                    e.parentElement.classList.remove('mdc-text-field--invalid');
+                    e.value='';}
+                );
+                 
+                $newCreditDialog.querySelector("#new-credit-recipient").value = recipient;
+                $newCreditDialog.querySelector("#send-new-credit-dialog-submit").onclick =  function(){
+                        $newCreditDialog = document.getElementById('new-credit-dialog');
+                        /* validate form */
+                        isFormValid = true;
+                        ls = $newCreditDialog.querySelectorAll(".mdc-text-field input");
 
+                        for (i=0; i< ls.length; i++ ){
+                             if (! ls[i].checkValidity()){ls[i].focus();isFormValid=false;break;  }
+
+                        }
+                        if(isFormValid){
+                            postBody = `{
+                                          "payerName"       : "${thisuserName}"
+                                        , "recipientName"   : "${document.getElementById('new-credit-recipient').value}"  
+                                        , "reference"       : "${document.getElementById('new-credit-service-reference').value}"
+                                        , "amount"          : ${document.getElementById('new-credit-amount').value * 1}
+                                        , "currency"        : "USD"
+                                        , "additionalNotes" :"${document.getElementById('new-credit-additional-notes').value}"
+                                        }`;
+
+                            newCreditDialog.close();
+                            el = document.getElementById(recipient);
+                            el.style.opacity=0.4;
+                            el.style.pointerEvents =  'none';
+                            el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
+
+                            showSnackBarMessage("sending new credit to HH Network ...");
+                            fetch('credits', {
+                                method: 'post',
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json'
+                                },
+                                body: postBody
+                            }).then(function(response) {
+                                return response.json();
+                            }).then(function(data) {
+                                showSnackBarMessage("New credit request sent");
+
+                            }).catch(function(res){
+                                alert(res);
+                            });
+                        }      
+                    
+                };
+               
+                newCreditDialog.open();
+                return false;
+            }
+        </script>
         
         <div id="confirm-credit-dialog" 
            
@@ -499,7 +558,45 @@
 
             </div>
         </div><div class="mdc-dialog-scrim"></div>
+        <script>
+            function openConfirmCreditDialog(threadId,otherUserId) {
+                event.preventDefault();
+                confirmCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-credit-dialog'));
+
+                $confirmCreditDialog = document.getElementById('confirm-credit-dialog');
+                $confirmCreditDialog.querySelector("#thread-id").value=threadId;
+                clickFunction = function(){
+                    $confirmCreditDialog = document.getElementById('confirm-credit-dialog');
+                    threadId = $confirmCreditDialog.querySelector("#thread-id").value;
+                    showSnackBarMessage("sending confirmation " + threadId + " ...");
+                    confirmCreditDialog.close();
+
+                    el = document.getElementById(otherUserId);
+                    el.style.opacity=0.4;
+                    el.style.pointerEvents =  'none';
+                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
+
+                    fetch('credits/ack/'+threadId, {
+                            method: 'post',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(function(response) {
+                            return response.json();
+                        }).then(function(data) {
+                            showSnackBarMessage("confirmation sent");
+
+                        }).catch(function(res){
+                            alert(res);
+                        });
         
+                };
+                $confirmCreditDialog.querySelector("#confirm-credit-send").onclick = clickFunction;
+                confirmCreditDialog.open();
+                return false;
+            }
+        </script>
         
         <div id="confirm-settlement-dialog" 
             class="mdc-dialog"
@@ -709,7 +806,69 @@
 
             </div>
         </div><div class="mdc-dialog-scrim"></div>
-        
+        <script>
+            function openSelectPaychannelDialog(threadId, userName) {
+                $paychannelDialog = document.getElementById('select-paychannel-dialog');
+                paychannelDialog  = new mdc.dialog.MDCDialog($paychannelDialog);
+                event.preventDefault(); 
+                $paychannelDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
+                    e.parentElement.classList.remove('mdc-text-field--invalid');
+                    e.value='';}
+                );
+                mdcList =  $paychannelDialog.querySelector(".mdc-list");
+                paymentChannels.forEach(c => {
+                    clonedListItem = $paychannelDialog.querySelector("#mdc-list-item-template").content.cloneNode(true);
+                    clonedListItem.querySelector("li").innerHTML=c.name;
+                    clonedListItem.querySelector("li").setAttribute("data-value",c.name);
+                    mdcList.appendChild(clonedListItem);
+                });
+                
+                let selectedPaymentChannelName=paymentChannels[0].name;
+                //$paychannelDialog.querySelector(".mdc-list").classList.add("mdc-list-item--selected");
+                $paychannelDialog.querySelector(".mdc-list").setAttribute("data-value",selectedPaymentChannelName);                
+                $paychannelDialog.querySelector(".mdc-select__selected-text").innerHTML=selectedPaymentChannelName;
+                
+                const mdcSelect  =  new mdc.select.MDCSelect( $paychannelDialog.querySelector(".mdc-select"));
+                
+                mdcSelect.listen('MDCSelect:change', () => {
+                    selectedPaymentChannelName = mdcSelect.value;
+                  });
+                $paychannelDialog.querySelector("#channel-now-send").onclick =  function(){
+                
+                    postBody = `{
+                                 "threadId"          : "${threadId}"
+                                , "paymentChannelName" :"${selectedPaymentChannelName}"
+                                , "additionalNotes" :"${$paychannelDialog.querySelector('#channel-additional-notes').value}"
+                                }`;
+
+                    paychannelDialog.close();
+                    el = document.getElementById(userName);
+                    el.style.opacity=0.4;
+                    el.style.pointerEvents =  'none';
+                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
+
+                    showSnackBarMessage("sending channel details to HH Network ...");
+                    fetch('/settlements/proposechannel', {
+                        method: 'post',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: postBody
+                    }).then(function(response) {
+                        return response.json();
+                    }).then(function(data) {
+                        showSnackBarMessage("New channel proposal sent");
+
+                    }).catch(function(res){
+                        alert(res);
+                    });
+                };
+                
+                paychannelDialog.open();
+                return false;
+            }
+        </script>
         
         <div id="init-pay-dialog" 
            
@@ -1268,6 +1427,7 @@
                             document.title= thisuserName + ' - Credits and Debits';
                             document.querySelectorAll("#lhs-menu .mdc-list-item").forEach(i=>i.classList.remove('mdc-list-item--activated'));
                             document.querySelector("#lhs-menu .credits-and-debits").classList.add("mdc-list-item--activated");
+                            document.querySelector("#lhs-menu .credits-and-debits").classList.remove("bold-text-notification");
                             document.getElementById("header-title").innerHTML = 'Outstanding Credits and Debits';
                             for(i=0; i < buyerSellersAddress.length; i++){
                                 var userName = buyerSellersAddress[i].name;
@@ -1642,135 +1802,9 @@
             }
             
             
-            function openNewCreditDialog(recipient) {
-                
-                /* Functions for the new credit dialog. () */
-                newCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('new-credit-dialog'));
-                
-                
-                event.preventDefault();
-                
-                $newCreditDialog = document.getElementById('new-credit-dialog');
-                /*Clear styles and values to reuse fields*/
-                $newCreditDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
-                    e.parentElement.classList.remove('mdc-text-field--invalid');
-                    e.value='';}
-                );
-                 
-                $newCreditDialog.querySelector("#new-credit-recipient").value = recipient;
-                
-                $newCreditDialog.querySelector("#send-new-credit-dialog-submit").onclick =  function(){
-                        $newCreditDialog = document.getElementById('new-credit-dialog');
-                        /* validate form */
-                        isFormValid = true;
-                        ls = $newCreditDialog.querySelectorAll(".mdc-text-field input");
-
-                        for (i=0; i< ls.length; i++ ){
-                             if (! ls[i].checkValidity()){ls[i].focus();isFormValid=false;break;  }
-
-                        }
-                        if(isFormValid){
-                            postBody = `{
-                                          "payerName"       : "${thisuserName}"
-                                        , "recipientName"   : "${document.getElementById('new-credit-recipient').value}"  
-                                        , "reference"       : "${document.getElementById('new-credit-service-reference').value}"
-                                        , "amount"          : ${document.getElementById('new-credit-amount').value * 1}
-                                        , "currency"        : "USD"
-                                        , "additionalNotes" :"${document.getElementById('new-credit-additional-notes').value}"
-                                        }`;
-
-                            newCreditDialog.close();
-                            el = document.getElementById(recipient);
-                            el.style.opacity=0.4;
-                            el.style.pointerEvents =  'none';
-                            el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
-
-                            showSnackBarMessage("sending new credit to HH Network ...");
-                            fetch('credits', {
-                                method: 'post',
-                                headers: {
-                                    'Accept': 'application/json',
-                                    'Content-Type': 'application/json'
-                                },
-                                body: postBody
-                            }).then(function(response) {
-                                return response.json();
-                            }).then(function(data) {
-                                showSnackBarMessage("New credit request sent");
-
-                            }).catch(function(res){
-                                alert(res);
-                            });
-                        }      
-                    
-                };
-               
-                newCreditDialog.open();
-                return false;
-            }
+            
             
            
-            function openSelectPaychannelDialog(threadId, userName) {
-                $paychannelDialog = document.getElementById('select-paychannel-dialog');
-                paychannelDialog  = new mdc.dialog.MDCDialog($paychannelDialog);
-                event.preventDefault(); 
-                $paychannelDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
-                    e.parentElement.classList.remove('mdc-text-field--invalid');
-                    e.value='';}
-                );
-                mdcList =  $paychannelDialog.querySelector(".mdc-list");
-                paymentChannels.forEach(c => {
-                    clonedListItem = $paychannelDialog.querySelector("#mdc-list-item-template").content.cloneNode(true);
-                    clonedListItem.querySelector("li").innerHTML=c.name;
-                    clonedListItem.querySelector("li").setAttribute("data-value",c.name);
-                    mdcList.appendChild(clonedListItem);
-                });
-                
-                let selectedPaymentChannelName=paymentChannels[0].name;
-                //$paychannelDialog.querySelector(".mdc-list").classList.add("mdc-list-item--selected");
-                $paychannelDialog.querySelector(".mdc-list").setAttribute("data-value",selectedPaymentChannelName);                
-                $paychannelDialog.querySelector(".mdc-select__selected-text").innerHTML=selectedPaymentChannelName;
-                
-                const mdcSelect  =  new mdc.select.MDCSelect( $paychannelDialog.querySelector(".mdc-select"));
-                
-                mdcSelect.listen('MDCSelect:change', () => {
-                    selectedPaymentChannelName = mdcSelect.value;
-                  });
-                $paychannelDialog.querySelector("#channel-now-send").onclick =  function(){
-                
-                    postBody = `{
-                                 "threadId"          : "${threadId}"
-                                , "paymentChannelName" :"${selectedPaymentChannelName}"
-                                , "additionalNotes" :"${$paychannelDialog.querySelector('#channel-additional-notes').value}"
-                                }`;
-
-                    paychannelDialog.close();
-                    el = document.getElementById(userName);
-                    el.style.opacity=0.4;
-                    el.style.pointerEvents =  'none';
-                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
-
-                    showSnackBarMessage("sending channel details to HH Network ...");
-                    fetch('/settlements/proposechannel', {
-                        method: 'post',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: postBody
-                    }).then(function(response) {
-                        return response.json();
-                    }).then(function(data) {
-                        showSnackBarMessage("New channel proposal sent");
-
-                    }).catch(function(res){
-                        alert(res);
-                    });
-                };
-                
-                paychannelDialog.open();
-                return false;
-            }
             
             function openPaySentDialog(threadId, userName) {
                 $paySentDialog = document.getElementById('pay-sent-dialog');
@@ -1954,14 +1988,17 @@
                 settlementCompletedDialog.open();
                 return false;
             }
-            
+                
+                
+                
         
-            function openAcceptPaychannelDialog (threadId, otherUserId,channelName){
+            function openAcceptPaychannelDialog (threadId, otherUserId, channelName){
                 event.preventDefault();
                 confirmChannelDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-pay-channel-dialog'));
 
                 $confirmChannelDialog = document.getElementById('confirm-pay-channel-dialog');
                 $confirmChannelDialog.querySelector("#channel-name").value=channelName;
+                
                 clickFunction = function(){
                    
                     showSnackBarMessage("sending confirmation " + threadId + " ...");
@@ -2143,43 +2180,7 @@
             }
             
             
-            function openConfirmCreditDialog(threadId,otherUserId) {
-                event.preventDefault();
-                confirmCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-credit-dialog'));
-
-                $confirmCreditDialog = document.getElementById('confirm-credit-dialog');
-                $confirmCreditDialog.querySelector("#thread-id").value=threadId;
-                clickFunction = function(){
-                    $confirmCreditDialog = document.getElementById('confirm-credit-dialog');
-                    threadId = $confirmCreditDialog.querySelector("#thread-id").value;
-                    showSnackBarMessage("sending confirmation " + threadId + " ...");
-                    confirmCreditDialog.close();
-
-                    el = document.getElementById(otherUserId);
-                    el.style.opacity=0.4;
-                    el.style.pointerEvents =  'none';
-                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
-
-                    fetch('credits/ack/'+threadId, {
-                            method: 'post',
-                            headers: {
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json'
-                            }
-                        }).then(function(response) {
-                            return response.json();
-                        }).then(function(data) {
-                            showSnackBarMessage("confirmation sent");
-
-                        }).catch(function(res){
-                            alert(res);
-                        });
-        
-                };
-                $confirmCreditDialog.querySelector("#confirm-credit-send").onclick = clickFunction;
-                confirmCreditDialog.open();
-                return false;
-            }
+            
             
             function openConfirmSettlementDialog(threadId,otherUserId) {
                 event.preventDefault();
@@ -2389,6 +2390,10 @@
                 notifyUi = messageOutput.context;
                 switch (notifyUi) {
                     case "credits":  
+                        if(location.hash !== '#credits-and-debits'){
+                            document.querySelector("a.credits-and-debits").classList.add("bold-text-notification");
+                        }
+                        
                         if(location.hash === '#settlements'){
                             await renderSettlementsPanel(
                                    messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
@@ -2408,6 +2413,10 @@
                         
                         break;
                     case "settlements":
+                        if(location.hash !== '#settlements'){
+                            document.querySelector("a.settlements").classList.add("bold-text-notification");
+                        }
+                        
                         if(location.hash === '#settlements'){
                             await renderSettlementsPanel(
                                    messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   

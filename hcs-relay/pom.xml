@@ -19,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>com.hedera</groupId>
-            <artifactId>hcs-lib</artifactId>
+            <artifactId>hcs-sxc-lib</artifactId>
             <version>${hcslib.version}</version>
         </dependency>
         <dependency>

@@ -11,9 +11,9 @@
         <version>0.0.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>hcs-lib</artifactId>
+    <artifactId>hcs-sxc-lib</artifactId>
 
-    <name>hcs-lib</name>
+    <name>hcs-sxc-lib</name>
     <description>HCS Library</description>
 
     <dependencies>

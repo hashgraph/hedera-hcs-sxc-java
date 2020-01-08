@@ -262,7 +262,7 @@
     </plugins>
   </build>
     <modules>
-      <module>hcs-lib</module>
+      <module>hcs-sxc-lib</module>
       <module>hcs-relay</module>
       <module>hcs-sxc-interfaces</module>
       <module>hcs-sxc-examples</module>

@@ -39,8 +39,8 @@ Looking through the java project, we have the following Maven components/artifac
     * hcs-sxc-relay
     * hcs-sxc-interfaces
     * hcs-sxc-examples
-        * simple-message-demo
-        * settlement-demo
+        * hcs-sxc-simple-message-demo
+        * hcs-sxc-settlement-demo
     * hcs-sxc-proto
     * hcs-sxc-plugins
         * hcs-sxc-plugins-persistence-in-memory
@@ -239,7 +239,7 @@ The `OPERATOR_KEY` is the private key of the account identified by `OPERATOR_ID`
 
 ## Docker
 
-Docker is a convenient way of starting a number of individual components, we use it extensively in the `settlement-demo` example, but also to start up the `hcs-sxc-relay` and `Artemis MQ` components when necessary. Below is an example `docker-compose.yml` file for this purpose. You may wish to extend it with your own application-specific images if necessary.
+Docker is a convenient way of starting a number of individual components, we use it extensively in the `hcs-sxc-settlement-demo` example, but also to start up the `hcs-sxc-relay` and `Artemis MQ` components when necessary. Below is an example `docker-compose.yml` file for this purpose. You may wish to extend it with your own application-specific images if necessary.
 
 ```
 version: '3.3'
@@ -340,12 +340,12 @@ These are merely sample lines of code, please refer to the example projects for 
 - Ensure the necessary configuration files are complete and accurate
     - hcs-sxc-relay/src/main/resources/relay-config.yaml (use relay-config.yaml.sample as a starting point)
     - hcs-sxc-plugins/hcs-sxc-plugins-mirror-queue-artemis/src/main/resources/queue-config.yaml (use queue-config.yaml.sample as a starting point)
-    - hcs-sxc-examples/settlement-demo/src/main/resources/.env (use dotenv.sample as a starting point)
-    - hcs-sxc-examples/settlement-demo/src/main/resources/.config.yaml (use config.yaml.sample as a starting point)
-    - hcs-sxc-examples/settlement-demo/src/main/resources/docker-compose.yml
-    - hcs-sxc-examples/simple-message-demo/src/main/resources/apps.yaml (use apps.yaml.sample as a starting point)
-    - hcs-sxc-examples/simple-message-demo/src/main/resources/config.yaml (use config.yaml.sample as a starting point)
-    - hcs-sxc-examples/simple-message-demo/docker-compose.yml
+    - hcs-sxc-examples/hcs-sxc-settlement-demo/src/main/resources/.env (use dotenv.sample as a starting point)
+    - hcs-sxc-examples/hcs-sxc-settlement-demo/src/main/resources/.config.yaml (use config.yaml.sample as a starting point)
+    - hcs-sxc-examples/hcs-sxc-settlement-demo/src/main/resources/docker-compose.yml
+    - hcs-sxc-examples/hcs-sxc-simple-message-demo/src/main/resources/apps.yaml (use apps.yaml.sample as a starting point)
+    - hcs-sxc-examples/hcs-sxc-simple-message-demo/src/main/resources/config.yaml (use config.yaml.sample as a starting point)
+    - hcs-sxc-examples/hcs-sxc-simple-message-demo/docker-compose.yml
 
 #### Compile docker images
 
@@ -371,9 +371,9 @@ You may also need to setup environment variables to match those in the `.env` an
 
 ## Examples
 
-The project comes with two examples to get you started, these are fully functional examples. The first `simple-message-demo` is a simple command line example where running two instances of the application side by side, you can witness that a message sent from one app is reflected in the other. The first app sends the message to Hedera and the second receives it via a subscription to a mirror node. The opposite also works. The second example `settlement-demo` is a more complex application which is based on spring boot with a web UI. Each instance of the application represents a participant in a settlement use case where participants can issue credit notes to each other, approve them, group them to reach a settlement amount, employ a third party to effect the payment and finally both original parties confirm the payment was completed. In addition to this, an audit log is provided so that the full history of messages between participants can be consulted.
+The project comes with two examples to get you started, these are fully functional examples. The first `hcs-sxc-simple-message-demo` is a simple command line example where running two instances of the application side by side, you can witness that a message sent from one app is reflected in the other. The first app sends the message to Hedera and the second receives it via a subscription to a mirror node. The opposite also works. The second example `hcs-sxc-settlement-demo` is a more complex application which is based on spring boot with a web UI. Each instance of the application represents a participant in a settlement use case where participants can issue credit notes to each other, approve them, group them to reach a settlement amount, employ a third party to effect the payment and finally both original parties confirm the payment was completed. In addition to this, an audit log is provided so that the full history of messages between participants can be consulted.
 
-### Simple-message-demo
+### hcs-sxc-simple-message-demo
 
 This is a simple messaging demo between two participants. All messages sent from one participant are pushed to the Hedera HCS service and each participant subscribes to a mirror node to receive the consensus messages.
 
@@ -391,7 +391,7 @@ OPERATOR_ID=0.0.2
 
 This demo uses the queue and relay components.
 
-Compile the project (see above) and open three console terminals and switch to the folder/directory containing the `simple-message-demo` example on your computer.
+Compile the project (see above) and open three console terminals and switch to the folder/directory containing the `hcs-sxc-simple-message-demo` example on your computer.
 
 In the first, run the docker images for the queue and relay.
 
@@ -427,7 +427,7 @@ typing text and pressing `[RETURN]` should result in the message appearing in th
 
 Both applications see the sent message, this is because both applications subscribe to mirror node notifications on topic and the sender essentially receives its own messages as well as those from others.
 
-### Settlement-demo
+### hcs-sxc-settlement-demo
 
 This is a more complex application which is based on spring boot with a web UI. Each instance of the application represents a participant in a settlement use case where participants can issue credit notes to each other, approve them, group them to reach a settlement amount, employ a third party to effect the payment and finally both original parties confirm the payment was completed. In addition to this, an audit log is provided so that the full history of messages between participants can be consulted.
 
@@ -443,9 +443,9 @@ OPERATOR_ID=0.0.2
 APP_ID=0
 ```
 
-This demo does not use the queue and relay components, although it's possible to enable them by modifying the `pom.xml` file of the `settlement-demo` project to include them, they will also need to run as docker containers.
+This demo does not use the queue and relay components, although it's possible to enable them by modifying the `pom.xml` file of the `hcs-sxc-settlement-demo` project to include them, they will also need to run as docker containers.
 
-Compile the project (see above) and open a console terminal and switch to the folder/directory containing the `settlement-demo` example on your computer.
+Compile the project (see above) and open a console terminal and switch to the folder/directory containing the `hcs-sxc-settlement-demo` example on your computer.
 
 Then switch to `src/main/resources` and run the docker images as follows
 
@@ -453,7 +453,7 @@ Then switch to `src/main/resources` and run the docker images as follows
 docker-compose -f docker-compose-direct.yml up --remove-orphans
 ```
 
-once the components are up and running (this may take a while), you can navigate to the UIs of the respective application users. Note: An instance of the `settlement-demo` application is run for each of the users and offered up on a separate http port.
+once the components are up and running (this may take a while), you can navigate to the UIs of the respective application users. Note: An instance of the `hcs-sxc-settlement-demo` application is run for each of the users and offered up on a separate http port.
 
 You can see all the participants by navigating to one of the application's landing page
 

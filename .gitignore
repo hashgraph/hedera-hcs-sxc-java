@@ -40,8 +40,8 @@ hcs-sxc-lib/.project
 hcs-sxc-lib/.settings
 hcs-sxc-lib/bin
 
-hcs-sxc-examples/simple-message-demo/.settings
-hcs-sxc-examples/simple-message-demo/.project
+hcs-sxc-examples/hcs-sxc-simple-message-demo/.settings
+hcs-sxc-examples/hcs-sxc-simple-message-demo/.project
 hcs-sxc-examples/.settings
 hcs-sxc-plugins/.settings/org.eclipse.core.resources.prefs
 /hcs-sxc-lib/nbproject/
@@ -50,16 +50,13 @@ nb-configuration.xml
 org.eclipse.jdt.core.prefs
 /hcs-sxc-proto/.settings
 /hcs-sxc-plugins/hcs-sxc-plugins-persistence-in-memory/.settings
-/hcs-sxc-examples/settlement-demo/target
-hcs-sxc-examples/settlement-demo/h2data/settlement-demo.mv.db
-hcs-sxc-examples/settlement-demo/h2data/settlement-demo.trace.db
+/hcs-sxc-examples/hcs-sxc-settlement-demo/target
+hcs-sxc-examples/hcs-sxc-settlement-demo/h2data
 /nbactions.xml
-hcs-sxc-examples/settlement-demo/h2data/libdb.mv.db
 hcs-sxc-plugins/hcs-sxc-plugins-persistence-in-db/target
 hcs-sxc-plugins/hcs-sxc-plugins-mirror-direct/target
 hcs-sxc-plugins/hcs-sxc-plugins-mirror-queue-artemis/target
-hcs-sxc-examples/settlement-demo/h2data/libdb.trace.db
-/hcs-sxc-examples/settlement-demo/nbactions-fatjar.xml
-/hcs-sxc-examples/settlement-demo/nbactions.xml
+/hcs-sxc-examples/hcs-sxc-settlement-demo/nbactions-fatjar.xml
+/hcs-sxc-examples/hcs-sxc-settlement-demo/nbactions.xml
 hcs-sxc-plugins/hcs-sxc-plugins-persistence-in-h2/target
-hcs-sxc-examples/settlement-demo/src/main/resources/config.yaml
+hcs-sxc-examples/hcs-sxc-settlement-demo/src/main/resources/config.yaml

@@ -17,7 +17,7 @@
     <description>HCS Library Examples</description>
 
     <modules>
-      <module>simple-message-demo</module>
-      <module>settlement-demo</module>
+      <module>hcs-sxc-simple-message-demo</module>
+      <module>hcs-sxc-settlement-demo</module>
     </modules>
 </project>

@@ -2,6 +2,7 @@ package com.hedera.hcslib.config;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.FileNotFoundException;
@@ -36,15 +37,13 @@ public class ConfigTest extends AbstractConfigTest {
     @Test
     public void loadConfig() throws Exception {
         assertAll(
-                () -> assertTrue(appNet.getSignMessages()),
-                 () -> assertTrue(appNet.getEncryptMessages()),
-                 () -> assertTrue(appNet.getRotateKeys()),
-                 () -> assertEquals(1, appNet.getRotateKeyFrequency()),
+                () -> assertFalse(appNet.getSignMessages()),
+                 () -> assertFalse(appNet.getEncryptMessages()),
+                 () -> assertFalse(appNet.getRotateKeys()),
+                 () -> assertEquals(0, appNet.getRotateKeyFrequency()),
                  () -> assertEquals(2, appNet.getTopics().size()),
-                 () -> assertEquals("0.0.10", appNet.getTopics().get(0).getTopic()),
-                 () -> assertEquals("0.0.11", appNet.getTopics().get(1).getTopic()),
-//                 () -> assertTopicId(0, 0, 10, appNet.getTopicIds().get(0)),
-//                 () -> assertTopicId(0, 0, 11, appNet.getTopicIds().get(1)),
+                 () -> assertEquals("0.0.1072", appNet.getTopics().get(0).getTopic()),
+                 () -> assertEquals("0.0.1088", appNet.getTopics().get(1).getTopic()),
                  () -> assertEquals(2, nodeList.size()),
                  () -> assertEquals("0.testnet.hedera.com:50211", nodeList.get(0).getAddress()),
                  () -> assertEquals("0.0.3", nodeList.get(0).getAccount()),
@@ -53,7 +52,11 @@ public class ConfigTest extends AbstractConfigTest {
                  () -> assertEquals(2, nodeMap.size()),
                  () -> assertEquals("0.testnet.hedera.com:50211", nodeMap.get(AccountId.fromString("0.0.3"))),
                  () -> assertEquals("1.testnet.hedera.com:50211", nodeMap.get(AccountId.fromString("0.0.4"))),
-                 () -> assertEquals(100000000, hcsTransactionFee)
+                 () -> assertEquals(100000000, hcsTransactionFee),
+                 () -> assertEquals("FULL", appNet.getPersistenceLevel().name()),
+                 () -> assertTrue(appNet.getCatchupHistory()),
+                 () -> assertEquals("34.66.214.12:6552", yamlConfig.getMirrorNode().getAddress()),
+                 () -> assertEquals(10, yamlConfig.getMirrorNode().getReconnectDelay())
          );
     }
 }

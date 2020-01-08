@@ -10,6 +10,7 @@ appNet:
   # HCS topics to be used
   topics:
     - topic: 0.0.1072
+    - topic: 0.0.1088
   # Which level of persistence should be used
   persistenceLevel: "FULL"
   # Should history of messages be caught up
@@ -26,12 +27,8 @@ mirrorNode:
 
 # List of Hedera Nodes to send HCS messages to, if more than one is specified, the SDK will randomly choose a node with each transaction
 nodes:
-  - address: 34.66.214.12:50211
+  - address: 0.testnet.hedera.com:50211
+    account: 0.0.3
+  - address: 1.testnet.hedera.com:50211
     account: 0.0.4
-# Commented out due to bug in java SDK
-#  - address: 1.testnet.hedera.com:50211
-#    account: 0.0.4
-#  - address: 2.testnet.hedera.com:50211
-#    account: 0.0.5
-#  - address: 3.testnet.hedera.com:50211
-#    account: 0.0.6
+    

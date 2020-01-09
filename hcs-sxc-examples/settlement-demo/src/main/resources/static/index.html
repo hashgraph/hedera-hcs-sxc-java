@@ -109,7 +109,7 @@
                         <span class="mdc-list-item__text">Audit</span>
                     </a>
                     
-<div role="separator" class="mdc-list-divider"></div>
+                    <div role="separator" class="mdc-list-divider"></div>
 <!--                    <a class="mdc-list-item" href="#" aria-current="page">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">account_box</i>
                         <span class="mdc-list-item__text">Account</span>
@@ -252,6 +252,12 @@
                                             id="settlements-user"
                                             class="mdc-typography--headline6" style="flex-grow:1">
                                             {{username}}
+                                        </span>
+                                        <span
+                                            id="settlements-seen"
+                                            class="material-icons"
+                                            >
+                                            updated
                                         </span>
                                     </div>
                                 </div>
@@ -1540,7 +1546,7 @@
             
             function syntaxHighlight(json) {
                 
-                if (typeof json != 'string') {
+                if (typeof json !== 'string') {
                      json = JSON.stringify(json, undefined, 2);
                 }
                
@@ -1575,6 +1581,14 @@
                 clonedPanelTemplate.querySelector(".panel").id=userName;    
                 clonedPanelTemplate.getElementById("settlements-user").innerHTML = userName;
 
+                clonedPanelTemplate.getElementById("settlements-seen").innerHTML = (notificationList.find(x=>x.payer===userName) === undefined ? '': 'updated');
+                
+                
+                clonedPanelTemplate.querySelector("details").addEventListener("toggle", e => {
+                    o = notificationList.find(x=>x.payer===userName);
+                    notificationList = notificationList.filter(x=>x!==o);
+                    document.querySelector("#"+userName+" #settlements-seen").innerHTML ='';
+                });
                 var tableBody = clonedPanelTemplate.getElementById("settlement-table-body");
                 var tableBodyTemplate = clonedPanelTemplate.getElementById("settlement-table-body-template");
 

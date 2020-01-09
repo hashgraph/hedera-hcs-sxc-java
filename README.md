@@ -30,6 +30,13 @@ These components use the Hedera Java SDK to communicate with Hedera's HCS servic
 - Application Message - a message sent between AppNet participants using a standard envelope (the message itself may be broken up into several HCS transactions if too large)
 - Business Process Message - an AppNet specific message which is sent to other participants inside an Application Message
 
+## The anatomy of an app with HCS SXC
+
+TBD
+* messaging
+* persistence
+* ...
+
 ## Components
 
 Looking through the java project, we have the following Maven components/artifacts.

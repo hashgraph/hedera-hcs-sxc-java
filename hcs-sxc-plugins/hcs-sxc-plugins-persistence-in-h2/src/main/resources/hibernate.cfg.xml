@@ -28,8 +28,8 @@
         <property name="hbm2ddl.auto">update</property>
 
         
-        <mapping class="com.hedera.plugin.persistence.entities.HCSApplicationMessage" />
-        <mapping class="com.hedera.plugin.persistence.entities.HCSTransaction" />
-        <mapping class="com.hedera.plugin.persistence.entities.MirrorResponse" />
+        <mapping class="com.hedera.hcs.sxc.plugin.persistence.entities.HCSApplicationMessage" />
+        <mapping class="com.hedera.hcs.sxc.plugin.persistence.entities.HCSTransaction" />
+        <mapping class="com.hedera.hcs.sxc.plugin.persistence.entities.MirrorResponse" />
     </session-factory>
 </hibernate-configuration>

@@ -1,6 +1,5 @@
 package com.hedera.hcs.sxc.interfaces;
 
-
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessage;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;

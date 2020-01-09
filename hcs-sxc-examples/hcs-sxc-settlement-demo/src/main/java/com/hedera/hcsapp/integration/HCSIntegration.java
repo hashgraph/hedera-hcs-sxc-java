@@ -11,7 +11,6 @@ import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
-import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
 import com.hedera.hcs.sxc.interfaces.HCSResponse;
 import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
@@ -65,7 +64,7 @@ public class HCSIntegration {
     public HCSIntegration() throws Exception {
         this.appData = new AppData();
         // create a callback object to receive the message
-        OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(appData.getHCSCore());
+        OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(this.appData.getHCSCore());
         onHCSMessageCallback.addObserver(hcsMessage -> {
             processHCSMessage(hcsMessage);
         });
@@ -331,8 +330,7 @@ public class HCSIntegration {
     }
     
     private void deleteData() {
-        HCSCore hcsCore = appData.getHCSCore();
-        SxcMessagePersistence persistence = hcsCore.getMessagePersistence();
+        SxcMessagePersistence persistence = this.appData.getHCSCore().getMessagePersistence();
 
         persistence.clear();
         

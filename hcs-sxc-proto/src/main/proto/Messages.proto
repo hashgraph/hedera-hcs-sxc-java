@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package proto;
 
-option java_package = "com.hedera.hcslib.proto.java";
+option java_package = "com.hedera.hcs.sxc.proto.java";
 option java_multiple_files = true;
 
 message AccountID {
@@ -21,7 +21,7 @@ message Timestamp {
     int32 nanos = 2; // Number of nanoseconds since the start of the last second
 }
 
-// a complete message containing data provided by an app to the library
+// a complete message containing data provided by an app to the core component
 message ApplicationMessage {
     ApplicationMessageId applicationMessageId = 1;
     bytes businessProcessMessage = 2;

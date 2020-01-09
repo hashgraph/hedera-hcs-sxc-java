@@ -14,10 +14,10 @@
     <packaging>pom</packaging>
 
     <name>hcs-sxc-examples</name>
-    <description>HCS Library Examples</description>
+    <description>HCS SXC Examples Examples</description>
 
     <modules>
-      <module>simple-message-demo</module>
-      <module>settlement-demo</module>
+      <module>hcs-sxc-simple-message-demo</module>
+      <module>hcs-sxc-settlement-demo</module>
     </modules>
 </project>

@@ -3,6 +3,9 @@ package com.hedera.hcsapp.controllers;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hcs.sxc.HCSCore;
+import com.hedera.hcs.sxc.interfaces.SxcConsensusMessage;
+import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.entities.Credit;
@@ -15,12 +18,9 @@ import com.hedera.hcsapp.restclasses.AuditHCSMessage;
 import com.hedera.hcsapp.restclasses.AuditHCSMessages;
 import com.hedera.hcsapp.restclasses.AuditThreadId;
 import com.hedera.hcsapp.restclasses.AuditThreadIds;
-import com.hedera.hcslib.HCSLib;
-import com.hedera.hcslib.interfaces.LibConsensusMessage;
-import com.hedera.hcslib.interfaces.LibMessagePersistence;
-import com.hedera.hcslib.proto.java.ApplicationMessage;
-import com.hedera.hcslib.proto.java.ApplicationMessageChunk;
-import com.hedera.hcslib.proto.java.ApplicationMessageId;
+import com.hedera.hcs.sxc.proto.java.ApplicationMessage;
+import com.hedera.hcs.sxc.proto.java.ApplicationMessageChunk;
+import com.hedera.hcs.sxc.proto.java.ApplicationMessageId;
 
 import lombok.extern.log4j.Log4j2;
 import proto.SettlementBPM;
@@ -69,7 +69,7 @@ public class AuditController {
                     credit.getThreadId()
                     , "Credit"
                     , States.valueOf(credit.getStatus()).getDisplayForCredit()
-                    , appData.getHCSLib().getTopicIds().get(appData.getTopicIndex()).toString()
+                    , appData.getHCSCore().getTopicIds().get(appData.getTopicIndex()).toString()
                     , credit.getCreatedDate()
                     , credit.getCreatedTime()
                 )
@@ -81,7 +81,7 @@ public class AuditController {
                     settlement.getThreadId()
                     , "Settlement"
                     , States.valueOf(settlement.getStatus()).getDisplayForSettlement()
-                    , appData.getHCSLib().getTopicIds().get(appData.getTopicIndex()).toString()
+                    , appData.getHCSCore().getTopicIds().get(appData.getTopicIndex()).toString()
                     , settlement.getCreatedDate()
                     , settlement.getCreatedTime()
                 )
@@ -108,8 +108,8 @@ public class AuditController {
         headers.add("Content-Type", "application/json");
 
         AuditApplicationMessages auditApplicationMessages = new AuditApplicationMessages();
-        HCSLib hcsLib = appData.getHCSLib();
-        LibMessagePersistence persistence = hcsLib.getMessagePersistence();
+        HCSCore hcsCore = appData.getHCSCore();
+        SxcMessagePersistence persistence = hcsCore.getMessagePersistence();
         
         
         Map<String, ApplicationMessage> applicationMessages = persistence.getApplicationMessages();
@@ -135,12 +135,12 @@ public class AuditController {
         headers.add("Content-Type", "application/json");
 
         AuditHCSMessages auditHCSMessages = new AuditHCSMessages();
-        HCSLib hcsLib = appData.getHCSLib();
-        LibMessagePersistence persistence = hcsLib.getMessagePersistence();
+        HCSCore hcsCore = appData.getHCSCore();
+        SxcMessagePersistence persistence = hcsCore.getMessagePersistence();
 
-        Map<String, LibConsensusMessage> mirrorResponses = persistence.getMirrorResponses();
+        Map<String, SxcConsensusMessage> mirrorResponses = persistence.getMirrorResponses();
 
-        for (Map.Entry<String, LibConsensusMessage> mirrorResponse : mirrorResponses.entrySet()) {
+        for (Map.Entry<String, SxcConsensusMessage> mirrorResponse : mirrorResponses.entrySet()) {
             
             try {
                 ApplicationMessageChunk chunk = ApplicationMessageChunk.parseFrom(mirrorResponse.getValue().getMessage());

@@ -32,20 +32,21 @@ hcs-sxc-relay/bin
 hcs-sxc-relay/.project
 hcs-sxc-relay/.settings
 
-hcs-sxc-lib/.idea/
-hcs-sxc-lib/target/
-hcs-sxc-lib/hcslib.iml
-hcs-sxc-lib/.classpath
-hcs-sxc-lib/.project
-hcs-sxc-lib/.settings
-hcs-sxc-lib/bin
+hcs-sxc-core/.idea/
+hcs-sxc-core/target/
+hcs-sxc-core/hcslib.iml
+hcs-sxc-core/hcscore.iml
+hcs-sxc-core/.classpath
+hcs-sxc-core/.project
+hcs-sxc-core/.settings
+hcs-sxc-core/bin
 
 hcs-sxc-examples/hcs-sxc-simple-message-demo/.settings
 hcs-sxc-examples/hcs-sxc-simple-message-demo/.project
 hcs-sxc-examples/.settings
 hcs-sxc-plugins/.settings/org.eclipse.core.resources.prefs
-/hcs-sxc-lib/nbproject/
-/hcs-sxc-lib/nb-configuration.xml
+/hcs-sxc-core/nbproject/
+/hcs-sxc-core/nb-configuration.xml
 nb-configuration.xml
 org.eclipse.jdt.core.prefs
 /hcs-sxc-proto/.settings

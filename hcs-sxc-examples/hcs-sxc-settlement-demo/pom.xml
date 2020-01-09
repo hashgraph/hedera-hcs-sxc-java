@@ -39,8 +39,8 @@
         </dependency>
         <dependency>
             <groupId>com.hedera</groupId>
-            <artifactId>hcs-sxc-lib</artifactId>
-            <version>${hcslib.version}</version>
+            <artifactId>hcs-sxc-core</artifactId>
+            <version>${hcs-sxc-core.version}</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -71,7 +71,7 @@
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-interfaces</artifactId>
-            <version>${hcslib.version}</version>
+            <version>${hcs-sxc-interfaces.version}</version>
         </dependency>
 
         <!-- PLUGINS -->

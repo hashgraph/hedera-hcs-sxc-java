@@ -31,12 +31,12 @@
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-proto</artifactId>
-            <version>${hcslib.version}</version>
+            <version>${hcs-sxc-proto.version}</version>
         </dependency>
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-interfaces</artifactId>
-            <version>${hcslib.version}</version>
+            <version>${hcs-sxc-interfaces.version}</version>
         </dependency>
     </dependencies>
 

@@ -19,8 +19,8 @@
     <dependencies>
         <dependency>
             <groupId>com.hedera</groupId>
-            <artifactId>hcs-sxc-lib</artifactId>
-            <version>${hcslib.version}</version>
+            <artifactId>hcs-sxc-core</artifactId>
+            <version>${hcs-sxc-core.version}</version>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
@@ -65,7 +65,7 @@
                                     <path>src/main/resources</path>
                                 </paths>
                             </extraDirectories>
-                            <mainClass>com.hedera.hcssxcrelay.Launch</mainClass>
+                            <mainClass>com.hedera.hcs.sxc.relay.Launch</mainClass>
                         </configuration>
                         <executions>
                             <execution>

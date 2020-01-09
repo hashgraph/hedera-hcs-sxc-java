@@ -3,6 +3,7 @@ package com.hedera.hcsapp.controllers;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.Utils;
@@ -11,7 +12,6 @@ import com.hedera.hcsapp.repository.AddressBookRepository;
 import com.hedera.hcsapp.repository.CreditRepository;
 import com.hedera.hcsapp.restclasses.CreditProposal;
 import com.hedera.hcsapp.restclasses.CreditRest;
-import com.hedera.hcslib.consensus.OutboundHCSMessage;
 
 import lombok.extern.log4j.Log4j2;
 import proto.CreditAckBPM;
@@ -98,7 +98,7 @@ public class CreditsController {
                 log.error("Credit state is already CREDIT_AGREED");
             }
 
-            TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib())
+            TransactionId transactionId = new OutboundHCSMessage(appData.getHCSCore())
                   .overrideEncryptedMessages(false)
                   .overrideMessageSignature(false)
                   .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
@@ -144,7 +144,7 @@ public class CreditsController {
                 .build();
 
         try {
-            TransactionId transactionId = new TransactionId(appData.getHCSLib().getOperatorAccountId());
+            TransactionId transactionId = new TransactionId(appData.getHCSCore().getOperatorAccountId());
 
             Credit credit = new Credit();
             // copy data from new credit
@@ -172,7 +172,7 @@ public class CreditsController {
             }
             
             credit = creditRepository.save(credit);
-            new OutboundHCSMessage(appData.getHCSLib())
+            new OutboundHCSMessage(appData.getHCSCore())
                   .overrideEncryptedMessages(false)
                   .overrideMessageSignature(false)
                   .withFirstTransactionId(transactionId)

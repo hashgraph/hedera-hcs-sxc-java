@@ -4,18 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcsapp.appconfig.AppClient;
 import com.hedera.hcsapp.dockercomposereader.DockerCompose;
 import com.hedera.hcsapp.dockercomposereader.DockerComposeReader;
 import com.hedera.hcsapp.dockercomposereader.Service;
-import com.hedera.hcslib.HCSLib;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public final class AppData {
-    private static HCSLib hcsLib;
+    private static HCSCore hcsCore;
     private int topicIndex = 0; // refers to the first topic ID in the config.yaml
     private String privateKey = "";
     private String publicKey = "";
@@ -47,7 +47,7 @@ public final class AppData {
         DockerCompose dockerCompose = DockerComposeReader.parse();
 
         this.appId = Long.parseLong(dotEnv.get("APP_ID"));
-        AppData.hcsLib = new HCSLib(appId);
+        AppData.hcsCore = new HCSCore(appId);
         this.privateKey = dotEnv.get("OPERATOR_KEY");
         this.publicKey = dockerCompose.getPublicKeyForId(this.appId);
         this.userName = dockerCompose.getNameForId(this.appId);
@@ -70,8 +70,8 @@ public final class AppData {
 
     }
 
-    public HCSLib getHCSLib() {
-        return AppData.hcsLib;
+    public HCSCore getHCSCore() {
+        return AppData.hcsCore;
     }
     public long getAppId() {
         return this.appId;

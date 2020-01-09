@@ -3,13 +3,14 @@ package com.hedera.hcsapp.controllers;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.repository.AddressBookRepository;
 import com.hedera.hcsapp.repository.CreditRepository;
 import com.hedera.hcsapp.repository.SettlementItemRepository;
 import com.hedera.hcsapp.repository.SettlementRepository;
-import com.hedera.hcslib.consensus.OutboundHCSMessage;
+
 import lombok.extern.log4j.Log4j2;
 
 import proto.AdminDeleteBPM;
@@ -59,7 +60,7 @@ public class AdminController {
                 .setAdminDelete(adminDeleteBPM)
                 .build();
         try {
-            new OutboundHCSMessage(appData.getHCSLib())
+            new OutboundHCSMessage(appData.getHCSCore())
                 .overrideEncryptedMessages(false)
                 .overrideMessageSignature(false)
                 .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
@@ -84,7 +85,7 @@ public class AdminController {
                 .setAdminStashDatabaseBPM(adminStashDatabaseBPM)
                 .build();
         try {
-            new OutboundHCSMessage(appData.getHCSLib())
+            new OutboundHCSMessage(appData.getHCSCore())
                 .overrideEncryptedMessages(false)
                 .overrideMessageSignature(false)
                 .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
@@ -107,7 +108,7 @@ public class AdminController {
                 .setAdminStashPopDatabaseBPM(adminStashPopDatabaseBPM)
                 .build();
         try {
-            new OutboundHCSMessage(appData.getHCSLib())
+            new OutboundHCSMessage(appData.getHCSCore())
                 .overrideEncryptedMessages(false)
                 .overrideMessageSignature(false)
                 .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());

@@ -2,9 +2,9 @@ package com.hedera.hcsapp;
 
 import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
-import com.hedera.hcslib.HCSLib;
-import com.hedera.hcslib.callback.OnHCSMessageCallback;
-import com.hedera.hcslib.consensus.OutboundHCSMessage;
+import com.hedera.hcs.sxc.HCSCore;
+import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
+import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.log4j.Log4j2;
@@ -33,7 +33,7 @@ public final class App {
         // Simplest setup and send
         Config config = new Config();
         Dotenv dotEnv = Dotenv.configure().ignoreIfMissing().load();
-        HCSLib hcsLib = new HCSLib(appId);
+        HCSCore hcsCore = new HCSCore(appId);
 
         System.out.println("****************************************");
         System.out.println("** Welcome to a simple HCS demo");
@@ -41,7 +41,7 @@ public final class App {
         System.out.println("****************************************");
         
         // create a callback object to receive the message
-        OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsLib);
+        OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsCore);
         onHCSMessageCallback.addObserver(hcsResponse -> {
             System.out.println("Received : "+ hcsResponse.getMessage());
         });
@@ -65,7 +65,7 @@ public final class App {
             } else {
                 Boolean messageSuccess;
                 try {
-                    new OutboundHCSMessage(hcsLib)
+                    new OutboundHCSMessage(hcsCore)
                         .overrideEncryptedMessages(false)
                         .overrideMessageSignature(false)
                         .sendMessage(topicIndex, userInput.getBytes());

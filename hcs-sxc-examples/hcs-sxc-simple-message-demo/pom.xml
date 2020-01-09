@@ -19,8 +19,8 @@
     <dependencies>
         <dependency>
             <groupId>com.hedera</groupId>
-            <artifactId>hcs-sxc-lib</artifactId>
-            <version>${hcslib.version}</version>
+            <artifactId>hcs-sxc-core</artifactId>
+            <version>${hcs-sxc-core.version}</version>
         </dependency>
         <dependency> 
             <groupId>com.hedera</groupId> 
@@ -98,7 +98,7 @@
                                 <paths>
                                     <path>src/main/resources</path>
                                     <path>.</path>
-                                    <path>../../hcs-sxc-plugins/lib-persistence-in-memory/target</path>
+                                    <path>../../hcs-sxc-plugins/hcs-sxc-plugins-persistence-in-memory/target</path>
                                 </paths>
                             </extraDirectories>
                             <mainClass>com.hedera.simple-message-demo.App</mainClass>

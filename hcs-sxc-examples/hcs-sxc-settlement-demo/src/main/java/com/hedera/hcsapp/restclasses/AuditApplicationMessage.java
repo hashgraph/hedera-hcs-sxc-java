@@ -11,6 +11,6 @@ public class AuditApplicationMessage {
     private String topicId;
     
     public AuditApplicationMessage(AppData appData) {
-        this.topicId = appData.getHCSLib().getTopicIds().get(appData.getTopicIndex()).toString();
+        this.topicId = appData.getHCSCore().getTopicIds().get(appData.getTopicIndex()).toString();
     }
 }

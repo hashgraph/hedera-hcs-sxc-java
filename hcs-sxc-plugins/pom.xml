@@ -11,7 +11,7 @@
   <packaging>pom</packaging>
 
   <name>hcs-sxc-plugins</name>
-  <description>Plugins for the HCS SXC Library</description>
+  <description>Plugins for the HCS SXC Core</description>
 
   <modules>
     <module>hcs-sxc-plugins-persistence-in-memory</module>

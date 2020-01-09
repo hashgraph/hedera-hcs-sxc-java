@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.Utils;
@@ -33,7 +34,6 @@ import com.hedera.hcsapp.restclasses.SettlementPaidOrComplete;
 import com.hedera.hcsapp.restclasses.SettlementPaymentInit;
 import com.hedera.hcsapp.restclasses.SettlementProposal;
 import com.hedera.hcsapp.restclasses.SettlementRest;
-import com.hedera.hcslib.consensus.OutboundHCSMessage;
 
 import lombok.extern.log4j.Log4j2;
 import proto.Money;
@@ -118,7 +118,7 @@ public class SettlementsController {
                 .setSettlePropose(settleProposeBPM.build()).build();
 
         try {
-            TransactionId transactionId = new TransactionId(appData.getHCSLib().getOperatorAccountId());
+            TransactionId transactionId = new TransactionId(appData.getHCSCore().getOperatorAccountId());
 
             Settlement settlement = new Settlement();
             // copy data
@@ -150,7 +150,7 @@ public class SettlementsController {
                 settlementItem = settlementItemRepository.save(settlementItem);
             }
 
-            new OutboundHCSMessage(appData.getHCSLib()).overrideEncryptedMessages(false).overrideMessageSignature(false)
+            new OutboundHCSMessage(appData.getHCSCore()).overrideEncryptedMessages(false).overrideMessageSignature(false)
                     .withFirstTransactionId(transactionId).sendMessage(topicIndex, settlementBPM.toByteArray());
 
             log.info("Message sent successfully.");
@@ -487,7 +487,7 @@ public class SettlementsController {
 
             Settlement newSettlement = settlementRepository.save(settlement);
 
-            TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib()).overrideEncryptedMessages(false)
+            TransactionId transactionId = new OutboundHCSMessage(appData.getHCSCore()).overrideEncryptedMessages(false)
                     .overrideMessageSignature(false).sendMessage(topicIndex, settlementBPM.toByteArray());
 
             log.info("Message sent successfully.");

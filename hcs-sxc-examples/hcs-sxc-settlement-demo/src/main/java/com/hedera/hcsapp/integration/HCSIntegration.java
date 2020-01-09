@@ -11,6 +11,10 @@ import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
+import com.hedera.hcs.sxc.HCSCore;
+import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
+import com.hedera.hcs.sxc.interfaces.HCSResponse;
+import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.Utils;
@@ -24,18 +28,10 @@ import com.hedera.hcsapp.repository.CreditRepository;
 import com.hedera.hcsapp.repository.SettlementItemRepository;
 import com.hedera.hcsapp.repository.SettlementRepository;
 import com.hedera.hcsapp.repository.Util;
-import com.hedera.hcslib.HCSLib;
-import com.hedera.hcslib.callback.OnHCSMessageCallback;
-import com.hedera.hcslib.interfaces.HCSResponse;
-import com.hedera.hcslib.interfaces.LibMessagePersistence;
-import com.hedera.hcslib.proto.java.ApplicationMessage;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import com.hedera.hcs.sxc.proto.java.ApplicationMessage;
+
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.transaction.annotation.Transactional;
 import proto.CreditBPM;
-import proto.PaymentInitAckBPM;
 import proto.PaymentInitBPM;
 import proto.PaymentSentBPM;
 import proto.SettleCompleteBPM;
@@ -69,7 +65,7 @@ public class HCSIntegration {
     public HCSIntegration() throws Exception {
         this.appData = new AppData();
         // create a callback object to receive the message
-        OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(appData.getHCSLib());
+        OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(appData.getHCSCore());
         onHCSMessageCallback.addObserver(hcsMessage -> {
             processHCSMessage(hcsMessage);
         });
@@ -335,8 +331,8 @@ public class HCSIntegration {
     }
     
     private void deleteData() {
-        HCSLib hcsLib = appData.getHCSLib();
-        LibMessagePersistence persistence = hcsLib.getMessagePersistence();
+        HCSCore hcsCore = appData.getHCSCore();
+        SxcMessagePersistence persistence = hcsCore.getMessagePersistence();
 
         persistence.clear();
         

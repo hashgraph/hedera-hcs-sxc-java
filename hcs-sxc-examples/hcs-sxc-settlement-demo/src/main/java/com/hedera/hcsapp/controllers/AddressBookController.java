@@ -61,9 +61,10 @@ public class AddressBookController {
                 String roles = service.getEnvironment().get("ROLES");
                 String paymentAccountDetails = service.getEnvironment().get("PAYMENT_ACCOUNT_DETAILS");
                 String[] publicPort = service.getPorts().get(0).split(":");
+                String color = service.getEnvironment().get("COLOR");
                 int port = Integer.parseInt(publicPort[0]);
                 
-                restResponse.add(new AddressBookRest(name, publicKey, roles, paymentAccountDetails, port));
+                restResponse.add(new AddressBookRest(name, publicKey, roles, paymentAccountDetails, port, color));
             }
             
         }

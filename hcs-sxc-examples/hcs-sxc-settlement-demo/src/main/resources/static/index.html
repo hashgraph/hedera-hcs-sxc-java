@@ -150,13 +150,13 @@
                         <details>
                             <summary>
                                 <div class="message-container" style="margin-left:55px; margin-right: 16px;">
-                                    <div style="display: flex">
+                                    <div style="display: flex; align-items: center;">
                                         <span 
                                             id="credits-and-debits-user"
                                             class="mdc-typography--headline6" style="flex-grow:1">
                                             {{username}}
                                         </span>
-                                        
+                                        <img id="credits-and-debits-img" style="float: right;" alt="" src="images/0.png" />
                                     </div>
                                 </div>
                             </summary>
@@ -1740,6 +1740,7 @@
                 var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
                 clonedPanelTemplate.querySelector(".panel").id=userName;    
                 clonedPanelTemplate.getElementById("credits-and-debits-user").innerHTML = userName;
+                clonedPanelTemplate.getElementById("credits-and-debits-img").src = "images/" + allAddresses.filter(a=>a.name===userName)[0].appId + ".png";
                 
                 let userNameP = userName; {
                     clonedPanelTemplate.getElementById("new-credit-button").addEventListener("click",

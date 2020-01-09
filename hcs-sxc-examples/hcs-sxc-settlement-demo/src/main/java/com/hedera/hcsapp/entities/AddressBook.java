@@ -1,9 +1,9 @@
 package com.hedera.hcsapp.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
 import lombok.Data;
 
 @Data
@@ -16,4 +16,6 @@ public class AddressBook {
     private String publicKey;
     private String roles;
     private String paymentAccountDetails;
+    private String color;
+    private int appId;
 }

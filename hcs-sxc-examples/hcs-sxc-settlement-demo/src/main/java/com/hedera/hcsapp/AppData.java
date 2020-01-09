@@ -62,6 +62,8 @@ public final class AppData {
                     appClient.setClientName(dockerService.getContainer_name());
                     appClient.setPaymentAccountDetails(dockerService.getEnvironment().get("PAYMENT_ACCOUNT_DETAILS"));
                     appClient.setRoles(dockerService.getEnvironment().get("ROLES"));
+                    appClient.setColor(dockerService.getEnvironment().get("COLOR"));
+                    appClient.setAppId(Integer.parseInt(dockerService.getEnvironment().get("APP_ID")));
 
                     this.appClients.add(appClient);
                 }

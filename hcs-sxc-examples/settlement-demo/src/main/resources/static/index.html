@@ -156,6 +156,12 @@
                                             class="mdc-typography--headline6" style="flex-grow:1">
                                             {{username}}
                                         </span>
+                                        <span
+                                            id="credits-and-debits-seen"
+                                            class="material-icons"
+                                            >
+                                            updated
+                                        </span>
                                         
                                     </div>
                                 </div>
@@ -1740,8 +1746,15 @@
                 var panelTemplate = document.getElementById("credits-and-debits-panel");
                 var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
                 clonedPanelTemplate.querySelector(".panel").id=userName;    
-                clonedPanelTemplate.getElementById("credits-and-debits-user").innerHTML = userName;
+                clonedPanelTemplate.getElementById("credits-and-debits-user").innerHTML = userName ;
+                clonedPanelTemplate.getElementById("credits-and-debits-seen").innerHTML = notificationList.find(x=>x.payer===userName) === undefined ? '': 'updated';
+                ;
                 
+                clonedPanelTemplate.querySelector("details").addEventListener("toggle", e => {
+                    o = notificationList.find(x=>x.payer===userName);
+                    notificationList = notificationList.filter(x=>x!==o);
+                    clonedPanelTemplate.getElementById("credits-and-debits-seen").innerHTML ='';
+                });
                 let userNameP = userName; {
                     clonedPanelTemplate.getElementById("new-credit-button").addEventListener("click",
                         function(){
@@ -2395,6 +2408,7 @@
             });
             
             async function onStompMessage(messageOutput) {
+                notificationList.push(messageOutput);
                 notifyUi = messageOutput.context;
                 switch (notifyUi) {
                     case "credits":  
@@ -2464,8 +2478,8 @@
                 }
                 document.getElementById("notification-badge").innerHTML = document.getElementById("notification-badge").innerHTML * 1.0 + 1;
                 document.getElementById("notification-badge").style.display="block";
-                notificationList.push(messageOutput);
-             }
+                
+            }
              
             function showSnackBarMessage(message){
                 snackbarEl = document.getElementById("snackbar");

@@ -62,7 +62,9 @@
         <guava.version>28.1-jre</guava.version>
 
         <hamcrest-core.version>1.3</hamcrest-core.version>
-        <hcslib.version>0.0.3-SNAPSHOT</hcslib.version>
+        <hcs-sxc-core.version>0.0.3-SNAPSHOT</hcs-sxc-core.version>
+        <hcs-sxc-proto.version>0.0.3-SNAPSHOT</hcs-sxc-proto.version>
+        <hcs-sxc-interfaces.version>0.0.3-SNAPSHOT</hcs-sxc-interfaces.version>
         <hedera-sdk.version>0.9.0-beta-3</hedera-sdk.version>
         <h2.version>1.4.199</h2.version>
 
@@ -262,8 +264,8 @@
     </plugins>
   </build>
     <modules>
-      <module>hcs-lib</module>
-      <module>hcs-relay</module>
+      <module>hcs-sxc-core</module>
+      <module>hcs-sxc-relay</module>
       <module>hcs-sxc-interfaces</module>
       <module>hcs-sxc-examples</module>
       <module>hcs-sxc-proto</module>

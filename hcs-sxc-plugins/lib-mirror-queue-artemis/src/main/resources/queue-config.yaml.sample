@@ -1,3 +1,0 @@
-queue:
-  tcpConnectionFactory: "tcp://hcsqueue:61616?jms.redeliveryPolicy.initialRedeliveryDelay=0&jms.redeliveryPolicy.backOffMultiplier=1&jms.redeliveryPolicy.maximumRedeliveries=5&jms.redeliveryPolicy.redeliveryDelay=500&jms.redeliveryPolicy.useExponentialBackOff=false"
-  initialContextFactory: "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"

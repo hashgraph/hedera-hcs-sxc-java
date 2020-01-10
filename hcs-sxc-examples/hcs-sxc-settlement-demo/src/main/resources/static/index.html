@@ -10,6 +10,7 @@
         <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <link rel="stylesheet" href="styles/custom.css"/>
+      
         
     </head>
     <body>
@@ -1446,6 +1447,7 @@
                 let responseWhoami =  await fetch('addressbook/me/');
                 let whoami = await responseWhoami.json();
                 thisuserName =  whoami.name;
+                document.documentElement.style.setProperty('--mdc-theme-primary', "#"+whoami.color);
                 
                 document.getElementById("this-user").innerHTML=whoami.name;
                 document.getElementById("this-pk").innerHTML=whoami.publicKey;

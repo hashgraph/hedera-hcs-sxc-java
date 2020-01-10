@@ -45,6 +45,8 @@ public class Application {
                 addressBook.setPublicKey(appClient.getClientKey());
                 addressBook.setRoles(appClient.getRoles());
                 addressBook.setPaymentAccountDetails(appClient.getPaymentAccountDetails());
+                addressBook.setColor(appClient.getColor());
+                addressBook.setAppId(appClient.getAppId());
                 addressBookRepository.save(addressBook);
             }
         };

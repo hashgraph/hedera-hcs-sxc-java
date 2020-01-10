@@ -5,6 +5,8 @@ public class AppClient {
     private String clientKey = "";
     private String roles = "";
     private String paymentAccountDetails = "";
+    private String color = "";
+    private int appId = 0;
     
     public String getClientName() {
         return this.clientName;
@@ -29,5 +31,17 @@ public class AppClient {
     }
     public void setPaymentAccountDetails(String paymentAccountDetails) {
         this.paymentAccountDetails = paymentAccountDetails;
+    }
+    public String getColor() {
+        return this.color;
+    }
+    public void setColor(String color) {
+        this.color = color;
+    }
+    public int getAppId() {
+        return this.appId;
+    }
+    public void setAppId(int appId) {
+        this.appId = appId;
     }
 }

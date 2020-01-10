@@ -150,7 +150,19 @@
                         <details>
                             <summary>
                                 <div class="message-container" style="margin-left:55px; margin-right: 16px;">
-                                    <div style="display: flex">
+                                    <div style="display: flex; align-items: center">
+                                        
+                                        <!--
+                                        <span class="mdc-typography--headline6" 
+                                              
+                                              style="width:48px; height:48px;
+                                              border-radius: 90px;
+                                              color:white; background-color: #e4e7e8;
+                                              background-image: url(https://raw.githubusercontent.com/hashgraph/hedera-hcs-sxc/285-UI-Add-icons-to-credits%2C-settlements-and-payments/hcs-sxc-examples/hcs-sxc-settlement-demo/src/main/resources/static/images/0.png?token=AIO4TMOL37JASCF6GIALCZC6EDFCW);
+                                              ">
+                                      
+                                        </span>
+                                        -->
                                         <span 
                                             id="credits-and-debits-user"
                                             class="mdc-typography--headline6" style="flex-grow:1">
@@ -158,6 +170,7 @@
                                         </span>
                                         <span
                                             id="credits-and-debits-seen"
+                                            
                                             class="material-icons"
                                             >
                                             updated
@@ -1585,10 +1598,11 @@
                 
                 
                 clonedPanelTemplate.querySelector("details").addEventListener("toggle", e => {
-                    o = notificationList.find(x=>x.payer===userName);
+                    o = notificationList.find(x=>x.payer===userName && x.context ==="settlements");
                     notificationList = notificationList.filter(x=>x!==o);
                     document.querySelector("#"+userName+" #settlements-seen").innerHTML ='';
-                });
+                });         
+                
                 var tableBody = clonedPanelTemplate.getElementById("settlement-table-body");
                 var tableBodyTemplate = clonedPanelTemplate.getElementById("settlement-table-body-template");
 
@@ -1764,11 +1778,13 @@
                 clonedPanelTemplate.getElementById("credits-and-debits-seen").innerHTML = (notificationList.find(x=>x.payer===userName) === undefined ? '': 'updated');
                 
                 
+               
                 clonedPanelTemplate.querySelector("details").addEventListener("toggle", e => {
-                    o = notificationList.find(x=>x.payer===userName);
-                    notificationList = notificationList.filter(x=>x!==o);
+                    o = notificationList.find(notification => notification.payer === userName && notification.context === "credits");
+                    notificationList = notificationList.filter(notification => notification !== o);
                     document.querySelector("#"+userName+" #credits-and-debits-seen").innerHTML ='';
                 });
+                
                 let userNameP = userName; {
                     clonedPanelTemplate.getElementById("new-credit-button").addEventListener("click",
                         function(){

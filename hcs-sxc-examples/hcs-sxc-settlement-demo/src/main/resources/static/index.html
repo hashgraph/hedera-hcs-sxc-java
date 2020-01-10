@@ -109,7 +109,7 @@
                         <span class="mdc-list-item__text">Audit</span>
                     </a>
                     
-<div role="separator" class="mdc-list-divider"></div>
+                    <div role="separator" class="mdc-list-divider"></div>
 <!--                    <a class="mdc-list-item" href="#" aria-current="page">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">account_box</i>
                         <span class="mdc-list-item__text">Account</span>
@@ -150,11 +150,33 @@
                         <details>
                             <summary>
                                 <div class="message-container" style="margin-left:55px; margin-right: 16px;">
-                                    <div style="display: flex">
+                                    <div style="display: flex; align-items: center">
+                                        
+                                        
+                                        <span class="mdc-typography--headline6" 
+                                              id="credits-and-debits-user-avatar"
+                                              style="width:36px; height:36px;
+                                              background-repeat: no-repeat;
+                                              background-size: cover;
+                                              background-position: center; 
+                                              border-radius: 90px;
+                                             
+                                              color:white; background-color: #e4e7e8;
+                                              ">
+                                      
+                                        </span>
+                                        
                                         <span 
                                             id="credits-and-debits-user"
-                                            class="mdc-typography--headline6" style="flex-grow:1">
+                                            class="mdc-typography--body" style="flex-grow:1;  padding-left:16px; ">
                                             {{username}}
+                                        </span>
+                                        <span
+                                            id="credits-and-debits-seen"
+                                            
+                                            class="material-icons"
+                                            >
+                                            updated
                                         </span>
                                         
                                     </div>
@@ -241,11 +263,30 @@
                         <details>
                             <summary>
                                 <div class="message-container" style="margin-left:55px; margin-right: 16px;">
-                                    <div style="display: flex">
+                                    <div style="display: flex; align-items: center">
+                                        <span class="mdc-typography--headline6" 
+                                              id="settlements-user-avatar"
+                                              style="width:36px; height:36px;
+                                              background-repeat: no-repeat;
+                                              background-size: cover;
+                                              background-position: center; 
+                                              border-radius: 90px;
+                                             
+                                              color:white; background-color: #e4e7e8;
+                                              ">
+                                      
+                                        </span>
+                                        
                                         <span 
                                             id="settlements-user"
-                                            class="mdc-typography--headline6" style="flex-grow:1">
+                                            class="mdc-typography--body" style="flex-grow:1;  padding-left:16px; ">
                                             {{username}}
+                                        </span>
+                                        <span
+                                            id="settlements-seen"
+                                            class="material-icons"
+                                            >
+                                            updated
                                         </span>
                                     </div>
                                 </div>
@@ -1394,6 +1435,7 @@
             allAddresses = [];
             buyerSellersAddress= [];
             paymentChannels = [];
+            notificationList = [];
             
             document.addEventListener("DOMContentLoaded", init);
             
@@ -1533,7 +1575,7 @@
             
             function syntaxHighlight(json) {
                 
-                if (typeof json != 'string') {
+                if (typeof json !== 'string') {
                      json = JSON.stringify(json, undefined, 2);
                 }
                
@@ -1566,8 +1608,19 @@
                 var panelTemplate = document.getElementById("settlements-panel");
                 var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
                 clonedPanelTemplate.querySelector(".panel").id=userName;    
+                
+                clonedPanelTemplate.getElementById("settlements-user-avatar").style.backgroundImage =  "url(images/"+addressBookBs.find(e => e.name === userName).appId+".png)";
                 clonedPanelTemplate.getElementById("settlements-user").innerHTML = userName;
 
+                clonedPanelTemplate.getElementById("settlements-seen").innerHTML = (notificationList.find(x=>x.payer===userName) === undefined ? '': 'updated');
+                
+                
+                clonedPanelTemplate.querySelector("details").addEventListener("toggle", e => {
+                    o = notificationList.find(x=>x.payer===userName && x.context ==="settlements");
+                    notificationList = notificationList.filter(x=>x!==o);
+                    document.querySelector("#"+userName+" #settlements-seen").innerHTML ='';
+                });         
+                
                 var tableBody = clonedPanelTemplate.getElementById("settlement-table-body");
                 var tableBodyTemplate = clonedPanelTemplate.getElementById("settlement-table-body-template");
 
@@ -1739,7 +1792,17 @@
                 var panelTemplate = document.getElementById("credits-and-debits-panel");
                 var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
                 clonedPanelTemplate.querySelector(".panel").id=userName;    
-                clonedPanelTemplate.getElementById("credits-and-debits-user").innerHTML = userName;
+                clonedPanelTemplate.getElementById("credits-and-debits-user").innerHTML = userName ;
+                clonedPanelTemplate.getElementById("credits-and-debits-user-avatar").style.backgroundImage =  "url(images/"+addressBookBs.find(e => e.name === userName).appId+".png)";
+                clonedPanelTemplate.getElementById("credits-and-debits-seen").innerHTML = (notificationList.find(x=>x.payer===userName) === undefined ? '': 'updated');
+                
+                
+               
+                clonedPanelTemplate.querySelector("details").addEventListener("toggle", e => {
+                    o = notificationList.find(notification => notification.payer === userName && notification.context === "credits");
+                    notificationList = notificationList.filter(notification => notification !== o);
+                    document.querySelector("#"+userName+" #credits-and-debits-seen").innerHTML ='';
+                });
                 
                 let userNameP = userName; {
                     clonedPanelTemplate.getElementById("new-credit-button").addEventListener("click",
@@ -2394,6 +2457,7 @@
             });
             
             async function onStompMessage(messageOutput) {
+                notificationList.push(messageOutput);
                 notifyUi = messageOutput.context;
                 switch (notifyUi) {
                     case "credits":  
@@ -2463,7 +2527,8 @@
                 }
                 document.getElementById("notification-badge").innerHTML = document.getElementById("notification-badge").innerHTML * 1.0 + 1;
                 document.getElementById("notification-badge").style.display="block";
-             }
+                
+            }
              
             function showSnackBarMessage(message){
                 snackbarEl = document.getElementById("snackbar");

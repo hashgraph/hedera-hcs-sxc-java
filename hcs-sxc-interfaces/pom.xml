@@ -14,13 +14,13 @@
     <artifactId>hcs-sxc-interfaces</artifactId>
 
     <name>hcs-sxc-interfaces</name>
-    <description>HCS SXC Library Interfaces</description>
+    <description>HCS SXC Interfaces</description>
 
     <dependencies>
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-proto</artifactId>
-            <version>${hcslib.version}</version>
+            <version>${hcs-sxc-proto.version}</version>
         </dependency>
     </dependencies>
 

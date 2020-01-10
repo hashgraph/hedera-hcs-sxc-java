@@ -11,13 +11,13 @@
   <packaging>pom</packaging>
 
   <name>hcs-sxc-plugins</name>
-  <description>Plugins for the HCS SXC Library</description>
+  <description>Plugins for the HCS SXC Core</description>
 
   <modules>
-    <module>lib-persistence-in-memory</module>
-    <module>lib-persistence-in-h2</module>
-    <module>lib-mirror-direct</module>
-    <module>lib-mirror-queue-artemis</module>
+    <module>hcs-sxc-plugins-persistence-in-memory</module>
+    <module>hcs-sxc-plugins-persistence-in-h2</module>
+    <module>hcs-sxc-plugins-mirror-direct</module>
+    <module>hcs-sxc-plugins-mirror-queue-artemis</module>
   </modules>
 
  </project>

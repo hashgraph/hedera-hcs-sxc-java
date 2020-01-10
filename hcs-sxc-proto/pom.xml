@@ -11,7 +11,7 @@
     <artifactId>hcs-sxc-proto</artifactId>
 
     <name>hcs-sxc-proto</name>
-    <description>Protobuf for the HCS SXC Library</description>
+    <description>Protobuf for the HCS SXC Components</description>
 
     <build>
         <extensions>

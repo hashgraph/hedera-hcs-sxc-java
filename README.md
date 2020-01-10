@@ -30,29 +30,36 @@ These components use the Hedera Java SDK to communicate with Hedera's HCS servic
 - Application Message - a message sent between AppNet participants using a standard envelope (the message itself may be broken up into several HCS transactions if too large)
 - Business Process Message - an AppNet specific message which is sent to other participants inside an Application Message
 
+## The anatomy of an app with HCS SXC
+
+TBD
+* messaging
+* persistence
+* ...
+
 ## Components
 
 Looking through the java project, we have the following Maven components/artifacts.
 
 * HCS-SXC
-    * hcs-lib
-    * hcs-relay
+    * hcs-sxc-core
+    * hcs-sxc-relay
     * hcs-sxc-interfaces
     * hcs-sxc-examples
-        * simple-message-demo
-        * settlement-demo
+        * hcs-sxc-simple-message-demo
+        * hcs-sxc-settlement-demo
     * hcs-sxc-proto
     * hcs-sxc-plugins
-        * lib-persistence-in-memory
-        * lib-persistence-in-h2
-        * lib-mirror-direct
-        * lib-mirror-queue-artemis
+        * hcs-sxc-plugins-persistence-in-memory
+        * hcs-sxc-plugins-persistence-in-h2
+        * hcs-sxc-plugins-mirror-direct
+        * hcs-sxc-plugins-mirror-queue-artemis
 
-### HCS-Lib
+### HCS-sxc-core
 
 This component does the bulk of the work and is imported into a project (see example applications).
 
-### HCS-Relay
+### HCS-sxc-relay
 
 This component subscribes to topic(s) from a mirror node and forwards messages to a message queue. `AppNet` participants subscribe to the queue to receive messages.
 
@@ -60,31 +67,31 @@ This component subscribes to topic(s) from a mirror node and forwards messages t
 
 A set of standard interfaces or structures for the various components to communicate with each other. Listed below are those that are used in the context of plug-ins which have to satisfy particular interface requirements.
 
-* HCSCallBackFromMirror - so that an app can register with the `hcs-lib` for callbacks
-* HCSCallBackToAppInterface - so that the `hcs-lib` can call back to an app
+* HCSCallBackFromMirror - so that an app can register with the `hcs-sxc-core` for callbacks
+* HCSCallBackToAppInterface - so that the `hcs-sxc-core` can call back to an app
 * MirrorSubscriptionInterface - so that plugins can be made to subscribe to mirror notifications
-* LibMessagePersistence - so that plugins can be used to persist data
+* SxcMessagePersistence - so that plugins can be used to persist data
 
 Defined in the `HCS-Interfaces` project, these are data structures that are shared between components.
 
-* HCSRelayMessage - a message from the `HCS-Relay` components
+* HCSRelayMessage - a message from the `hcs-sxc-relay` components
 * HCSResponse - a application message id and message
-* LibConsensusMessage - a (temporary) POJO for consensus messages (until these can be serialized)
+* SxcConsensusMessage - a (temporary) POJO for consensus messages (until these can be serialized)
 * MessagePersistenceLevel - a list of pre-defined persistence levels
 
 ### HCS-SXC-Plugins
 
-This project contains a series of plugins to be used in conjunction with the lib, at the time of writing, the following plug-ins are available.
+This project contains a series of plugins to be used in conjunction with the hcs sxc core component, at the time of writing, the following plug-ins are available.
 The choice of a plug-in architecture is to enable additional plugins to be developed without needing to change the projects that may later depend on them and so to offer extensibility with a choice of options.
 
-* lib-mirror-direct - plugin to enable the `hcs-lib` to subscribe to mirror notifications directly
-* lib-mirror-queue-artemis - plugin to enable the `hcs-lib` to subscribe to mirror notifications via an Artemis Message Queue (which receives messages via the `hcs-relay` component)
-* lib-persistence-in-h2 - plug in to provide data persistence in a database (H2)
-* lib-persistence-in-memory - plug in to provide data persistence in memory
+* hcs-sxc-plugins-mirror-direct - plugin to enable the `hcs-sxc-core` to subscribe to mirror notifications directly
+* hcs-sxc-plugins-mirror-queue-artemis - plugin to enable the `hcs-sxc-core` to subscribe to mirror notifications via an Artemis Message Queue (which receives messages via the `hcs-sxc-relay` component)
+* hcs-sxc-plugins-persistence-in-h2 - plug in to provide data persistence in a database (H2)
+* hcs-sxc-plugins-persistence-in-memory - plug in to provide data persistence in memory
 
 ### HCS-SXC Proto
 
-Defines the protobuf messages used within `hcs-lib`.
+Defines the protobuf messages used within `hcs-sxc-core`.
 
 ### Artemis Message Queue
 
@@ -92,13 +99,13 @@ This is not a java project, but a component which is started by way of a docker 
 
 ## Choosing which plugins to use
 
-To choose whether to use the `direct` or `hcs-relay+activeMQ` subscription method, include either the first or second dependency below in your application's `pom.xml`
+To choose whether to use the `direct` or `hcs-sxc-relay+activeMQ` subscription method, include either the first or second dependency below in your application's `pom.xml`
 
 for direct
 
 ```
 <groupId>com.hedera</groupId>
-<artifactId>lib-mirror-direct</artifactId>
+<artifactId>hcs-sxc-plugins-mirror-direct</artifactId>
 <version>0.0.3-SNAPSHOT</version>
 ```
 
@@ -106,11 +113,11 @@ for Artemis Message Queue
 
 ```
 <groupId>com.hedera</groupId>
-<artifactId>lib-mirror-queue-artemis</artifactId>
+<artifactId>hcs-sxc-plugins-mirror-queue-artemis</artifactId>
 <version>0.0.3-SNAPSHOT</version>
 ```
 
-If you choose Artemis Message Queue, you must run a `hcs-relay` to ensure the queue is given messages to persist on behalf of `AppNet` participants.
+If you choose Artemis Message Queue, you must run a `hcs-sxc-relay` to ensure the queue is given messages to persist on behalf of `AppNet` participants.
 
 To choose whether to use the `in memory` or `in database` persistence plug in, include either the first or second dependency below in your application's `pom.xml`
 
@@ -118,7 +125,7 @@ for in memory
 
 ```
 <groupId>com.hedera</groupId>
-<artifactId>lib-persistence-in-memory</artifactId>
+<artifactId>hcs-sxc-plugins-persistence-in-memory</artifactId>
 <version>0.0.3-SNAPSHOT</version>
 ```
 
@@ -126,21 +133,21 @@ for in database
 
 ```
 <groupId>com.hedera</groupId>
-<artifactId>lib-persistence-in-h2</artifactId>
+<artifactId>hcs-sxc-plugins-persistence-in-h2</artifactId>
 <version>0.0.3-SNAPSHOT</version>
 ```
 
 *Note 1: Version numbers may change over time.*
 
-*Note 2: Class loading should happen from the class path if the correct jar is found, it may therefore not be absolutely necessary to declare dependencies here since loading of a class matching the appropriate interface (`MirrorSubscriptionInterface` or `LibMessagePersistence`) will happen dynamically when the application starts.*
+*Note 2: Class loading should happen from the class path if the correct jar is found, it may therefore not be absolutely necessary to declare dependencies here since loading of a class matching the appropriate interface (`MirrorSubscriptionInterface` or `SxcMessagePersistence`) will happen dynamically when the application starts.*
 
 ## Configuration files
 
 A number of configuration files are necessary in order to provide the components the necessary information such as which TopicId(s) to use or subscribe to, etc... These files are listed and explained below.
 
-### HCS-relay
+### HCS-sxc-relay
 
-The `relay-config.yaml` file contains the necessary configuration for the `hcs-relay` component and is found in `/src/main/resources` of the corresponding java project. A sample file is provided as a starting point.
+The `relay-config.yaml` file contains the necessary configuration for the `hcs-sxc-relay` component and is found in `/src/main/resources` of the corresponding java project. A sample file is provided as a starting point.
 
 *Note: If a `relay-config.yaml` file is found in the root of the project, it will override the file from `src/main/resources`*
 
@@ -164,24 +171,24 @@ lastConsensusTimeFile: "./lastConsensusTime.txt"
 # Connection details to the Artemis MQ component
 queue:
   initialContextFactory: "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
-  tcpConnectionFactory: "tcp://hcsqueue:61616?jms.redeliveryPolicy.initialRedeliveryDelay=0&jms.redeliveryPolicy.backOffMultiplier=1&jms.redeliveryPolicy.maximumRedeliveries=5&jms.redeliveryPolicy.redeliveryDelay=500&jms.redeliveryPolicy.useExponentialBackOff=false"
+  tcpConnectionFactory: "tcp://hcs-sxc-queue:61616?jms.redeliveryPolicy.initialRedeliveryDelay=0&jms.redeliveryPolicy.backOffMultiplier=1&jms.redeliveryPolicy.maximumRedeliveries=5&jms.redeliveryPolicy.redeliveryDelay=500&jms.redeliveryPolicy.useExponentialBackOff=false"
 ```
 
-### lib-mirror-queue-artemis
+### hcs-sxc-plugins-mirror-queue-artemis
 
-The `queue-config.yaml` file contains the necessary configuration for the `lib-mirror-queue-artemis` component and is found in the `/src/main/resources` of the corresponding java project. A sample file is provided as a starting point.
+The `queue-config.yaml` file contains the necessary configuration for the `hcs-sxc-plugins-mirror-queue-artemis` component and is found in the `/src/main/resources` of the corresponding java project. A sample file is provided as a starting point.
 
 *Note: If a `queue-config.yaml` file is found in the root of the project, it will override the file from `src/main/resources`*
 
 ```
 queue:
-  tcpConnectionFactory: "tcp://hcsqueue:61616?jms.redeliveryPolicy.initialRedeliveryDelay=0&jms.redeliveryPolicy.backOffMultiplier=1&jms.redeliveryPolicy.maximumRedeliveries=5&jms.redeliveryPolicy.redeliveryDelay=500&jms.redeliveryPolicy.useExponentialBackOff=false"
+  tcpConnectionFactory: "tcp://hcs-sxc-queue:61616?jms.redeliveryPolicy.initialRedeliveryDelay=0&jms.redeliveryPolicy.backOffMultiplier=1&jms.redeliveryPolicy.maximumRedeliveries=5&jms.redeliveryPolicy.redeliveryDelay=500&jms.redeliveryPolicy.useExponentialBackOff=false"
   initialContextFactory: "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
 ```
 
 ### Applications
 
-Applications will vary in use cases, however the `hcs-lib` expects the application to provide a number of configurable parameters, these are defined in the `config.yaml` file which resides in the `/src/main/resources` folder of the application's project.
+Applications will vary in use cases, however the `hcs-sxc-core` expects the application to provide a number of configurable parameters, these are defined in the `config.yaml` file which resides in the `/src/main/resources` folder of the application's project.
 
 *Note: If a `config.yaml` file is found in the root of the project, it will override the file from `src/main/resources`*
 
@@ -239,13 +246,13 @@ The `OPERATOR_KEY` is the private key of the account identified by `OPERATOR_ID`
 
 ## Docker
 
-Docker is a convenient way of starting a number of individual components, we use it extensively in the `settlement-demo` example, but also to start up the `hcs-relay` and `Artemis MQ` components when necessary. Below is an example `docker-compose.yml` file for this purpose. You may wish to extend it with your own application-specific images if necessary.
+Docker is a convenient way of starting a number of individual components, we use it extensively in the `hcs-sxc-settlement-demo` example, but also to start up the `hcs-sxc-relay` and `Artemis MQ` components when necessary. Below is an example `docker-compose.yml` file for this purpose. You may wish to extend it with your own application-specific images if necessary.
 
 ```
 version: '3.3'
 services:
-  hcs-queue:
-    container_name: hcs-queue
+  hcs-sxc-queue:
+    container_name: hcs-sxc-queue
     image: vromero/activemq-artemis:2.10.1-alpine
     restart: on-failure
     ports:
@@ -269,11 +276,11 @@ services:
       ARTEMIS_PASSWORD: hcsdemo
       RESTORE_CONFIGURATION: true
 
-  hcs-relay:
-    container_name: hcs-relay
+  hcs-sxc-relay:
+    container_name: hcs-sxc-relay
     depends_on:
-      - hcs-queue
-    image: hederahashgraph/hcs-relay:latest
+      - hcs-sxc-queue
+    image: hederahashgraph/hcs-sxc-relay:latest
     restart: on-failure
     networks:
       - backing-services
@@ -290,31 +297,31 @@ networks:
 
 These are merely sample lines of code, please refer to the example projects for more details
 
-### Sending a HCS message via the lib
+### Sending a HCS message via the core component
 
 ```java
-    TransactionId transactionId = new OutboundHCSMessage(appData.getHCSLib())
+    TransactionId transactionId = new OutboundHCSMessage(appData.getHCSCore())
             .sendMessage(appData.getTopicIndex(), myMessage.toByteArray());
 ```
 
-*Note 1: `myMessage` may be larger than 4k, in which case the libarary will take care of breaking it up into multiple transactions, and recombining the contents of each transaction post-consensus to rebuild the message.*
+*Note 1: `myMessage` may be larger than 4k, in which case the hcs sxc core will take care of breaking it up into multiple transactions, and recombining the contents of each transaction post-consensus to rebuild the message.*
 
-*Note 2: If the `hcs-lib` is setup to encrypt, sign, key-rotate (subject to availability), this will all happen automatically, the application developer need not worry about it*
+*Note 2: If the `hcs-sxc-core` is setup to encrypt, sign, key-rotate (subject to availability), this will all happen automatically, the application developer need not worry about it*
 
-### Susbcribing to a topic via `hcs-lib`
+### Susbcribing to a topic via `hcs-sxc-core`
 
 ```java
     public HCSIntegration() throws Exception {
         this.appData = new AppData();
         // create a callback object to receive the message
-        OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(appData.getHCSLib());
+        OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(appData.getHCSCore());
         onHCSMessageCallback.addObserver(hcsMessage -> {
             processHCSMessage(hcsMessage);
         });
     }
 ```
 
-### Handling a notification from `hcs-lib`
+### Handling a notification from `hcs-sxc-core`
 
 ```
     public void processHCSMessage(HCSResponse hcsResponse) {
@@ -338,14 +345,14 @@ These are merely sample lines of code, please refer to the example projects for 
 ### Compilation steps
 
 - Ensure the necessary configuration files are complete and accurate
-    - hcs-relay/src/main/resources/relay-config.yaml (use relay-config.yaml.sample as a starting point)
-    - hcs-sxc-plugins/lib-mirror-queue-artemis/src/main/resources/queue-config.yaml (use queue-config.yaml.sample as a starting point)
-    - hcs-sxc-examples/settlement-demo/src/main/resources/.env (use dotenv.sample as a starting point)
-    - hcs-sxc-examples/settlement-demo/src/main/resources/.config.yaml (use config.yaml.sample as a starting point)
-    - hcs-sxc-examples/settlement-demo/src/main/resources/docker-compose.yml
-    - hcs-sxc-examples/simple-message-demo/src/main/resources/apps.yaml (use apps.yaml.sample as a starting point)
-    - hcs-sxc-examples/simple-message-demo/src/main/resources/config.yaml (use config.yaml.sample as a starting point)
-    - hcs-sxc-examples/simple-message-demo/docker-compose.yml
+    - hcs-sxc-relay/src/main/resources/relay-config.yaml (use relay-config.yaml.sample as a starting point)
+    - hcs-sxc-plugins/hcs-sxc-plugins-mirror-queue-artemis/src/main/resources/queue-config.yaml (use queue-config.yaml.sample as a starting point)
+    - hcs-sxc-examples/hcs-sxc-settlement-demo/src/main/resources/.env (use dotenv.sample as a starting point)
+    - hcs-sxc-examples/hcs-sxc-settlement-demo/src/main/resources/.config.yaml (use config.yaml.sample as a starting point)
+    - hcs-sxc-examples/hcs-sxc-settlement-demo/src/main/resources/docker-compose.yml
+    - hcs-sxc-examples/hcs-sxc-simple-message-demo/src/main/resources/apps.yaml (use apps.yaml.sample as a starting point)
+    - hcs-sxc-examples/hcs-sxc-simple-message-demo/src/main/resources/config.yaml (use config.yaml.sample as a starting point)
+    - hcs-sxc-examples/hcs-sxc-simple-message-demo/docker-compose.yml
 
 #### Compile docker images
 
@@ -371,16 +378,16 @@ You may also need to setup environment variables to match those in the `.env` an
 
 ## Examples
 
-The project comes with two examples to get you started, these are fully functional examples. The first `simple-message-demo` is a simple command line example where running two instances of the application side by side, you can witness that a message sent from one app is reflected in the other. The first app sends the message to Hedera and the second receives it via a subscription to a mirror node. The opposite also works. The second example `settlement-demo` is a more complex application which is based on spring boot with a web UI. Each instance of the application represents a participant in a settlement use case where participants can issue credit notes to each other, approve them, group them to reach a settlement amount, employ a third party to effect the payment and finally both original parties confirm the payment was completed. In addition to this, an audit log is provided so that the full history of messages between participants can be consulted.
+The project comes with two examples to get you started, these are fully functional examples. The first `hcs-sxc-simple-message-demo` is a simple command line example where running two instances of the application side by side, you can witness that a message sent from one app is reflected in the other. The first app sends the message to Hedera and the second receives it via a subscription to a mirror node. The opposite also works. The second example `hcs-sxc-settlement-demo` is a more complex application which is based on spring boot with a web UI. Each instance of the application represents a participant in a settlement use case where participants can issue credit notes to each other, approve them, group them to reach a settlement amount, employ a third party to effect the payment and finally both original parties confirm the payment was completed. In addition to this, an audit log is provided so that the full history of messages between participants can be consulted.
 
-### Simple-message-demo
+### hcs-sxc-simple-message-demo
 
 This is a simple messaging demo between two participants. All messages sent from one participant are pushed to the Hedera HCS service and each participant subscribes to a mirror node to receive the consensus messages.
 
 To run the demo, first create a new HCS topic using the SDK and edit the `src/main/resources/config.yaml` file to reflect the new topic id. This is to ensure that when you run the demo, you don't receive messages from someone else who you may be sharing a topic id with - although that could be fun.
 Also check other details such as the mirror node, hedera network, etc... are correct.
 
-You will also need to ensure the same topic id is reflected in `hcs-relay/src/main/resources/relay-config.yaml`
+You will also need to ensure the same topic id is reflected in `hcs-sxc-relay/src/main/resources/relay-config.yaml`
 
 Also create a `.env` file with the following information
 
@@ -389,9 +396,13 @@ OPERATOR_KEY=
 OPERATOR_ID=0.0.2
 ```
 
-This demo uses the queue and relay components.
+This demo uses the queue and relay components. For the apps to connect to the queue, an entry in your hosts file needs to be added as follows:
 
-Compile the project (see above) and open three console terminals and switch to the folder/directory containing the `simple-message-demo` example on your computer.
+```text
+127.0.0.1       hcs-sxc-queue
+```
+
+Compile the project (see above) and open three console terminals and switch to the folder/directory containing the `hcs-sxc-simple-message-demo` example on your computer.
 
 In the first, run the docker images for the queue and relay.
 
@@ -402,8 +413,8 @@ docker-compose up
 once the components are up and running
 
 ```shell
-hcs-relay_1  | 2020-01-07 13:07:22 [Thread-1] INFO  MirrorTopicSubscriber:131 - Sleeping 30s
-hcs-relay_1  | 2020-01-07 13:07:52 [Thread-1] INFO  MirrorTopicSubscriber:131 - Sleeping 30s
+hcs-sxc-relay_1  | 2020-01-07 13:07:22 [Thread-1] INFO  MirrorTopicSubscriber:131 - Sleeping 30s
+hcs-sxc-relay_1  | 2020-01-07 13:07:52 [Thread-1] INFO  MirrorTopicSubscriber:131 - Sleeping 30s
 ```
 
 switch to the second terminal window and type
@@ -427,7 +438,7 @@ typing text and pressing `[RETURN]` should result in the message appearing in th
 
 Both applications see the sent message, this is because both applications subscribe to mirror node notifications on topic and the sender essentially receives its own messages as well as those from others.
 
-### Settlement-demo
+### hcs-sxc-settlement-demo
 
 This is a more complex application which is based on spring boot with a web UI. Each instance of the application represents a participant in a settlement use case where participants can issue credit notes to each other, approve them, group them to reach a settlement amount, employ a third party to effect the payment and finally both original parties confirm the payment was completed. In addition to this, an audit log is provided so that the full history of messages between participants can be consulted.
 
@@ -443,9 +454,9 @@ OPERATOR_ID=0.0.2
 APP_ID=0
 ```
 
-This demo does not use the queue and relay components, although it's possible to enable them by modifying the `pom.xml` file of the `settlement-demo` project to include them, they will also need to run as docker containers.
+This demo does not use the queue and relay components, although it's possible to enable them by modifying the `pom.xml` file of the `hcs-sxc-settlement-demo` project to include them, they will also need to run as docker containers.
 
-Compile the project (see above) and open a console terminal and switch to the folder/directory containing the `settlement-demo` example on your computer.
+Compile the project (see above) and open a console terminal and switch to the folder/directory containing the `hcs-sxc-settlement-demo` example on your computer.
 
 Then switch to `src/main/resources` and run the docker images as follows
 
@@ -453,7 +464,7 @@ Then switch to `src/main/resources` and run the docker images as follows
 docker-compose -f docker-compose-direct.yml up --remove-orphans
 ```
 
-once the components are up and running (this may take a while), you can navigate to the UIs of the respective application users. Note: An instance of the `settlement-demo` application is run for each of the users and offered up on a separate http port.
+once the components are up and running (this may take a while), you can navigate to the UIs of the respective application users. Note: An instance of the `hcs-sxc-settlement-demo` application is run for each of the users and offered up on a separate http port.
 
 You can see all the participants by navigating to one of the application's landing page
 

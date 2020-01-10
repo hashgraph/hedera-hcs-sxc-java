@@ -32,10 +32,32 @@ These components use the Hedera Java SDK to communicate with Hedera's HCS servic
 
 ## The anatomy of an app with HCS SXC
 
-TBD
-* messaging
-* persistence
-* ...
+An HCS SXC application is part of a network of applications which share the same code. They communicate messages with each other via the Hedera Consensus Service rather than in a peer to peer or other fashion.
+
+The application code is likely to be akin to a state machine which responds to user inputs and generates HCS transactions as a result. It will also receive messages from a mirror node which may result in an update to the application's state.
+
+All things being equal and making sure applications do not behave in an unpredictable way (using random number generators or external data sources independently for example), the state of all applications running in the app net should be the same at a given HCS message sequence number.
+
+*Note: it is perfectly reasonable for an app to generate a random number and communicate this number to others via a HCS message, or fetch some data from an internet service and share it with others, but it would not be appropriate for each instance of an app to generate its own random number upon receiving a HCS message.*
+
+### Messaging, signing and encryption
+
+The most basic option for sending messages with HCS SXC Core is to send a non-encrypted message. This however will mean anyone with access to a mirror node will be able to read the messages that are being exchanged between app net participants on a given topic id.
+
+In order to provide some privacy, the HCS SXC Core component will implement plugins for message encryption. These plugins may be used to provide different encryption methodologies.
+
+Further, an encrypted message is only truly safe if the key used to decrypt it isn't known to the public, but only to the intended recipient of the message. One solution is to implement key rotation, whereby the keys used to encrypt and decrypt messages are rotated more or less frequently. Assuming rotated keys are discarded, it should not be possible to subsequently decrypt messages.
+
+Finally, the HCS SXC Core component will provide functionality such that messages can be signed (whether encrypted or not), this can be used to prove the origin of a message.
+
+### Persistence
+
+The HCS SXC Core component provides some level of persistence, however this is not meant to implement application-specific persistence. The persistence afforded by the HCS SXC Core component provides transaction and message level persistence.
+
+It is fully expected that an application would need to persist some data itself, data from messages exchanges with HCS for example, or data created as a result of HCS transactions (e.g. Bob bought this token from Alice). This application-level persisted data would constitute the application's state and will depend on each and every application rather than being common to all.
+
+*Note: The settlement demo makes use of application level persistence, however it has been implemented such that a transaction sent to HCS is not considered part of state (it remains pending) until the transaction has been confirmed by mirror node at which point the state transition is confirmed.
+This is to ensure application state does not end up out of sync with other applications in the event of a transaction processing failure for example.*
 
 ## Components
 
@@ -362,6 +384,8 @@ From the top of the project, issue the following command to compile docker image
 mvn clean install -Dcom.hedera.hashgraph.sdk.experimental=true -Pdocker
 ```
 
+*Note: a `mvnw` executable is provided in the project in the event you don't have maven installed*
+
 #### Compile "fat" jars
 
 From the top of the project, issue the following command to create fat jars
@@ -369,6 +393,8 @@ From the top of the project, issue the following command to create fat jars
 ```shell
 mvn clean install -Dcom.hedera.hashgraph.sdk.experimental=true -Pfatjar
 ```
+
+*Note: a `mvnw` executable is provided in the project in the event you don't have maven installed*
 
 ## Running the project in your IDE
 
@@ -482,3 +508,17 @@ And from there, open a new page for each of the participants
 * Stripe http://localhost:8088
 
 Whenever a participant performs and action in the UI, this results in a HCS transaction containing an `application-message` which itself contains a `business-message` containing the user's intent. Once the transaction has reached consensus, it's broadcast to all participants since they all subscribe to the same topic on a mirror node.
+
+## Contributing
+
+Contributions are welcome. Please see the [contributing](CONTRIBUTING.md) guide to see how you can get
+involved.
+
+## Code of Conduct
+
+This project is governed by the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are
+expected to uphold this code of conduct. Please report unacceptable behavior to [oss@hedera.com](mailto:oss@hedera.com)
+
+## License
+
+[Apache License 2.0](LICENSE)

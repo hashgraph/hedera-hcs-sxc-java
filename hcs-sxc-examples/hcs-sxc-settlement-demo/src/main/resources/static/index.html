@@ -263,10 +263,23 @@
                         <details>
                             <summary>
                                 <div class="message-container" style="margin-left:55px; margin-right: 16px;">
-                                    <div style="display: flex">
+                                    <div style="display: flex; align-items: center">
+                                        <span class="mdc-typography--headline6" 
+                                              id="settlements-user-avatar"
+                                              style="width:36px; height:36px;
+                                              background-repeat: no-repeat;
+                                              background-size: cover;
+                                              background-position: center; 
+                                              border-radius: 90px;
+                                             
+                                              color:white; background-color: #e4e7e8;
+                                              ">
+                                      
+                                        </span>
+                                        
                                         <span 
                                             id="settlements-user"
-                                            class="mdc-typography--headline6" style="flex-grow:1">
+                                            class="mdc-typography--body" style="flex-grow:1;  padding-left:16px; ">
                                             {{username}}
                                         </span>
                                         <span
@@ -1595,6 +1608,8 @@
                 var panelTemplate = document.getElementById("settlements-panel");
                 var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
                 clonedPanelTemplate.querySelector(".panel").id=userName;    
+                
+                clonedPanelTemplate.getElementById("settlements-user-avatar").style.backgroundImage =  "url(images/"+addressBookBs.find(e => e.name === userName).appId+".png)";
                 clonedPanelTemplate.getElementById("settlements-user").innerHTML = userName;
 
                 clonedPanelTemplate.getElementById("settlements-seen").innerHTML = (notificationList.find(x=>x.payer===userName) === undefined ? '': 'updated');

@@ -18,6 +18,10 @@
     <module>hcs-sxc-plugins-persistence-in-h2</module>
     <module>hcs-sxc-plugins-mirror-direct</module>
     <module>hcs-sxc-plugins-mirror-queue-artemis</module>
+    <module>hcs-sxc-plugins-encryption-diffie-hellman</module>
+    <module>hcs-sxc-plugins-encryption-noop</module>
+    <module>hcs-sxc-plugins-keyrotation-noop</module>
+    <module>hcs-sxc-plugins-keyrotation-diffie-hellman</module>
   </modules>
 
  </project>

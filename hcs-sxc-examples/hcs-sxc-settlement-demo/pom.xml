@@ -93,6 +93,18 @@
         </dependency>
         <!-- <dependency> <groupId>com.hedera</groupId> <artifactId>hcs-sxc-plugins-mirror-queue-artemis</artifactId> 
             <version>0.0.3-SNAPSHOT</version> </dependency> -->
+
+         <dependency>
+            <groupId>com.hedera</groupId>
+            <artifactId>hcs-sxc-plugins-encryption-noop</artifactId>
+            <version>0.0.3-SNAPSHOT</version>
+        </dependency>
+
+         <dependency>
+            <groupId>com.hedera</groupId>
+            <artifactId>hcs-sxc-plugins-keyrotation-noop</artifactId>
+            <version>0.0.3-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

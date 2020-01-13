@@ -28,9 +28,9 @@ public final class Environment {
         String operatorKey = dotEnv.get("OPERATOR_KEY");
         if (operatorKey == null){
             operatorKey = System.getProperty("OPERATOR_KEY");
-        }   
+    }
         return Ed25519PrivateKey.fromString(operatorKey);
-        
+
         
     }
 
@@ -42,7 +42,7 @@ public final class Environment {
         String operatorId = dotEnv.get("OPERATOR_ID");
         if (operatorId == null){
             operatorId = System.getProperty("OPERATOR_ID");
-        }   
+    }
         return operatorId;
     }
 
@@ -54,7 +54,7 @@ public final class Environment {
         String operatorId = dotEnv.get("OPERATOR_ID");
         if (operatorId == null){
             operatorId = System.getProperty("OPERATOR_ID");
-        }
+    }
         return AccountId.fromString(operatorId);
     }
     
@@ -65,7 +65,7 @@ public final class Environment {
         String appId = dotEnv.get("APP_ID");
         if(appId == null){
             appId = System.getProperty("APP_ID");
-        }
+    }
         return Integer.parseInt(appId);
     }
 }

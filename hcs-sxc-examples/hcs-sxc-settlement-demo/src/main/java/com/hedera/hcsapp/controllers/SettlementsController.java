@@ -136,8 +136,8 @@ public class SettlementsController {
 
             settlement = settlementRepository.findById(threadId).get();
             if ((settlement.getStatus() == null)
-                    || (!settlement.getStatus().contentEquals(States.SETTLEMENT_PROPOSED.name()))) {
-                settlement.setStatus(States.SETTLEMENT_PROPOSED_PENDING.name());
+                    || (!settlement.getStatus().contentEquals(States.SETTLE_PROPOSED.name()))) {
+                settlement.setStatus(States.SETTLE_PROPOSED_PENDING.name());
                 settlement = settlementRepository.save(settlement);
             } else {
                 log.error("Settlement state is already SETTLEMENT_PROPOSED");
@@ -188,7 +188,7 @@ public class SettlementsController {
             SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
                     .setSettleProposeAck(settleProposeAck).build();
 
-            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLEMENT_AGREED);
+            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_AGREED);
         } else {
             return serverError();
         }
@@ -218,7 +218,7 @@ public class SettlementsController {
             SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId).setSettleInit(settleInitBPM)
                     .build();
 
-            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_INIT_AWAIT_ACK);
+            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAY_CHANNEL_PROPOSED);
         } else {
             return serverError();
         }
@@ -245,7 +245,7 @@ public class SettlementsController {
             SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
                     .setSettleInitAck(settleInitAckBPM).build();
 
-            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_INIT_ACK);
+            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAY_CHANNEL_AGREED);
         } else {
             return serverError();
         }
@@ -274,7 +274,7 @@ public class SettlementsController {
             SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
                     .setPaymentInit(paymentInitBPM).build();
 
-            return saveAndSendSettlement(settlementBPM, settlement.get(), States.PAYMENT_INIT_AWAIT_ACK);
+            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAY_PROPOSED);
         } else {
             return serverError();
         }
@@ -301,7 +301,7 @@ public class SettlementsController {
             SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
                     .setPaymentInitAck(paymentInitAckBPM).build();
 
-            return saveAndSendSettlement(settlementBPM, settlement.get(), States.PAYMENT_INIT_ACK);
+            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAY_AGREED);
         } else {
             return serverError();
         }
@@ -330,7 +330,7 @@ public class SettlementsController {
             SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
                     .setPaymentSent(paymentSentBPM).build();
 
-            return saveAndSendSettlement(settlementBPM, settlement.get(), States.PAYMENT_SENT_AWAIT_ACK);
+            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAY_MADE);
         } else {
             return serverError();
         }
@@ -359,7 +359,7 @@ public class SettlementsController {
             SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
                     .setPaymentSentAck(paymentSentAckBPM).build();
 
-            return saveAndSendSettlement(settlementBPM, settlement.get(), States.PAYMENT_SENT_ACK);
+            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAY_ACKNOWLEDGED);
         } else {
             return serverError();
         }
@@ -385,7 +385,7 @@ public class SettlementsController {
             SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
                     .setSettlePayment(settlePaidBPM).build();
 
-            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAID_AWAIT_ACK);
+            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_RCPT_REQUESTED);
         } else {
             return serverError();
         }
@@ -413,7 +413,7 @@ public class SettlementsController {
             SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
                     .setSettlePaymentAck(settlePaidAckBPM).build();
 
-            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAID_ACK);
+            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_RCPT_CONFIRMED);
         } else {
             return serverError();
         }
@@ -439,7 +439,7 @@ public class SettlementsController {
             SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
                     .setSettleComplete(settleCompleteBPM).build();
 
-            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_COMP_AWAIT_ACK);
+            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAY_CONFIRMED);
         } else {
             return serverError();
         }
@@ -467,7 +467,7 @@ public class SettlementsController {
             SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
                     .setSettleCompleteAck(settleCompleteAckBPM).build();
 
-            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_COMPLETE_ACK);
+            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_COMPLETE);
         } else {
             return serverError();
         }

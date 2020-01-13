@@ -113,7 +113,7 @@ public class HCSIntegration {
             } else if (settlementBPM.hasCreditAck()) {
                 updateCredit(threadId, States.CREDIT_PROPOSED, States.CREDIT_AGREED);
             } else if (settlementBPM.hasSettlePropose()) {
-                String nextState = States.SETTLEMENT_PROPOSED.name();
+                String nextState = States.SETTLE_PROPOSED.name();
 
                 SettleProposeBPM settleProposeBPM = settlementBPM.getSettlePropose();
                 // update the settlement state
@@ -149,10 +149,10 @@ public class HCSIntegration {
                         }
                 );
             } else if (settlementBPM.hasSettleProposeAck()) {
-                updateSettlement(threadId, States.SETTLEMENT_PROPOSED, States.SETTLEMENT_AGREED);
+                updateSettlement(threadId, States.SETTLE_PROPOSED, States.SETTLE_AGREED);
             } else if (settlementBPM.hasSettleInit()) {
-                String priorState = States.SETTLEMENT_AGREED.name();
-                String nextState = States.SETTLE_INIT_AWAIT_ACK.name();
+                String priorState = States.SETTLE_AGREED.name();
+                String nextState = States.SETTLE_PAY_CHANNEL_PROPOSED.name();
 
                 SettleInitBPM settleInitBPM = settlementBPM.getSettleInit();
                 // update the settlement state
@@ -173,11 +173,11 @@ public class HCSIntegration {
                         }
                 );
             } else if (settlementBPM.hasSettleInitAck()) {
-                updateSettlement(threadId, States.SETTLE_INIT_AWAIT_ACK, States.SETTLE_INIT_ACK);
+                updateSettlement(threadId, States.SETTLE_PAY_CHANNEL_PROPOSED, States.SETTLE_PAY_CHANNEL_AGREED);
             } else if (settlementBPM.hasPaymentInit()) {
                 
-                String priorState = States.SETTLE_INIT_ACK.name();
-                String nextState = States.PAYMENT_INIT_AWAIT_ACK.name();
+                String priorState = States.SETTLE_PAY_CHANNEL_AGREED.name();
+                String nextState = States.SETTLE_PAY_PROPOSED.name();
 
                 PaymentInitBPM paymentInitBPM = settlementBPM.getPaymentInit();
                 // update the settlement state
@@ -200,10 +200,10 @@ public class HCSIntegration {
                         }
                 );
             } else if (settlementBPM.hasPaymentInitAck()) {
-                updateSettlement(threadId, States.PAYMENT_INIT_AWAIT_ACK, States.PAYMENT_INIT_ACK);
+                updateSettlement(threadId, States.SETTLE_PAY_PROPOSED, States.SETTLE_PAY_AGREED);
             } else if (settlementBPM.hasPaymentSent()) {
-                String priorState = States.PAYMENT_INIT_ACK.name();
-                String nextState = States.PAYMENT_SENT_AWAIT_ACK.name();
+                String priorState = States.SETTLE_PAY_AGREED.name();
+                String nextState = States.SETTLE_PAY_MADE.name();
 
                 PaymentSentBPM paymentSentBPM = settlementBPM.getPaymentSent();
                 // update the settlement state
@@ -226,10 +226,10 @@ public class HCSIntegration {
                 );
 
             } else if (settlementBPM.hasPaymentSentAck()) {
-                updateSettlement(threadId, States.PAYMENT_SENT_AWAIT_ACK, States.PAYMENT_SENT_ACK);
+                updateSettlement(threadId, States.SETTLE_PAY_MADE, States.SETTLE_PAY_ACKNOWLEDGED);
             } else if (settlementBPM.hasSettlePayment()) {
-                String priorState = States.PAYMENT_SENT_ACK.name();
-                String nextState = States.SETTLE_PAID_AWAIT_ACK.name();
+                String priorState = States.SETTLE_PAY_ACKNOWLEDGED.name();
+                String nextState = States.SETTLE_RCPT_REQUESTED.name();
 
                 SettlePaidBPM settlePaidBPM = settlementBPM.getSettlePayment();
                 // update the settlement state
@@ -251,10 +251,10 @@ public class HCSIntegration {
                         }
                 );
             } else if (settlementBPM.hasSettlePaymentAck()) {
-                updateSettlement(threadId, States.SETTLE_PAID_AWAIT_ACK, States.SETTLE_PAID_ACK);
+                updateSettlement(threadId, States.SETTLE_RCPT_REQUESTED, States.SETTLE_RCPT_CONFIRMED);
             } else if (settlementBPM.hasSettleComplete()) {
-                String priorState = States.SETTLE_PAID_ACK.name();
-                String nextState = States.SETTLE_COMP_AWAIT_ACK.name();
+                String priorState = States.SETTLE_RCPT_CONFIRMED.name();
+                String nextState = States.SETTLE_PAY_CONFIRMED.name();
 
                 SettleCompleteBPM settleCompleteBPM = settlementBPM.getSettleComplete();
                 // update the settlement state
@@ -276,7 +276,7 @@ public class HCSIntegration {
                         }
                 );
             } else if (settlementBPM.hasSettleCompleteAck()) {
-                updateSettlement(threadId, States.SETTLE_COMP_AWAIT_ACK, States.SETTLE_COMPLETE_ACK);
+                updateSettlement(threadId, States.SETTLE_PAY_CONFIRMED, States.SETTLE_COMPLETE);
             } else if (settlementBPM.hasAdminDelete()) {
                 deleteData();
                 notify("admin", "admin", "admin", "admin");

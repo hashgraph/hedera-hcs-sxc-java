@@ -31,14 +31,15 @@ jobs:
           command: cd sdk; git init
       - run:
           name: Running git pull on hcs java sdk
-          command: cd sdk; git clone -b HCS https://github.com/mike-burrage-hedera/hedera-sdk-java.git
+          command: cd sdk; git clone -b "292-ConsensusMessage-doesn't-have-a-public-constructor" https://github.com/hashgraph/hedera-sdk-java
+          # command: cd sdk; git clone https://github.com/hashgraph/hedera-sdk-java
       - run:
           name: Running maven (install - skipping tests) for hcs java sdk
-          command: cd sdk/hedera-sdk-java; mvn install -DskipTests
+          command: cd sdk/hedera-sdk-java; mvn install -Dcom.hedera.hashgraph.sdk.experimental=true -DskipTests
 #HCS lib
       - run:
           name: Running maven (validate, compile, test, package)
-          command: mvn package
+          command: mvn package -Dcom.hedera.hashgraph.sdk.experimental=true
       # - save_cache:
       #     key: maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
       #     paths:

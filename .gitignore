@@ -61,3 +61,4 @@ hcs-sxc-plugins/hcs-sxc-plugins-mirror-queue-artemis/target
 /hcs-sxc-examples/hcs-sxc-settlement-demo/nbactions.xml
 hcs-sxc-plugins/hcs-sxc-plugins-persistence-in-h2/target
 hcs-sxc-examples/hcs-sxc-settlement-demo/src/main/resources/config.yaml
+/hcs-sxc-examples/hcs-sxc-settlement-demo-test/

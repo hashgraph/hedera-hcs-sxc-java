@@ -1614,15 +1614,14 @@
                 clonedPanelTemplate.getElementById("settlements-user-avatar").style.backgroundImage =  "url(images/"+addressBookBs.find(e => e.name === userName).appId+".png)";
                 clonedPanelTemplate.getElementById("settlements-user").innerHTML = userName;
 
-                clonedPanelTemplate.getElementById("settlements-seen").innerHTML = (notificationList.find(x=>x.payer===userName) === undefined ? '': 'updated');
-                
-                
+                clonedPanelTemplate.getElementById("settlements-seen").innerHTML = (notificationList.filter(el => (el.payer === userName || el.recipient === userName) && el.context === "settlements" ).length > 0 ? 'updated': '');
+               
                 clonedPanelTemplate.querySelector("details").addEventListener("toggle", e => {
-                    o = notificationList.find(x=>x.payer===userName && x.context ==="settlements");
-                    notificationList = notificationList.filter(x=>x!==o);
+                    o = notificationList.find(notification => (notification.payer === userName || notification.recipient === userName  ) && notification.context === "settlements");
+                    notificationList = notificationList.filter(notification => notification !== o);
                     document.querySelector("#"+userName+" #settlements-seen").innerHTML ='';
-                });         
-                
+                });
+                  
                 var tableBody = clonedPanelTemplate.getElementById("settlement-table-body");
                 var tableBodyTemplate = clonedPanelTemplate.getElementById("settlement-table-body-template");
 
@@ -1796,12 +1795,10 @@
                 clonedPanelTemplate.querySelector(".panel").id=userName;    
                 clonedPanelTemplate.getElementById("credits-and-debits-user").innerHTML = userName ;
                 clonedPanelTemplate.getElementById("credits-and-debits-user-avatar").style.backgroundImage =  "url(images/"+addressBookBs.find(e => e.name === userName).appId+".png)";
-                clonedPanelTemplate.getElementById("credits-and-debits-seen").innerHTML = (notificationList.find(x=>x.payer===userName) === undefined ? '': 'updated');
-                
-                
+                clonedPanelTemplate.getElementById("credits-and-debits-seen").innerHTML = (notificationList.filter(el => (el.payer === userName || el.recipient === userName) && el.context === "credits" ).length > 0 ? 'updated': '');
                
                 clonedPanelTemplate.querySelector("details").addEventListener("toggle", e => {
-                    o = notificationList.find(notification => notification.payer === userName && notification.context === "credits");
+                    o = notificationList.find(notification => (notification.payer === userName || notification.recipient === userName  ) && notification.context === "credits");
                     notificationList = notificationList.filter(notification => notification !== o);
                     document.querySelector("#"+userName+" #credits-and-debits-seen").innerHTML ='';
                 });

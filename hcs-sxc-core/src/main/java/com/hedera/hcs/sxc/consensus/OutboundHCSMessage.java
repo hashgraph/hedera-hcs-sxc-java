@@ -19,6 +19,8 @@ import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcs.sxc.HCSCore;
+import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
+import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
 import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
 import com.hedera.hcs.sxc.plugins.Plugins;
 import com.hedera.hcs.sxc.proto.java.AccountID;
@@ -44,9 +46,13 @@ public final class OutboundHCSMessage {
     private List<ConsensusTopicId> topicIds = new ArrayList<ConsensusTopicId>();
     private long hcsTransactionFee = 0L;
     private TransactionId transactionId = null;
-    private SxcMessagePersistence persistence;
+    private SxcMessagePersistence persistencePlugin;
+    private SxcMessageEncryption messageEncryptionPlugin;
+    private static SxcKeyRotation keyRotationPlugin;
+    private HCSCore hcsCore;
 
     public OutboundHCSMessage(HCSCore hcsCore) throws Exception {
+        this.hcsCore = hcsCore;
         this.signMessages = hcsCore.getSignMessages();
         this.encryptMessages = hcsCore.getEncryptMessages();
         this.rotateKeys = hcsCore.getRotateKeys();
@@ -58,7 +64,11 @@ public final class OutboundHCSMessage {
 
         // load persistence implementation at runtime
         Class<?> persistenceClass = Plugins.find("com.hedera.hcs.sxc.plugin.persistence.*", "com.hedera.hcs.sxc.interfaces.SxcMessagePersistence", true);
-        this.persistence = (SxcMessagePersistence)persistenceClass.newInstance();
+        this.persistencePlugin = (SxcMessagePersistence)persistenceClass.newInstance();
+        Class<?> messageEncryptionClass = Plugins.find("com.hedera.hsc.sxc.plugins.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
+        this.messageEncryptionPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
+        Class<?> keyRotationClass = Plugins.find("com.hedera.hsc.sxc.plugins.keyrotation.*", "com.hedera.hcs.sxc.interfaces.SxcKeyRotation", true);
+        this.keyRotationPlugin = (SxcKeyRotation)keyRotationClass.newInstance();
     }
 
     public OutboundHCSMessage overrideMessageSignature(boolean signMessages) {
@@ -106,14 +116,15 @@ public final class OutboundHCSMessage {
      * @throws IllegalArgumentException
      * @throws HederaException
      */
-    public TransactionId sendMessage(int topicIndex, byte[] message) throws HederaNetworkException, IllegalArgumentException, HederaException {
+    public TransactionId sendMessage(int topicIndex, byte[] message) throws Exception {
 
         if (signMessages) {
 
         }
         if (encryptMessages) {
-
+            message = messageEncryptionPlugin.encrypt(hcsCore.getMessageEncryptionKey(), message);
         }
+
         if (rotateKeys) {
             int messageCount = 0; //TODO - keep track of messages app-wide, not just here. ( per topic )
             if (messageCount > rotationFrequency) {
@@ -146,7 +157,7 @@ public final class OutboundHCSMessage {
                     .setTransactionId(transactionId);
 
                 // persist the transaction
-                this.persistence.storeTransaction(transactionId, tx);
+                this.persistencePlugin.storeTransaction(transactionId, tx);
 
                 log.info("Executing transaction");
                 TransactionId txId = tx.execute(client);

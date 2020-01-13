@@ -12,17 +12,17 @@
 
   <name>hcs-sxc-plugins-mirror-direct</name>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.hedera</groupId>
-            <artifactId>hcs-sxc-proto</artifactId>
-            <version>${hcs-sxc-proto.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.hedera</groupId>
-            <artifactId>hcs-sxc-interfaces</artifactId>
-            <version>${hcs-sxc-interfaces.version}</version>
-        </dependency>
-    </dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>com.hedera</groupId>
+      <artifactId>hcs-sxc-proto</artifactId>
+      <version>${hcs-sxc-proto.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.hedera</groupId>
+      <artifactId>hcs-sxc-interfaces</artifactId>
+      <version>${hcs-sxc-interfaces.version}</version>
+    </dependency>
+  </dependencies>
 
 </project>

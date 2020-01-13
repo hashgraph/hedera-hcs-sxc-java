@@ -22,6 +22,7 @@
             <artifactId>hcs-sxc-core</artifactId>
             <version>${hcs-sxc-core.version}</version>
         </dependency>
+        <!--  PLUGINS -->
         <dependency> 
             <groupId>com.hedera</groupId> 
             <artifactId>hcs-sxc-plugins-persistence-in-memory</artifactId> 
@@ -32,6 +33,16 @@
             <artifactId>hcs-sxc-plugins-mirror-queue-artemis</artifactId> 
             <version>0.0.3-SNAPSHOT</version> 
         </dependency> 
+         <dependency>
+            <groupId>com.hedera</groupId>
+            <artifactId>hcs-sxc-plugins-encryption-noop</artifactId>
+            <version>0.0.3-SNAPSHOT</version>
+        </dependency>
+         <dependency>
+            <groupId>com.hedera</groupId>
+            <artifactId>hcs-sxc-plugins-keyrotation-noop</artifactId>
+            <version>0.0.3-SNAPSHOT</version>
+        </dependency>
     </dependencies>
     <build>
         <sourceDirectory>src</sourceDirectory>

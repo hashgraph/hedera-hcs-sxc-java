@@ -24,7 +24,7 @@ public enum States {
     ,SETTLE_PAY_MADE_PENDING("Settling", "Payment Made (Pending)")
     ,SETTLE_PAY_MADE("Settling", "Payment Made")
     ,SETTLE_PAY_ACK_PENDING("Settling", "Payment Acknowledged (Pending)")
-    ,SETTLE_PAY_ACKNOWLEDGED("Settling", "Payment Acknowledged")
+    ,SETTLE_PAY_ACK("Settling", "Payment Acknowledged")
 
     ,SETTLE_RCPT_REQUESTED_PENDING("Settling", "Receipt Requested (Pending)")
     ,SETTLE_RCPT_REQUESTED("Settling", "Receipt Requested")

@@ -12,7 +12,11 @@ public interface SettlementRepository extends CrudRepository<Settlement, String>
     @Query("SELECT s FROM Settlement s "
             + "WHERE (s.payerName = :currentUser AND s.recipientName = :searchUser) "
             + "OR (s.payerName = :searchUser AND s.recipientName = :currentUser) "
-            + "OR (s.paymentChannelName = :currentUser AND s.payerName = :searchUser )")
+            + "OR (s.paymentChannelName = :currentUser AND s.payerName = :searchUser ) ORDER BY threadId DESC")
+    
     List<Settlement> findAllSettlementsForUsers(@Param("currentUser") String currentUser, @Param("searchUser") String searchUser);
+
+    @Query("SELECT s FROM Settlement s ORDER BY threadId DESC")
+    List<Settlement> findAllDesc();
 }
 

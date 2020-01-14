@@ -66,18 +66,23 @@
                         id="app-bar-of-main-content">     
                     <div class="mdc-top-app-bar__row">
                         <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+                            
+                            <span class="mdc-typography--headline6" 
+                                              id="this-user-avatar"
+                                              style="width:36px; height:36px;
+                                              background-repeat: no-repeat;
+                                              background-size: cover;
+                                              background-position: center; 
+                                              border-radius: 90px;
+                                              color:white; background-color: #e4e7e8;
+                                              "></span>
                             <span id="this-user"
                                   class="mdc-top-app-bar__title
                                   mdc-typography--body1
                                   "
-                                  style="padding: 8px"
+                                  style="padding: 8px;padding-left:24px; text-transform: capitalize"
                                   >Alice</span>
-                            <span 
-                                id="this-pk"
-                                class="overflow-elipsis mdc-typography--body1"
-                                title="302fdsadfsafdsadfsadfsdfsadfsadfsadf">
-                                PK 302fdsadfsafdsadfsadfsdfsadfsadfsadf
-                            </span>
+                            
                         </section>
                     </div>           
                 </header>
@@ -1449,10 +1454,13 @@
                 thisuserName =  whoami.name;
                 document.documentElement.style.setProperty('--mdc-theme-primary', "#"+whoami.color);
                 
-                document.getElementById("this-user").innerHTML=whoami.name;
+                document.getElementById("this-user").innerHTML=whoami.name +"<span style='color:#aaa; font-size:12px;'> ("+whoami.roles+")</span>";
+                document.getElementById("this-user-avatar").style.backgroundImage= "url(images/"+whoami.appId+".png)";
+                
+                /*
                 document.getElementById("this-pk").innerHTML=whoami.publicKey;
                 document.getElementById("this-pk").title=whoami.publicKey;
-                
+                */
                 responsePaymentChannel = await fetch('addressbook/paychannel/');
                 paymentChannels  = await responsePaymentChannel.json(); 
                 

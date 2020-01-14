@@ -28,7 +28,6 @@ import com.hedera.hcsapp.entities.SettlementItemId;
 import com.hedera.hcsapp.repository.CreditRepository;
 import com.hedera.hcsapp.repository.SettlementItemRepository;
 import com.hedera.hcsapp.repository.SettlementRepository;
-import com.hedera.hcsapp.restclasses.PaymentSent;
 import com.hedera.hcsapp.restclasses.SettlementChannelProposal;
 import com.hedera.hcsapp.restclasses.SettlementPaidOrComplete;
 import com.hedera.hcsapp.restclasses.SettlementPaymentInit;
@@ -334,63 +333,6 @@ public class SettlementsController {
     }
 
 //  @Transactional
-//    @PostMapping(value = "/settlements/paymentSent", consumes = "application/json", produces = "application/json")
-//    public ResponseEntity<SettlementRest> paymentSent(@RequestBody PaymentSent paymentSent) throws Exception {
-//
-//        String threadId = paymentSent.getThreadId();
-//
-//        Optional<Settlement> settlement = settlementRepository.findById(threadId);
-//
-//        if (settlement.isPresent()) {
-//
-//            PaymentSentBPM.Builder paymentSentBPM = PaymentSentBPM.newBuilder()
-//                    .setPayerName(settlement.get().getPayerName())
-//                    .setRecipientName(settlement.get().getRecipientName())
-//                    .setPayerAccountDetails(settlement.get().getPayerAccountDetails())
-//                    .setRecipientAccountDetails(settlement.get().getRecipientAccountDetails())
-//                    .setAdditionalNotes(paymentSent.getAdditionalNotes())
-//                    .setPaymentReference(paymentSent.getPaymentReference())
-//                    .setNetValue(moneyFromSettlement(settlement.get()));
-//
-//            SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
-//                    .setPaymentSent(paymentSentBPM).build();
-//
-//            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAY_MADE);
-//        } else {
-//            return serverError();
-//        }
-//
-//    }
-
-//@Transactional
-//    @PostMapping(value = "/settlements/paymentSent/ack/{threadId}", produces = "application/json")
-//    public ResponseEntity<SettlementRest> paymentSentAck(@PathVariable String threadId) throws Exception {
-//
-//        Optional<Settlement> settlement = settlementRepository.findById(threadId);
-//
-//        if (settlement.isPresent()) {
-//
-//            PaymentSentBPM.Builder paymentSentBPM = PaymentSentBPM.newBuilder()
-//                    .setPayerName(settlement.get().getPayerName())
-//                    .setRecipientName(settlement.get().getRecipientName())
-//                    .setPayerAccountDetails(settlement.get().getPayerAccountDetails())
-//                    .setRecipientAccountDetails(settlement.get().getRecipientAccountDetails())
-//                    .setAdditionalNotes(settlement.get().getAdditionalNotes())
-//                    .setPaymentReference(settlement.get().getPaymentReference())
-//                    .setNetValue(Utils.moneyFromSettlement(settlement.get()));
-//
-//            PaymentSentAckBPM.Builder paymentSentAckBPM = PaymentSentAckBPM.newBuilder().setPaymentSent(paymentSentBPM);
-//
-//            SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
-//                    .setPaymentSentAck(paymentSentAckBPM).build();
-//
-//            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAY_ACKNOWLEDGED);
-//        } else {
-//            return Utils.serverError();
-//        }
-//    }
-
-//  @Transactional
     @PostMapping(value = "/settlements/paid", consumes = "application/json", produces = "application/json")
     public ResponseEntity<SettlementRest> paid(@RequestBody SettlementPaidOrComplete settlementPaid) throws Exception {
 
@@ -483,32 +425,6 @@ public class SettlementsController {
 
     }
 
-  //@Transactional
-//    @PostMapping(value = "/settlements/complete/ack/{threadId}", produces = "application/json")
-//    public ResponseEntity<SettlementRest> completeAck(@PathVariable String threadId) throws Exception {
-//
-//        Optional<Settlement> settlement = settlementRepository.findById(threadId);
-//
-//        if (settlement.isPresent()) {
-//
-//            SettleCompleteBPM.Builder settleCompleteBPM = SettleCompleteBPM.newBuilder()
-//                    .setPayerName(settlement.get().getPayerName())
-//                    .setRecipientName(settlement.get().getRecipientName())
-//                    .setAdditionalNotes(settlement.get().getAdditionalNotes())
-//                    .setPaymentReference(settlement.get().getPaymentReference())
-//                    .setNetValue(Utils.moneyFromSettlement(settlement.get()));
-//
-//            SettleCompleteAckBPM.Builder settleCompleteAckBPM = SettleCompleteAckBPM.newBuilder()
-//                    .setSettlePaid(settleCompleteBPM);
-//            
-//            SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
-//                    .setSettleCompleteAck(settleCompleteAckBPM).build();
-//
-//            return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_COMPLETE);
-//        } else {
-//            return Utils.serverError();
-//        }
-//    }
     private ResponseEntity<SettlementRest> saveAndSendSettlement(SettlementBPM settlementBPM, Settlement settlement,
             States newState) throws Exception {
         

@@ -11,7 +11,9 @@ import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
+import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
+import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 import com.hedera.hcs.sxc.interfaces.HCSResponse;
 import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
 import com.hedera.hcsapp.AppData;
@@ -33,7 +35,9 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.core.env.Environment;
 import proto.CreditBPM;
 import proto.PaymentInitBPM;
+import proto.PaymentSentAckBPM;
 import proto.PaymentSentBPM;
+import proto.SettleCompleteAckBPM;
 import proto.SettleCompleteBPM;
 import proto.SettleInitBPM;
 import proto.SettlePaidBPM;
@@ -183,24 +187,78 @@ public class HCSIntegration {
                 // update the settlement state
                 settlementRepository.findById(threadId).ifPresent(
                         (settlement) -> {
-                            if ((settlement.getStatus().equals(nextState + "_PENDING")) || (settlement.getStatus().equals(priorState))) {
-                                settlement.setStatus(nextState);
-                                settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
-                                settlement.setAdditionalNotes(paymentInitBPM.getAdditionalNotes());
-                                settlement.setPayerAccountDetails(paymentInitBPM.getPayerAccountDetails());
-                                settlement.setRecipientAccountDetails(paymentInitBPM.getRecipientAccountDetails());
-                                
-                                settlementRepository.save(settlement);
-                                // update the credits too
-                                updateCreditStateForSettlementItems(threadId, nextState);
-                                notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
-                            } else {
-                                log.error("Settlement status should be " + priorState + " or " + nextState + ", found : " + settlement.getStatus());
+                            // only update status if user is paychannel or initiator
+                            if ((settlement.getPayerName().endsWith(appData.getUserName())) || (settlement.getPaymentChannelName().equals(appData.getUserName()))) {
+                                if ((settlement.getStatus().equals(nextState + "_PENDING")) || (settlement.getStatus().equals(priorState))) {
+                                    settlement.setStatus(nextState);
+                                    settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                                    settlement.setAdditionalNotes(paymentInitBPM.getAdditionalNotes());
+                                    settlement.setPayerAccountDetails(paymentInitBPM.getPayerAccountDetails());
+                                    settlement.setRecipientAccountDetails(paymentInitBPM.getRecipientAccountDetails());
+                                    
+                                    settlementRepository.save(settlement);
+                                    // update the credits too
+                                    updateCreditStateForSettlementItems(threadId, nextState);
+                                    notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
+                                } else {
+                                    log.error("Settlement status should be " + priorState + " or " + nextState + ", found : " + settlement.getStatus());
+                                }
                             }
                         }
                 );
             } else if (settlementBPM.hasPaymentInitAck()) {
-                updateSettlement(threadId, States.SETTLE_PAY_PROPOSED, States.SETTLE_PAY_AGREED);
+                // Pay channel initiates payment (bank transfer between parties) and sends payment made message if
+                // self is responsible for payment
+
+                settlementRepository.findById(threadId).ifPresent(
+                    (settlement) -> {
+                        // only update status if user is paychannel or initiator
+                        if ((settlement.getPayerName().equals(appData.getUserName())) || (settlement.getPaymentChannelName().equals(appData.getUserName()))) {
+                            updateSettlement(threadId, States.SETTLE_PAY_PROPOSED, States.SETTLE_PAY_AGREED);
+                        }
+
+                        // only send payment made message if user is the payment channel
+                        if (settlement.getPaymentChannelName().equals(appData.getUserName())) {
+
+                            int random = (int) ((Math.random() * ((10000 - 1) + 1)) + 1);
+                            String payref = String.format("PAYREF{%05d}",random);
+                            
+                            PaymentSentBPM.Builder paymentSentBPM = PaymentSentBPM.newBuilder()
+                                    .setPayerName(settlement.getPayerName())
+                                    .setRecipientName(settlement.getRecipientName())
+                                    .setPayerAccountDetails(settlement.getPayerAccountDetails())
+                                    .setRecipientAccountDetails(settlement.getRecipientAccountDetails())
+                                    .setAdditionalNotes("Bank Transfer Complete")
+                                    .setPaymentReference(payref)
+                                    .setNetValue(Utils.moneyFromSettlement(settlement));
+        
+                            SettlementBPM newSettlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
+                                    .setPaymentSent(paymentSentBPM).build();
+        
+                            States newState = States.SETTLE_PAY_MADE;
+        
+                            try {
+        
+                                if ( ! settlement.getStatus().contentEquals(newState.name())) {
+                                    settlement.setStatus(newState.name() + "_PENDING");
+                                } else {
+                                    log.error("Settlement state is already " + newState.name());
+                                }
+        
+                                settlementRepository.save(settlement);
+        
+                                TransactionId transactionId = new OutboundHCSMessage(appData.getHCSCore()).overrideEncryptedMessages(false)
+                                        .overrideMessageSignature(false).sendMessage(appData.getTopicIndex(), newSettlementBPM.toByteArray());
+        
+                                log.info("Message sent successfully.");
+                                notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
+        
+                            } catch (Exception e) {
+                                log.error(e);
+                            }
+                        }
+                    }
+                );
             } else if (settlementBPM.hasPaymentSent()) {
                 String priorState = States.SETTLE_PAY_AGREED.name();
                 String nextState = States.SETTLE_PAY_MADE.name();
@@ -209,49 +267,118 @@ public class HCSIntegration {
                 // update the settlement state
                 settlementRepository.findById(threadId).ifPresent(
                         (settlement) -> {
-                            if ((settlement.getStatus().equals(nextState + "_PENDING")) || (settlement.getStatus().equals(priorState))) {
-                                settlement.setStatus(nextState);
-                                settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
-                                settlement.setAdditionalNotes(paymentSentBPM.getAdditionalNotes());
-                                settlement.setPaymentReference(paymentSentBPM.getPaymentReference());
-                                
-                                settlementRepository.save(settlement);
-                                // update the credits too
-                                updateCreditStateForSettlementItems(threadId, nextState);
-                                notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
-                            } else {
-                                log.error("Settlement status should be " + nextState + "_PENDING" + " or " + priorState + ", found : " + settlement.getStatus());
+                            // only update status if user is paychannel or initiator
+                            if ((settlement.getPayerName().equals(appData.getUserName())) || (settlement.getPaymentChannelName().equals(appData.getUserName()))) {
+                                if ((settlement.getStatus().equals(nextState + "_PENDING")) || (settlement.getStatus().equals(priorState))) {
+                                    settlement.setStatus(nextState);
+                                    settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                                    settlement.setAdditionalNotes(paymentSentBPM.getAdditionalNotes());
+                                    settlement.setPaymentReference(paymentSentBPM.getPaymentReference());
+                                    
+                                    settlementRepository.save(settlement);
+                                    // update the credits too
+                                    updateCreditStateForSettlementItems(threadId, nextState);
+                                    notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
+                                    
+                                    // only send next message if user is the originator
+                                    if (settlement.getPayerName().equals(appData.getUserName())) {
+
+                                        PaymentSentAckBPM.Builder paymentSentAckBPM = PaymentSentAckBPM.newBuilder().setPaymentSent(paymentSentBPM);
+                    
+                                        SettlementBPM newSettlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
+                                                .setPaymentSentAck(paymentSentAckBPM).build();
+                    
+                                        States newState = States.SETTLE_PAY_ACK;
+                    
+                                        try {
+                    
+                                            if ( ! settlement.getStatus().contentEquals(newState.name())) {
+                                                settlement.setStatus(newState.name() + "_PENDING");
+                                            } else {
+                                                log.error("Settlement state is already " + newState.name());
+                                            }
+                    
+                                            settlementRepository.save(settlement);
+                    
+                                            TransactionId transactionId = new OutboundHCSMessage(appData.getHCSCore()).overrideEncryptedMessages(false)
+                                                    .overrideMessageSignature(false).sendMessage(appData.getTopicIndex(), newSettlementBPM.toByteArray());
+                    
+                                            notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
+                                            log.info("Message sent successfully.");
+                    
+                                        } catch (Exception e) {
+                                            log.error(e);
+                                        }
+                                    }
+                                    
+                                } else {
+                                    log.error("Settlement status should be " + nextState + "_PENDING" + " or " + priorState + ", found : " + settlement.getStatus());
+                                }
                             }
                         }
                 );
 
             } else if (settlementBPM.hasPaymentSentAck()) {
-                updateSettlement(threadId, States.SETTLE_PAY_MADE, States.SETTLE_PAY_ACKNOWLEDGED);
+                
+                settlementRepository.findById(threadId).ifPresent(
+                    (settlement) -> {
+                        // only update status if user is paychannel or initiator
+                        if ((settlement.getPayerName().equals(appData.getUserName())) || (settlement.getPaymentChannelName().equals(appData.getUserName()))) {
+                            updateSettlement(threadId, States.SETTLE_PAY_MADE, States.SETTLE_PAY_ACK);
+                        }
+                    }
+                );
+                
             } else if (settlementBPM.hasSettlePayment()) {
-                String priorState = States.SETTLE_PAY_ACKNOWLEDGED.name();
+                String priorState = States.SETTLE_PAY_ACK.name();
                 String nextState = States.SETTLE_RCPT_REQUESTED.name();
 
                 SettlePaidBPM settlePaidBPM = settlementBPM.getSettlePayment();
                 // update the settlement state
                 settlementRepository.findById(threadId).ifPresent(
                         (settlement) -> {
-                            if ((settlement.getStatus().equals(nextState + "_PENDING")) || (settlement.getStatus().equals(priorState))) {
-                                settlement.setStatus(nextState);
-                                settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
-                                settlement.setAdditionalNotes(settlePaidBPM.getAdditionalNotes());
-                                settlement.setPaymentReference(settlePaidBPM.getPaymentReference());
-                                
-                                settlementRepository.save(settlement);
-                                // update the credits too
-                                updateCreditStateForSettlementItems(threadId, nextState);
-                                notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
-                            } else {
-                                log.error("Settlement status should be " + nextState + "_PENDING" + " or " + priorState + ", found : " + settlement.getStatus());
+                            // only update state if payer or receipient
+                            if ((settlement.getPayerName().equals(appData.getUserName())) || (settlement.getRecipientName().equals(appData.getUserName()))) {
+                                boolean doUpdate = false;
+                                if ((settlement.getStatus().equals(nextState + "_PENDING")) || (settlement.getStatus().equals(priorState))) {
+                                    // payer settlement status is ok
+                                    doUpdate = true;
+                                }
+                                if (settlement.getStatus().equals(States.SETTLE_PAY_CHANNEL_AGREED.name())) {
+                                    // recipient settlement status is ok
+                                    doUpdate = true;
+                                }
+                                if (doUpdate) {
+                                    settlement.setStatus(nextState);
+                                    settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                                    settlement.setAdditionalNotes(settlePaidBPM.getAdditionalNotes());
+                                    settlement.setPaymentReference(settlePaidBPM.getPaymentReference());
+                                    
+                                    settlementRepository.save(settlement);
+                                    // update the credits too
+                                    updateCreditStateForSettlementItems(threadId, nextState);
+                                    notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
+                                } else {
+                                    log.error("Settlement status should be " + nextState + "_PENDING" + " or " + priorState + ", found : " + settlement.getStatus());
+                                }
                             }
                         }
                 );
             } else if (settlementBPM.hasSettlePaymentAck()) {
-                updateSettlement(threadId, States.SETTLE_RCPT_REQUESTED, States.SETTLE_RCPT_CONFIRMED);
+                settlementRepository.findById(threadId).ifPresent(
+                        (settlement) -> {
+                            // only update state if payer or recipient
+                            if (settlement.getPayerName().equals(appData.getUserName())) {
+                                updateSettlement(threadId, States.SETTLE_RCPT_REQUESTED, States.SETTLE_RCPT_CONFIRMED);
+                            } else if (settlement.getRecipientName().equals(appData.getUserName())) {
+                                settlement.setStatus(States.SETTLE_COMPLETE.name());
+                                settlementRepository.save(settlement);
+                                // update the credits too
+                                updateCreditStateForSettlementItems(threadId, States.SETTLE_COMPLETE.name());
+                                notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
+                            }
+                        }
+                    );
             } else if (settlementBPM.hasSettleComplete()) {
                 String priorState = States.SETTLE_RCPT_CONFIRMED.name();
                 String nextState = States.SETTLE_PAY_CONFIRMED.name();
@@ -260,23 +387,76 @@ public class HCSIntegration {
                 // update the settlement state
                 settlementRepository.findById(threadId).ifPresent(
                         (settlement) -> {
-                            if ((settlement.getStatus().equals(nextState + "_PENDING")) || (settlement.getStatus().equals(priorState))) {
-                                settlement.setStatus(nextState);
-                                settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
-                                settlement.setAdditionalNotes(settleCompleteBPM.getAdditionalNotes());
-                                settlement.setPaymentReference(settleCompleteBPM.getPaymentReference());
-                                
-                                settlementRepository.save(settlement);
-                                // update the credits too
-                                updateCreditStateForSettlementItems(threadId, nextState);
-                                notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
-                            } else {
-                                log.error("Settlement status should be " + nextState + "_PENDING" + " or " + priorState + ", found : " + settlement.getStatus());
+                            if (settlement.getPayerName().equals(appData.getUserName())) {
+                                // payer updates status to SETTLE_PAY_CONFIRMED
+                                if ((settlement.getStatus().equals(nextState + "_PENDING")) || (settlement.getStatus().equals(priorState))) {
+                                    settlement.setStatus(nextState);
+                                    settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                                    settlement.setAdditionalNotes(settleCompleteBPM.getAdditionalNotes());
+                                    settlement.setPaymentReference(settleCompleteBPM.getPaymentReference());
+                                    
+                                    settlementRepository.save(settlement);
+                                    // update the credits too
+                                    updateCreditStateForSettlementItems(threadId, nextState);
+                                    notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
+                                } else {
+                                    log.error("Settlement status should be " + nextState + "_PENDING" + " or " + priorState + ", found : " + settlement.getStatus());
+                                }
+                            } else if (settlement.getPaymentChannelName().equals(appData.getUserName())) {
+                                if (settlement.getStatus().equals(States.SETTLE_PAY_ACK.name())) {
+                                    settlement.setStatus(nextState);
+                                    settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                                    settlement.setAdditionalNotes(settleCompleteBPM.getAdditionalNotes());
+                                    settlement.setPaymentReference(settleCompleteBPM.getPaymentReference());
+                                    
+                                    settlementRepository.save(settlement);
+                                    // update the credits too
+                                    updateCreditStateForSettlementItems(threadId, nextState);
+                                    notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
+                                    
+                                    // send ack automatically
+                                    SettleCompleteAckBPM.Builder settleCompleteAckBPM = SettleCompleteAckBPM.newBuilder()
+                                            .setSettlePaid(settleCompleteBPM);
+                                    
+                                    SettlementBPM ackSettlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
+                                            .setSettleCompleteAck(settleCompleteAckBPM).build();
+
+                                    try {
+
+                                        if ( ! settlement.getStatus().contentEquals(States.SETTLE_COMPLETE.name())) {
+                                            settlement.setStatus(States.SETTLE_COMPLETE.name() + "_PENDING");
+                                        } else {
+                                            log.error("Settlement state is already " + States.SETTLE_COMPLETE.name());
+                                        }
+
+                                        Settlement newSettlement = settlementRepository.save(settlement);
+
+                                        TransactionId transactionId = new OutboundHCSMessage(appData.getHCSCore()).overrideEncryptedMessages(false)
+                                                .overrideMessageSignature(false).sendMessage(appData.getTopicIndex(), ackSettlementBPM.toByteArray());
+
+                                        notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
+                                        log.info("Message sent successfully.");
+
+                                    } catch (Exception e) {
+                                        log.error(e);
+                                    }
+                                    
+                                } else {
+                                    log.error("Settlement status should be " + nextState + "_PENDING" + " or " + priorState + ", found : " + settlement.getStatus());
+                                }
                             }
                         }
                 );
             } else if (settlementBPM.hasSettleCompleteAck()) {
-                updateSettlement(threadId, States.SETTLE_PAY_CONFIRMED, States.SETTLE_COMPLETE);
+                settlementRepository.findById(threadId).ifPresent(
+                    (settlement) -> {
+                        if (settlement.getPayerName().equals(appData.getUserName())) {
+                            updateSettlement(threadId, States.SETTLE_PAY_CONFIRMED, States.SETTLE_COMPLETE);
+                        } else if (settlement.getPaymentChannelName().equals(appData.getUserName())) {
+                            updateSettlement(threadId, States.SETTLE_PAY_CONFIRMED, States.SETTLE_COMPLETE);
+                        }
+                    }
+                );
             } else if (settlementBPM.hasAdminDelete()) {
                 deleteData();
                 notify("admin", "admin", "admin", "admin");
@@ -352,8 +532,6 @@ public class HCSIntegration {
         repositoryUtil.stashPopData();
     }
     
-   
-    
     private void updateSettlement(String threadId, States priorState, States newState) {
         // update the settlement state
         settlementRepository.findById(threadId).ifPresent(
@@ -364,7 +542,7 @@ public class HCSIntegration {
                         // update the credits too
                         updateCreditStateForSettlementItems(threadId, newState.name());
                         notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
-                    } else {
+                    } else if (!settlement.getStatus().equals(newState.name())){
                         log.error("Settlement status should be " + newState.name() + "_PENDING" + " or " + priorState.name() + ", found : " + settlement.getStatus());
                     }
                 }

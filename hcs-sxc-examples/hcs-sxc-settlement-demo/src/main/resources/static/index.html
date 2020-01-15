@@ -92,7 +92,7 @@
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">home</i>
                         <span class="mdc-list-item__text">Overview</span>
                     </a>
-                    <a class="credits-and-debits mdc-list-item" href="#credits-and-debits" aria-current="page">
+                    <a  style="display:none" class="credits-and-debits mdc-list-item" href="#credits-and-debits" aria-current="page">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">money</i>
                         <span class="mdc-list-item__text">Credits and Debits</span>
                     </a>
@@ -1534,10 +1534,8 @@
                 
                 document.getElementById("this-user").innerHTML=whoami.name +"<span style='color:#aaa; font-size:12px;'> ("+whoami.roles+")</span>";
                 document.getElementById("this-user-avatar").style.backgroundImage= "url(images/"+whoami.appId+".png)";
+                if(thisRoles.includes("BUYER")) document.querySelector("#lhs-menu .credits-and-debits").style.display='block';
                 
-                /*
-                
-                */
                 responsePaymentChannel = await fetch('addressbook/paychannel/');
                 paymentChannels  = await responsePaymentChannel.json(); 
                 
@@ -1545,6 +1543,8 @@
                 responseAddressBookBs = await fetch('addressbook/buyerseller/');
                 addressBookBs  = await responseAddressBookBs.json(); 
                 buyerSellersAddress = addressBookBs;
+                
+                // redirect  subviews on browserRefresh - only one atm
                 switch(location.hash){
                     case "#audit-detail": 
                         location.hash="audit";
@@ -1552,6 +1552,7 @@
                         break;
                     default: //event.preventDefault();//do nothing'
                 }
+                
                 renderMain();
                 window.onhashchange = renderMain;
                 
@@ -1792,7 +1793,8 @@
                         newButton.innerHTML = "Accept";
                         newButton.classList.add("mdc-button");
                         newButton.classList.add("mdc-button--outlined");
-                        newButton.addEventListener("click", function(){openAcceptPaychannelDialog(threadId,userName,i_Settlements.paymentChannelName );});
+                        let cname = i_Settlements.paymentChannelName;
+                        newButton.addEventListener("click", function(){openAcceptPaychannelDialog(threadId,userName,cname );});
                         clonedRow.getElementById("action").appendChild(newButton);
                     } else if (i_Settlements.payerName === thisuserName  && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_PAY_CHANNEL_AGREED'){
                         let threadId = i_Settlements.threadId;

@@ -7,9 +7,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Random;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.entities.Settlement;
+import com.hedera.hcsapp.restclasses.SettlementRest;
 import com.hedera.hcs.sxc.proto.java.AccountID;
 import com.hedera.hcs.sxc.proto.java.ApplicationMessageId;
 import com.hedera.hcs.sxc.proto.java.Timestamp;
@@ -134,5 +139,16 @@ public final class Utils {
         }
      
         return now.getEpochSecond() + "-" + nano;
+    }
+    public static Money moneyFromSettlement(Settlement settlement) {
+        return Money.newBuilder().setCurrencyCode(settlement.getCurrency())
+                .setUnits(settlement.getNetValue()).build();
+
+    }
+    public static ResponseEntity<SettlementRest> serverError() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json");
+
+        return new ResponseEntity<>(headers, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

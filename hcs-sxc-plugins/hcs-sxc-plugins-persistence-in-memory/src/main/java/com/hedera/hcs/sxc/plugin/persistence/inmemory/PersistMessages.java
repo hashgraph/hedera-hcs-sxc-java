@@ -4,7 +4,6 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessage;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hcs.sxc.interfaces.SxcConsensusMessage;
-import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
 import com.hedera.hcs.sxc.proto.java.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.java.ApplicationMessageChunk;
@@ -116,7 +115,7 @@ public class PersistMessages
     }
 
     @Override
-    public void putParts(ApplicationMessageId applicationMessageId, List l) {
+    public void putParts(ApplicationMessageId applicationMessageId, List<ApplicationMessageChunk> l) {
         // always keep data to allow for reassembly of messages,
         // part messages can be deleted once full messages have been reconstituted
         // see removeParts

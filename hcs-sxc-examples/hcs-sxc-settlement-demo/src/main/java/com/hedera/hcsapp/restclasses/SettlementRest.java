@@ -52,7 +52,6 @@ public final class SettlementRest {
         this.paymentReference = settlement.getPaymentReference();
 
         List<SettlementItem> settlementItemsFromDB = settlementItemRepository.findAllSettlementItems(settlement.getThreadId());
-        List<String> threadIds = new ArrayList<String>();
         for (SettlementItem settlementItem : settlementItemsFromDB) {
             this.threadIds.add(settlementItem.getId().getSettledThreadId());
             creditRepository.findById(settlementItem.getId().getSettledThreadId()).ifPresent(

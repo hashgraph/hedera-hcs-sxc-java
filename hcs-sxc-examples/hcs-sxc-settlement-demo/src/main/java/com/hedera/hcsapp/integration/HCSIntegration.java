@@ -11,7 +11,6 @@ import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
-import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 import com.hedera.hcs.sxc.interfaces.HCSResponse;
@@ -247,7 +246,7 @@ public class HCSIntegration {
         
                                 settlementRepository.save(settlement);
         
-                                TransactionId transactionId = new OutboundHCSMessage(appData.getHCSCore()).overrideEncryptedMessages(false)
+                                new OutboundHCSMessage(appData.getHCSCore()).overrideEncryptedMessages(false)
                                         .overrideMessageSignature(false).sendMessage(appData.getTopicIndex(), newSettlementBPM.toByteArray());
         
                                 log.info("Message sent successfully.");
@@ -300,7 +299,7 @@ public class HCSIntegration {
                     
                                             settlementRepository.save(settlement);
                     
-                                            TransactionId transactionId = new OutboundHCSMessage(appData.getHCSCore()).overrideEncryptedMessages(false)
+                                            new OutboundHCSMessage(appData.getHCSCore()).overrideEncryptedMessages(false)
                                                     .overrideMessageSignature(false).sendMessage(appData.getTopicIndex(), newSettlementBPM.toByteArray());
                     
                                             notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
@@ -429,9 +428,9 @@ public class HCSIntegration {
                                             log.error("Settlement state is already " + States.SETTLE_COMPLETE.name());
                                         }
 
-                                        Settlement newSettlement = settlementRepository.save(settlement);
+                                        settlementRepository.save(settlement);
 
-                                        TransactionId transactionId = new OutboundHCSMessage(appData.getHCSCore()).overrideEncryptedMessages(false)
+                                        new OutboundHCSMessage(appData.getHCSCore()).overrideEncryptedMessages(false)
                                                 .overrideMessageSignature(false).sendMessage(appData.getTopicIndex(), ackSettlementBPM.toByteArray());
 
                                         notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);

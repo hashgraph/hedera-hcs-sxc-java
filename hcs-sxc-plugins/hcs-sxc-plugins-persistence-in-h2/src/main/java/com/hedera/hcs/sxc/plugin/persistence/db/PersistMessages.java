@@ -2,7 +2,6 @@ package com.hedera.hcs.sxc.plugin.persistence.db;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessage;
@@ -136,11 +135,11 @@ public class PersistMessages
     // Transactions
     @Override
     public void storeTransaction(TransactionId transactionId, ConsensusMessageSubmitTransaction submitMessageTransaction) {
-        String txId = transactionId.accountId.shard
-                + "." + transactionId.accountId.realm
-                + "." + transactionId.accountId.account
-                + "-" + transactionId.validStart.getEpochSecond()
-                + "-" + transactionId.validStart.getNano();
+//        String txId = transactionId.accountId.shard
+//                + "." + transactionId.accountId.realm
+//                + "." + transactionId.accountId.account
+//                + "-" + transactionId.validStart.getEpochSecond()
+//                + "-" + transactionId.validStart.getNano();
 
 //        HCSTransaction hcsTransaction = new HCSTransaction();
 //
@@ -175,7 +174,6 @@ public class PersistMessages
 
             TransactionBody body = TransactionBody.parseFrom(hcsTransaction.getBodyBytes());
 
-            Client client = null;
             ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction();
 
             tx.setMemo(body.getMemo());
@@ -328,7 +326,7 @@ public class PersistMessages
     }
 
     @Override
-    public void putParts(ApplicationMessageId applicationMessageId, List l) {
+    public void putParts(ApplicationMessageId applicationMessageId, List<ApplicationMessageChunk> l) {
         // always keep data to allow for reassembly of messages,
         // part messages can be deleted once full messages have been reconstituted
         // see removeParts
@@ -375,6 +373,7 @@ public class PersistMessages
                 int nanos = (int) (maxTimestamp % SCALAR);
                 lastConsensusTimestamp = Instant.ofEpochSecond(seconds, nanos);
             }
+            log.info("Last consensus timestamp from database is : " + lastConsensusTimestamp.getEpochSecond() + " seconds, " + lastConsensusTimestamp.getNano() + " nanos.");
         }
 
         return lastConsensusTimestamp;

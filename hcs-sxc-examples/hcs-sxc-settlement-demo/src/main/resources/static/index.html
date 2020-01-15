@@ -254,7 +254,7 @@
                             <div style="display: flex; flex-direction: row; padding: 24px;">
                                 <div style="flex-grow: 1">
                                     <button id="settle-now-button" disabled class="mdc-button mdc-button--outlined">Settle</button>
-                                    &nbsp; <small>Settle 12345 USD</small>
+                                    &nbsp; <small>Total:</small> <small id="settle-total">Settle 12345 USD</small>
                                 </div>
                                 <div >
                                     <button 
@@ -1907,13 +1907,17 @@
                         }
                     );
                 }
-
+                    
+               
 
                 var tableBody = clonedPanelTemplate.getElementById("credit-table-body");
                 var tableBodyTemplate = clonedPanelTemplate.getElementById("credit-table-body-template");
 
                 var responseCredits = await fetch(`credits/${userName}`);
                 var i_UserCredits = await responseCredits.json();
+                
+                
+                
                 
                 for(z=0; z < i_UserCredits.length ; z++){
                     clonedRow = tableBodyTemplate.content.cloneNode(true);
@@ -1960,6 +1964,28 @@
                     clonedPanelTemplate.querySelector("details").setAttribute("open","true");
                     existingPanel.replaceWith(clonedPanelTemplate);
                 }
+                
+                
+                
+                var thisUserPays = 0;
+                var otherUserPays = 0;
+              
+                var threadIds=[];    
+                document.querySelectorAll("#"+userName+" .mdc-data-table__row").forEach(
+                    r=>{
+                         if(r.cells.settlebox.querySelector("input").checked){
+                             threadIds.push(r.cells.threadId.title);
+                             rowAmount = 1*r.cells.amount.getAttribute("data-amount");
+                             if (r.cells.payer.textContent!==userName){
+                                thisUserPays += rowAmount ;
+                            } else {
+                                otherUserPays += rowAmount ; 
+                            }
+                         }
+                     }
+                );
+                document.querySelector("#"+userName+" #settle-total").innerHTML = 
+                    (thisUserPays + " - " + otherUserPays + " = " + (thisUserPays - otherUserPays));
 
             }
             

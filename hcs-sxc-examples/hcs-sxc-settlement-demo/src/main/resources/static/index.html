@@ -66,24 +66,29 @@
                         id="app-bar-of-main-content">     
                     <div class="mdc-top-app-bar__row">
                         <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+                            
+                            <span class="mdc-typography--headline6" 
+                                              id="this-user-avatar"
+                                              style="width:36px; height:36px;
+                                              background-repeat: no-repeat;
+                                              background-size: cover;
+                                              background-position: center; 
+                                              border-radius: 90px;
+                                              color:white; background-color: #e4e7e8;
+                                              "></span>
                             <span id="this-user"
                                   class="mdc-top-app-bar__title
                                   mdc-typography--body1
                                   "
-                                  style="padding: 8px"
+                                  style="padding: 8px;padding-left:24px; text-transform: capitalize"
                                   >Alice</span>
-                            <span 
-                                id="this-pk"
-                                class="overflow-elipsis mdc-typography--body1"
-                                title="302fdsadfsafdsadfsadfsdfsadfsadfsadf">
-                                PK 302fdsadfsafdsadfsadfsdfsadfsadfsadf
-                            </span>
+                            
                         </section>
                     </div>           
                 </header>
                 <div  id="lhs-menu" class="mdc-list  mdc-top-app-bar--fixed-adjust">
 
-                    <a class="mdc-list-item mdc-list-item--activated" href="#overview">
+                    <a class="overview mdc-list-item mdc-list-item--activated" href="#overview">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">home</i>
                         <span class="mdc-list-item__text">Overview</span>
                     </a>
@@ -134,8 +139,71 @@
                         </section>
                     </div>           
                 </header>
-                <template id="credits-and-debits-panel" >
-                    
+                <template id="overview-template">
+                    <div id="{{username}}" class="panel">
+                        <div class="mdc-card demo-card demo-ui-control">
+                            <div class="mdc-card__primary-action demo-card__primary-action" style="display: flex;  flex-direction: row" tabindex="0">
+                              <div id="this-user-avatar" class="mdc-card__media mdc-card__media--square demo-card__media" style=" width: 160px;  background-color: #dde1e7"></div>
+                              <div class="demo-card__primary" style="padding:16px">
+                                <h2 id="this-user" class="demo-card__title mdc-typography mdc-typography--headline6" style="text-transform: capitalize">Alice</h2>
+                                <h3 id="this-role" class="demo-card__subtitle mdc-typography mdc-typography--subtitle2">BUYER,SELLER</h3>
+                                <div class="demo-card__secondary mdc-typography mdc-typography--body2" >Public key: <span id="this-pk">203...</span></div>
+                            
+                              </div>
+                            </div>
+                            <div class="mdc-card__actions">
+                              <div class="mdc-card__action-buttons">
+                                <button onclick="location.hash='credits-and-debits'" class="mdc-button mdc-card__action mdc-card__action--button">  <span class="mdc-button__ripple"></span> Credits and Debits</button>
+                                <button onclick="location.hash='settlements'" class="mdc-button mdc-card__action mdc-card__action--button">  <span class="mdc-button__ripple"></span> Settlements</button>
+                                <button onclick="location.hash='audit'" class="mdc-button mdc-card__action mdc-card__action--button">  <span class="mdc-button__ripple"></span> Audit</button>
+                       
+                              </div>
+                              <div class="mdc-card__action-icons">
+                                <button id="location"  class="mdc-icon-button material-icons mdc-card__action mdc-card__action--icon--unbounded" title="More options" data-mdc-ripple-is-unbounded="true">wifi</button>
+                              </div>
+                            </div>
+                          </div>
+                          <br/>
+                          <div class="mdc-data-table" style="width:100%">
+                            <table class="mdc-data-table__table" aria-label="Dessert calories" style="border-spacing: 10px 10px;">
+                                <thead>
+                                    <tr class="mdc-data-table__header-row">
+                                        <th class="mdc-data-table__header-cell" role="columnheader" scope="col">&nbsp;</th>
+                                        <th class="mdc-data-table__header-cell" role="columnheader" scope="col">User</th>
+                                        <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Role(s)</th>
+                                        <th class="mdc-data-table__header-cell" style="flex:1" role="columnheader" scope="col">Location</th>
+                                        <th class="mdc-data-table__header-cell" role="columnheader" scope="col"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="overview-table-body" class="mdc-data-table__content">
+                                    <template id="overview-table-body-template">
+                                        <tr class="mdc-data-table__row">
+                                            <td  class="mdc-data-table__cell">
+                                                <span class="mdc-typography--headline6" 
+                                                    id="user-avatar"
+                                                    style="width:36px; height:36px;
+                                                    display:block;
+                                                    background-repeat: no-repeat;
+                                                    background-size: cover;
+                                                    background-position: center; 
+                                                    border-radius: 90px;
+                                                    color:white; background-color: #e4e7e8;
+                                                    "></span>
+                                            </td>
+                                            <td id="user"       class="mdc-data-table__cell">user</td>
+                                            <td id="roles"          class="mdc-data-table__cell">roles</td>
+                                            <td id="link"      class="mdc-data-table__cell">link</td>
+                                            <td                class="mdc-data-table__cell" style="text-align: right">  <button id=""  class="mdc-icon-button material-icons " title="More options" data-mdc-ripple-is-unbounded="true">more_vert</button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                    </div>
+                </template>
+                <template id="credits-and-debits-panel" >    
                     <div id="{{username}}" class="panel">
                         <div role="progressbar" class="mdc-linear-progress mdc-linear-progress--indeterminate	mdc-linear-progress--closed" aria-label="Example Progress Bar" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0">
                             <div class="mdc-linear-progress__buffering-dots"></div>
@@ -150,7 +218,7 @@
                         
                         <details>
                             <summary>
-                                <div class="message-container" style="margin-left:55px; margin-right: 16px;">
+                                <div class="message-container" style="margin-left:16px">
                                     <div style="display: flex; align-items: center">
                                         
                                         
@@ -174,7 +242,7 @@
                                         </span>
                                         <span
                                             id="credits-and-debits-seen"
-                                            
+                                            style="padding-right: 16px;"
                                             class="material-icons"
                                             >
                                             updated
@@ -183,6 +251,21 @@
                                     </div>
                                 </div>
                             </summary>
+                            <div style="display: flex; flex-direction: row; padding: 24px;">
+                                <div style="flex-grow: 1">
+                                    <button id="settle-now-button" disabled class="mdc-button mdc-button--outlined">Settle</button>
+                                    &nbsp; <small>Total:</small> <small id="settle-total">Settle 12345 USD</small>
+                                </div>
+                                <div >
+                                    <button 
+                                        
+                                        id="new-credit-button"
+                                        role="open-new-credit-button-dialog"
+                                        class="mdc-button mdc-button--unelevated">
+                                        new credit
+                                    </button>
+                                </div>
+                            </div>
                             <div class="content"
                                  style="overflow-x: scroll"
                                  >
@@ -190,7 +273,7 @@
                                     <table class="mdc-data-table__table" aria-label="Dessert calories">
                                         <thead>
                                             <tr class="mdc-data-table__header-row">
-                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col"><button id="settle-now-button" disabled class="mdc-button mdc-button--outlined">Settle</button></th>
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col"></th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">ThreadID</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Payer</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recipient</th>
@@ -238,14 +321,7 @@
                                     </table>
                                 </div>
                             </div>
-                            <div style="padding: 16px;text-align: right">
-                                <button 
-                                    id="new-credit-button"
-                                    role="open-new-credit-button-dialog"
-                                    class="mdc-button mdc-button--unelevated">
-                                    new credit
-                                </button>
-                            </div>
+                            
                         </details>
                     </div>
                 </template>
@@ -263,7 +339,7 @@
                         </div>      
                         <details>
                             <summary>
-                                <div class="message-container" style="margin-left:55px; margin-right: 16px;">
+                                <div class="message-container" style="margin-left:16px; margin-right: 16px;">
                                     <div style="display: flex; align-items: center">
                                         <span class="mdc-typography--headline6" 
                                               id="settlements-user-avatar"
@@ -285,6 +361,7 @@
                                         </span>
                                         <span
                                             id="settlements-seen"
+                                            style="padding-right: 16px"
                                             class="material-icons"
                                             >
                                             updated
@@ -1433,6 +1510,9 @@
         
         <script>
             thisuserName = "";
+            thisRoles = "";
+            thisPK = "";
+            thisPort="";
             allAddresses = [];
             buyerSellersAddress= [];
             paymentChannels = [];
@@ -1442,17 +1522,23 @@
             
             async function init ()  {
                 //location.hash ='';
-                wAddressBook =  await fetch('addressbook-everything/');
+                wAddressBook =  await fetch('addressbook/appusers/');
                 allAddresses = await wAddressBook.json();
                 let responseWhoami =  await fetch('addressbook/me/');
                 let whoami = await responseWhoami.json();
                 thisuserName =  whoami.name;
+                thisRoles = whoami.roles;
+                thisAppId = whoami.appId;
+                thisPK = whoami.publicKey;
+                thisPort = allAddresses[thisAppId].port;
                 document.documentElement.style.setProperty('--mdc-theme-primary', "#"+whoami.color);
                 
-                document.getElementById("this-user").innerHTML=whoami.name;
-                document.getElementById("this-pk").innerHTML=whoami.publicKey;
-                document.getElementById("this-pk").title=whoami.publicKey;
+                document.getElementById("this-user").innerHTML=whoami.name +"<span style='color:#aaa; font-size:12px;'> ("+whoami.roles+")</span>";
+                document.getElementById("this-user-avatar").style.backgroundImage= "url(images/"+whoami.appId+".png)";
                 
+                /*
+                
+                */
                 responsePaymentChannel = await fetch('addressbook/paychannel/');
                 paymentChannels  = await responsePaymentChannel.json(); 
                 
@@ -1473,6 +1559,13 @@
                 async function renderMain(){
                     document.getElementById("main-panel-holder").innerHTML = "";
                     switch(location.hash){
+                        case '#overview':
+                            document.title= thisuserName + ' - Overview';
+                            document.querySelectorAll("#lhs-menu .mdc-list-item").forEach(i=>i.classList.remove('mdc-list-item--activated'));
+                            document.querySelector("#lhs-menu .overview").classList.add("mdc-list-item--activated");
+                            document.getElementById("header-title").innerHTML = 'Overview';
+                            await renderOverviewTab();
+                            break;
                         case '#credits-and-debits':
                             document.title= thisuserName + ' - Credits and Debits';
                             document.querySelectorAll("#lhs-menu .mdc-list-item").forEach(i=>i.classList.remove('mdc-list-item--activated'));
@@ -1513,6 +1606,35 @@
             
             function hasRole(userName, roleName){
                 return allAddresses.filter(f => f.name === userName)[0].roles.includes(roleName);
+            }
+       </script>
+      
+       <script>
+            async function renderOverviewTab(){
+                var panelTemplate = document.getElementById("overview-template");
+                var clonedTableTemplate = panelTemplate.content.cloneNode(true);
+                clonedTableTemplate.getElementById("this-user").innerHTML = thisuserName;
+                clonedTableTemplate.getElementById("this-user-avatar").style.backgroundImage = 'url(images/'+thisAppId+'.png)';
+                clonedTableTemplate.getElementById("this-role").innerHTML = thisRoles.replace(/,/g,", ");;;
+                clonedTableTemplate.getElementById("this-pk").innerHTML = thisPK;
+                var url = window.location.protocol + "//" + window.location.hostname + ":" +thisPort;
+                var tableBodyTemplate = clonedTableTemplate.getElementById("overview-table-body-template");
+                var tableBody = clonedTableTemplate.getElementById("overview-table-body");
+                for(z=0; z < allAddresses.length ; z++){
+                    var url = window.location.protocol + "//" + window.location.hostname + ":" + allAddresses[z].port;
+
+                    clonedRow = tableBodyTemplate.content.cloneNode(true);
+                    clonedRow.getElementById("user").innerHTML = allAddresses[z].name;
+                    clonedRow.getElementById("roles").innerHTML = allAddresses[z].roles.toLowerCase().replace(/,/g,", ");;
+                    clonedRow.getElementById("roles").style.textTransform = "capitalize";
+                    clonedRow.getElementById("link").innerHTML =  url ;
+                    clonedRow.getElementById('user-avatar').style.backgroundImage = "url(images/" + allAddresses[z].appId + ".png)";
+                    tableBody.appendChild(clonedRow);
+                }     
+                
+                clonedTableTemplate.getElementById("location").onclick = function(){alert(url);};
+                document.getElementById("main-panel-holder").appendChild(clonedTableTemplate);
+                
             }
        </script>
        <script>
@@ -1785,13 +1907,17 @@
                         }
                     );
                 }
-
+                    
+               
 
                 var tableBody = clonedPanelTemplate.getElementById("credit-table-body");
                 var tableBodyTemplate = clonedPanelTemplate.getElementById("credit-table-body-template");
 
                 var responseCredits = await fetch(`credits/${userName}`);
                 var i_UserCredits = await responseCredits.json();
+                
+                
+                
                 
                 for(z=0; z < i_UserCredits.length ; z++){
                     clonedRow = tableBodyTemplate.content.cloneNode(true);
@@ -1838,6 +1964,28 @@
                     clonedPanelTemplate.querySelector("details").setAttribute("open","true");
                     existingPanel.replaceWith(clonedPanelTemplate);
                 }
+                
+                
+                
+                var thisUserPays = 0;
+                var otherUserPays = 0;
+              
+                var threadIds=[];    
+                document.querySelectorAll("#"+userName+" .mdc-data-table__row").forEach(
+                    r=>{
+                         if(r.cells.settlebox.querySelector("input").checked){
+                             threadIds.push(r.cells.threadId.title);
+                             rowAmount = 1*r.cells.amount.getAttribute("data-amount");
+                             if (r.cells.payer.textContent!==userName){
+                                thisUserPays += rowAmount ;
+                            } else {
+                                otherUserPays += rowAmount ; 
+                            }
+                         }
+                     }
+                );
+                document.querySelector("#"+userName+" #settle-total").innerHTML = 
+                    (thisUserPays + " - " + otherUserPays + " = " + (thisUserPays - otherUserPays));
 
             }
             

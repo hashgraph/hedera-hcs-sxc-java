@@ -85,7 +85,6 @@ public final class MirrorTopicSubscriber extends Thread {
                         File consensusTimeFile = new File(this.consensusFile);
                         if (consensusTimeFile.exists()) {
                             try(BufferedReader br = new BufferedReader(new FileReader(this.consensusFile))) {
-                                StringBuilder sb = new StringBuilder();
                                 String line = br.readLine();
 
                                 String[] lastStoredConsensusTimestamp = line.split("-");

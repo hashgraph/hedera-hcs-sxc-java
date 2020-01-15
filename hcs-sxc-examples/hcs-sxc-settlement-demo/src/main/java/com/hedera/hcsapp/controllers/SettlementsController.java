@@ -38,9 +38,6 @@ import lombok.extern.log4j.Log4j2;
 import proto.Money;
 import proto.PaymentInitAckBPM;
 import proto.PaymentInitBPM;
-import proto.PaymentSentAckBPM;
-import proto.PaymentSentBPM;
-import proto.SettleCompleteAckBPM;
 import proto.SettleCompleteBPM;
 import proto.SettleInitAckBPM;
 import proto.SettleInitBPM;
@@ -438,7 +435,7 @@ public class SettlementsController {
 
             Settlement newSettlement = settlementRepository.save(settlement);
 
-            TransactionId transactionId = new OutboundHCSMessage(appData.getHCSCore()).overrideEncryptedMessages(false)
+            new OutboundHCSMessage(appData.getHCSCore()).overrideEncryptedMessages(false)
                     .overrideMessageSignature(false).sendMessage(topicIndex, settlementBPM.toByteArray());
 
             log.info("Message sent successfully.");

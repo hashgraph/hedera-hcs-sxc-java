@@ -254,7 +254,7 @@
                             <div style="display: flex; flex-direction: row; padding: 24px;">
                                 <div style="flex-grow: 1">
                                     <button id="settle-now-button" disabled class="mdc-button mdc-button--outlined">Settle</button>
-                                    &nbsp; <small>Total:</small> <small id="settle-total">Settle 12345 USD</small>
+                                    &nbsp; <small id="settle-total"></small>
                                 </div>
                                 <div >
                                     <button 
@@ -1984,8 +1984,10 @@
                          }
                      }
                 );
-                document.querySelector("#"+userName+" #settle-total").innerHTML = 
-                    (thisUserPays + " - " + otherUserPays + " = " + (thisUserPays - otherUserPays));
+        
+                if(thisUserPays - otherUserPays)
+                    document.querySelector("#"+userName+" #settle-total").innerHTML = 
+                        ("Total (USD): " + thisUserPays + " - " + otherUserPays + " = " + (thisUserPays - otherUserPays) );
 
             }
             

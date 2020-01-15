@@ -14,7 +14,7 @@ import lombok.Data;
 
 @Data
 public final class SettlementRest {
-    
+
     private String threadId;
     private String applicationMessageId;
     private String payerName;
@@ -30,10 +30,10 @@ public final class SettlementRest {
     private String payerAccountDetails;
     private String recipientAccountDetails;
     private String paymentReference;
-    
+
     private List<CreditRest> credits = new ArrayList<CreditRest>();
     private List<String> threadIds = new ArrayList<String>();
-    
+
     public SettlementRest (Settlement settlement, AppData appData, SettlementItemRepository settlementItemRepository, CreditRepository creditRepository) {
         this.threadId = settlement.getThreadId();
         this.applicationMessageId = settlement.getApplicationMessageId();
@@ -50,17 +50,17 @@ public final class SettlementRest {
         this.payerAccountDetails = settlement.getPayerAccountDetails();
         this.recipientAccountDetails = settlement.getRecipientAccountDetails();
         this.paymentReference = settlement.getPaymentReference();
-        
+
         List<SettlementItem> settlementItemsFromDB = settlementItemRepository.findAllSettlementItems(settlement.getThreadId());
         List<String> threadIds = new ArrayList<String>();
         for (SettlementItem settlementItem : settlementItemsFromDB) {
             this.threadIds.add(settlementItem.getId().getSettledThreadId());
             creditRepository.findById(settlementItem.getId().getSettledThreadId()).ifPresent(
                     (credit) -> {
-                        credits.add(new CreditRest(credit, appData));        
+                        credits.add(new CreditRest(credit, appData));
                     }
             );
-                
+
         }
     }
 }

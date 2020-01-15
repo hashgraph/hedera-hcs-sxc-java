@@ -11,7 +11,7 @@ import com.hedera.hcsapp.entities.SettlementItemId;
 
 public interface SettlementItemRepository extends CrudRepository<SettlementItem, SettlementItemId> {
     
-    @Query("SELECT si FROM SettlementItem si WHERE si.id.threadId = :threadId")
+    @Query("SELECT si FROM SettlementItem si WHERE si.id.threadId = :threadId ORDER BY si.id.settledThreadId DESC")
     List<SettlementItem> findAllSettlementItems(@Param("threadId") String threadId);
 }
 

@@ -23,6 +23,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -58,7 +59,7 @@ public class CreditsController {
         List<CreditRest> restResponse = new ArrayList<CreditRest>();
 
         if (user == null) {
-            creditList = (List<Credit>) creditRepository.findAll();
+            creditList = (List<Credit>) creditRepository.findAllDesc();
         } else {
             creditList = creditRepository.findAllCreditsForUsers(appData.getUserName(), user);
         }
@@ -187,4 +188,7 @@ public class CreditsController {
             throw e;
         }
     }
+//    private Sort sortByIdAsc() {
+//        return new Sort(Sort.Direction.DESC, "threadId");
+//    }
 }

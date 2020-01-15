@@ -1650,7 +1650,7 @@
                     
                     
                     
-                    if(i_Settlements.payerName === userName && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLEMENT_PROPOSED'){ //SETTLEMENT_PROPOSED
+                    if(i_Settlements.payerName === userName && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_PROPOSED'){ //SETTLEMENT_PROPOSED
                         let threadId = i_Settlements.threadId;
                         newButton = document.createElement("button");
                         newButton.innerHTML = "Accept";
@@ -1658,75 +1658,57 @@
                         newButton.classList.add("mdc-button--outlined");
                         newButton.addEventListener("click", function(){openConfirmSettlementDialog(threadId,userName);});
                         clonedRow.getElementById("action").appendChild(newButton);
-                    } else if (i_Settlements.payerName === thisuserName  && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLEMENT_AGREED'){
+                    } else if (i_Settlements.payerName === thisuserName  && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_AGREED'){
                         let threadId = i_Settlements.threadId;
                         newButton = document.createElement("button");
-                        newButton.innerHTML = "Prop Paychannel";
+                        newButton.innerHTML = "Propose Pay Channel";
                         newButton.classList.add("mdc-button");
                         newButton.classList.add("mdc-button--outlined");
                         newButton.addEventListener("click", function(){openSelectPaychannelDialog(threadId,userName);});
                         clonedRow.getElementById("action").appendChild(newButton);
-                    } else if (i_Settlements.payerName === userName && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_INIT_AWAIT_ACK'  ){
+                    } else if (i_Settlements.payerName === userName && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_PAY_CHANNEL_PROPOSED'  ){
                         let threadId = i_Settlements.threadId;
                         newButton = document.createElement("button");
-                        newButton.innerHTML = "Acceptsvn";
+                        newButton.innerHTML = "Accept";
                         newButton.classList.add("mdc-button");
                         newButton.classList.add("mdc-button--outlined");
                         newButton.addEventListener("click", function(){openAcceptPaychannelDialog(threadId,userName,i_Settlements.paymentChannelName );});
                         clonedRow.getElementById("action").appendChild(newButton);
-                    } else if (i_Settlements.payerName === thisuserName  && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_INIT_ACK'){
+                    } else if (i_Settlements.payerName === thisuserName  && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_PAY_CHANNEL_AGREED'){
                         let threadId = i_Settlements.threadId;
                         newButton = document.createElement("button");
-                        newButton.innerHTML = "Init Pay";
+                        newButton.innerHTML = "Init Payment";
                         newButton.classList.add("mdc-button");
                         newButton.classList.add("mdc-button--outlined");
                         newButton.addEventListener("click", function(){openInitPayDialog(threadId,userName,i_Settlements.paymentChannelName );});
                         clonedRow.getElementById("action").appendChild(newButton);
-                    } else if ( hasRole(thisuserName,'PAYCHANNEL') && i_Settlements.status === 'PAYMENT_INIT_AWAIT_ACK'){
+                    } else if ( hasRole(thisuserName,'PAYCHANNEL') && i_Settlements.status === 'SETTLE_PAY_PROPOSED'){
                         // Diana Agree Payment
                         let threadId = i_Settlements.threadId;
                         newButton = document.createElement("button");
-                        newButton.innerHTML = "Accept Pay Prop";
+                        newButton.innerHTML = "Accept";
                         newButton.classList.add("mdc-button");
                         newButton.classList.add("mdc-button--outlined");
                         newButton.addEventListener("click", function(){openAcceptPaymentDialog(threadId,userName );});
                         clonedRow.getElementById("action").appendChild(newButton);
-                    } else if (i_Settlements.payerName === thisuserName   && hasRole(thisuserName,'BUYER') && i_Settlements.status === 'PAYMENT_INIT_ACK'){
-                        //Alice request receipt
-                        let threadId = i_Settlements.threadId;
-                        newButton = document.createElement("button");
-                        newButton.innerHTML = "Pay Sent";
-                        newButton.classList.add("mdc-button");
-                        newButton.classList.add("mdc-button--outlined");
-                        newButton.addEventListener("click", function(){openPaySentDialog(threadId,userName,i_Settlements.paymentChannelName );});
-                        clonedRow.getElementById("action").appendChild(newButton);
-                    } else if (i_Settlements.payerName === userName  && hasRole(thisuserName,'BUYER') && i_Settlements.status === 'PAYMENT_SENT_AWAIT_ACK'){
-                        //Bob confirm receipt
-                        let threadId = i_Settlements.threadId;
-                        newButton = document.createElement("button");
-                        newButton.innerHTML = "Accept Pay Sent";
-                        newButton.classList.add("mdc-button");
-                        newButton.classList.add("mdc-button--outlined");
-                        newButton.addEventListener("click", function(){openAcceptPaymentSentDialog(threadId,userName );});
-                        clonedRow.getElementById("action").appendChild(newButton);
-                    }  else if (i_Settlements.payerName === thisuserName  &&  hasRole(thisuserName,'BUYER') && i_Settlements.status === 'PAYMENT_SENT_ACK'){
+                    }  else if (i_Settlements.payerName === thisuserName  &&  hasRole(thisuserName,'BUYER') && i_Settlements.status === 'SETTLE_PAY_ACK'){
                         //Alice confirm payment
                         let threadId = i_Settlements.threadId;
                         newButton = document.createElement("button");
-                        newButton.innerHTML = "Settlement Payment Made";
+                        newButton.innerHTML = "Request Receipt";
                         newButton.classList.add("mdc-button");
                         newButton.classList.add("mdc-button--outlined");
                         newButton.addEventListener("click", function(){openSettlementPaymentMadeDialog(threadId,userName,i_Settlements.paymentChannelName );});
                         clonedRow.getElementById("action").appendChild(newButton);
-                    } else if (i_Settlements.payerName === userName  && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_PAID_AWAIT_ACK'){
+                    } else if (i_Settlements.payerName === userName  && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_RCPT_REQUESTED'){
                         let threadId = i_Settlements.threadId;
                         newButton = document.createElement("button");
-                        newButton.innerHTML = "Accept Settle Payment Made";
+                        newButton.innerHTML = "Confirm Receipt";
                         newButton.classList.add("mdc-button");
                         newButton.classList.add("mdc-button--outlined");
                         newButton.addEventListener("click", function(){openAcceptSettlePaymentMade(threadId,userName );});
                         clonedRow.getElementById("action").appendChild(newButton);
-                     } else if (i_Settlements.payerName === thisuserName  && hasRole(thisuserName,'BUYER') && i_Settlements.status === 'SETTLE_PAID_ACK'){
+                     } else if (i_Settlements.payerName === thisuserName  && hasRole(thisuserName,'BUYER') && i_Settlements.status === 'SETTLE_RCPT_CONFIRMED'){
                         let threadId = i_Settlements.threadId;
                         newButton = document.createElement("button");
                         newButton.innerHTML = "Settlement Completed";
@@ -1734,15 +1716,7 @@
                         newButton.classList.add("mdc-button--outlined");
                         newButton.addEventListener("click", function(){openSettlementCompletedDialog(threadId,userName,i_Settlements.paymentChannelName);});
                         clonedRow.getElementById("action").appendChild(newButton);
-                     } else if (i_Settlements.payerName === userName  && hasRole(thisuserName,'BUYER') && i_Settlements.status === 'SETTLE_COMP_AWAIT_ACK'){
-                        let threadId = i_Settlements.threadId;
-                        newButton = document.createElement("button");
-                        newButton.innerHTML = "Accept Settle Payment Made";
-                        newButton.classList.add("mdc-button");
-                        newButton.classList.add("mdc-button--outlined");
-                        newButton.addEventListener("click", function(){openAcceptSettlementCompletedDialog(threadId,userName );});
-                        clonedRow.getElementById("action").appendChild(newButton);
-                    }  
+                     }  
                   
                     clonedRow.getElementById("notes").innerHTML = i_Settlements.additionalNotes;
                     tableBody.appendChild(clonedRow);
@@ -1766,9 +1740,6 @@
                         
                         clonedCreditRow.getElementById("date-time").innerHTML = credit.createdDateTime;
                         clonedCreditRow.getElementById("status").innerHTML =  credit.displayStatus;
-                        //clonedCreditRow.getElementById("net-value").innerHTML = "";
-
-
                     
                         tableBody.appendChild(clonedCreditRow);
                     }
@@ -1789,7 +1760,6 @@
         
         <script>
             async function  renderCreditsPanel(userName){
-                //if (document.getElementById(userName) === null) {
                 var panelTemplate = document.getElementById("credits-and-debits-panel");
                 var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
                 clonedPanelTemplate.querySelector(".panel").id=userName;    
@@ -1870,56 +1840,6 @@
                 }
 
             }
-            
-            
-            
-           
-            
-            function openPaySentDialog(threadId, userName) {
-                $paySentDialog = document.getElementById('pay-sent-dialog');
-                paySentDialog  = new mdc.dialog.MDCDialog($paySentDialog);
-                event.preventDefault(); 
-                $paySentDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
-                    e.parentElement.classList.remove('mdc-text-field--invalid');
-                    e.value='';}
-                );
-                $paySentDialog.querySelector("#thread-id").value=threadId;
-                $paySentDialog.querySelector("#pay-sent-send").onclick =  function(){
-                    postBody = `{
-                                 "threadId"          : "${threadId}"
-                                ,"paymentReference" :  "${$paySentDialog.querySelector('#pay-sent-reference').value}"
-                                ,"additionalNotes" :   "${$paySentDialog.querySelector('#pay-sent-additional-notes').value}"
-                                }`;
-
-                    paySentDialog.close();
-                    el = document.getElementById(userName);
-                    el.style.opacity=0.4;
-                    el.style.pointerEvents =  'none';
-                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
-
-                    showSnackBarMessage("sending channel details to HH Network ...");
-                    fetch('/settlements/paymentSent', {
-                        method: 'post',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: postBody
-                    }).then(function(response) {
-                        return response.json();
-                    }).then(function(data) {
-                        showSnackBarMessage("Payment sent  sent");
-
-                    }).catch(function(res){
-                        alert(res);
-                    });
-                };
-                
-                paySentDialog.open();
-                return false;
-            }
-    
-            
             
             function openInitPayDialog(threadId, userName) {
                 $initPayDialog = document.getElementById('init-pay-dialog');
@@ -2136,44 +2056,6 @@
                 return false;
             }
 
-            
-            function openAcceptPaymentSentDialog (threadId, otherUserId){
-                event.preventDefault();
-                confirmPaymentSentDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-payment-sent-dialog'));
-
-                $confirmPaymentSentDialog = document.getElementById('confirm-payment-sent-dialog');
-                $confirmPaymentSentDialog.querySelector("#thread-id").value=threadId;
-                clickFunction = function(){
-                   
-                    showSnackBarMessage("sending confirmation " + threadId + " ...");
-                    confirmPaymentSentDialog.close();
-
-                    el = document.getElementById(otherUserId);
-                    el.style.opacity=0.4;
-                    el.style.pointerEvents =  'none';
-                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
-
-                    fetch('settlements/paymentSent/ack/'+threadId, {
-                            method: 'post',
-                            headers: {
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json'
-                            }
-                        }).then(function(response) {
-                            return response.json();
-                        }).then(function(data) {
-                            showSnackBarMessage("confirmation sent");
-
-                        }).catch(function(res){
-                            alert(res);
-                        });
-        
-                };
-                $confirmPaymentSentDialog.querySelector("#confirm-payment-sent-send").onclick = clickFunction;
-                confirmPaymentSentDialog.open();
-                return false;
-            }
-            
             function openAcceptSettlePaymentMade (threadId, otherUserId){
                 event.preventDefault();
                 acceptSettlePaymentMadeDialog  = new mdc.dialog.MDCDialog(document.getElementById('accept-settle-payment-made-dialog'));
@@ -2210,46 +2092,6 @@
                 acceptSettlePaymentMadeDialog.open();
                 return false;
             }
-            
-            function openAcceptSettlementCompletedDialog (threadId, otherUserId){
-                event.preventDefault();
-                acceptSettleCompletedDialog  = new mdc.dialog.MDCDialog(document.getElementById('accept-settle-completed-dialog'));
-
-                $acceptSettleCompletedDialog = document.getElementById('accept-settle-completed-dialog');
-                $acceptSettleCompletedDialog.querySelector("#thread-id").value=threadId;
-                clickFunction = function(){
-                   
-                    showSnackBarMessage("sending confirmation " + threadId + " ...");
-                    acceptSettleCompletedDialog.close();
-
-                    el = document.getElementById(otherUserId);
-                    el.style.opacity=0.4;
-                    el.style.pointerEvents =  'none';
-                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
-
-                    fetch('/settlements/complete/ack/'+threadId, {
-                            method: 'post',
-                            headers: {
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json'
-                            }
-                        }).then(function(response) {
-                            return response.json();
-                        }).then(function(data) {
-                            showSnackBarMessage("confirmation sent");
-
-                        }).catch(function(res){
-                            alert(res);
-                        });
-        
-                };
-                $acceptSettleCompletedDialog.querySelector("#accept-settlement-completed-send").onclick = clickFunction;
-                acceptSettleCompletedDialog.open();
-                return false;
-            }
-            
-            
-            
             
             function openConfirmSettlementDialog(threadId,otherUserId) {
                 event.preventDefault();

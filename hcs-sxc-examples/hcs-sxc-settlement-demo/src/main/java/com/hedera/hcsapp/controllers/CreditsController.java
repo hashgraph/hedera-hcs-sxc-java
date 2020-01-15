@@ -23,7 +23,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.data.domain.Sort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -99,7 +98,7 @@ public class CreditsController {
                 log.error("Credit state is already CREDIT_AGREED");
             }
 
-            TransactionId transactionId = new OutboundHCSMessage(appData.getHCSCore())
+            new OutboundHCSMessage(appData.getHCSCore())
                   .overrideEncryptedMessages(false)
                   .overrideMessageSignature(false)
                   .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());

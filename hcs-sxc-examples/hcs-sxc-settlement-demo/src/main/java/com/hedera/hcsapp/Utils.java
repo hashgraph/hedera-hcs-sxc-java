@@ -48,9 +48,9 @@ public final class Utils {
     }
     
     public static String TransactionIdToString(TransactionId transactionId) {
-        String txId = "0.0." + transactionId.getAccountId().getAccountNum()
-                + "-" + transactionId.getValidStart().getEpochSecond()
-                + "-" + transactionId.getValidStart().getNano();
+        String txId = "0.0." + transactionId.accountId.account
+                + "-" + transactionId.validStart.getEpochSecond()
+                + "-" + transactionId.validStart.getNano();
         return txId;
     }
     

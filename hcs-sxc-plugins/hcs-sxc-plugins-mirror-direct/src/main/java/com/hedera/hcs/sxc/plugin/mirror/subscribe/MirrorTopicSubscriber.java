@@ -54,7 +54,7 @@ public final class MirrorTopicSubscriber extends Thread {
         this.subscribeFrom = subscribeFrom;
         this.onHCSMessageCallback = onHCSMessageCallback;
         this.mirrorReconnectDelay = mirrorReconnectDelay;
-        if (this.mirrorReconnectDelay != 0) {
+        if (this.mirrorReconnectDelay == 0) {
             // reconnect delay set to 0, wait indefinitely between reconnects
             this.nextRefreshTime = Instant.now().plus(Duration.ofDays(365));
         } else {
@@ -82,6 +82,7 @@ public final class MirrorTopicSubscriber extends Thread {
 
                 if (this.subscribeFrom.isPresent()) {
                     this.subscribeFrom = Optional.of(this.subscribeFrom.get().plusNanos(1));
+                    log.info("subscribing from " + this.subscribeFrom.get().getEpochSecond() + " seconds, " + this.subscribeFrom.get().getNano() + " nanos.");
                     Subscription subscription = subscriber.subscribe(this.topicId, this.subscribeFrom.get(), tm -> {
                         log.info("Got mirror message, calling handler");
                         this.subscribeFrom = Optional.of(tm.consensusTimestamp.plusNanos(1));
@@ -91,7 +92,8 @@ public final class MirrorTopicSubscriber extends Thread {
                 } else {
                     Subscription subscription = subscriber.subscribe(this.topicId, tm -> {
                         log.info("Got mirror message, calling handler");
-                        this.subscribeFrom = Optional.of(tm.consensusTimestamp.plusNanos(1));
+                        this.subscribeFrom = Optional.of(tm.consensusTimestamp);
+                        log.info("Last consensus time is " + this.subscribeFrom.get().getEpochSecond() + " seconds, " + this.subscribeFrom.get().getNano() + " nanos.");
                         onMirrorMessage(tm, this.onHCSMessageCallback);   
                     });
                     completeSubscription(subscription);
@@ -131,14 +133,13 @@ public final class MirrorTopicSubscriber extends Thread {
         log.info("Adding shutdown hook to subscription");
         Runtime.getRuntime().addShutdownHook(new SusbcriberCloseHook(subscription));
         for (;;) {
-            log.info("Sleeping 30s");
             Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(30));
             if (Instant.now().compareTo(nextRefreshTime) > 0) {
-                //  need to reconnect, no activity for this.mirrorReconnectDelay since last message
+                // need to reconnect, no activity for this.mirrorReconnectDelay since last message
                 nextRefreshTime = Instant.now().plusSeconds(this.mirrorReconnectDelay * 60);
-                log.info("Unsusbscribing");
+                log.info("Unsubscribing from mirror node");
                 subscription.unsubscribe();
-                log.info("Unsusbscribed");
+                break;
             }
         }
     }

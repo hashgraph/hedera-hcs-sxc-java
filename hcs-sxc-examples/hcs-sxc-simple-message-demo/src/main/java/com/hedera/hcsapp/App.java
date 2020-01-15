@@ -6,7 +6,6 @@ import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.Scanner;
@@ -32,7 +31,6 @@ public final class App {
         
         // Simplest setup and send
         Config config = new Config();
-        Dotenv dotEnv = Dotenv.configure().ignoreIfMissing().load();
         HCSCore hcsCore = new HCSCore(appId);
 
         System.out.println("****************************************");
@@ -63,7 +61,6 @@ public final class App {
             if (userInput.isEmpty()) {
                 System.out.println("Please input a message before pressing [RETURN].");
             } else {
-                Boolean messageSuccess;
                 try {
                     new OutboundHCSMessage(hcsCore)
                         .overrideEncryptedMessages(false)

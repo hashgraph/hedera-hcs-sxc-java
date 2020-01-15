@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
-import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.Topic;
 import javax.naming.Context;
@@ -111,7 +110,7 @@ public final class Launch {
 
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-            MessageProducer messageProducer = session.createProducer(topic);
+            session.createProducer(topic);
 
             r = true;
             

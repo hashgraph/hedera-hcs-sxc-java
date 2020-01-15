@@ -171,7 +171,7 @@
                                         <th class="mdc-data-table__header-cell" role="columnheader" scope="col">&nbsp;</th>
                                         <th class="mdc-data-table__header-cell" role="columnheader" scope="col">User</th>
                                         <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Role(s)</th>
-                                        <th class="mdc-data-table__header-cell" style="flex:1" role="columnheader" scope="col">Location</th>
+                                        <th class="mdc-data-table__header-cell" style="flex:1" role="columnheader" scope="col">Payment Account Details</th>
                                         <th class="mdc-data-table__header-cell" role="columnheader" scope="col"></th>
                                     </tr>
                                 </thead>
@@ -1621,13 +1621,12 @@
                 var tableBodyTemplate = clonedTableTemplate.getElementById("overview-table-body-template");
                 var tableBody = clonedTableTemplate.getElementById("overview-table-body");
                 for(z=0; z < allAddresses.length ; z++){
-                    var url = window.location.protocol + "//" + window.location.hostname + ":" + allAddresses[z].port;
-
+                    
                     clonedRow = tableBodyTemplate.content.cloneNode(true);
                     clonedRow.getElementById("user").innerHTML = allAddresses[z].name;
                     clonedRow.getElementById("roles").innerHTML = allAddresses[z].roles.toLowerCase().replace(/,/g,", ");;
                     clonedRow.getElementById("roles").style.textTransform = "capitalize";
-                    clonedRow.getElementById("link").innerHTML =  url ;
+                    clonedRow.getElementById("link").innerHTML =  allAddresses[z].paymentAccountDetails ;
                     clonedRow.getElementById('user-avatar').style.backgroundImage = "url(images/" + allAddresses[z].appId + ".png)";
                     tableBody.appendChild(clonedRow);
                 }     

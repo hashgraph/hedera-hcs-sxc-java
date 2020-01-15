@@ -22,7 +22,7 @@ public final class CreditRest {
     private String displayStatus;
     private String createdDateTime;
     private String topicId;
-    
+
     public CreditRest(Credit credit, AppData appData) {
         try {
             this.threadId = credit.getThreadId();

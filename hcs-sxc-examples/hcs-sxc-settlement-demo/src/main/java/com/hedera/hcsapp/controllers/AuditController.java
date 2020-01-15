@@ -63,7 +63,7 @@ public class AuditController {
         headers.add("Content-Type", "application/json");
 
         Map<String, AuditThreadId> threads = new HashMap<>();
-        
+
         for (Credit credit : creditRepository.findAll()) {
             threads.put(credit.getThreadId(), new AuditThreadId (
                     credit.getThreadId()
@@ -75,7 +75,7 @@ public class AuditController {
                 )
             );
         }
-        
+
         for (Settlement settlement : settlementRepository.findAll()) {
             threads.put(settlement.getThreadId(), new AuditThreadId (
                     settlement.getThreadId()
@@ -98,10 +98,10 @@ public class AuditController {
                 auditThreadIds.getThreadIds().add(auditThreadId.getValue());
             }
         );
-        
+
         return new ResponseEntity<>(auditThreadIds, headers, HttpStatus.OK);
     }
-    
+
     @GetMapping(value = "/audit/{threadId}", produces = "application/json")
     public ResponseEntity<AuditApplicationMessages> applicationMessages(@PathVariable String threadId) throws InvalidProtocolBufferException {
         HttpHeaders headers = new HttpHeaders();
@@ -110,25 +110,25 @@ public class AuditController {
         AuditApplicationMessages auditApplicationMessages = new AuditApplicationMessages();
         HCSCore hcsCore = appData.getHCSCore();
         SxcMessagePersistence persistence = hcsCore.getMessagePersistence();
-        
-        
+
+
         Map<String, ApplicationMessage> applicationMessages = persistence.getApplicationMessages();
-        
+
         SortedSet<String> applicationMessageIds = new TreeSet<>(applicationMessages.keySet());
-        for (String applicationMessageId : applicationMessageIds) { 
+        for (String applicationMessageId : applicationMessageIds) {
            SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessages.get(applicationMessageId).getBusinessProcessMessage());
-           
+
            if (settlementBPM.getThreadId().contentEquals(threadId)) {
                AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
                auditApplicationMessage.setApplicationMessageId(applicationMessageId);
                auditApplicationMessage.setMessage(settlementBPM.toString());
                auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
-           }            
+           }
         }
-        
+
         return new ResponseEntity<>(auditApplicationMessages, headers, HttpStatus.OK);
     }
-    
+
     @GetMapping(value = "/audit/{threadId}/{applicationMessageId}", produces = "application/json")
     public ResponseEntity<AuditHCSMessages> applicationMessages(@PathVariable String threadId, @PathVariable String applicationMessageId) {
         HttpHeaders headers = new HttpHeaders();
@@ -141,7 +141,7 @@ public class AuditController {
         Map<String, SxcConsensusMessage> mirrorResponses = persistence.getMirrorResponses();
 
         for (Map.Entry<String, SxcConsensusMessage> mirrorResponse : mirrorResponses.entrySet()) {
-            
+
             try {
                 ApplicationMessageChunk chunk = ApplicationMessageChunk.parseFrom(mirrorResponse.getValue().getMessage());
 
@@ -152,7 +152,7 @@ public class AuditController {
                         + "." + applicationMessageIdProto.getAccountID().getAccountNum()
                         + "-" + applicationMessageIdProto.getValidStart().getSeconds()
                         + "-" + applicationMessageIdProto.getValidStart().getNanos();
-                
+
                 if (appMessageId.contentEquals(applicationMessageId)) {
                     AuditHCSMessage auditHCSMessage = new AuditHCSMessage(appData);
                     auditHCSMessage.setConsensusTimeStampSeconds(mirrorResponse.getValue().getConsensusTimeStampSeconds());
@@ -160,11 +160,11 @@ public class AuditController {
                     byte[] runningHash = mirrorResponse.getValue().getRunningHash();
                     auditHCSMessage.setRunningHash(Hex.encodeHexString(runningHash));
                     auditHCSMessage.setSequenceNumber(mirrorResponse.getValue().getSequenceNumber());
-                    
+
                     auditHCSMessage.setPart(chunk.getChunkIndex() + " of " + chunk.getChunksCount());
-                    
+
                     auditHCSMessage.setMessage(ApplicationMessage.parseFrom(chunk.getMessageChunk()).toString());
-                    
+
                     auditHCSMessages.getAuditHCSMessages().add(auditHCSMessage);
                 }
             } catch (InvalidProtocolBufferException e) {

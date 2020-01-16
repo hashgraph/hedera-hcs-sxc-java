@@ -509,6 +509,27 @@ And from there, open a new page for each of the participants
 
 Whenever a participant performs and action in the UI, this results in a HCS transaction containing an `application-message` which itself contains a `business-message` containing the user's intent. Once the transaction has reached consensus, it's broadcast to all participants since they all subscribe to the same topic on a mirror node.
 
+To run the examples outside of docker and override `.env` variables  and the database location/name run  :
+```
+mvn exec:java -Dexec.mainClass="com.hedera.hcsapp.Application" -Dserver.port=8081 -Dcom.hedera.hashgraph.sdk.experimental=true -Pfatjar -Dspring.datasource.url="jdbc:h2:./h2data/settlement-demo-8081" -DAPP_ID=1 -DOPERATOR_ID=0.0.1010 -DOPERATOR_KEY=302e0208...94329fb
+```
+where 
+
+```-Dserver.port=8081```
+
+is the server port to use and
+
+```-Dspring.datasource.url="jdbc:h2:./h2data/settlement-demo-8081"```
+
+is the name of the database. If the database is not available then a new one will be generated.
+
+If you want to run multiple clients from the command line simultaneously then you must
+
+- use the `hcs-sxc-plugins-persistence-in-memory` plugin 
+- make sure that the database locations and the server ports don't overlap. 
+
+Note that the demo provides helper functions to delete save and restore the local database however, these have no effect when `hcs-sxc-plugins-persistence-in-memory` is chosen. 
+
 ## Contributing
 
 Contributions are welcome. Please see the [contributing](CONTRIBUTING.md) guide to see how you can get

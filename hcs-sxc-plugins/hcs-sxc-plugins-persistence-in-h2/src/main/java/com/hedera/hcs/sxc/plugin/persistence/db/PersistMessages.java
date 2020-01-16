@@ -2,7 +2,6 @@ package com.hedera.hcs.sxc.plugin.persistence.db;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessage;
@@ -74,31 +73,43 @@ public class PersistMessages
         mirrorResponse.setTimestampNS(timestampNS);
 
         Transaction dbTransaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            // start a transaction
-            dbTransaction = session.beginTransaction();
-            // save the student objects
-            session.save(mirrorResponse);
-            // commit transaction
-            dbTransaction.commit();
+        final Session session = HibernateUtil.getHibernateSession();
+        // start a transaction
+        dbTransaction = session.beginTransaction();
+        // save the student objects
+        session.save(mirrorResponse);
+        // commit transaction
+        dbTransaction.commit();
 
-            log.info("storeMirrorResponse " + mirrorTopicMessageResponse.toString());
-        } catch (Exception e) {
-            if (dbTransaction != null) {
-                dbTransaction.rollback();
-            }
-            log.error(e);
-        }
+        log.info("storeMirrorResponse " + mirrorTopicMessageResponse.toString());
     }
 
     @Override
     public SxcConsensusMessage getMirrorResponse(String timestamp) {
 
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            MirrorResponse mirrorResponse = session.createQuery("from MirrorResponse mr where mr.timestamp = :timestamp", MirrorResponse.class)
-                    .setParameter("timestamp", timestamp)
-                    .getSingleResult();
+      final Session session = HibernateUtil.getHibernateSession();
+      MirrorResponse mirrorResponse = session.createQuery("from MirrorResponse mr where mr.timestamp = :timestamp", MirrorResponse.class)
+              .setParameter("timestamp", timestamp)
+              .getSingleResult();
 
+      SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage();
+      sxcConsensusMessage.setConsensusTimeStampSeconds(mirrorResponse.getTimestampSeconds());
+      sxcConsensusMessage.setConsensusTimeStampNanos(mirrorResponse.getTimestampNanos());
+      sxcConsensusMessage.setMessage(mirrorResponse.getMessage());
+      sxcConsensusMessage.setRunningHash(mirrorResponse.getRunningHash());
+      sxcConsensusMessage.setSequenceNumber(mirrorResponse.getSequenceNumber());
+      sxcConsensusMessage.setTopicId(mirrorResponse.getTopicId());
+
+      return sxcConsensusMessage;
+    }
+
+    @Override
+    public Map<String, SxcConsensusMessage> getMirrorResponses() {
+        Map<String, SxcConsensusMessage> responseList = new HashMap<>();
+
+        final Session session = HibernateUtil.getHibernateSession();
+        List < MirrorResponse > mirrorResponses = session.createQuery("from MirrorResponse mr order by mr.timestamp desc", MirrorResponse.class).list();
+        mirrorResponses.forEach(mirrorResponse -> {
             SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage();
             sxcConsensusMessage.setConsensusTimeStampSeconds(mirrorResponse.getTimestampSeconds());
             sxcConsensusMessage.setConsensusTimeStampNanos(mirrorResponse.getTimestampNanos());
@@ -107,28 +118,8 @@ public class PersistMessages
             sxcConsensusMessage.setSequenceNumber(mirrorResponse.getSequenceNumber());
             sxcConsensusMessage.setTopicId(mirrorResponse.getTopicId());
 
-            return sxcConsensusMessage;
-        }
-    }
-
-    @Override
-    public Map<String, SxcConsensusMessage> getMirrorResponses() {
-        Map<String, SxcConsensusMessage> responseList = new HashMap<>();
-
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            List < MirrorResponse > mirrorResponses = session.createQuery("from MirrorResponse", MirrorResponse.class).list();
-            mirrorResponses.forEach(mirrorResponse -> {
-                SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage();
-                sxcConsensusMessage.setConsensusTimeStampSeconds(mirrorResponse.getTimestampSeconds());
-                sxcConsensusMessage.setConsensusTimeStampNanos(mirrorResponse.getTimestampNanos());
-                sxcConsensusMessage.setMessage(mirrorResponse.getMessage());
-                sxcConsensusMessage.setRunningHash(mirrorResponse.getRunningHash());
-                sxcConsensusMessage.setSequenceNumber(mirrorResponse.getSequenceNumber());
-                sxcConsensusMessage.setTopicId(mirrorResponse.getTopicId());
-
-                responseList.put(mirrorResponse.getTimestamp(), sxcConsensusMessage);
-            });
-        }
+            responseList.put(mirrorResponse.getTimestamp(), sxcConsensusMessage);
+        });
 
         return responseList;
      }
@@ -136,11 +127,11 @@ public class PersistMessages
     // Transactions
     @Override
     public void storeTransaction(TransactionId transactionId, ConsensusMessageSubmitTransaction submitMessageTransaction) {
-        String txId = transactionId.accountId.shard
-                + "." + transactionId.accountId.realm
-                + "." + transactionId.accountId.account
-                + "-" + transactionId.validStart.getEpochSecond()
-                + "-" + transactionId.validStart.getNano();
+//        String txId = transactionId.accountId.shard
+//                + "." + transactionId.accountId.realm
+//                + "." + transactionId.accountId.account
+//                + "-" + transactionId.validStart.getEpochSecond()
+//                + "-" + transactionId.validStart.getNano();
 
 //        HCSTransaction hcsTransaction = new HCSTransaction();
 //
@@ -168,93 +159,91 @@ public class PersistMessages
     @Override
     public ConsensusMessageSubmitTransaction getSubmittedTransaction(String transactionId) {
 
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            HCSTransaction hcsTransaction = session.createQuery("from HCSTransaction t where t.transactionId = :transactionId", HCSTransaction.class)
-                    .setParameter("transactionId", transactionId)
-                    .getSingleResult();
+      final Session session = HibernateUtil.getHibernateSession();
+        HCSTransaction hcsTransaction = session.createQuery("from HCSTransaction t where t.transactionId = :transactionId", HCSTransaction.class)
+                .setParameter("transactionId", transactionId)
+                .getSingleResult();
 
-            TransactionBody body = TransactionBody.parseFrom(hcsTransaction.getBodyBytes());
-
-            Client client = null;
-            ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction();
-
-            tx.setMemo(body.getMemo());
-            tx.setMessage(body.getConsensusSubmitMessage().getMessage().toByteArray());
-            AccountId accountId = new AccountId(body.getNodeAccountID().getShardNum()
-                    ,body.getNodeAccountID().getRealmNum()
-                    ,body.getNodeAccountID().getAccountNum()
-            );
-            tx.setNodeAccountId(accountId);
-
-            ConsensusTopicId topicId = new ConsensusTopicId(body.getConsensusSubmitMessage().getTopicID().getShardNum()
-                    ,body.getConsensusSubmitMessage().getTopicID().getRealmNum()
-                    ,body.getConsensusSubmitMessage().getTopicID().getTopicNum()
-            );
-
-            tx.setTopicId(topicId);
-
-            tx.setMaxTransactionFee(body.getTransactionFee());
-
-            Instant start = Instant.ofEpochSecond(body.getTransactionID().getTransactionValidStart().getSeconds(), body.getTransactionID().getTransactionValidStart().getNanos());
-            TransactionId txId = new TransactionId(accountId, start);
-            tx.setTransactionId(txId);
-            Duration validDuration = Duration.ofSeconds(body.getTransactionValidDuration().getSeconds());
-
-            tx.setTransactionValidDuration(validDuration);
-
-            return tx;
+        try {
+          TransactionBody body = TransactionBody.parseFrom(hcsTransaction.getBodyBytes());
+  
+          ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction();
+  
+          tx.setMemo(body.getMemo());
+          tx.setMessage(body.getConsensusSubmitMessage().getMessage().toByteArray());
+          AccountId accountId = new AccountId(body.getNodeAccountID().getShardNum()
+                  ,body.getNodeAccountID().getRealmNum()
+                  ,body.getNodeAccountID().getAccountNum()
+          );
+          tx.setNodeAccountId(accountId);
+  
+          ConsensusTopicId topicId = new ConsensusTopicId(body.getConsensusSubmitMessage().getTopicID().getShardNum()
+                  ,body.getConsensusSubmitMessage().getTopicID().getRealmNum()
+                  ,body.getConsensusSubmitMessage().getTopicID().getTopicNum()
+          );
+  
+          tx.setTopicId(topicId);
+  
+          tx.setMaxTransactionFee(body.getTransactionFee());
+  
+          Instant start = Instant.ofEpochSecond(body.getTransactionID().getTransactionValidStart().getSeconds(), body.getTransactionID().getTransactionValidStart().getNanos());
+          TransactionId txId = new TransactionId(accountId, start);
+          tx.setTransactionId(txId);
+          Duration validDuration = Duration.ofSeconds(body.getTransactionValidDuration().getSeconds());
+  
+          tx.setTransactionValidDuration(validDuration);
+  
+          return tx;
         } catch (InvalidProtocolBufferException e) {
-            log.error(e);
-        }
-        return null;
-
+          log.error(e);
+          return null;
+      }
+          
     }
 
     @Override
     public Map<String, ConsensusMessageSubmitTransaction> getSubmittedTransactions() {
         Map<String, ConsensusMessageSubmitTransaction> responseList = new HashMap<>();
 
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        final Session session = HibernateUtil.getHibernateSession();
+        List<HCSTransaction> hcsTransactions = session.createQuery("from HCSTransaction t order by t.transactionId desc", HCSTransaction.class)
+                .list();
 
-            List<HCSTransaction> hcsTransactions = session.createQuery("from HCSTransaction", HCSTransaction.class)
-                    .list();
+        hcsTransactions.forEach(hcsTransaction -> {
+            try {
+                ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction();
 
-            hcsTransactions.forEach(hcsTransaction -> {
-                try {
-                    ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction();
+                TransactionBody body = TransactionBody.parseFrom(hcsTransaction.getBodyBytes());
+                tx.setMemo(body.getMemo());
+                tx.setMessage(body.getConsensusSubmitMessage().getMessage().toByteArray());
+                AccountId accountId = new AccountId(body.getNodeAccountID().getShardNum()
+                        ,body.getNodeAccountID().getRealmNum()
+                        ,body.getNodeAccountID().getAccountNum()
+                );
+                tx.setNodeAccountId(accountId);
 
-                    TransactionBody body = TransactionBody.parseFrom(hcsTransaction.getBodyBytes());
-                    tx.setMemo(body.getMemo());
-                    tx.setMessage(body.getConsensusSubmitMessage().getMessage().toByteArray());
-                    AccountId accountId = new AccountId(body.getNodeAccountID().getShardNum()
-                            ,body.getNodeAccountID().getRealmNum()
-                            ,body.getNodeAccountID().getAccountNum()
-                    );
-                    tx.setNodeAccountId(accountId);
+                ConsensusTopicId topicId = new ConsensusTopicId(body.getConsensusSubmitMessage().getTopicID().getShardNum()
+                        ,body.getConsensusSubmitMessage().getTopicID().getRealmNum()
+                        ,body.getConsensusSubmitMessage().getTopicID().getTopicNum()
+                );
 
-                    ConsensusTopicId topicId = new ConsensusTopicId(body.getConsensusSubmitMessage().getTopicID().getShardNum()
-                            ,body.getConsensusSubmitMessage().getTopicID().getRealmNum()
-                            ,body.getConsensusSubmitMessage().getTopicID().getTopicNum()
-                    );
+                tx.setTopicId(topicId);
 
-                    tx.setTopicId(topicId);
+                tx.setMaxTransactionFee(body.getTransactionFee());
 
-                    tx.setMaxTransactionFee(body.getTransactionFee());
+                Instant start = Instant.ofEpochSecond(body.getTransactionID().getTransactionValidStart().getSeconds(), body.getTransactionID().getTransactionValidStart().getNanos());
+                TransactionId txId = new TransactionId(accountId, start);
+                tx.setTransactionId(txId);
+                Duration validDuration = Duration.ofSeconds(body.getTransactionValidDuration().getSeconds());
 
-                    Instant start = Instant.ofEpochSecond(body.getTransactionID().getTransactionValidStart().getSeconds(), body.getTransactionID().getTransactionValidStart().getNanos());
-                    TransactionId txId = new TransactionId(accountId, start);
-                    tx.setTransactionId(txId);
-                    Duration validDuration = Duration.ofSeconds(body.getTransactionValidDuration().getSeconds());
+                tx.setTransactionValidDuration(validDuration);
 
-                    tx.setTransactionValidDuration(validDuration);
+                responseList.put(hcsTransaction.getTransactionId(), tx);
+            } catch (InvalidProtocolBufferException e) {
+                log.error(e);
+            }
+        });
 
-                    responseList.put(hcsTransaction.getTransactionId(), tx);
-                } catch (InvalidProtocolBufferException e) {
-                    log.error(e);
-                }
-            });
-
-        }
         return responseList;
 
     }
@@ -278,24 +267,18 @@ public class PersistMessages
         hcsApplicationMessage.setApplicationMessage(applicationMessage.toByteArray());
 
         Transaction dbTransaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            dbTransaction = session.beginTransaction();
-            session.save(hcsApplicationMessage);
-            dbTransaction.commit();
+        final Session session = HibernateUtil.getHibernateSession();
+        dbTransaction = session.beginTransaction();
+        session.save(hcsApplicationMessage);
+        dbTransaction.commit();
 
-            log.info("storeApplicationMessage " + appMessageId + "-" + applicationMessage);
-
-        } catch (Exception e) {
-            if (dbTransaction != null) {
-                dbTransaction.rollback();
-            }
-            log.error(e);
-        }
+        log.info("storeApplicationMessage " + appMessageId + "-" + applicationMessage);
     }
 
     @Override
     public ApplicationMessage getApplicationMessage(String applicationMessageId) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+      final Session session = HibernateUtil.getHibernateSession();
+      try {
             HCSApplicationMessage applicationMessage = session.createQuery("from HCSApplicationMessage m where m.applicationMessageId = :applicationMessageId", HCSApplicationMessage.class)
                     .setParameter("applicationMessageId", applicationMessageId)
                     .getSingleResult();
@@ -311,24 +294,23 @@ public class PersistMessages
     public Map<String, ApplicationMessage> getApplicationMessages() {
         Map<String, ApplicationMessage> responseList = new HashMap<>();
 
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            List<HCSApplicationMessage> applicationMessages = session.createQuery("from HCSApplicationMessage", HCSApplicationMessage.class)
-                    .list();
+        final Session session = HibernateUtil.getHibernateSession();
+        List<HCSApplicationMessage> applicationMessages = session.createQuery("from HCSApplicationMessage", HCSApplicationMessage.class)
+                .list();
 
-            applicationMessages.forEach(applicationMessage -> {
-                try {
-                    responseList.put(applicationMessage.getApplicationMessageId(), ApplicationMessage.parseFrom(applicationMessage.getApplicationMessage()));
-                } catch (InvalidProtocolBufferException e) {
-                    log.error(e);
-                }
-            });
-        }
+        applicationMessages.forEach(applicationMessage -> {
+            try {
+                responseList.put(applicationMessage.getApplicationMessageId(), ApplicationMessage.parseFrom(applicationMessage.getApplicationMessage()));
+            } catch (InvalidProtocolBufferException e) {
+                log.error(e);
+            }
+        });
 
         return responseList;
     }
 
     @Override
-    public void putParts(ApplicationMessageId applicationMessageId, List l) {
+    public void putParts(ApplicationMessageId applicationMessageId, List<ApplicationMessageChunk> l) {
         // always keep data to allow for reassembly of messages,
         // part messages can be deleted once full messages have been reconstituted
         // see removeParts
@@ -358,24 +340,24 @@ public class PersistMessages
 
         Instant lastConsensusTimestamp = Instant.EPOCH;
 
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            CriteriaBuilder builder = session.getCriteriaBuilder();
-            CriteriaQuery<Long> criteriaQuery = builder.createQuery(Long.class);
-            
-            Root<MirrorResponse> root = criteriaQuery.from(MirrorResponse.class);
-            criteriaQuery.select(builder.max(root.get("timestampNS")));
-            
-            Query<Long> query = session.createQuery(criteriaQuery);
-            Long maxTimestamp = query.getSingleResult();
-            
-            if (maxTimestamp == null) {
-                lastConsensusTimestamp = Instant.EPOCH;
-            } else {
-                long seconds = maxTimestamp / SCALAR;
-                int nanos = (int) (maxTimestamp % SCALAR);
-                lastConsensusTimestamp = Instant.ofEpochSecond(seconds, nanos);
-            }
+        final Session session = HibernateUtil.getHibernateSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Long> criteriaQuery = builder.createQuery(Long.class);
+        
+        Root<MirrorResponse> root = criteriaQuery.from(MirrorResponse.class);
+        criteriaQuery.select(builder.max(root.get("timestampNS")));
+        
+        Query<Long> query = session.createQuery(criteriaQuery);
+        Long maxTimestamp = query.getSingleResult();
+        
+        if (maxTimestamp == null) {
+            lastConsensusTimestamp = Instant.EPOCH;
+        } else {
+            long seconds = maxTimestamp / SCALAR;
+            int nanos = (int) (maxTimestamp % SCALAR);
+            lastConsensusTimestamp = Instant.ofEpochSecond(seconds, nanos);
         }
+        log.info("Last consensus timestamp from database is : " + lastConsensusTimestamp.getEpochSecond() + " seconds, " + lastConsensusTimestamp.getNano() + " nanos.");
 
         return lastConsensusTimestamp;
     }
@@ -384,12 +366,11 @@ public class PersistMessages
     public void clear() {
         partialMessages = new HashMap<>();
 
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            session.beginTransaction();
-            session.createQuery("delete MirrorResponse").executeUpdate();
-            session.createQuery("delete HCSTransaction").executeUpdate();
-            session.createQuery("delete HCSApplicationMessage").executeUpdate();
-            session.getTransaction().commit();
-        }
+        final Session session = HibernateUtil.getHibernateSession();
+        session.beginTransaction();
+        session.createQuery("delete MirrorResponse").executeUpdate();
+        session.createQuery("delete HCSTransaction").executeUpdate();
+        session.createQuery("delete HCSApplicationMessage").executeUpdate();
+        session.getTransaction().commit();
     }
 }

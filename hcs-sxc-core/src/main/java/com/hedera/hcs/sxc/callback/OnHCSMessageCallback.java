@@ -15,8 +15,6 @@ import com.hedera.hcs.sxc.proto.java.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.java.ApplicationMessageChunk;
 import com.hedera.hcs.sxc.proto.java.ApplicationMessageId;
 
-import lombok.extern.log4j.Log4j2;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -28,7 +26,6 @@ import java.util.Optional;
  * Implements callback registration and notification capabilities to support apps
  *
  */
-@Log4j2
 public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
 
     private final List<HCSCallBackToAppInterface> observers = new ArrayList<>();

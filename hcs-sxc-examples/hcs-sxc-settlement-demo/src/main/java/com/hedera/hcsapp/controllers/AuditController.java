@@ -27,6 +27,7 @@ import proto.SettlementBPM;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
@@ -93,7 +94,7 @@ public class AuditController {
         // sort the list
         threads.entrySet()
             .stream()
-            .sorted(Map.Entry.<String, AuditThreadId>comparingByKey())
+            .sorted(Map.Entry.<String, AuditThreadId>comparingByKey(Comparator.reverseOrder()))
             .forEach( (auditThreadId) -> {
                 auditThreadIds.getThreadIds().add(auditThreadId.getValue());
             }
@@ -111,15 +112,15 @@ public class AuditController {
         HCSCore hcsCore = appData.getHCSCore();
         SxcMessagePersistence persistence = hcsCore.getMessagePersistence();
 
-
         Map<String, ApplicationMessage> applicationMessages = persistence.getApplicationMessages();
 
         SortedSet<String> applicationMessageIds = new TreeSet<>(applicationMessages.keySet());
         for (String applicationMessageId : applicationMessageIds) {
            SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessages.get(applicationMessageId).getBusinessProcessMessage());
 
-           if (settlementBPM.getThreadId().contentEquals(threadId)) {
+           if (settlementBPM.getThreadId().equals(threadId)) {
                AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
+               System.out.println(applicationMessageId);
                auditApplicationMessage.setApplicationMessageId(applicationMessageId);
                auditApplicationMessage.setMessage(settlementBPM.toString());
                auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);

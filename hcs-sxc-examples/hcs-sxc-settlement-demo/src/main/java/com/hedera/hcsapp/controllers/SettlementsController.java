@@ -271,9 +271,6 @@ public class SettlementsController {
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
         if (settlement.isPresent()) {
-            System.out.println(settlement.get().getStatus());
-            System.out.println(States.SETTLE_PAY_CHANNEL_AGREED.name());
-            
             if (settlement.get().getStatus().contentEquals(States.SETTLE_PAY_CHANNEL_AGREED.name())) {
     
                 PaymentInitBPM.Builder paymentInitBPM = PaymentInitBPM.newBuilder()

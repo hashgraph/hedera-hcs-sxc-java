@@ -34,8 +34,8 @@ services:
     networks:
       - backing-services
 
-  alice:
-    container_name: alice
+  Alice:
+    container_name: Alice
     depends_on:
       - hcs-sxc-queue
       - hcs-sxc-relay
@@ -52,8 +52,8 @@ services:
     networks:
       - backing-services
 
-  bob:
-    container_name: bob
+  Bob:
+    container_name: Bob
     depends_on:
       - hcs-sxc-queue
       - hcs-sxc-relay
@@ -70,8 +70,8 @@ services:
     networks:
       - backing-services
 
-  carlos:
-    container_name: carlos
+  Carlos:
+    container_name: Carlos
     depends_on:
       - hcs-sxc-queue
       - hcs-sxc-relay
@@ -88,8 +88,8 @@ services:
     networks:
       - backing-services
 
-  worldpay:
-    container_name: worldpay
+  Diana:
+    container_name: Diana
     depends_on:
       - hcs-sxc-queue
       - hcs-sxc-relay
@@ -106,8 +106,8 @@ services:
     networks:
       - backing-services
 
-  erica:
-    container_name: erica
+  Erica:
+    container_name: Erica
     depends_on:
       - hcs-sxc-queue
       - hcs-sxc-relay
@@ -124,8 +124,8 @@ services:
     networks:
       - backing-services
 
-  farouk:
-    container_name: farouk
+  Farouk:
+    container_name: Farouk
     depends_on:
       - hcs-sxc-queue
       - hcs-sxc-relay
@@ -142,8 +142,8 @@ services:
     networks:
       - backing-services
 
-  grace:
-    container_name: grace
+  Grace:
+    container_name: Grace
     depends_on:
       - hcs-sxc-queue
       - hcs-sxc-relay
@@ -160,8 +160,8 @@ services:
     networks:
       - backing-services
 
-  stripe:
-    container_name: stripe
+  Harry:
+    container_name: Harry
     depends_on:
       - hcs-sxc-queue
       - hcs-sxc-relay

@@ -473,6 +473,8 @@ This is a more complex application which is based on spring boot with a web UI. 
 To run the demo, first create a new HCS topic using the SDK and edit the `src/main/resources/config.yaml` file to reflect the new topic id. This is to ensure that when you run the demo, you don't receive messages from someone else who you may be sharing a topic id with - although that could be fun.
 Also check other details such as the mirror node, hedera network, etc... are correct.
 
+In order to reduce the load on your computer, you may want to comment out some sections of the `src/main/resources/docker-compose.yml` file too. Comment out the containers for Erica, Farouk, Grace and Henry, they're not strictly necessary to run the example.
+
 Also create a `.env` file with the following information
 
 ```
@@ -504,10 +506,10 @@ And from there, open a new page for each of the participants
 * Bob http://localhost:8082
 * Carlos http://localhost:8083
 * Diana http://localhost:8084
-* Erica http://localhost:8085
-* Farouk http://localhost:8086
-* Grace http://localhost:8087
-* Henry http://localhost:8088
+* Erica http://localhost:8085 (if enabled in `src/main/resources/docker-compose.yml`)
+* Farouk http://localhost:8086 (if enabled in `src/main/resources/docker-compose.yml`)
+* Grace http://localhost:8087 (if enabled in `src/main/resources/docker-compose.yml`)
+* Henry http://localhost:8088 (if enabled in `src/main/resources/docker-compose.yml`)
 
 Whenever a participant performs and action in the UI, this results in a HCS transaction containing an `application-message` which itself contains a `business-message` containing the user's intent. Once the transaction has reached consensus, it's broadcast to all participants since they all subscribe to the same topic on a mirror node.
 

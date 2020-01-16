@@ -33,7 +33,7 @@ public final class Launch {
         
         log.info("Relay topics to subscribe to from mirror and queue");
         boolean blockingSetupJmsTopic = blockingCreateJmsTopic(config);
-        System.out.println("Queue in relay is set up:" + blockingSetupJmsTopic);
+        log.info("Queue in relay is set up:" + blockingSetupJmsTopic);
         if (blockingSetupJmsTopic) {
             for (ConsensusTopicId topic : config.getConfig().getTopicIds()) {
                 log.info("Processing topic num: " + topic.topic);

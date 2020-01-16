@@ -85,7 +85,7 @@ This component does the bulk of the work and is imported into a project (see exa
 
 This component subscribes to topic(s) from a mirror node and forwards messages to a message queue. `AppNet` participants subscribe to the queue to receive messages.
 
-### HCS-Interfaces
+### HCS-interfaces
 
 A set of standard interfaces or structures for the various components to communicate with each other. Listed below are those that are used in the context of plug-ins which have to satisfy particular interface requirements.
 
@@ -101,7 +101,7 @@ Defined in the `HCS-Interfaces` project, these are data structures that are shar
 * SxcConsensusMessage - a (temporary) POJO for consensus messages (until these can be serialized)
 * MessagePersistenceLevel - a list of pre-defined persistence levels
 
-### HCS-SXC-Plugins
+### HCS-SXC-plugins
 
 This project contains a series of plugins to be used in conjunction with the hcs sxc core component, at the time of writing, the following plug-ins are available.
 The choice of a plug-in architecture is to enable additional plugins to be developed without needing to change the projects that may later depend on them and so to offer extensibility with a choice of options.
@@ -111,7 +111,7 @@ The choice of a plug-in architecture is to enable additional plugins to be devel
 * hcs-sxc-plugins-persistence-in-h2 - plug in to provide data persistence in a database (H2)
 * hcs-sxc-plugins-persistence-in-memory - plug in to provide data persistence in memory
 
-### HCS-SXC Proto
+### HCS-SXC proto
 
 Defines the protobuf messages used within `hcs-sxc-core`.
 
@@ -213,6 +213,8 @@ queue:
 Applications will vary in use cases, however the `hcs-sxc-core` expects the application to provide a number of configurable parameters, these are defined in the `config.yaml` file which resides in the `/src/main/resources` folder of the application's project.
 
 *Note: If a `config.yaml` file is found in the root of the project, it will override the file from `src/main/resources`*
+
+Example `config.yaml`
 
 ```
 appNet:
@@ -471,6 +473,8 @@ This is a more complex application which is based on spring boot with a web UI. 
 To run the demo, first create a new HCS topic using the SDK and edit the `src/main/resources/config.yaml` file to reflect the new topic id. This is to ensure that when you run the demo, you don't receive messages from someone else who you may be sharing a topic id with - although that could be fun.
 Also check other details such as the mirror node, hedera network, etc... are correct.
 
+In order to reduce the load on your computer, you may want to comment out some sections of the `src/main/resources/docker-compose.yml` file too. Comment out the containers for Erica, Farouk, Grace and Henry, they're not strictly necessary to run the example.
+
 Also create a `.env` file with the following information
 
 ```
@@ -501,13 +505,39 @@ And from there, open a new page for each of the participants
 * Alice http://localhost:8081
 * Bob http://localhost:8082
 * Carlos http://localhost:8083
-* Worldpay http://localhost:8084
-* Erica http://localhost:8085
-* Farouk http://localhost:8086
-* Grace http://localhost:8087
-* Stripe http://localhost:8088
+* Diana http://localhost:8084
+* Erica http://localhost:8085 (if enabled in `src/main/resources/docker-compose.yml`)
+* Farouk http://localhost:8086 (if enabled in `src/main/resources/docker-compose.yml`)
+* Grace http://localhost:8087 (if enabled in `src/main/resources/docker-compose.yml`)
+* Henry http://localhost:8088 (if enabled in `src/main/resources/docker-compose.yml`)
 
 Whenever a participant performs and action in the UI, this results in a HCS transaction containing an `application-message` which itself contains a `business-message` containing the user's intent. Once the transaction has reached consensus, it's broadcast to all participants since they all subscribe to the same topic on a mirror node.
+
+#### Without docker (useful when debugging)
+
+To run the examples outside of docker and override `.env` variables and the database location/name run:
+
+```
+mvn exec:java -Dexec.mainClass="com.hedera.hcsapp.Application" -Dserver.port=8081 -Dcom.hedera.hashgraph.sdk.experimental=true -Pfatjar -Dspring.datasource.url="jdbc:h2:./h2data/settlement-demo-8081" -DAPP_ID=1 -DOPERATOR_ID=0.0.1010 -DOPERATOR_KEY=302e0208...94329fb
+```
+where 
+
+```-Dserver.port=8081```
+
+is the server port to use and
+
+```-Dspring.datasource.url="jdbc:h2:./h2data/settlement-demo-8081"```
+
+is the name of the database. If the database is not available then a new one will be generated.
+
+If you want to run multiple clients from the command line simultaneously then you must
+
+- use the `hcs-sxc-plugins-persistence-in-memory` plugin 
+- make sure that the database locations and the server ports don't overlap. 
+
+Note that the demo provides helper functions to delete save and restore the local database however, these have no effect when `hcs-sxc-plugins-persistence-in-memory` is chosen.
+
+You can also specify these `-D` input values in your IDE so that you can run several instances of the application in the IDE, this can help when debugging.
 
 ## Contributing
 

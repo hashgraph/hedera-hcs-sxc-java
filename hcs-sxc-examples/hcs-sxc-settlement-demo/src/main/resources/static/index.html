@@ -2480,9 +2480,13 @@
                         }
                         
                         if(location.hash === '#settlements'){
-                            await renderSettlementsPanel(
+                            if (thisRoles.includes('PAYCHANNEL')){
+                                await renderSettlementsPanel(messageOutput.payer);
+                            } else {
+                                await renderSettlementsPanel(
                                    messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
-                                   );
+                                );
+                            }
                             styleButtons();
                         } else if (location.hash === '#credits-and-debits'){
                             await renderCreditsPanel(
@@ -2490,10 +2494,8 @@
                                   );
                              styleButtons();
                         } else if (location.hash === '#audits'){
-                            await renderAuditIndexTable()(
-                                    messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
-                                  );
-                             styleButtons();
+                            await renderAuditIndexTable();
+                            styleButtons();
                         }
                         break;
                     case "audits":
@@ -2506,12 +2508,10 @@
                             await renderCreditsPanel(
                                     messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
                                   );
-                             styleButtons();
+                            styleButtons();
                         } else if (location.hash === '#audits'){
-                            await renderAuditIndexTable()(
-                                    messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
-                                  );
-                             styleButtons();
+                            await renderAuditIndexTable();
+                            styleButtons();
                         }
                         break;
                     default: alert("wrong target element");

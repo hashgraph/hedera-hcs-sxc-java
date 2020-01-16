@@ -1682,16 +1682,17 @@
                 let response = await fetch('audit/'+threadId);
                 let responseJSON = await  response.json();
                 //$auditThreadDialog.querySelector("#audit-thread-panel-holder").innerHTML="";
-                responseJSON.auditApplicationMessages.forEach(async m=>{
-                    let response = await fetch('audit/'+threadId+"/"+m.applicationMessageId);
+                let auditApplicationMessages = responseJSON.auditApplicationMessages;
+                for (z=0; z < auditApplicationMessages.length ; z++) {
+                    let response = await fetch('audit/'+threadId+"/"+auditApplicationMessages[z].applicationMessageId);
                     let responseJSON = await  response.json();
                     responseJSON = responseJSON.auditHCSMessages;
                     clonedTemplate = document.getElementById("audit-thread-template").content.cloneNode(true);
-                    clonedTemplate.querySelector("#audit-thread-message-id").innerHTML=m.applicationMessageId;
-                    clonedTemplate.querySelector("#audit-thread-message-text").innerHTML=syntaxHighlight(m.message);//.substring(0,180)+"...";
+                    clonedTemplate.querySelector("#audit-thread-message-id").innerHTML=auditApplicationMessages[z].applicationMessageId;
+                    clonedTemplate.querySelector("#audit-thread-message-text").innerHTML=syntaxHighlight(auditApplicationMessages[z].message);//.substring(0,180)+"...";
                     clonedTemplate.querySelector("#audit-thread-message-parts-json").innerHTML=syntaxHighlight(responseJSON);
                     main.appendChild(clonedTemplate);
-                });
+                }
         
                 //auditThreadDialog.open();
                 return false;

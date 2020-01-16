@@ -182,7 +182,7 @@ mirrorReconnectDelay: 10
 
 # The topic IDs to subscribe to
 topics:
-  - topic: "0.0.1044"
+  - topic: "0.0.999"
 
 # Should relay catch up with message history on startup
 catchupHistory: true
@@ -226,7 +226,7 @@ appNet:
   rotateKeyFrequency: 0
   # HCS topics to be used
   topics:
-    - topic: 0.0.1072
+    - topic: 0.0.999
   # Which level of persistence should be used
   persistenceLevel: "FULL"
   # Should history of messages be caught up

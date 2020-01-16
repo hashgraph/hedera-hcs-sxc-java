@@ -1,5 +1,6 @@
 package com.hedera.hcs.sxc.interfaces;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessage;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
@@ -31,7 +32,7 @@ public interface SxcMessagePersistence {
     // application message persistence
     public void storeApplicationMessage(ApplicationMessageId applicationMessageId, ApplicationMessage applicationMessage);
     public Map<String, ApplicationMessage> getApplicationMessages();
-    public ApplicationMessage getApplicationMessage(String applicationMessageId);
+    public ApplicationMessage getApplicationMessage(String applicationMessageId) throws InvalidProtocolBufferException;
     
     // consensus timestamp
     public Instant getLastConsensusTimestamp();

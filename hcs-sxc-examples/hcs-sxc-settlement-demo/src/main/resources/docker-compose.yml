@@ -42,8 +42,8 @@ services:
     ports:
       - 8083:8080
 
-  Diane:
-    container_name: Diane
+  Diana:
+    container_name: Diana
     image: hederahashgraph/hcs-sxc-settlement-demo:latest
     restart: on-failure
     environment:

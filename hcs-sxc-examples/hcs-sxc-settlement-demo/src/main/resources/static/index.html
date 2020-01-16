@@ -92,7 +92,7 @@
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">home</i>
                         <span class="mdc-list-item__text">Overview</span>
                     </a>
-                    <a class="credits-and-debits mdc-list-item" href="#credits-and-debits" aria-current="page">
+                    <a  style="display:none" class="credits-and-debits mdc-list-item" href="#credits-and-debits" aria-current="page">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">money</i>
                         <span class="mdc-list-item__text">Credits and Debits</span>
                     </a>
@@ -153,7 +153,7 @@
                             </div>
                             <div class="mdc-card__actions">
                               <div class="mdc-card__action-buttons">
-                                <button onclick="location.hash='credits-and-debits'" class="mdc-button mdc-card__action mdc-card__action--button">  <span class="mdc-button__ripple"></span> Credits and Debits</button>
+                                <button id="overview-credits-debits-button" style="display:none" onclick="location.hash='credits-and-debits'" class="mdc-button mdc-card__action mdc-card__action--button">  <span class="mdc-button__ripple"></span> Credits and Debits</button>
                                 <button onclick="location.hash='settlements'" class="mdc-button mdc-card__action mdc-card__action--button">  <span class="mdc-button__ripple"></span> Settlements</button>
                                 <button onclick="location.hash='audit'" class="mdc-button mdc-card__action mdc-card__action--button">  <span class="mdc-button__ripple"></span> Audit</button>
                        
@@ -171,7 +171,7 @@
                                         <th class="mdc-data-table__header-cell" role="columnheader" scope="col">&nbsp;</th>
                                         <th class="mdc-data-table__header-cell" role="columnheader" scope="col">User</th>
                                         <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Role(s)</th>
-                                        <th class="mdc-data-table__header-cell" style="flex:1" role="columnheader" scope="col">Location</th>
+                                        <th class="mdc-data-table__header-cell" style="flex:1" role="columnheader" scope="col">Payment Account Details</th>
                                         <th class="mdc-data-table__header-cell" role="columnheader" scope="col"></th>
                                     </tr>
                                 </thead>
@@ -254,7 +254,7 @@
                             <div style="display: flex; flex-direction: row; padding: 24px;">
                                 <div style="flex-grow: 1">
                                     <button id="settle-now-button" disabled class="mdc-button mdc-button--outlined">Settle</button>
-                                    &nbsp; <small>Total:</small> <small id="settle-total">Settle 12345 USD</small>
+                                    &nbsp; <small id="settle-total"></small>
                                 </div>
                                 <div >
                                     <button 
@@ -383,9 +383,9 @@
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Reference</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Amount (USD)</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">DateTime</th>
-                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Status</th>
-                                                <!--<th class="mdc-data-table__header-cell" role="columnheader" scope="col">Channel</th>-->
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Actions</th>
+                                              
+                                                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Status</th>
                                                 <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Notes</th>
                                             </tr>
                                         </thead>
@@ -400,9 +400,8 @@
                                                     <td id="reference"      class="mdc-data-table__cell">A77U312</td>
                                                     <td id="amount-net"     class="mdc-data-table__cell" style="text-align: right" data-amount="120" data-currency="USD">$120</td>
                                                     <td id="date-time"           class="mdc-data-table__cell">13 Nov</td>
-                                                    <td id="status"         class="mdc-data-table__cell">Pending</td>
-                                                    <!--<td id="channel-name"   class="mdc-data-table__cell"></td>-->
                                                     <td id="action"         class="mdc-data-table__cell"></td>
+                                                    <td id="status"         class="mdc-data-table__cell">Pending</td>
                                                     <td id="notes"          class="mdc-data-table__cell">1 x XYZ Service</td>
                                                 </tr>
                                             </template>
@@ -1535,10 +1534,8 @@
                 
                 document.getElementById("this-user").innerHTML=whoami.name +"<span style='color:#aaa; font-size:12px;'> ("+whoami.roles+")</span>";
                 document.getElementById("this-user-avatar").style.backgroundImage= "url(images/"+whoami.appId+".png)";
+                if(thisRoles.includes("BUYER")) document.querySelector("#lhs-menu .credits-and-debits").style.display='block';
                 
-                /*
-                
-                */
                 responsePaymentChannel = await fetch('addressbook/paychannel/');
                 paymentChannels  = await responsePaymentChannel.json(); 
                 
@@ -1546,6 +1543,8 @@
                 responseAddressBookBs = await fetch('addressbook/buyerseller/');
                 addressBookBs  = await responseAddressBookBs.json(); 
                 buyerSellersAddress = addressBookBs;
+                
+                // redirect  subviews on browserRefresh - only one atm
                 switch(location.hash){
                     case "#audit-detail": 
                         location.hash="audit";
@@ -1553,6 +1552,7 @@
                         break;
                     default: //event.preventDefault();//do nothing'
                 }
+                
                 renderMain();
                 window.onhashchange = renderMain;
                 
@@ -1617,17 +1617,17 @@
                 clonedTableTemplate.getElementById("this-user-avatar").style.backgroundImage = 'url(images/'+thisAppId+'.png)';
                 clonedTableTemplate.getElementById("this-role").innerHTML = thisRoles.replace(/,/g,", ");;;
                 clonedTableTemplate.getElementById("this-pk").innerHTML = thisPK;
+                if(!thisRoles.includes("PAYCHANNEL")) clonedTableTemplate.getElementById("overview-credits-debits-button").style.display='block';
                 var url = window.location.protocol + "//" + window.location.hostname + ":" +thisPort;
                 var tableBodyTemplate = clonedTableTemplate.getElementById("overview-table-body-template");
                 var tableBody = clonedTableTemplate.getElementById("overview-table-body");
+                
                 for(z=0; z < allAddresses.length ; z++){
-                    var url = window.location.protocol + "//" + window.location.hostname + ":" + allAddresses[z].port;
-
                     clonedRow = tableBodyTemplate.content.cloneNode(true);
                     clonedRow.getElementById("user").innerHTML = allAddresses[z].name;
                     clonedRow.getElementById("roles").innerHTML = allAddresses[z].roles.toLowerCase().replace(/,/g,", ");;
                     clonedRow.getElementById("roles").style.textTransform = "capitalize";
-                    clonedRow.getElementById("link").innerHTML =  url ;
+                    clonedRow.getElementById("link").innerHTML =  allAddresses[z].paymentAccountDetails ;
                     clonedRow.getElementById('user-avatar').style.backgroundImage = "url(images/" + allAddresses[z].appId + ".png)";
                     tableBody.appendChild(clonedRow);
                 }     
@@ -1678,20 +1678,20 @@
                 
                 //auditThreadDialog  = new mdc.dialog.MDCDialog($auditThreadDialog);
                 //$auditThreadDialog.querySelector("#thread-id").innerHTML = threadId;
+                
                 let response = await fetch('audit/'+threadId);
                 let responseJSON = await  response.json();
                 //$auditThreadDialog.querySelector("#audit-thread-panel-holder").innerHTML="";
-                let auditApplicationMessages = responseJSON.auditApplicationMessages;
-                for (z=0; z < auditApplicationMessages.length ; z++) {
-                    let response = await fetch('audit/'+threadId+"/"+auditApplicationMessages[z].applicationMessageId);
+                responseJSON.auditApplicationMessages.forEach(async m=>{
+                    let response = await fetch('audit/'+threadId+"/"+m.applicationMessageId);
                     let responseJSON = await  response.json();
                     responseJSON = responseJSON.auditHCSMessages;
                     clonedTemplate = document.getElementById("audit-thread-template").content.cloneNode(true);
-                    clonedTemplate.querySelector("#audit-thread-message-id").innerHTML=auditApplicationMessages[z].applicationMessageId;
-                    clonedTemplate.querySelector("#audit-thread-message-text").innerHTML=syntaxHighlight(auditApplicationMessages[z].message);//.substring(0,180)+"...";
+                    clonedTemplate.querySelector("#audit-thread-message-id").innerHTML=m.applicationMessageId;
+                    clonedTemplate.querySelector("#audit-thread-message-text").innerHTML=syntaxHighlight(m.message);//.substring(0,180)+"...";
                     clonedTemplate.querySelector("#audit-thread-message-parts-json").innerHTML=syntaxHighlight(responseJSON);
                     main.appendChild(clonedTemplate);
-                }
+                });
         
                 //auditThreadDialog.open();
                 return false;
@@ -1794,7 +1794,8 @@
                         newButton.innerHTML = "Accept";
                         newButton.classList.add("mdc-button");
                         newButton.classList.add("mdc-button--outlined");
-                        newButton.addEventListener("click", function(){openAcceptPaychannelDialog(threadId,userName,i_Settlements.paymentChannelName );});
+                        let cname = i_Settlements.paymentChannelName;
+                        newButton.addEventListener("click", function(){openAcceptPaychannelDialog(threadId,userName,cname );});
                         clonedRow.getElementById("action").appendChild(newButton);
                     } else if (i_Settlements.payerName === thisuserName  && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_PAY_CHANNEL_AGREED'){
                         let threadId = i_Settlements.threadId;
@@ -1984,8 +1985,10 @@
                          }
                      }
                 );
-                document.querySelector("#"+userName+" #settle-total").innerHTML = 
-                    (thisUserPays + " - " + otherUserPays + " = " + (thisUserPays - otherUserPays));
+        
+                if(thisUserPays - otherUserPays)
+                    document.querySelector("#"+userName+" #settle-total").innerHTML = 
+                        ("Total (USD): " + thisUserPays + " - " + otherUserPays + " = " + (thisUserPays - otherUserPays) );
 
             }
             
@@ -2478,9 +2481,13 @@
                         }
                         
                         if(location.hash === '#settlements'){
-                            await renderSettlementsPanel(
+                            if (thisRoles.includes('PAYCHANNEL')){
+                                await renderSettlementsPanel(messageOutput.payer);
+                            } else {
+                                await renderSettlementsPanel(
                                    messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
-                                   );
+                                );
+                            }
                             styleButtons();
                         } else if (location.hash === '#credits-and-debits'){
                             await renderCreditsPanel(
@@ -2488,10 +2495,8 @@
                                   );
                              styleButtons();
                         } else if (location.hash === '#audits'){
-                            await renderAuditIndexTable()(
-                                    messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
-                                  );
-                             styleButtons();
+                            await renderAuditIndexTable();
+                            styleButtons();
                         }
                         break;
                     case "audits":
@@ -2504,12 +2509,10 @@
                             await renderCreditsPanel(
                                     messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
                                   );
-                             styleButtons();
+                            styleButtons();
                         } else if (location.hash === '#audits'){
-                            await renderAuditIndexTable()(
-                                    messageOutput.recipient===thisuserName?messageOutput.payer:messageOutput.recipient   
-                                  );
-                             styleButtons();
+                            await renderAuditIndexTable();
+                            styleButtons();
                         }
                         break;
                     default: alert("wrong target element");

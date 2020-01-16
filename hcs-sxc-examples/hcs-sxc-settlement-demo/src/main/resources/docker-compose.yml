@@ -1,7 +1,7 @@
 version: '3.3'
 services:
-  alice:
-    container_name: alice
+  Alice:
+    container_name: Alice
     image: hederahashgraph/hcs-sxc-settlement-demo:latest
     restart: on-failure
     environment:
@@ -14,8 +14,8 @@ services:
     ports:
       - 8081:8080
 
-  bob:
-    container_name: bob
+  Bob:
+    container_name: Bob
     image: hederahashgraph/hcs-sxc-settlement-demo:latest
     restart: on-failure
     environment:
@@ -28,8 +28,8 @@ services:
     ports:
       - 8082:8080
 
-  carlos:
-    container_name: carlos
+  Carlos:
+    container_name: Carlos
     image: hederahashgraph/hcs-sxc-settlement-demo:latest
     restart: on-failure
     environment:
@@ -42,8 +42,8 @@ services:
     ports:
       - 8083:8080
 
-  worldpay:
-    container_name: worldpay
+  Diane:
+    container_name: Diane
     image: hederahashgraph/hcs-sxc-settlement-demo:latest
     restart: on-failure
     environment:
@@ -56,8 +56,8 @@ services:
     ports:
       - 8084:8080
 
-  erica:
-    container_name: erica
+  Erica:
+    container_name: Erica
     image: hederahashgraph/hcs-sxc-settlement-demo:latest
     restart: on-failure
     environment:
@@ -70,8 +70,8 @@ services:
     ports:
       - 8085:8080
 
-  farouk:
-    container_name: farouk
+  Farouk:
+    container_name: Farouk
     image: hederahashgraph/hcs-sxc-settlement-demo:latest
     restart: on-failure
     environment:
@@ -84,8 +84,8 @@ services:
     ports:
       - 8086:8080
 
-  grace:
-    container_name: grace
+  Grace:
+    container_name: Grace
     image: hederahashgraph/hcs-sxc-settlement-demo:latest
     restart: on-failure
     environment:
@@ -98,8 +98,8 @@ services:
     ports:
       - 8087:8080
 
-  stripe:
-    container_name: stripe
+  Harry:
+    container_name: Harry
     image: hederahashgraph/hcs-sxc-settlement-demo:latest
     restart: on-failure
     environment:

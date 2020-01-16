@@ -52,7 +52,7 @@ public class HCSIntegration {
     private AppData appData;
     
     @Autowired
-    private Environment environemnt;
+    private Environment environment;
             
     
     @Autowired
@@ -482,7 +482,7 @@ public class HCSIntegration {
             stompClient.setMessageConverter(new MappingJackson2MessageConverter());
             StompSessionHandler sessionHandler = new CustomStompSessionHandler(); 
             try {
-                this.stompSession = stompClient.connect("ws://localhost:"+ environemnt.getProperty("local.server.port")+"/notifications", sessionHandler).get();
+                this.stompSession = stompClient.connect("ws://localhost:"+ environment.getProperty("local.server.port")+"/notifications", sessionHandler).get();
             } catch (InterruptedException | ExecutionException e) {
                 log.error(e);
             }

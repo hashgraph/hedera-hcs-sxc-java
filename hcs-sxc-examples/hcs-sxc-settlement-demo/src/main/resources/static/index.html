@@ -153,7 +153,7 @@
                             </div>
                             <div class="mdc-card__actions">
                               <div class="mdc-card__action-buttons">
-                                <button onclick="location.hash='credits-and-debits'" class="mdc-button mdc-card__action mdc-card__action--button">  <span class="mdc-button__ripple"></span> Credits and Debits</button>
+                                <button id="overview-credits-debits-button" style="display:none" onclick="location.hash='credits-and-debits'" class="mdc-button mdc-card__action mdc-card__action--button">  <span class="mdc-button__ripple"></span> Credits and Debits</button>
                                 <button onclick="location.hash='settlements'" class="mdc-button mdc-card__action mdc-card__action--button">  <span class="mdc-button__ripple"></span> Settlements</button>
                                 <button onclick="location.hash='audit'" class="mdc-button mdc-card__action mdc-card__action--button">  <span class="mdc-button__ripple"></span> Audit</button>
                        
@@ -1617,11 +1617,12 @@
                 clonedTableTemplate.getElementById("this-user-avatar").style.backgroundImage = 'url(images/'+thisAppId+'.png)';
                 clonedTableTemplate.getElementById("this-role").innerHTML = thisRoles.replace(/,/g,", ");;;
                 clonedTableTemplate.getElementById("this-pk").innerHTML = thisPK;
+                if(!thisRoles.includes("PAYCHANNEL")) clonedTableTemplate.getElementById("overview-credits-debits-button").style.display='block';
                 var url = window.location.protocol + "//" + window.location.hostname + ":" +thisPort;
                 var tableBodyTemplate = clonedTableTemplate.getElementById("overview-table-body-template");
                 var tableBody = clonedTableTemplate.getElementById("overview-table-body");
+                
                 for(z=0; z < allAddresses.length ; z++){
-                    
                     clonedRow = tableBodyTemplate.content.cloneNode(true);
                     clonedRow.getElementById("user").innerHTML = allAddresses[z].name;
                     clonedRow.getElementById("roles").innerHTML = allAddresses[z].roles.toLowerCase().replace(/,/g,", ");;

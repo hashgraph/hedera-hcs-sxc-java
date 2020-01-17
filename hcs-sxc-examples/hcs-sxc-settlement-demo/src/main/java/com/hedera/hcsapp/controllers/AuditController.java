@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcs.sxc.HCSCore;
-import com.hedera.hcs.sxc.interfaces.SxcConsensusMessage;
+import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.States;
@@ -143,7 +143,7 @@ public class AuditController {
         for (Map.Entry<String, SxcConsensusMessage> mirrorResponse : mirrorResponses.entrySet()) {
 
             try {
-                ApplicationMessageChunk chunk = ApplicationMessageChunk.parseFrom(mirrorResponse.getValue().getMessage());
+                ApplicationMessageChunk chunk = ApplicationMessageChunk.parseFrom(mirrorResponse.getValue().message);
 
                 ApplicationMessageId applicationMessageIdProto = chunk.getApplicationMessageId();
 
@@ -155,11 +155,11 @@ public class AuditController {
 
                 if (appMessageId.contentEquals(applicationMessageId)) {
                     AuditHCSMessage auditHCSMessage = new AuditHCSMessage(appData);
-                    auditHCSMessage.setConsensusTimeStampSeconds(mirrorResponse.getValue().getConsensusTimeStampSeconds());
-                    auditHCSMessage.setConsensusTimeStampNanos(mirrorResponse.getValue().getConsensusTimeStampNanos());
-                    byte[] runningHash = mirrorResponse.getValue().getRunningHash();
+                    auditHCSMessage.setConsensusTimeStampSeconds(mirrorResponse.getValue().consensusTimestamp.getEpochSecond());
+                    auditHCSMessage.setConsensusTimeStampNanos(mirrorResponse.getValue().consensusTimestamp.getNano());
+                    byte[] runningHash = mirrorResponse.getValue().runningHash;
                     auditHCSMessage.setRunningHash(Hex.encodeHexString(runningHash));
-                    auditHCSMessage.setSequenceNumber(mirrorResponse.getValue().getSequenceNumber());
+                    auditHCSMessage.setSequenceNumber(mirrorResponse.getValue().sequenceNumber);
 
                     auditHCSMessage.setPart(chunk.getChunkIndex() + " of " + chunk.getChunksCount());
 

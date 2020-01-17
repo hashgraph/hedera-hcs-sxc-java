@@ -164,4 +164,9 @@ public class PersistMessages
         mirrorTopicMessages = new HashMap<>();
         applicationMessages = new HashMap<>();
     }
+
+    @Override
+    public void setHibernateProperties(Map<String, String> hibernateProperties) {
+        
+    }
 }

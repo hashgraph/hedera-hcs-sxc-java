@@ -14,6 +14,9 @@ import java.util.Map;
 
 
 public interface SxcMessagePersistence {
+    // Hibernate properties
+    public void setHibernateProperties(Map<String, String> hibernateProperties);
+    
     // message chunking persistence
     public List<ApplicationMessageChunk> getParts(ApplicationMessageId applicationMessageId);
     public void putParts(ApplicationMessageId applicationMessageId, List<ApplicationMessageChunk> l);

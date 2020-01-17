@@ -35,6 +35,7 @@ public final class HCSCore {
     private MessagePersistenceLevel messagePersistenceLevel;
     private String mirrorAddress;
     private int reconnectDelay = 0;
+    private Map<String, String> hibernateConfig = new HashMap<String, String>();
 
     /**
      * Constructor for HCS Core
@@ -65,6 +66,10 @@ public final class HCSCore {
         this.ed25519PrivateKey = environment.getOperatorKey();
 
         this.applicationId = applicationId;
+        
+        String appId = Long.toString(this.applicationId);
+        // replace hibernate configuration {appid}
+        yamlConfig.getCoreHibernate().forEach((key,value) -> this.hibernateConfig.put(key, value.replace("{appid}", appId))); 
     }
     public HCSCore withMessageSignature(boolean signMessages) {
         this.signMessages = signMessages;
@@ -141,5 +146,9 @@ public final class HCSCore {
 
     public SxcMessagePersistence getMessagePersistence() {
         return HCSCore.persistence;
+    }
+    
+    public Map<String, String> getHibernateConfig() {
+        return this.hibernateConfig;
     }
 }

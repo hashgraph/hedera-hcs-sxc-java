@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
@@ -104,9 +103,9 @@ public final class OutboundHCSMessage {
      * @param message
      * @throws HederaNetworkException
      * @throws IllegalArgumentException
-     * @throws HederaException
+     * @throws Exception
      */
-    public TransactionId sendMessage(int topicIndex, byte[] message) throws HederaNetworkException, IllegalArgumentException, HederaException {
+    public TransactionId sendMessage(int topicIndex, byte[] message) throws Exception {
 
         if (signMessages) {
 

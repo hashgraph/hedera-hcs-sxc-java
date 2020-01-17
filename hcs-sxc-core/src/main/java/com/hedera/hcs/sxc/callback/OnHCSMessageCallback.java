@@ -2,8 +2,8 @@ package com.hedera.hcs.sxc.callback;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.consensus.ConsensusMessage;
 import com.hedera.hcs.sxc.HCSCore;
+import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackFromMirror;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackToAppInterface;
 import com.hedera.hcs.sxc.interfaces.HCSResponse;
@@ -66,7 +66,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
         hcsResponse.setMessage(message);
         observers.forEach(listener -> listener.onMessage(hcsResponse));
     }
-    public void storeMirrorResponse(ConsensusMessage consensusMessage) {
+    public void storeMirrorResponse(SxcConsensusMessage consensusMessage) {
         hcsCore.getMessagePersistence().storeMirrorResponse(consensusMessage);
     }
     public void partialMessage(ApplicationMessageChunk messagePart) throws InvalidProtocolBufferException {

@@ -39,7 +39,6 @@
         <url>https://github.com/hashgraph/hedera-hcs-sxc/tree/master</url>
     </scm>
     <url>https://github.com/hashgraph/hedera-hcs-sxc</url>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>10</maven.compiler.source>
@@ -65,7 +64,11 @@
         <hcs-sxc-core.version>0.0.3-SNAPSHOT</hcs-sxc-core.version>
         <hcs-sxc-proto.version>0.0.3-SNAPSHOT</hcs-sxc-proto.version>
         <hcs-sxc-interfaces.version>0.0.3-SNAPSHOT</hcs-sxc-interfaces.version>
+<!-- 
         <hedera-sdk.version>0.9.0-beta-3</hedera-sdk.version>
+         -->
+        <hedera-sdk.version>1.0.0-hcs-1</hedera-sdk.version>
+        
         <h2.version>1.4.199</h2.version>
 
         <jackson-databind.version>2.10.0</jackson-databind.version>
@@ -159,6 +162,7 @@
           <artifactId>sdk</artifactId>
           <version>${hedera-sdk.version}</version>
       </dependency>
+      
       <dependency>
           <groupId>io.github.cdimascio</groupId>
           <artifactId>java-dotenv</artifactId>

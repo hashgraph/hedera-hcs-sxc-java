@@ -6,10 +6,14 @@ import java.util.Optional;
 import lombok.extern.log4j.Log4j2;
 
 import com.google.common.util.concurrent.Uninterruptibles;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.proto.Timestamp;
+import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
 import com.hedera.hashgraph.sdk.consensus.ConsensusClient;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessage;
 import com.hedera.hashgraph.sdk.consensus.ConsensusClient.Subscription;
+import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackFromMirror;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hcs.sxc.proto.java.ApplicationMessageChunk;
@@ -112,8 +116,15 @@ public final class MirrorTopicSubscriber extends Thread {
     
     void onMirrorMessage(ConsensusMessage messagesResponse, HCSCallBackFromMirror onHCSMessageCallback) {
           log.info("Got message from mirror - persisting");
-    
-          onHCSMessageCallback.storeMirrorResponse(messagesResponse);
+          ConsensusTopicResponse consensusTopicResponse = ConsensusTopicResponse.newBuilder()
+                  .setConsensusTimestamp(Timestamp.newBuilder().setSeconds(messagesResponse.consensusTimestamp.getEpochSecond()).setNanos(messagesResponse.consensusTimestamp.getNano()).build())
+                  .setMessage(ByteString.copyFrom(messagesResponse.message))
+                  .setRunningHash(ByteString.copyFrom(messagesResponse.runningHash))
+                  .setSequenceNumber(messagesResponse.sequenceNumber)
+                  .build();
+          
+          SxcConsensusMessage consensusMessage = new SxcConsensusMessage(messagesResponse.topicId, consensusTopicResponse);
+          onHCSMessageCallback.storeMirrorResponse(consensusMessage);
           
           byte[] message = messagesResponse.message;
           ApplicationMessageChunk messagePart;

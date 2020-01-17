@@ -26,6 +26,7 @@ import com.hedera.hashgraph.proto.Timestamp;
 import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessage;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
+import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackFromMirror;
 import com.hedera.hcs.sxc.interfaces.HCSRelayMessage;
 import com.hedera.hcs.sxc.interfaces.MirrorSubscriptionInterface;
@@ -106,7 +107,7 @@ public class MirrorSubscribe implements MirrorSubscriptionInterface {
                                         .setSequenceNumber(rlm.getSequenceNumber())
                                         .build();
                                 ConsensusTopicId topicId = new ConsensusTopicId(rlm.getTopicShard(), rlm.getTopicRealm(), rlm.getTopicNum());
-                                ConsensusMessage consensusMessage = new ConsensusMessage(topicId, consensusTopicResponse);
+                                SxcConsensusMessage consensusMessage = new SxcConsensusMessage(topicId, consensusTopicResponse);
 
                                 onHCSMessageCallback.storeMirrorResponse(consensusMessage);
                                 

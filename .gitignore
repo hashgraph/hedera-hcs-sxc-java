@@ -54,11 +54,10 @@ org.eclipse.jdt.core.prefs
 /hcs-sxc-examples/hcs-sxc-settlement-demo/target
 hcs-sxc-examples/hcs-sxc-settlement-demo/h2data
 /nbactions.xml
-hcs-sxc-plugins/hcs-sxc-plugins-persistence-in-db/target
 hcs-sxc-plugins/hcs-sxc-plugins-mirror-direct/target
 hcs-sxc-plugins/hcs-sxc-plugins-mirror-queue-artemis/target
 /hcs-sxc-examples/hcs-sxc-settlement-demo/nbactions-fatjar.xml
 /hcs-sxc-examples/hcs-sxc-settlement-demo/nbactions.xml
-hcs-sxc-plugins/hcs-sxc-plugins-persistence-in-h2/target
+hcs-sxc-plugins/hcs-sxc-plugins-persistence-hibernate/target
 hcs-sxc-examples/hcs-sxc-settlement-demo/src/main/resources/config.yaml
 /hcs-sxc-examples/hcs-sxc-settlement-demo-test/

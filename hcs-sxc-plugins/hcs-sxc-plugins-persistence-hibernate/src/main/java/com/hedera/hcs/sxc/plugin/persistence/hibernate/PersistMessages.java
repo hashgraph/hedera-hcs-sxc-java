@@ -1,4 +1,4 @@
-package com.hedera.hcs.sxc.plugin.persistence.db;
+package com.hedera.hcs.sxc.plugin.persistence.hibernate;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.proto.TransactionBody;
@@ -19,7 +19,6 @@ import com.hedera.hcs.sxc.proto.java.ApplicationMessageId;
 
 import lombok.extern.log4j.Log4j2;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -39,13 +38,16 @@ public class PersistMessages
         implements SxcMessagePersistence{
 
     private final Long SCALAR = 1_000_000_000L;
-
     private Map<ApplicationMessageId, List<ApplicationMessageChunk>> partialMessages;
-
     private MessagePersistenceLevel persistenceLevel = null;
+    private Map<String, String> hibernateProperties = new HashMap<String, String>();
 
-    public PersistMessages() throws IOException{
+    public PersistMessages() throws Exception {
         partialMessages = new HashMap<>();
+    }
+    
+    public void setHibernateProperties(Map<String, String> hibernateProperties) {
+        this.hibernateProperties = hibernateProperties;
     }
 
     public void setPersistenceLevel(MessagePersistenceLevel persistenceLevel) {
@@ -73,7 +75,7 @@ public class PersistMessages
         mirrorResponse.setTimestampNS(timestampNS);
 
         Transaction dbTransaction = null;
-        final Session session = HibernateUtil.getHibernateSession();
+        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         // start a transaction
         dbTransaction = session.beginTransaction();
         // save the student objects
@@ -87,7 +89,7 @@ public class PersistMessages
     @Override
     public SxcConsensusMessage getMirrorResponse(String timestamp) {
 
-      final Session session = HibernateUtil.getHibernateSession();
+      final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
       MirrorResponse mirrorResponse = session.createQuery("from MirrorResponse mr where mr.timestamp = :timestamp", MirrorResponse.class)
               .setParameter("timestamp", timestamp)
               .getSingleResult();
@@ -107,7 +109,7 @@ public class PersistMessages
     public Map<String, SxcConsensusMessage> getMirrorResponses() {
         Map<String, SxcConsensusMessage> responseList = new HashMap<>();
 
-        final Session session = HibernateUtil.getHibernateSession();
+        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         List < MirrorResponse > mirrorResponses = session.createQuery("from MirrorResponse mr order by mr.timestamp desc", MirrorResponse.class).list();
         mirrorResponses.forEach(mirrorResponse -> {
             SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage();
@@ -159,7 +161,7 @@ public class PersistMessages
     @Override
     public ConsensusMessageSubmitTransaction getSubmittedTransaction(String transactionId) {
 
-      final Session session = HibernateUtil.getHibernateSession();
+        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         HCSTransaction hcsTransaction = session.createQuery("from HCSTransaction t where t.transactionId = :transactionId", HCSTransaction.class)
                 .setParameter("transactionId", transactionId)
                 .getSingleResult();
@@ -205,7 +207,7 @@ public class PersistMessages
     public Map<String, ConsensusMessageSubmitTransaction> getSubmittedTransactions() {
         Map<String, ConsensusMessageSubmitTransaction> responseList = new HashMap<>();
 
-        final Session session = HibernateUtil.getHibernateSession();
+        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         List<HCSTransaction> hcsTransactions = session.createQuery("from HCSTransaction t order by t.transactionId desc", HCSTransaction.class)
                 .list();
 
@@ -267,7 +269,7 @@ public class PersistMessages
         hcsApplicationMessage.setApplicationMessage(applicationMessage.toByteArray());
 
         Transaction dbTransaction = null;
-        final Session session = HibernateUtil.getHibernateSession();
+        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         dbTransaction = session.beginTransaction();
         session.save(hcsApplicationMessage);
         dbTransaction.commit();
@@ -277,7 +279,7 @@ public class PersistMessages
 
     @Override
     public ApplicationMessage getApplicationMessage(String applicationMessageId) {
-      final Session session = HibernateUtil.getHibernateSession();
+      final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
       try {
             HCSApplicationMessage applicationMessage = session.createQuery("from HCSApplicationMessage m where m.applicationMessageId = :applicationMessageId", HCSApplicationMessage.class)
                     .setParameter("applicationMessageId", applicationMessageId)
@@ -294,7 +296,7 @@ public class PersistMessages
     public Map<String, ApplicationMessage> getApplicationMessages() {
         Map<String, ApplicationMessage> responseList = new HashMap<>();
 
-        final Session session = HibernateUtil.getHibernateSession();
+        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         List<HCSApplicationMessage> applicationMessages = session.createQuery("from HCSApplicationMessage", HCSApplicationMessage.class)
                 .list();
 
@@ -340,7 +342,7 @@ public class PersistMessages
 
         Instant lastConsensusTimestamp = Instant.EPOCH;
 
-        final Session session = HibernateUtil.getHibernateSession();
+        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<Long> criteriaQuery = builder.createQuery(Long.class);
         
@@ -366,7 +368,7 @@ public class PersistMessages
     public void clear() {
         partialMessages = new HashMap<>();
 
-        final Session session = HibernateUtil.getHibernateSession();
+        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         session.beginTransaction();
         session.createQuery("delete MirrorResponse").executeUpdate();
         session.createQuery("delete HCSTransaction").executeUpdate();

@@ -73,7 +73,7 @@ Looking through the java project, we have the following Maven components/artifac
     * hcs-sxc-proto
     * hcs-sxc-plugins
         * hcs-sxc-plugins-persistence-in-memory
-        * hcs-sxc-plugins-persistence-in-h2
+        * hcs-sxc-plugins-persistence-hibernate
         * hcs-sxc-plugins-mirror-direct
         * hcs-sxc-plugins-mirror-queue-artemis
 
@@ -108,8 +108,99 @@ The choice of a plug-in architecture is to enable additional plugins to be devel
 
 * hcs-sxc-plugins-mirror-direct - plugin to enable the `hcs-sxc-core` to subscribe to mirror notifications directly
 * hcs-sxc-plugins-mirror-queue-artemis - plugin to enable the `hcs-sxc-core` to subscribe to mirror notifications via an Artemis Message Queue (which receives messages via the `hcs-sxc-relay` component)
-* hcs-sxc-plugins-persistence-in-h2 - plug in to provide data persistence in a database (H2)
+* hcs-sxc-plugins-persistence-hibernate - plug in to provide data persistence in a database through hibernate
 * hcs-sxc-plugins-persistence-in-memory - plug in to provide data persistence in memory
+
+#### HCS-SXC-plugins-mirror-direct
+
+This plugin provides a direct subscription to a mirror node which implements the same subscription API as the [open source mirror node project provided by Hedera] (https://github.com/hashgraph/hedera-mirror-node). Other mirror node projects may have different subscription APIs in which case new plug ins conforming to those mirror nodes' subscription APIs would be required.
+
+When in use, the plug in uses the configuration parameters from `config.yaml` (defined in the application's `src/main/resources`) to identify the IP address and port of the mirror node to subscribe to.
+
+#### HCS-SXC-plugins-mirror-queue-artemis
+
+This plugin provides a subscription to an Artemis Active MQ from which it will receive notifications from a mirror node. Note: An Active MQ service must be available and be populated with data from a mirror node via the `HCS-SXC-relay`.
+
+#### HCS-SXC-plugins-persistence-hibernate
+
+This plugin provides persistence of HCS transactions and mirror notifications into a database via hibernate. The default project configuration uses H2 as a database, but others can easily be implemented.
+
+To configure a different database, edit the `coreHibernate` section of the `config.yaml` file found in `src/main/resources` of the application.
+
+Example configuration for h2:
+
+```
+coreHibernate:
+  # these values will be loaded as a map, add or remove properties as necessary
+  # {appId} will be replaced with the application instance id
+  hibernate.connection.driver_class: "org.h2.Driver"
+  hibernate.connection.url: "jdbc:h2:./h2data/libdb-{appid}"
+  hibernate.connection.username: "admin"
+  hibernate.connection.password: ""
+  hibernate.default_schema: "PUBLIC"
+  hibernate.connection.pool_size: 5
+  hibernate.dialect.H2Dialect: "org.hibernate.dialect.H2Dialect"
+  hibernate.cache.provider_class: "org.hibernate.cache.internal.NoCacheProvider"
+  hibernate.show_sql: "false"
+  hibernate.hbm2ddl.auto: "update"
+```
+
+The list of configuration entries is variable, you may add or remove entries as necessary for your particular database.
+Also, if `{appid}` is found in any of the values, it will be swapped at run time for the id of the instance of the application being run.
+
+Further, to ensure the appropriate database vendors' dependencies are available when compiling, the `hcs-sxc-plugins-persistence-hibernate` project makes use of profiles in its `pom.xml`. 
+
+For example:
+
+```
+   <profiles>
+        <profile>
+            <id>mysql</id>                
+            <dependencies>
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <version>5.1.9</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>postgres</id>
+            <dependencies>
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <version>5.1.9</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>h2</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>1.4.200</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+```
+
+to build this hibernate component with the appropriate vendor's dependencies, add `-P profileName` to your maven install command.
+
+Example:
+```
+mvnw clean install -Dcom.hedera.hashgraph.sdk.experimental=true -Pdocker -Ppostgres
+```
+
+the `h2` profile is the default profile
+
+#### HCS-SXC-plugins-persistence-in-memory
+
 
 ### HCS-SXC proto
 
@@ -155,7 +246,7 @@ for in database
 
 ```
 <groupId>com.hedera</groupId>
-<artifactId>hcs-sxc-plugins-persistence-in-h2</artifactId>
+<artifactId>hcs-sxc-plugins-persistence-hibernate</artifactId>
 <version>0.0.3-SNAPSHOT</version>
 ```
 
@@ -233,6 +324,20 @@ appNet:
   persistenceLevel: "FULL"
   # Should history of messages be caught up
   catchupHistory: true
+
+coreHibernate:
+  # these values will be loaded as a map, add or remove properties as necessary
+  # {appId} will be replaced with the application instance id
+  hibernate.connection.driver_class: "org.h2.Driver"
+  hibernate.connection.url: "jdbc:h2:./h2data/libdb-{appid}"
+  hibernate.connection.username: "admin"
+  hibernate.connection.password: ""
+  hibernate.default_schema: "PUBLIC"
+  hibernate.connection.pool_size: 5
+  hibernate.dialect.H2Dialect: "org.hibernate.dialect.H2Dialect"
+  hibernate.cache.provider_class: "org.hibernate.cache.internal.NoCacheProvider"
+  hibernate.show_sql: "false"
+  hibernate.hbm2ddl.auto: "update"
 
 # Default HCS transaction fee in tinybar
 HCSTransactionFee: 100000000
@@ -383,7 +488,7 @@ These are merely sample lines of code, please refer to the example projects for 
 From the top of the project, issue the following command to compile docker images
 
 ```shell
-mvn clean install -Dcom.hedera.hashgraph.sdk.experimental=true -Pdocker
+mvnw clean install -Dcom.hedera.hashgraph.sdk.experimental=true -Pdocker
 ```
 
 *Note: a `mvnw` executable is provided in the project in the event you don't have maven installed*
@@ -393,7 +498,7 @@ mvn clean install -Dcom.hedera.hashgraph.sdk.experimental=true -Pdocker
 From the top of the project, issue the following command to create fat jars
 
 ```shell
-mvn clean install -Dcom.hedera.hashgraph.sdk.experimental=true -Pfatjar
+mvnw clean install -Dcom.hedera.hashgraph.sdk.experimental=true -Pfatjar
 ```
 
 *Note: a `mvnw` executable is provided in the project in the event you don't have maven installed*
@@ -518,7 +623,7 @@ Whenever a participant performs and action in the UI, this results in a HCS tran
 To run the examples outside of docker and override `.env` variables and the database location/name run:
 
 ```
-mvn exec:java -Dexec.mainClass="com.hedera.hcsapp.Application" -Dserver.port=8081 -Dcom.hedera.hashgraph.sdk.experimental=true -Pfatjar -Dspring.datasource.url="jdbc:h2:./h2data/settlement-demo-8081" -DAPP_ID=1 -DOPERATOR_ID=0.0.1010 -DOPERATOR_KEY=302e0208...94329fb
+mvnw exec:java -Dexec.mainClass="com.hedera.hcsapp.Application" -Dserver.port=8081 -Dcom.hedera.hashgraph.sdk.experimental=true -Pfatjar -Dspring.datasource.url="jdbc:h2:./h2data/settlement-demo-8081" -DAPP_ID=1 -DOPERATOR_ID=0.0.1010 -DOPERATOR_KEY=302e0208...94329fb
 ```
 where 
 

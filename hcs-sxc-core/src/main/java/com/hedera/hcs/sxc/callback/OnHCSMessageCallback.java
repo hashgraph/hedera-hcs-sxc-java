@@ -36,6 +36,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
         // load persistence implementation at runtime
         Class<?> persistenceClass = Plugins.find("com.hedera.hcs.sxc.plugin.persistence.*", "com.hedera.hcs.sxc.interfaces.SxcMessagePersistence", true);
         this.hcsCore.setMessagePersistence((SxcMessagePersistence)persistenceClass.newInstance());
+        this.hcsCore.getMessagePersistence().setHibernateProperties(this.hcsCore.getHibernateConfig());
 
         // load mirror callback implementation at runtime
         Class<?> callbackClass = Plugins.find("com.hedera.hcs.sxc.plugin.mirror.*", "com.hedera.hcs.sxc.interfaces.MirrorSubscriptionInterface", true);

@@ -25,13 +25,11 @@ public final class Environment {
      * @return Ed25519PrivateKey
      */
     public Ed25519PrivateKey getOperatorKey() {
-        String operatorKey = dotEnv.get("OPERATOR_KEY");
+        String operatorKey = System.getProperty("OPERATOR_KEY");
         if (operatorKey == null){
-            operatorKey = System.getProperty("OPERATOR_KEY");
-    }
+            operatorKey = dotEnv.get("OPERATOR_KEY");
+        }
         return Ed25519PrivateKey.fromString(operatorKey);
-
-        
     }
 
     /** 
@@ -39,10 +37,10 @@ public final class Environment {
      * @return String
      */
     public String getOperatorAccount() {
-        String operatorId = dotEnv.get("OPERATOR_ID");
+        String operatorId = System.getProperty("OPERATOR_ID");
         if (operatorId == null){
-            operatorId = System.getProperty("OPERATOR_ID");
-    }
+            operatorId = dotEnv.get("OPERATOR_ID");
+        }
         return operatorId;
     }
 
@@ -51,10 +49,10 @@ public final class Environment {
      * @return AccountId
      */
     public AccountId getOperatorAccountId() {
-        String operatorId = dotEnv.get("OPERATOR_ID");
+        String operatorId = System.getProperty("OPERATOR_ID");
         if (operatorId == null){
-            operatorId = System.getProperty("OPERATOR_ID");
-    }
+            operatorId = dotEnv.get("OPERATOR_ID");
+        }
         return AccountId.fromString(operatorId);
     }
     
@@ -62,10 +60,10 @@ public final class Environment {
      * Returns the app id
      */
     public int getAppId() {
-        String appId = dotEnv.get("APP_ID");
+        String appId = System.getProperty("APP_ID");
         if(appId == null){
-            appId = System.getProperty("APP_ID");
-    }
+            appId = dotEnv.get("APP_ID");
+        }
         return Integer.parseInt(appId);
     }
 }

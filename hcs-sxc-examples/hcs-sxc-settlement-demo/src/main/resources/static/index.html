@@ -11,6 +11,35 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <link rel="stylesheet" href="styles/custom.css"/>
       
+        <script>
+            function includeHTML() {
+                var z, i, elmnt, file, xhttp;
+                z = document.getElementsByTagName("*");
+                for (i = 0; i < z.length; i++) {
+                    elmnt = z[i];
+                    file = elmnt.getAttribute("hh-include-html");
+                  if (file) {
+                    xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4) {
+                            if (this.status == 200) {
+                                elmnt.innerHTML = this.responseText;
+                            }
+                            if (this.status == 404) {
+                                elmnt.innerHTML = "Page not found.";
+                            }
+                            elmnt.removeAttribute("hh-include-html");
+                                includeHTML();
+                            }
+                        }
+                        xhttp.open("GET", file, true);
+                        xhttp.send();
+                        /* Exit the function: */
+                        return;
+                    }
+                }
+            }
+        </script> 
         
     </head>
     <body>
@@ -478,596 +507,43 @@
                 </div>
             </main>
         </div>
-
-        <div id="new-credit-dialog" 
-           
-            class="mdc-dialog"
-             role="alertdialog"
-             aria-modal="true"
-             aria-labelledby="my-dialog-title"
-             aria-describedby="my-dialog-content">
-            <div class="mdc-dialog__container">
-
-
-                <div class="mdc-dialog__surface" >
-                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
-                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
-                    -->New Credit<!--
-                    --></h2>
-                    <div class="mdc-dialog__content" id="my-dialog-content" >
-                        
-                        <div style="display:flex; flex-direction: column">
-                            <form id="new-credit-dialog-form">
-                                <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text" disabled id="new-credit-recipient"
-                                           value="{{newCreditRecipient}}"
-                                           required
-                                           class="mdc-text-field__input ">
-                                    <label class="mdc-floating-label" for="my-text-field">
-                                        Recipient 
-                                    </label>
-                                </div>
-                                
-                                
-                                <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text" id="new-credit-service-reference" 
-                                           required minlength=4
-                                           class="mdc-text-field__input">
-                                    <label class="mdc-floating-label" for="">
-                                        Service Reference
-                                    </label>
-                                </div>   
-                                <div class="mdc-text-field-helper-line">
-                                    <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
-                                        Field is required and must be at least 4 characters long
-                                    </div>
-                                </div>
-                                
-                                <div class="mdc-text-field  mdc-text-field--with-leading-icon  mdc-text-field--full-width">
-                                    <i class="material-icons mdc-text-field__icon">money</i>
-                                    <input type="number" 
-                                           id="new-credit-amount"
-                                           required
-                                           id="my-text-field" class="mdc-text-field__input">
-                                    <label class="mdc-floating-label" for="new-credit-amount">
-                                        Amount
-                                    </label>
-                                </div>   
-                                
-                                <div class="mdc-text-field-helper-line">
-                                    <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
-                                        Field is required and must be a number without decimals
-                                    </div>
-                                </div>
-                                <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text"
-                                           id="new-credit-additional-notes"
-                                           required minlength=4
-                                           id="my-text-field" class="mdc-text-field__input">
-                                    <label class="mdc-floating-label" for="new-credit-additional-notes">
-                                        Additional Notes
-                                    </label>
-                                </div>
-                                
-                                <div class="mdc-text-field-helper-line">
-                                    <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
-                                        Field is required and must be at least 4 characters long
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    
-            
-                    <footer class="mdc-dialog__actions" style="padding:24px">
-                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
-                            <span class="mdc-button__label">Cancel</span>
-                        </button>
-                        <button type="button" 
-                                id="send-new-credit-dialog-submit"
-                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
->
-                            <span class="mdc-button__label">Send Now</span>
-                        </button>
-                    </footer>
-                </div>
-
-            </div>
-        </div><div class="mdc-dialog-scrim"></div>
-        <script>
-            function openNewCreditDialog(recipient) {
-                
-                /* Functions for the new credit dialog. () */
-                newCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('new-credit-dialog'));
-                event.preventDefault();
-                $newCreditDialog = document.getElementById('new-credit-dialog');
-                /*Clear styles and values to reuse fields*/
-                $newCreditDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
-                    e.parentElement.classList.remove('mdc-text-field--invalid');
-                    e.value='';}
-                );
-                 
-                $newCreditDialog.querySelector("#new-credit-recipient").value = recipient;
-                $newCreditDialog.querySelector("#send-new-credit-dialog-submit").onclick =  function(){
-                        $newCreditDialog = document.getElementById('new-credit-dialog');
-                        /* validate form */
-                        isFormValid = true;
-                        ls = $newCreditDialog.querySelectorAll(".mdc-text-field input");
-
-                        for (i=0; i< ls.length; i++ ){
-                             if (! ls[i].checkValidity()){ls[i].focus();isFormValid=false;break;  }
-
-                        }
-                        if(isFormValid){
-                            postBody = `{
-                                          "payerName"       : "${thisuserName}"
-                                        , "recipientName"   : "${document.getElementById('new-credit-recipient').value}"  
-                                        , "reference"       : "${document.getElementById('new-credit-service-reference').value}"
-                                        , "amount"          : ${document.getElementById('new-credit-amount').value * 1}
-                                        , "currency"        : "USD"
-                                        , "additionalNotes" :"${document.getElementById('new-credit-additional-notes').value}"
-                                        }`;
-
-                            newCreditDialog.close();
-                            el = document.getElementById(recipient);
-                            el.style.opacity=0.4;
-                            el.style.pointerEvents =  'none';
-                            el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
-
-                            showSnackBarMessage("sending new credit to HH Network ...");
-                            fetch('credits', {
-                                method: 'post',
-                                headers: {
-                                    'Accept': 'application/json',
-                                    'Content-Type': 'application/json'
-                                },
-                                body: postBody
-                            }).then(function(response) {
-                                return response.json();
-                            }).then(function(data) {
-                                showSnackBarMessage("New credit request sent");
-
-                            }).catch(function(res){
-                                alert(res);
-                            });
-                        }      
-                    
-                };
-               
-                newCreditDialog.open();
-                return false;
-            }
-        </script>
         
-        <div id="confirm-credit-dialog" 
-           
-            class="mdc-dialog"
-             role="alertdialog"
-             aria-modal="true"
-             aria-labelledby="my-dialog-title"
-             aria-describedby="my-dialog-content">
-            <div class="mdc-dialog__container">
-
-                <div class="mdc-dialog__surface" >
-                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
-                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
-                    -->Confirm Credit<!--
-                    --></h2>
-                    <div class="mdc-dialog__content" id="my-dialog-content" >
-                        Do you accept this credit?
-                    </div>
-                    <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text"
-                                           id="thread-id"
-                                           value="{{threadId}}"
-                                           disabled
-                                           class="mdc-text-field__input">
-                                    <label class="mdc-floating-label" for="thread-id">
-                                        ThreadId
-                                    </label>
-                    </div>
-                  
-                    <footer class="mdc-dialog__actions" style="padding:24px">
-                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
-                            <span class="mdc-button__label">Cancel</span>
-                        </button>
-                        <button type="button" 
-                                id="confirm-credit-send"
-                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
-                        >
-                            <span class="mdc-button__label">Confirm</span>
-                        </button>
-                    </footer>
-                </div>
-
-            </div>
-        </div><div class="mdc-dialog-scrim"></div>
-        <script>
-            function openConfirmCreditDialog(threadId,otherUserId) {
-                event.preventDefault();
-                confirmCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-credit-dialog'));
-
-                $confirmCreditDialog = document.getElementById('confirm-credit-dialog');
-                $confirmCreditDialog.querySelector("#thread-id").value=threadId;
-                clickFunction = function(){
-                    $confirmCreditDialog = document.getElementById('confirm-credit-dialog');
-                    threadId = $confirmCreditDialog.querySelector("#thread-id").value;
-                    showSnackBarMessage("sending confirmation " + threadId + " ...");
-                    confirmCreditDialog.close();
-
-                    el = document.getElementById(otherUserId);
-                    el.style.opacity=0.4;
-                    el.style.pointerEvents =  'none';
-                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
-
-                    fetch('credits/ack/'+threadId, {
-                            method: 'post',
-                            headers: {
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json'
-                            }
-                        }).then(function(response) {
-                            return response.json();
-                        }).then(function(data) {
-                            showSnackBarMessage("confirmation sent");
-
-                        }).catch(function(res){
-                            alert(res);
-                        });
+        <div hh-include-html="dialogs/credits/new-credit-dialog.html"></div> 
+        <script src="dialogs/credits/new-credit-dialog.js"></script>
         
-                };
-                $confirmCreditDialog.querySelector("#confirm-credit-send").onclick = clickFunction;
-                confirmCreditDialog.open();
-                return false;
-            }
-        </script>
+        <div hh-include-html="dialogs/credits/confirm-credit-dialog.html"></div> 
+        <script src="dialogs/credits/confirm-credit-dialog.js"></script>
         
-        <div id="confirm-settlement-dialog" 
-            class="mdc-dialog"
-            role="alertdialog"
-            aria-modal="true"
-            aria-labelledby="my-dialog-title"
-            aria-describedby="my-dialog-content">
-            <div class="mdc-dialog__container">
-
-                <div class="mdc-dialog__surface" >
-                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
-                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
-                    -->Confirm Settlement<!--
-                    --></h2>
-                    <div class="mdc-dialog__content" id="my-dialog-content" >
-                        Do you accept this settlement?
-                    </div>
-                    <div class="mdc-text-field mdc-text-field--full-width">
-                        <input type="text"
-                               id="thread-id"
-                               value="{{threadId}}"
-                               disabled
-                               class="mdc-text-field__input">
-                        <label class="mdc-floating-label" for="thread-id">
-                            ThreadId
-                        </label>
-                    </div>
-                  
-                    <footer class="mdc-dialog__actions" style="padding:24px">
-                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
-                            <span class="mdc-button__label">Cancel</span>
-                        </button>
-                        <button type="button" 
-                                id="confirm-settlement-send"
-                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
-                        >
-                            <span class="mdc-button__label">Confirm</span>
-                        </button>
-                    </footer>
-                </div>
-            </div>
-        </div><div class="mdc-dialog-scrim"></div>
+        <div hh-include-html="dialogs/credits/settle-now-dialog.html"></div> 
+        <script src="dialogs/credits/settle-now-dialog.js"></script>
         
-        <div id="settle-now-dialog" 
-           
-            class="mdc-dialog"
-             role="alertdialog"
-             aria-modal="true"
-             aria-labelledby="my-dialog-title"
-             aria-describedby="my-dialog-content">
-            <div class="mdc-dialog__container">
-                <div class="mdc-dialog__surface" >
-                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
-                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
-                    -->Create Settlement Request<!--
-                    --></h2>
-                    <div class="mdc-dialog__content" id="my-dialog-content" >
-                        <p class="warning" style="color:red; visibility: hidden">
-                            You can not settle this amount because you are a net receiver.
-                        </p>
-                        
-                        <div style="display:fex; flex-direction: column">
-                            <form id="new-credit-dialog-form">
-                                
-                                <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text" disabled id="settle-now-thread-ids"
-                                           value="{{threadIds}}"
-                                           required
-                                           class="mdc-text-field__input ">
-                                    <label class="mdc-floating-label" for="settle-now-thread-ids">
-                                        ThreadIds
-                                    </label>
-                                </div>
-                                
-                                <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text" disabled id="settle-now-payer"
-                                           value="{{settleNowPayer}}"
-                                           required
-                                           class="mdc-text-field__input ">
-                                    <label class="mdc-floating-label" for="settle-now-payer">
-                                        Payer 
-                                    </label>
-                                </div>
-                                
-                                <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text" disabled id="settle-now-recipient"
-                                           value="{{settleNowRecipient}}"
-                                           required
-                                           class="mdc-text-field__input ">
-                                    <label class="mdc-floating-label" for="settle-now-recipient">
-                                        Recipient 
-                                    </label>
-                                </div>
-                                
-                                <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text" disabled id="settle-now-net-value"
-                                           value="{{netValue}}"
-                                           required
-                                           class="mdc-text-field__input ">
-                                    <label class="mdc-floating-label" for="settle-now-net-value">
-                                        Net Value 
-                                    </label>
-                                </div>
-                                
-                                <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text"
-                                           id="settle-now-additional-notes"
-                                           required minlength=4
-                                           id="my-text-field" class="mdc-text-field__input">
-                                    <label class="mdc-floating-label" for="settle-now-additional-notes">
-                                        Additional Notes
-                                    </label>
-                                </div>
-                                
-                                <div class="mdc-text-field-helper-line">
-                                    <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
-                                        Field is required and must be at least 4 characters long
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <footer class="mdc-dialog__actions" style="padding:24px">
-                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
-                            <span class="mdc-button__label">Cancel</span>
-                        </button>
-                        <button id="settle-now-send" type="button" 
-                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
-                        >
-                            <span class="mdc-button__label">Send Now</span>
-                        </button>
-                    </footer>
-                </div>
-
-            </div>
-        </div><div class="mdc-dialog-scrim"></div>
+        <div hh-include-html="dialogs/settlements/confirm-settlement-dialog.html"></div> 
+        <script src="dialogs/settlements/confirm-settlement-dialog.js"></script>
         
-        <div id="select-paychannel-dialog" 
-           
-            class="mdc-dialog"
-             role="alertdialog"
-             aria-modal="true"
-             aria-labelledby="my-dialog-title"
-             aria-describedby="my-dialog-content">
-            <div class="mdc-dialog__container">
-                <div class="mdc-dialog__surface" >
-                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
-                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
-                    -->Select a payment channel<!--
-                    --></h2>
-                    <div class="mdc-dialog__content" id="my-dialog-content" >
-                       <br/>
-                        
-                        <div style="display:fex; flex-direction: column">
-                            
-                            <form id="select-paychannel-dialog-form">
-                                <div class="mdc-select">
-                                    <div class="mdc-select__anchor " style="width: 100%;">
-                                      <i class="mdc-select__dropdown-icon"></i>
-                                      <div class="mdc-select__selected-text" data-value="Doris">Doris</div>
-                                      <span class="mdc-floating-label">Select channel</span>
-                                      <div class="mdc-line-ripple"></div>
-                                    </div>
-
-                                    <div class="mdc-select__menu mdc-menu mdc-menu-surface" style="width: 100%;">
-                                        <template id="mdc-list-item-template">
-                                                <li class="mdc-list-item" data-value="Doris">
-                                                  Doris
-                                                </li>
-                                        </template>  
-                                        <ul id="channel-name" class="mdc-list" data-value="Doris">
-
-                                        </ul>
-                                    </div>
-                                 </div>
-                
-                                <br/>
-                                <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text"
-                                           id="channel-additional-notes"
-                                           required minlength=4
-                                           id="my-text-field" class="mdc-text-field__input">
-                                    <label class="mdc-floating-label" for="settle-now-additional-notes">
-                                        Additional Notes
-                                    </label>
-                                </div>
-                                
-                                <div class="mdc-text-field-helper-line">
-                                    <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
-                                        Field is required and must be at least 4 characters long
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <footer class="mdc-dialog__actions" style="padding:24px">
-                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
-                            <span class="mdc-button__label">Cancel</span>
-                        </button>
-                        <button id="channel-now-send" type="button" 
-                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
-                        >
-                            <span class="mdc-button__label">Send Now</span>
-                        </button>
-                    </footer>
-                </div>
-
-            </div>
-        </div><div class="mdc-dialog-scrim"></div>
-        <script>
-            function openSelectPaychannelDialog(threadId, userName) {
-                $paychannelDialog = document.getElementById('select-paychannel-dialog');
-                paychannelDialog  = new mdc.dialog.MDCDialog($paychannelDialog);
-                event.preventDefault(); 
-                $paychannelDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
-                    e.parentElement.classList.remove('mdc-text-field--invalid');
-                    e.value='';}
-                );
-                mdcList =  $paychannelDialog.querySelector(".mdc-list");
-                paymentChannels.forEach(c => {
-                    clonedListItem = $paychannelDialog.querySelector("#mdc-list-item-template").content.cloneNode(true);
-                    clonedListItem.querySelector("li").innerHTML=c.name;
-                    clonedListItem.querySelector("li").setAttribute("data-value",c.name);
-                    mdcList.appendChild(clonedListItem);
-                });
-                
-                let selectedPaymentChannelName=paymentChannels[0].name;
-                //$paychannelDialog.querySelector(".mdc-list").classList.add("mdc-list-item--selected");
-                $paychannelDialog.querySelector(".mdc-list").setAttribute("data-value",selectedPaymentChannelName);                
-                $paychannelDialog.querySelector(".mdc-select__selected-text").innerHTML=selectedPaymentChannelName;
-                
-                const mdcSelect  =  new mdc.select.MDCSelect( $paychannelDialog.querySelector(".mdc-select"));
-                
-                mdcSelect.listen('MDCSelect:change', () => {
-                    selectedPaymentChannelName = mdcSelect.value;
-                  });
-                $paychannelDialog.querySelector("#channel-now-send").onclick =  function(){
-                
-                    postBody = `{
-                                 "threadId"          : "${threadId}"
-                                , "paymentChannelName" :"${selectedPaymentChannelName}"
-                                , "additionalNotes" :"${$paychannelDialog.querySelector('#channel-additional-notes').value}"
-                                }`;
-
-                    paychannelDialog.close();
-                    el = document.getElementById(userName);
-                    el.style.opacity=0.4;
-                    el.style.pointerEvents =  'none';
-                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
-
-                    showSnackBarMessage("sending channel details to HH Network ...");
-                    fetch('/settlements/proposechannel', {
-                        method: 'post',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: postBody
-                    }).then(function(response) {
-                        return response.json();
-                    }).then(function(data) {
-                        showSnackBarMessage("New channel proposal sent");
-
-                    }).catch(function(res){
-                        alert(res);
-                    });
-                };
-                
-                paychannelDialog.open();
-                return false;
-            }
-        </script>
         
-        <div id="init-pay-dialog" 
-           
-            class="mdc-dialog"
-             role="alertdialog"
-             aria-modal="true"
-             aria-labelledby="my-dialog-title"
-             aria-describedby="my-dialog-content">
-            <div class="mdc-dialog__container">
-                <div class="mdc-dialog__surface" >
-                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
-                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
-                    -->Initialize payment<!--
-                    --></h2>
-                    <div class="mdc-dialog__content" id="my-dialog-content" >
-                       <br/>
-                        
-                        <div style="display:fex; flex-direction: column">
-                            
-                            <form id="pay-dialog-form">
-                                
-                                
-                                <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text"
-                                           id="init-pay-payer-details"
-                                           value="{payerDetails}"
-                                           disabled
-                                           id="my-text-field" class="mdc-text-field__input">
-                                    <label class="mdc-floating-label" for="init-pay-payer-details">
-                                        Payer Account Details
-                                    </label>
-                                </div>
-                                <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text"
-                                           id="init-pay-recipient-details"
-                                           value="{recipientDetails}"
-                                           disabled
-                                           id="my-text-field" class="mdc-text-field__input">
-                                    <label class="mdc-floating-label" for="init-pay-recipient-details">
-                                        Recipient Account Details
-                                    </label>
-                                </div>
-                                <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text"
-                                           id="init-pay-additional-notes"
-                                           required minlength=4
-                                           id="my-text-field" class="mdc-text-field__input">
-                                    <label class="mdc-floating-label" for="init-pay-additional-notes">
-                                        Additional Notes
-                                    </label>
-                                </div>
-                                
-                                <div class="mdc-text-field-helper-line">
-                                    <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
-                                        Field is required and must be at least 4 characters long
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <footer class="mdc-dialog__actions" style="padding:24px">
-                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
-                            <span class="mdc-button__label">Cancel</span>
-                        </button>
-                        <button id="init-pay-now-send" type="button" 
-                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
-                        >
-                            <span class="mdc-button__label">Send Now</span>
-                        </button>
-                    </footer>
-                </div>
-
-            </div>
-        </div><div class="mdc-dialog-scrim"></div>
+        <div hh-include-html="dialogs/settlements/select-paychannel-dialog.html"></div> 
+        <script src="dialogs/settlements/select-paychannel-dialog.js"></script>
         
+        
+        <div hh-include-html="dialogs/settlements/accept-paychannel-dialog.html"></div> 
+        <script src="dialogs/settlements/accept-paychannel-dialog.js"></script>
+        
+        <div hh-include-html="dialogs/settlements/initialise-payment-dialog.html"></div> 
+        <script src="dialogs/settlements/initialise-payment-dialog.js"></script>
+        
+        <div hh-include-html="dialogs/settlements/confirm-payment-dialog.html"></div> 
+        <script src="dialogs/settlements/confirm-payment-dialog.js"></script>
+        
+        <div hh-include-html="dialogs/settlements/payment-made-dialog.html"></div> 
+        <script src="dialogs/settlements/payment-made-dialog.js"></script>
+        
+        <div hh-include-html="dialogs/settlements/confirm-settlement-receipt-dialog.html"></div> 
+        <script src="dialogs/settlements/confirm-settlement-receipt-dialog.js"></script>
+        
+        <div hh-include-html="dialogs/settlements/settlement-completed-dialog.html"></div> 
+        <script src="dialogs/settlements/settlement-completed-dialog.js"></script>
+        
+       
         
         <div id="pay-sent-dialog" 
            
@@ -1145,349 +621,6 @@
         </div><div class="mdc-dialog-scrim"></div>
         
         
-        <div id="settlement-payment-made-dialog" 
-           
-            class="mdc-dialog"
-             role="alertdialog"
-             aria-modal="true"
-             aria-labelledby="my-dialog-title"
-             aria-describedby="my-dialog-content">
-            <div class="mdc-dialog__container">
-                <div class="mdc-dialog__surface" >
-                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
-                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
-                    -->Settlement Payment Made<!--
-                    --></h2>
-                    <div class="mdc-dialog__content" id="my-dialog-content" >
-                       <br/>
-                        
-                        <div style="display:fex; flex-direction: column">
-                            
-                            <form >
-                                
-                                
-                                <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text"
-                                           id="thread-id"
-                                           value="{threadId}"
-                                           disabled
-                                           id="my-text-field" class="mdc-text-field__input">
-                                    <label class="mdc-floating-label" for="pay-payer-details">
-                                        threadId
-                                    </label>
-                                </div>
-                                
-                               
-                                <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text"
-                                           id="settlement-paymend-made-additional-notes"
-                                           required minlength=4
-                                           id="my-text-field" class="mdc-text-field__input">
-                                    <label class="mdc-floating-label" for="settlement-paymend-made-additional-notes">
-                                        Additional Notes
-                                    </label>
-                                </div>
-                                
-                                <div class="mdc-text-field-helper-line">
-                                    <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
-                                        Field is required and must be at least 4 characters long
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <footer class="mdc-dialog__actions" style="padding:24px">
-                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
-                            <span class="mdc-button__label">Cancel</span>
-                        </button>
-                        <button id="settlement-paymend-made-send" type="button" 
-                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
-                        >
-                            <span class="mdc-button__label">Send Now</span>
-                        </button>
-                    </footer>
-                </div>
-
-            </div>
-        </div><div class="mdc-dialog-scrim"></div>
-        
-        <div id="settlement-completed-dialog" 
-           
-            class="mdc-dialog"
-             role="alertdialog"
-             aria-modal="true"
-             aria-labelledby="my-dialog-title"
-             aria-describedby="my-dialog-content">
-            <div class="mdc-dialog__container">
-                <div class="mdc-dialog__surface" >
-                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
-                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
-                    -->Settlement Completed<!--
-                    --></h2>
-                    <div class="mdc-dialog__content" id="my-dialog-content" >
-                       <br/>
-                        
-                        <div style="display:fex; flex-direction: column">
-                            
-                            <form >
-                                
-                                
-                                <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text"
-                                           id="thread-id"
-                                           value="{threadId}"
-                                           disabled
-                                           id="my-text-field" class="mdc-text-field__input">
-                                    <label class="mdc-floating-label" for="pay-payer-details">
-                                        threadId
-                                    </label>
-                                </div>
-                                
-                               
-                                <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text"
-                                           id="settlement-completed-additional-notes"
-                                           required minlength=4
-                                           id="my-text-field" class="mdc-text-field__input">
-                                    <label class="mdc-floating-label" for="settlement-completed-additional-notes">
-                                        Additional Notes
-                                    </label>
-                                </div>
-                                
-                                <div class="mdc-text-field-helper-line">
-                                    <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
-                                        Field is required and must be at least 4 characters long
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <footer class="mdc-dialog__actions" style="padding:24px">
-                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
-                            <span class="mdc-button__label">Cancel</span>
-                        </button>
-                        <button id="settlement-completed-send" type="button" 
-                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
-                        >
-                            <span class="mdc-button__label">Send Now</span>
-                        </button>
-                    </footer>
-                </div>
-
-            </div>
-        </div><div class="mdc-dialog-scrim"></div>
-        
-        <div id="confirm-pay-channel-dialog" 
-            class="mdc-dialog"
-            role="alertdialog"
-            aria-modal="true"
-            aria-labelledby="my-dialog-title"
-            aria-describedby="my-dialog-content">
-            <div class="mdc-dialog__container">
-
-                <div class="mdc-dialog__surface" >
-                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
-                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
-                    -->Confirm Payment Channel<!--
-                    --></h2>
-                    <div class="mdc-dialog__content" id="my-dialog-content" >
-                       Accept this payment channel
-                    </div>
-                    <div class="mdc-text-field mdc-text-field--full-width">
-                        <input type="text"
-                               id="channel-name"
-                               value="{{paychannel}}"
-                               disabled
-                               class="mdc-text-field__input">
-                        <label class="mdc-floating-label" for="thread-id">
-                            Proposed payment channel
-                        </label>
-                    </div>
-                  
-                    <footer class="mdc-dialog__actions" style="padding:24px">
-                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
-                            <span class="mdc-button__label">Cancel</span>
-                        </button>
-                        <button type="button" 
-                                id="confirm-channel-send"
-                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
-                        >
-                            <span class="mdc-button__label">Confirm</span>
-                        </button>
-                    </footer>
-                </div>
-            </div>
-        </div><div class="mdc-dialog-scrim"></div>
-        
-        <div id="confirm-payment-dialog" 
-            class="mdc-dialog"
-            role="alertdialog"
-            aria-modal="true"
-            aria-labelledby="my-dialog-title"
-            aria-describedby="my-dialog-content">
-            <div class="mdc-dialog__container">
-
-                <div class="mdc-dialog__surface" >
-                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
-                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
-                    -->Confirm Payment<!--
-                    --></h2>
-                    <div class="mdc-dialog__content" id="my-dialog-content" >
-                       Accept this payment
-                    </div>
-                    <div class="mdc-text-field mdc-text-field--full-width">
-                        <input type="text"
-                               id="thread-id"
-                               value="{{threadId}}"
-                               disabled
-                               class="mdc-text-field__input">
-                        <label class="mdc-floating-label" for="thread-id">
-                            Thread Id
-                        </label>
-                    </div>
-                  
-                    <footer class="mdc-dialog__actions" style="padding:24px">
-                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
-                            <span class="mdc-button__label">Cancel</span>
-                        </button>
-                        <button type="button" 
-                                id="confirm-payment-send"
-                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
-                        >
-                            <span class="mdc-button__label">Confirm</span>
-                        </button>
-                    </footer>
-                </div>
-            </div>
-        </div><div class="mdc-dialog-scrim"></div>
-        
-        <div id="accept-settle-payment-made-dialog" 
-            class="mdc-dialog"
-            role="alertdialog"
-            aria-modal="true"
-            aria-labelledby="my-dialog-title"
-            aria-describedby="my-dialog-content">
-            <div class="mdc-dialog__container">
-
-                <div class="mdc-dialog__surface" >
-                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
-                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
-                    -->Confirm Settlement Payment Made<!--
-                    --></h2>
-                    <div class="mdc-dialog__content" id="my-dialog-content" >
-                       Confirm
-                    </div>
-                    <div class="mdc-text-field mdc-text-field--full-width">
-                        <input type="text"
-                               id="thread-id"
-                               value="{{threadId}}"
-                               disabled
-                               class="mdc-text-field__input">
-                        <label class="mdc-floating-label" for="thread-id">
-                            Thread Id
-                        </label>
-                    </div>
-                  
-                    <footer class="mdc-dialog__actions" style="padding:24px">
-                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
-                            <span class="mdc-button__label">Cancel</span>
-                        </button>
-                        <button type="button" 
-                                id="accept-settlement-payment-made-send"
-                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
-                        >
-                            <span class="mdc-button__label">Confirm</span>
-                        </button>
-                    </footer>
-                </div>
-            </div>
-        </div><div class="mdc-dialog-scrim"></div>
-        
-        
-        <div id="accept-settle-completed-dialog" 
-            class="mdc-dialog"
-            role="alertdialog"
-            aria-modal="true"
-            aria-labelledby="my-dialog-title"
-            aria-describedby="my-dialog-content">
-            <div class="mdc-dialog__container">
-
-                <div class="mdc-dialog__surface" >
-                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
-                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
-                    -->Confirm Settlement  Completed<!--
-                    --></h2>
-                    <div class="mdc-dialog__content" id="my-dialog-content" >
-                       Confirm
-                    </div>
-                    <div class="mdc-text-field mdc-text-field--full-width">
-                        <input type="text"
-                               id="thread-id"
-                               value="{{threadId}}"
-                               disabled
-                               class="mdc-text-field__input">
-                        <label class="mdc-floating-label" for="thread-id">
-                            Thread Id
-                        </label>
-                    </div>
-                  
-                    <footer class="mdc-dialog__actions" style="padding:24px">
-                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
-                            <span class="mdc-button__label">Cancel</span>
-                        </button>
-                        <button type="button" 
-                                id="accept-settlement-completed-send"
-                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
-                        >
-                            <span class="mdc-button__label">Confirm</span>
-                        </button>
-                    </footer>
-                </div>
-            </div>
-        </div><div class="mdc-dialog-scrim"></div>
-          
-        <div id="confirm-payment-sent-dialog" 
-            class="mdc-dialog"
-            role="alertdialog"
-            aria-modal="true"
-            aria-labelledby="my-dialog-title"
-            aria-describedby="my-dialog-content">
-            <div class="mdc-dialog__container">
-
-                <div class="mdc-dialog__surface" >
-                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
-                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
-                    -->Confirm Payment Sent<!--
-                    --></h2>
-                    <div class="mdc-dialog__content" id="my-dialog-content" >
-                       Confirm Paymet Sent
-                    </div>
-                    <div class="mdc-text-field mdc-text-field--full-width">
-                        <input type="text"
-                               id="thread-id"
-                               value="{{threadId}}"
-                               disabled
-                               class="mdc-text-field__input">
-                        <label class="mdc-floating-label" for="thread-id">
-                            Thread Id
-                        </label>
-                    </div>
-                  
-                    <footer class="mdc-dialog__actions" style="padding:24px">
-                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
-                            <span class="mdc-button__label">Cancel</span>
-                        </button>
-                        <button type="button" 
-                                id="confirm-payment-sent-send"
-                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
-                        >
-                            <span class="mdc-button__label">Confirm</span>
-                        </button>
-                    </footer>
-                </div>
-            </div>
-        </div><div class="mdc-dialog-scrim"></div>
-        
       
         <div id="snackbar" class="mdc-snackbar">
                 <div class="mdc-snackbar__surface">
@@ -1516,7 +649,6 @@
             buyerSellersAddress= [];
             paymentChannels = [];
             notificationList = [];
-            
             document.addEventListener("DOMContentLoaded", init);
             
             async function init ()  {
@@ -1534,7 +666,7 @@
                 
                 document.getElementById("this-user").innerHTML=whoami.name +"<span style='color:#aaa; font-size:12px;'> ("+whoami.roles+")</span>";
                 document.getElementById("this-user-avatar").style.backgroundImage= "url(images/"+whoami.appId+".png)";
-                if(thisRoles.includes("BUYER")) document.querySelector("#lhs-menu .credits-and-debits").style.display='block';
+                if(thisRoles.includes("BUYER")) document.querySelector("#lhs-menu .credits-and-debits").style.display='flex';
                 
                 responsePaymentChannel = await fetch('addressbook/paychannel/');
                 paymentChannels  = await responsePaymentChannel.json(); 
@@ -1548,7 +680,6 @@
                 switch(location.hash){
                     case "#audit-detail": 
                         location.hash="audit";
-                        ;
                         break;
                     default: //event.preventDefault();//do nothing'
                 }
@@ -1598,7 +729,7 @@
                             renderAuditIndexTable();
                             break;
                         case '#audit-detail':break;
-                        default://
+                        default: renderOverviewTab();
                     }
                     styleButtons();
                 }
@@ -1607,6 +738,7 @@
             function hasRole(userName, roleName){
                 return allAddresses.filter(f => f.name === userName)[0].roles.includes(roleName);
             }
+            
        </script>
       
        <script>
@@ -1614,7 +746,7 @@
                 var panelTemplate = document.getElementById("overview-template");
                 var clonedTableTemplate = panelTemplate.content.cloneNode(true);
                 clonedTableTemplate.getElementById("this-user").innerHTML = thisuserName;
-                clonedTableTemplate.getElementById("this-user-avatar").style.backgroundImage = 'url(images/'+thisAppId+'.png)';
+                clonedTableTemplate.getElementById("this-user-avatar").style.backgroundImage = 'url(images/'+thisAppId+'-100.png)';
                 clonedTableTemplate.getElementById("this-role").innerHTML = thisRoles.replace(/,/g,", ");;;
                 clonedTableTemplate.getElementById("this-pk").innerHTML = thisPK;
                 if(!thisRoles.includes("PAYCHANNEL")) clonedTableTemplate.getElementById("overview-credits-debits-button").style.display='block';
@@ -1682,16 +814,17 @@
                 let response = await fetch('audit/'+threadId);
                 let responseJSON = await  response.json();
                 //$auditThreadDialog.querySelector("#audit-thread-panel-holder").innerHTML="";
-                responseJSON.auditApplicationMessages.forEach(async m=>{
-                    let response = await fetch('audit/'+threadId+"/"+m.applicationMessageId);
+                let auditApplicationMessages = responseJSON.auditApplicationMessages;
+                for (z=0; z < auditApplicationMessages.length ; z++) {
+                    let response = await fetch('audit/'+threadId+"/"+auditApplicationMessages[z].applicationMessageId);
                     let responseJSON = await  response.json();
                     responseJSON = responseJSON.auditHCSMessages;
                     clonedTemplate = document.getElementById("audit-thread-template").content.cloneNode(true);
-                    clonedTemplate.querySelector("#audit-thread-message-id").innerHTML=m.applicationMessageId;
-                    clonedTemplate.querySelector("#audit-thread-message-text").innerHTML=syntaxHighlight(m.message);//.substring(0,180)+"...";
+                    clonedTemplate.querySelector("#audit-thread-message-id").innerHTML=auditApplicationMessages[z].applicationMessageId;
+                    clonedTemplate.querySelector("#audit-thread-message-text").innerHTML=syntaxHighlight(auditApplicationMessages[z].message);//.substring(0,180)+"...";
                     clonedTemplate.querySelector("#audit-thread-message-parts-json").innerHTML=syntaxHighlight(responseJSON);
                     main.appendChild(clonedTemplate);
-                });
+                }
         
                 //auditThreadDialog.open();
                 return false;
@@ -1992,395 +1125,23 @@
 
             }
             
-            function openInitPayDialog(threadId, userName) {
-                $initPayDialog = document.getElementById('init-pay-dialog');
-                initPayDialog  = new mdc.dialog.MDCDialog($initPayDialog);
-                event.preventDefault(); 
-                $initPayDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
-                    e.parentElement.classList.remove('mdc-text-field--invalid');
-                    e.value='';}
-                );
-                p = allAddresses.filter(a=>a.name===thisuserName)[0];
-                r = allAddresses.filter(a=>a.name===userName)[0];
-                payerAccountDetails = p.name + "- SortNo/AccNo: " + p.paymentAccountDetails;
-                $initPayDialog.querySelector("#init-pay-payer-details").value = payerAccountDetails;
-                recipientAccountDetails = r.name + "- SortNo/AccNo: " + r.paymentAccountDetails;
-                $initPayDialog.querySelector("#init-pay-recipient-details").value = recipientAccountDetails;
-                $initPayDialog.querySelector("#init-pay-now-send").onclick =  function(){
-                    postBody = `{
-                                 "threadId"          : "${threadId}"
-                                ,"payerAccountDetails" : "${payerAccountDetails}"
-                                ,"recipientAccountDetails" :"${recipientAccountDetails}"
-                                ,"additionalNotes" : "${$initPayDialog.querySelector("#init-pay-additional-notes").value}"
-                                }`;
-
-                    initPayDialog.close();
-                    el = document.getElementById(userName);
-                    el.style.opacity=0.4;
-                    el.style.pointerEvents =  'none';
-                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
-
-                    showSnackBarMessage("sending channel details to HH Network ...");
-                    fetch('/settlements/paymentInit', {
-                        method: 'post',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: postBody
-                    }).then(function(response) {
-                        return response.json();
-                    }).then(function(data) {
-                        showSnackBarMessage("Payment init sent");
-
-                    }).catch(function(res){
-                        alert(res);
-                    });
-                };
-                
-                initPayDialog.open();
-                return false;
-            }
-            
-            function openSettlementPaymentMadeDialog(threadId, userName) {
-                $settlementPaymentMadeDialog = document.getElementById('settlement-payment-made-dialog');
-                settlementPaymentMadeDialog  = new mdc.dialog.MDCDialog($settlementPaymentMadeDialog);
-                event.preventDefault(); 
-                $settlementPaymentMadeDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
-                    e.parentElement.classList.remove('mdc-text-field--invalid');
-                    e.value='';}
-                );
-                $settlementPaymentMadeDialog.querySelector("#thread-id").value=threadId;
-                $settlementPaymentMadeDialog.querySelector("#settlement-paymend-made-send").onclick =  function(){
-                    postBody = `{
-                                 "threadId"        : "${threadId}"
-                                ,"additionalNotes" : "${$settlementPaymentMadeDialog.querySelector("#settlement-paymend-made-additional-notes").value}"
-                                }`;
-
-                    settlementPaymentMadeDialog.close();
-                    el = document.getElementById(userName);
-                    el.style.opacity=0.4;
-                    el.style.pointerEvents =  'none';
-                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
-
-                    showSnackBarMessage("sending channel details to HH Network ...");
-                    fetch('/settlements/paid', {
-                        method: 'post',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: postBody
-                    }).then(function(response) {
-                        return response.json();
-                    }).then(function(data) {
-                        showSnackBarMessage("Settlement paid Sent");
-
-                    }).catch(function(res){
-                        alert(res);
-                    });
-                };
-                
-                settlementPaymentMadeDialog.open();
-                return false;
-            }
             
             
-            function openSettlementCompletedDialog(threadId, userName) {
-                $settlementCompletedDialog = document.getElementById('settlement-completed-dialog');
-                settlementCompletedDialog  = new mdc.dialog.MDCDialog($settlementCompletedDialog);
-                event.preventDefault(); 
-                $settlementCompletedDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
-                    e.parentElement.classList.remove('mdc-text-field--invalid');
-                    e.value='';}
-                );
-                $settlementCompletedDialog.querySelector("#thread-id").value=threadId;
-                $settlementCompletedDialog.querySelector("#settlement-completed-send").onclick =  function(){
-                    postBody = `{
-                                 "threadId"        : "${threadId}"
-                                ,"additionalNotes" : "${$settlementCompletedDialog.querySelector("#settlement-completed-additional-notes").value}"
-                                }`;
-
-                    settlementCompletedDialog.close();
-                    el = document.getElementById(userName);
-                    el.style.opacity=0.4;
-                    el.style.pointerEvents =  'none';
-                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
-
-                    showSnackBarMessage("sending settlement completed to HH Network ...");
-                    fetch('/settlements/complete', {
-                        method: 'post',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: postBody
-                    }).then(function(response) {
-                        return response.json();
-                    }).then(function(data) {
-                        showSnackBarMessage("Settlement paid Sent");
-
-                    }).catch(function(res){
-                        alert(res);
-                    });
-                };
-                
-                settlementCompletedDialog.open();
-                return false;
-            }
-                
-                
-                
-        
-            function openAcceptPaychannelDialog (threadId, otherUserId, channelName){
-                event.preventDefault();
-                confirmChannelDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-pay-channel-dialog'));
-
-                $confirmChannelDialog = document.getElementById('confirm-pay-channel-dialog');
-                $confirmChannelDialog.querySelector("#channel-name").value=channelName;
-                
-                clickFunction = function(){
-                   
-                    showSnackBarMessage("sending confirmation " + threadId + " ...");
-                    confirmChannelDialog.close();
-
-                    el = document.getElementById(otherUserId);
-                    el.style.opacity=0.4;
-                    el.style.pointerEvents =  'none';
-                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
-
-                    fetch('settlements/proposechannel/ack/'+threadId, {
-                            method: 'post',
-                            headers: {
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json'
-                            }
-                        }).then(function(response) {
-                            return response.json();
-                        }).then(function(data) {
-                            showSnackBarMessage("confirmation sent");
-
-                        }).catch(function(res){
-                            alert(res);
-                        });
-        
-                };
-                $confirmChannelDialog.querySelector("#confirm-channel-send").onclick = clickFunction;
-                confirmChannelDialog.open();
-                return false;
-            }
-
-            function openAcceptPaymentDialog (threadId, otherUserId){
-                event.preventDefault();
-                confirmPaymentDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-payment-dialog'));
-
-                $confirmPaymentDialog = document.getElementById('confirm-payment-dialog');
-                $confirmPaymentDialog.querySelector("#thread-id").value=threadId;
-                clickFunction = function(){
-                   
-                    showSnackBarMessage("sending confirmation " + threadId + " ...");
-                    confirmPaymentDialog.close();
-
-                    el = document.getElementById(otherUserId);
-                    el.style.opacity=0.4;
-                    el.style.pointerEvents =  'none';
-                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
-
-                    fetch('settlements/paymentInit/ack/'+threadId, {
-                            method: 'post',
-                            headers: {
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json'
-                            }
-                        }).then(function(response) {
-                            return response.json();
-                        }).then(function(data) {
-                            showSnackBarMessage("confirmation sent");
-
-                        }).catch(function(res){
-                            alert(res);
-                        });
-        
-                };
-                $confirmPaymentDialog.querySelector("#confirm-payment-send").onclick = clickFunction;
-                confirmPaymentDialog.open();
-                return false;
-            }
-
-            function openAcceptSettlePaymentMade (threadId, otherUserId){
-                event.preventDefault();
-                acceptSettlePaymentMadeDialog  = new mdc.dialog.MDCDialog(document.getElementById('accept-settle-payment-made-dialog'));
-
-                $acceptSettlePaymentMadeDialog = document.getElementById('accept-settle-payment-made-dialog');
-                $acceptSettlePaymentMadeDialog.querySelector("#thread-id").value=threadId;
-                clickFunction = function(){
-                   
-                    showSnackBarMessage("sending confirmation " + threadId + " ...");
-                    acceptSettlePaymentMadeDialog.close();
-
-                    el = document.getElementById(otherUserId);
-                    el.style.opacity=0.4;
-                    el.style.pointerEvents =  'none';
-                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
-
-                    fetch('/settlements/paid/ack/'+threadId, {
-                            method: 'post',
-                            headers: {
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json'
-                            }
-                        }).then(function(response) {
-                            return response.json();
-                        }).then(function(data) {
-                            showSnackBarMessage("confirmation sent");
-
-                        }).catch(function(res){
-                            alert(res);
-                        });
-        
-                };
-                $acceptSettlePaymentMadeDialog.querySelector("#accept-settlement-payment-made-send").onclick = clickFunction;
-                acceptSettlePaymentMadeDialog.open();
-                return false;
-            }
             
-            function openConfirmSettlementDialog(threadId,otherUserId) {
-                event.preventDefault();
-                confirmSettlementDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-settlement-dialog'));
-
-                $confirmSettlementDialog = document.getElementById('confirm-settlement-dialog');
-                $confirmSettlementDialog.querySelector("#thread-id").value=threadId;
-                clickFunction = function(){
-                    $confirmSettlementDialog = document.getElementById('confirm-settlement-dialog');
-                    threadId = $confirmSettlementDialog.querySelector("#thread-id").value;
-                    showSnackBarMessage("sending confirmation " + threadId + " ...");
-                    confirmSettlementDialog.close();
-
-                    el = document.getElementById(otherUserId);
-                    el.style.opacity=0.4;
-                    el.style.pointerEvents =  'none';
-                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
-
-                    fetch('settlements/ack/'+threadId, {
-                            method: 'post',
-                            headers: {
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json'
-                            }
-                        }).then(function(response) {
-                            return response.json();
-                        }).then(function(data) {
-                            showSnackBarMessage("confirmation sent");
-
-                        }).catch(function(res){
-                            alert(res);
-                        });
+            
+            
+                
         
-                };
-                $confirmSettlementDialog.querySelector("#confirm-settlement-send").onclick = clickFunction;
-                confirmSettlementDialog.open();
-                return false;
-            }
+            
+
+            
+
+            
+            
+            
         </script>
             
-        <script>
-            
-            function openSettleNowDialog(otherUserId){
-                /* Functions for settlement dialog in credit tab */
-                settleNowDialog  = new mdc.dialog.MDCDialog(document.getElementById('settle-now-dialog'));
-                event.preventDefault();
-                $settleNowDialog = document.getElementById('settle-now-dialog');
-                
-                $settleNowDialog.querySelector("#settle-now-additional-notes").removeAttribute("disabled");
-                $settleNowDialog.querySelector("#settle-now-send").removeAttribute("disabled");
-                $settleNowDialog.querySelector(".warning").style.visibility='hidden';
-                /*
-                 * Calculate the net amount.
-                 */
-                
-                var thisUserPays = 0;
-                var otherUserPays = 0;
-                var payerName = "";
-                var recipientName = "";
-                var threadIds=[];    
-                document.querySelectorAll("#"+otherUserId+" .mdc-data-table__row").forEach(
-                    r=>{
-                         if(r.cells.settlebox.querySelector("input").checked){
-                             threadIds.push(r.cells.threadId.title);
-                             rowAmount = 1*r.cells.amount.getAttribute("data-amount");
-                             if (r.cells.payer.textContent!==otherUserId){
-                                thisUserPays += rowAmount ;
-                            } else {
-                                otherUserPays += rowAmount ; 
-                            }
-                         }
-                     }
-                );
-                
-                payerName = thisUserPays > otherUserPays? thisuserName : otherUserId;
-                recipientName = thisUserPays < otherUserPays? thisuserName : otherUserId;
-                netValue = Math.abs(thisUserPays - otherUserPays);
-                
-              
-                $settleNowDialog.querySelector("#settle-now-thread-ids").value=threadIds;
-                $settleNowDialog.querySelector("#settle-now-payer").value= payerName;
-                $settleNowDialog.querySelector("#settle-now-dialog #settle-now-recipient").value= recipientName;
-                $settleNowDialog.querySelector("#settle-now-dialog #settle-now-net-value").value= netValue;
-                
-                clickFunction = function(){
-                    additionalNotes = $settleNowDialog.querySelector("#settle-now-additional-notes").value;
-                    //alert(thisUserPays + " " + otherUserPays);
-                    settleNowDialog.close();
-                    
-                    el = document.getElementById(otherUserId);
-                    el.style.opacity=0.4;
-                    el.style.pointerEvents =  'none';
-                    el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
-                    
-                    postBody = `{
-                                  "payerName"       : "${payerName}"
-                                , "recipientName"   : "${recipientName}"  
-                                , "netValue"        : ${netValue}
-                                , "currency"        : "USD"
-                                , "threadIds"       : ${JSON.stringify(threadIds)}
-                                , "additionalNotes" : "${additionalNotes}"
-                                }`;
-                    
-              
-                    showSnackBarMessage("sending new settlement request to HH Network ...");
-                    fetch('settlements', {
-                        method: 'post',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: postBody
-                    }).then(function(response) {
-                        if (response.status===200){
-                            showSnackBarMessage("Settlement request sent");
-                        } else {
-                            alert("Failed to send message to HH network");
-                        }
-                    }).catch(function(res){
-                        alert(res);
-                    });
-                    
-                    
-                };
-                if (payerName === thisuserName) {
-                    $settleNowDialog.querySelector("#settle-now-send").onclick =  clickFunction;
-                }   else {
-                    $settleNowDialog.querySelector("#settle-now-additional-notes").setAttribute("disabled","disabled");
-                    $settleNowDialog.querySelector("#settle-now-send").setAttribute("disabled","disabled");
-                    $settleNowDialog.querySelector(".warning").style.visibility='visible';
-                }
-                
-                settleNowDialog.open();
-                return false;
-            }
-            
-        </script>
-        
+
         
         <script>
             /* Visual effects for components. This script does not apply an client long. */
@@ -2395,7 +1156,8 @@
                 leftDrawer.open = !leftDrawer.open;
             });
             
-           
+            
+            includeHTML();
             styleButtons();
             styleTextFields();
             styleTextFieldIcons();
@@ -2563,5 +1325,6 @@
             }
             
         </script>
+        
     </body>
 </html>

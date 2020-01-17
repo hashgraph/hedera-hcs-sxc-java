@@ -15,6 +15,20 @@ appNet:
   # Should history of messages be caught up
   catchupHistory: true
 
+coreHibernate:
+  # these values will be loaded as a map, add or remove properties as necessary
+  # {appId} will be replaced with the application instance id
+  hibernate.connection.driver_class: "org.h2.Driver"
+  hibernate.connection.url: "jdbc:h2:./h2data/libdb-{appid}"
+  hibernate.connection.username: "admin"
+  hibernate.connection.password: ""
+  hibernate.default_schema: "PUBLIC"
+  hibernate.connection.pool_size: 5
+  hibernate.dialect.H2Dialect: "org.hibernate.dialect.H2Dialect"
+  hibernate.cache.provider_class: "org.hibernate.cache.internal.NoCacheProvider"
+  hibernate.show_sql: "false"
+  hibernate.hbm2ddl.auto: "update"
+  
 # Default HCS transaction fee in tinybar
 HCSTransactionFee: 100000000
 

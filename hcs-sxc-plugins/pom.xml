@@ -15,7 +15,7 @@
 
   <modules>
     <module>hcs-sxc-plugins-persistence-in-memory</module>
-    <module>hcs-sxc-plugins-persistence-in-h2</module>
+    <module>hcs-sxc-plugins-persistence-hibernate</module>
     <module>hcs-sxc-plugins-mirror-direct</module>
     <module>hcs-sxc-plugins-mirror-queue-artemis</module>
   </modules>

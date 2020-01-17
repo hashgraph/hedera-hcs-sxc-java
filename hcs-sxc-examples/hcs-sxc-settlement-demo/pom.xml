@@ -78,7 +78,7 @@
         
         <dependency>
             <groupId>com.hedera</groupId>
-            <artifactId>hcs-sxc-plugins-persistence-in-h2</artifactId>
+            <artifactId>hcs-sxc-plugins-persistence-hibernate</artifactId>
             <version>0.0.3-SNAPSHOT</version>
         </dependency>
       <!--

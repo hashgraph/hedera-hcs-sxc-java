@@ -13,6 +13,7 @@ public final class YAMLConfig {
     private AppNet appNet = new AppNet();
     private Long HCSTransactionFee = 0L;
     private MirrorNode mirrorNode = new MirrorNode();
+    private Map<String, String> coreHibernate = new HashMap<String, String>();
 
     public MirrorNode getMirrorNode() {
         return this.mirrorNode;
@@ -38,6 +39,13 @@ public final class YAMLConfig {
     public void setHCSTransactionFee(long hcsTransactionFee) {
         this.HCSTransactionFee = hcsTransactionFee;
     }
+    public Map<String, String> getCoreHibernate() {
+        return this.coreHibernate;
+    }
+    public void setCoreHibernate(Map<String, String> coreHibernate) {
+        this.coreHibernate = coreHibernate;
+    }
+
     /** 
      * Returns a map of node details (AccountId and address)
      * @return Map<AccountId, String> 

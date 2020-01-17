@@ -62,6 +62,20 @@ public class PersistMessages
     public Map<String, SxcConsensusMessage> getMirrorResponses() {
         return mirrorTopicMessages;
     }
+    
+    @Override
+    public Map<String, SxcConsensusMessage> getMirrorResponses(String fromTimestamp, String toTimestamp) {
+        Map<String, SxcConsensusMessage> response = new HashMap<String, SxcConsensusMessage>();
+        
+        mirrorTopicMessages.forEach((key,value) -> {
+            if ((key.compareTo(fromTimestamp) >= 0) && (key.compareTo(toTimestamp) <= 0) ) {
+                response.put(key, value);            
+            }
+        }); 
+        
+        return response;
+    }
+    
 
     // Transactions
     @Override

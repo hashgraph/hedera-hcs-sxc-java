@@ -1,0 +1,93 @@
+<div id="settle-now-dialog" 
+           
+    class="mdc-dialog"
+     role="alertdialog"
+     aria-modal="true"
+     aria-labelledby="my-dialog-title"
+     aria-describedby="my-dialog-content">
+    <div class="mdc-dialog__container">
+        <div class="mdc-dialog__surface" >
+            <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
+            <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
+            -->Create Settlement Request<!--
+            --></h2>
+            <div class="mdc-dialog__content" id="my-dialog-content" >
+                <p class="warning" style="color:red; visibility: hidden">
+                    You can not settle this amount because you are a net receiver.
+                </p>
+
+                <div style="display:fex; flex-direction: column">
+                    <form id="new-credit-dialog-form">
+
+                        <div class="mdc-text-field mdc-text-field--full-width">
+                            <input type="text" disabled id="settle-now-thread-ids"
+                                   value="{{threadIds}}"
+                                   required
+                                   class="mdc-text-field__input ">
+                            <label class="mdc-floating-label" for="settle-now-thread-ids">
+                                ThreadIds
+                            </label>
+                        </div>
+
+                        <div class="mdc-text-field mdc-text-field--full-width">
+                            <input type="text" disabled id="settle-now-payer"
+                                   value="{{settleNowPayer}}"
+                                   required
+                                   class="mdc-text-field__input ">
+                            <label class="mdc-floating-label" for="settle-now-payer">
+                                Payer 
+                            </label>
+                        </div>
+
+                        <div class="mdc-text-field mdc-text-field--full-width">
+                            <input type="text" disabled id="settle-now-recipient"
+                                   value="{{settleNowRecipient}}"
+                                   required
+                                   class="mdc-text-field__input ">
+                            <label class="mdc-floating-label" for="settle-now-recipient">
+                                Recipient 
+                            </label>
+                        </div>
+
+                        <div class="mdc-text-field mdc-text-field--full-width">
+                            <input type="text" disabled id="settle-now-net-value"
+                                   value="{{netValue}}"
+                                   required
+                                   class="mdc-text-field__input ">
+                            <label class="mdc-floating-label" for="settle-now-net-value">
+                                Net Value 
+                            </label>
+                        </div>
+
+                        <div class="mdc-text-field mdc-text-field--full-width">
+                            <input type="text"
+                                   id="settle-now-additional-notes"
+                                   required minlength=4
+                                   id="my-text-field" class="mdc-text-field__input">
+                            <label class="mdc-floating-label" for="settle-now-additional-notes">
+                                Additional Notes
+                            </label>
+                        </div>
+
+                        <div class="mdc-text-field-helper-line">
+                            <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
+                                Field is required and must be at least 4 characters long
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <footer class="mdc-dialog__actions" style="padding:24px">
+                <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+                    <span class="mdc-button__label">Cancel</span>
+                </button>
+                <button id="settle-now-send" type="button" 
+                        class="mdc-button mdc-button--raised  mdc-dialog__button" 
+                >
+                    <span class="mdc-button__label">Send Now</span>
+                </button>
+            </footer>
+        </div>
+
+    </div>
+</div><div class="mdc-dialog-scrim"></div>

@@ -1,0 +1,68 @@
+
+
+
+<div id="settlement-completed-dialog" 
+           
+    class="mdc-dialog"
+     role="alertdialog"
+     aria-modal="true"
+     aria-labelledby="my-dialog-title"
+     aria-describedby="my-dialog-content">
+    <div class="mdc-dialog__container">
+        <div class="mdc-dialog__surface" >
+            <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
+            <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
+            -->Settlement Completed<!--
+            --></h2>
+            <div class="mdc-dialog__content" id="my-dialog-content" >
+               <br/>
+
+                <div style="display:fex; flex-direction: column">
+
+                    <form >
+
+
+                        <div class="mdc-text-field mdc-text-field--full-width">
+                            <input type="text"
+                                   id="thread-id"
+                                   value="{threadId}"
+                                   disabled
+                                   id="my-text-field" class="mdc-text-field__input">
+                            <label class="mdc-floating-label" for="pay-payer-details">
+                                threadId
+                            </label>
+                        </div>
+
+
+                        <div class="mdc-text-field mdc-text-field--full-width">
+                            <input type="text"
+                                   id="settlement-completed-additional-notes"
+                                   required minlength=4
+                                   id="my-text-field" class="mdc-text-field__input">
+                            <label class="mdc-floating-label" for="settlement-completed-additional-notes">
+                                Additional Notes
+                            </label>
+                        </div>
+
+                        <div class="mdc-text-field-helper-line">
+                            <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
+                                Field is required and must be at least 4 characters long
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <footer class="mdc-dialog__actions" style="padding:24px">
+                <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+                    <span class="mdc-button__label">Cancel</span>
+                </button>
+                <button id="settlement-completed-send" type="button" 
+                        class="mdc-button mdc-button--raised  mdc-dialog__button" 
+                >
+                    <span class="mdc-button__label">Send Now</span>
+                </button>
+            </footer>
+        </div>
+
+    </div>
+</div><div class="mdc-dialog-scrim"></div>

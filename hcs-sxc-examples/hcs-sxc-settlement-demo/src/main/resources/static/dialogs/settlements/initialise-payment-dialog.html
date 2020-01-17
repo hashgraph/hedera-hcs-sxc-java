@@ -1,0 +1,73 @@
+<div id="init-pay-dialog" 
+           
+    class="mdc-dialog"
+     role="alertdialog"
+     aria-modal="true"
+     aria-labelledby="my-dialog-title"
+     aria-describedby="my-dialog-content">
+    <div class="mdc-dialog__container">
+        <div class="mdc-dialog__surface" >
+            <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
+            <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
+            -->Initialise payment<!--
+            --></h2>
+            <div class="mdc-dialog__content" id="my-dialog-content" >
+               <br/>
+
+                <div style="display:fex; flex-direction: column">
+
+                    <form id="pay-dialog-form">
+
+
+                        <div class="mdc-text-field mdc-text-field--full-width">
+                            <input type="text"
+                                   id="init-pay-payer-details"
+                                   value="{payerDetails}"
+                                   disabled
+                                   id="my-text-field" class="mdc-text-field__input">
+                            <label class="mdc-floating-label" for="init-pay-payer-details">
+                                Payer Account Details
+                            </label>
+                        </div>
+                        <div class="mdc-text-field mdc-text-field--full-width">
+                            <input type="text"
+                                   id="init-pay-recipient-details"
+                                   value="{recipientDetails}"
+                                   disabled
+                                   id="my-text-field" class="mdc-text-field__input">
+                            <label class="mdc-floating-label" for="init-pay-recipient-details">
+                                Recipient Account Details
+                            </label>
+                        </div>
+                        <div class="mdc-text-field mdc-text-field--full-width">
+                            <input type="text"
+                                   id="init-pay-additional-notes"
+                                   required minlength=4
+                                   id="my-text-field" class="mdc-text-field__input">
+                            <label class="mdc-floating-label" for="init-pay-additional-notes">
+                                Additional Notes
+                            </label>
+                        </div>
+
+                        <div class="mdc-text-field-helper-line">
+                            <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
+                                Field is required and must be at least 4 characters long
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <footer class="mdc-dialog__actions" style="padding:24px">
+                <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+                    <span class="mdc-button__label">Cancel</span>
+                </button>
+                <button id="init-pay-now-send" type="button" 
+                        class="mdc-button mdc-button--raised  mdc-dialog__button" 
+                >
+                    <span class="mdc-button__label">Send Now</span>
+                </button>
+            </footer>
+        </div>
+
+    </div>
+</div><div class="mdc-dialog-scrim"></div>

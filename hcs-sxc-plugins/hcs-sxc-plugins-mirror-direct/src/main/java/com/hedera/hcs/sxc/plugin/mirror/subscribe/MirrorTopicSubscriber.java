@@ -32,8 +32,6 @@ public final class MirrorTopicSubscriber extends Thread {
     private ConsensusTopicId topicId;
     private Optional<Instant> subscribeFrom;
     private HCSCallBackFromMirror onHCSMessageCallback;
-    private int mirrorReconnectDelay = 0;
-    private Instant nextRefreshTime = Instant.now();
     
     public class SusbcriberCloseHook extends Thread {
         private Subscription subscription;
@@ -51,19 +49,12 @@ public final class MirrorTopicSubscriber extends Thread {
         }
     }
     
-    public MirrorTopicSubscriber(String mirrorAddress, int mirrorPort, ConsensusTopicId topicId, Optional<Instant> subscribeFrom, HCSCallBackFromMirror onHCSMessageCallback, int mirrorReconnectDelay) {
+    public MirrorTopicSubscriber(String mirrorAddress, int mirrorPort, ConsensusTopicId topicId, Optional<Instant> subscribeFrom, HCSCallBackFromMirror onHCSMessageCallback) {
         this.mirrorAddress = mirrorAddress;
         this.mirrorPort = mirrorPort;
         this.topicId = topicId;
         this.subscribeFrom = subscribeFrom;
         this.onHCSMessageCallback = onHCSMessageCallback;
-        this.mirrorReconnectDelay = mirrorReconnectDelay;
-        if (this.mirrorReconnectDelay == 0) {
-            // reconnect delay set to 0, wait indefinitely between reconnects
-            this.nextRefreshTime = Instant.now().plus(Duration.ofDays(365));
-        } else {
-            this.nextRefreshTime = Instant.now().plusSeconds(this.mirrorReconnectDelay * 60);
-        }
     }
     
     public void run() {
@@ -73,11 +64,9 @@ public final class MirrorTopicSubscriber extends Thread {
     private void subscribe() {
         try (ConsensusClient subscriber = new ConsensusClient(this.mirrorAddress+ ":" + this.mirrorPort)
                 .setErrorHandler(e -> {
-//                        log.error(e);
                     log.info("Attempting to reconnect");
                     subscribe();
                 })
-                
         )
         {
             try {
@@ -86,21 +75,20 @@ public final class MirrorTopicSubscriber extends Thread {
 
                 if (this.subscribeFrom.isPresent()) {
                     this.subscribeFrom = Optional.of(this.subscribeFrom.get().plusNanos(1));
-                    log.info("subscribing from " + this.subscribeFrom.get().getEpochSecond() + " seconds, " + this.subscribeFrom.get().getNano() + " nanos.");
-                    Subscription subscription = subscriber.subscribe(this.topicId, this.subscribeFrom.get(), tm -> {
-                        log.info("Got mirror message, calling handler");
-                        this.subscribeFrom = Optional.of(tm.consensusTimestamp.plusNanos(1));
-                        onMirrorMessage(tm, this.onHCSMessageCallback);   
-                    });
-                    completeSubscription(subscription);
                 } else {
-                    Subscription subscription = subscriber.subscribe(this.topicId, tm -> {
-                        log.info("Got mirror message, calling handler");
-                        this.subscribeFrom = Optional.of(tm.consensusTimestamp);
-                        log.info("Last consensus time is " + this.subscribeFrom.get().getEpochSecond() + " seconds, " + this.subscribeFrom.get().getNano() + " nanos.");
-                        onMirrorMessage(tm, this.onHCSMessageCallback);   
-                    });
-                    completeSubscription(subscription);
+                    this.subscribeFrom = Optional.of(Instant.now());
+                }
+                
+                log.info("subscribing from " + this.subscribeFrom.get().getEpochSecond() + " seconds, " + this.subscribeFrom.get().getNano() + " nanos.");
+                Subscription subscription = subscriber.subscribe(this.topicId, this.subscribeFrom.get(), tm -> {
+                    log.info("Got mirror message, calling handler");
+                    this.subscribeFrom = Optional.of(tm.consensusTimestamp.plusNanos(1));
+                    onMirrorMessage(tm, this.onHCSMessageCallback);   
+                });
+                log.info("Adding shutdown hook to subscription");
+                Runtime.getRuntime().addShutdownHook(new SusbcriberCloseHook(subscription));
+                for (;;) {
+                  Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(30));
                 }
             } catch (Exception e) {
                 log.error(e);
@@ -138,20 +126,5 @@ public final class MirrorTopicSubscriber extends Thread {
 
         log.info("Got message from mirror - acknowledged");
       
-    }
-    
-    void completeSubscription(Subscription subscription) {
-        log.info("Adding shutdown hook to subscription");
-        Runtime.getRuntime().addShutdownHook(new SusbcriberCloseHook(subscription));
-        for (;;) {
-            Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(30));
-            if (Instant.now().compareTo(nextRefreshTime) > 0) {
-                // need to reconnect, no activity for this.mirrorReconnectDelay since last message
-                nextRefreshTime = Instant.now().plusSeconds(this.mirrorReconnectDelay * 60);
-                log.info("Unsubscribing from mirror node");
-                subscription.unsubscribe();
-                break;
-            }
-        }
     }
 }

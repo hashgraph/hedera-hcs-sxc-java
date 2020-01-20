@@ -1,9 +1,6 @@
 # Address of the mirror node's subscription end point
 mirrorAddress: "34.66.214.12:6552"
 
-# The frequency (in minutes) at which a subscription to mirror node is restarted
-mirrorReconnectDelay: 10  
-
 # The topic IDs to subscribe to
 topics:
   - topic: "0.0.1044"

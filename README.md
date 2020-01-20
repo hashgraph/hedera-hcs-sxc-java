@@ -268,9 +268,6 @@ The `relay-config.yaml` file contains the necessary configuration for the `hcs-s
 # Address of the mirror node's subscription end point
 mirrorAddress: "34.66.214.12:6552"
 
-# The frequency (in minutes) at which a subscription to mirror node is restarted
-mirrorReconnectDelay: 10  
-
 # The topic IDs to subscribe to
 topics:
   - topic: "0.0.999"
@@ -345,8 +342,6 @@ HCSTransactionFee: 100000000
 mirrorNode:
   # Address of the mirror node's subscription end point
   address: "34.66.214.12:6552"
-  # automatically disconnect/reconnect from mirror node every reconnectDelay minutes
-  reconnectDelay: 10  
 
 # List of Hedera Nodes to send HCS messages to, if more than one is specified, the SDK will randomly choose a node with each transaction
 nodes:

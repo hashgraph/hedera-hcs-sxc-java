@@ -28,8 +28,6 @@ public final class MirrorTopicSubscriber extends Thread {
     private boolean catchupHistory = false;
     private String consensusFile = "";
     private Optional<Instant> lastConsensusTimestamp = Optional.empty(); 
-    private int mirrorReconnectDelay = 0;
-    private Instant nextRefreshTime = Instant.now();
     
     public class SusbcriberCloseHook extends Thread {
         private Subscription subscription;
@@ -47,20 +45,12 @@ public final class MirrorTopicSubscriber extends Thread {
         }
     }
 
-    public MirrorTopicSubscriber(String mirrorAddress, int mirrorPort, ConsensusTopicId topicId, boolean catchupHistory, String consensusFile, int mirrorReconnectDelay) {
+    public MirrorTopicSubscriber(String mirrorAddress, int mirrorPort, ConsensusTopicId topicId, boolean catchupHistory, String consensusFile) {
         this.mirrorAddress = mirrorAddress;
         this.mirrorPort = mirrorPort;
         this.topicId = topicId;
         this.catchupHistory = catchupHistory;
         this.consensusFile = consensusFile;
-        this.mirrorReconnectDelay = mirrorReconnectDelay;
-        if (this.mirrorReconnectDelay != 0) {
-            // reconnect delay set to 0, wait indefinitely between reconnects
-            this.nextRefreshTime = Instant.now().plus(Duration.ofDays(365));
-        } else {
-            this.nextRefreshTime = Instant.now().plusSeconds(this.mirrorReconnectDelay * 60);
-        }
-        
     }
 
     public void run() {
@@ -70,7 +60,6 @@ public final class MirrorTopicSubscriber extends Thread {
     private void subscribe() {
         try (ConsensusClient subscriber = new ConsensusClient(this.mirrorAddress+ ":" + this.mirrorPort)
                 .setErrorHandler(e -> {
-//                        log.error(e);
                     log.info("Attempting to reconnect");
                     subscribe();
                 })
@@ -92,24 +81,21 @@ public final class MirrorTopicSubscriber extends Thread {
                                 this.lastConsensusTimestamp.get().plusNanos(1);
                             }
                         }
+                    } else {
+                        this.lastConsensusTimestamp = Optional.of(Instant.now());
                     }
                     
                     log.info("Relay Subscribing to topic number " + this.topicId.toString() + " on mirror node: " + this.mirrorAddress + ":" + this.mirrorPort);
 
-                    if (lastConsensusTimestamp.isPresent()) {
-                        Subscription subscription = subscriber.subscribe(this.topicId, lastConsensusTimestamp.get(), tm -> {
-                            log.info("Got mirror message, calling handler");
-                            lastConsensusTimestamp = Optional.of(tm.consensusTimestamp.plusNanos(1));
-                            MirrorMessageHandler.onMirrorMessage(tm, this.topicId);
-                        });
-                        completeSubscription(subscription);
-                    } else {
-                        Subscription subscription = subscriber.subscribe(this.topicId, tm -> {
-                            log.info("Got mirror message, calling handler");
-                            lastConsensusTimestamp = Optional.of(tm.consensusTimestamp.plusNanos(1));
-                            MirrorMessageHandler.onMirrorMessage(tm, this.topicId);
-                        });
-                        completeSubscription(subscription);
+                    Subscription subscription = subscriber.subscribe(this.topicId, lastConsensusTimestamp.get(), tm -> {
+                        log.info("Got mirror message, calling handler");
+                        lastConsensusTimestamp = Optional.of(tm.consensusTimestamp.plusNanos(1));
+                        MirrorMessageHandler.onMirrorMessage(tm, this.topicId);
+                    });
+                    Runtime.getRuntime().addShutdownHook(new SusbcriberCloseHook(subscription));
+                    for (;;) {
+                        log.info("Sleeping 30s");
+                        Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(30));
                     }
                 } catch (Exception e) {
                     log.error(e);
@@ -123,19 +109,4 @@ public final class MirrorTopicSubscriber extends Thread {
         }
 
     }
-    void completeSubscription(Subscription subscription) {
-        log.info("Adding shutdown hook to subscription");
-        Runtime.getRuntime().addShutdownHook(new SusbcriberCloseHook(subscription));
-        for (;;) {
-            log.info("Sleeping 30s");
-            Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(30));
-            if (Instant.now().compareTo(nextRefreshTime) > 0) {
-                //  need to reconnect, no activity for this.mirrorReconnectDelay since last message
-                nextRefreshTime = Instant.now().plusSeconds(this.mirrorReconnectDelay * 60);
-                log.info("Unsusbscribing");
-                subscription.unsubscribe();
-                log.info("Unsusbscribed");
-            }
-        }
-    }    
 }

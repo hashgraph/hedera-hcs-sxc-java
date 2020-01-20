@@ -2,14 +2,7 @@ package com.hedera.hcs.sxc.config;
 
 public final class MirrorNode {
     private String address;
-    private int reconnectDelay = 0;
-    
-    public int getReconnectDelay() {
-        return this.reconnectDelay;
-    }
-    public void setReconnectDelay(int reconnectDelay) {
-        this.reconnectDelay = reconnectDelay;
-    }
+
     public String getAddress() {
         return this.address;
     }

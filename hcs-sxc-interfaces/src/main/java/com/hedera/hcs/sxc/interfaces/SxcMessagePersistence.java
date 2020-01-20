@@ -25,6 +25,7 @@ public interface SxcMessagePersistence {
     // mirror message persistence
     void storeMirrorResponse(SxcConsensusMessage mirrorTopicMessageResponse);
     public SxcConsensusMessage getMirrorResponse(String timestamp);
+    public Map<String, SxcConsensusMessage> getMirrorResponses(String fromTimestamp, String toTimestamp);
     public Map<String, SxcConsensusMessage> getMirrorResponses();
 
     // HCS transaction persistence

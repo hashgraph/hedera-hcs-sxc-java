@@ -12,14 +12,7 @@ public final class YAMLConfig {
     private Queue queue = new Queue();
     private boolean catchupHistory;
     private String lastConsensusTimeFile;
-    private int mirrorReconnectDelay = 0;
     
-    public int getMirorReconnectDelay() {
-        return this.mirrorReconnectDelay;
-    }
-    public void setMirrorReconnectDelay(int mirrorReconnectDelay) {
-        this.mirrorReconnectDelay = mirrorReconnectDelay;
-    }
     public String getLastConsensusTimeFile() {
         return this.lastConsensusTimeFile;
     }

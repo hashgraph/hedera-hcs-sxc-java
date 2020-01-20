@@ -18,9 +18,9 @@ import com.hedera.hcsapp.restclasses.AuditHCSMessage;
 import com.hedera.hcsapp.restclasses.AuditHCSMessages;
 import com.hedera.hcsapp.restclasses.AuditThreadId;
 import com.hedera.hcsapp.restclasses.AuditThreadIds;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessage;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessageChunk;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessageId;
+import com.hedera.hcs.sxc.proto.ApplicationMessage;
+import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
+import com.hedera.hcs.sxc.proto.ApplicationMessageId;
 
 import lombok.extern.log4j.Log4j2;
 import proto.SettlementBPM;

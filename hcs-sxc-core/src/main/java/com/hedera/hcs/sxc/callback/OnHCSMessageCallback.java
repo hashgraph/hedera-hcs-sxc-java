@@ -11,9 +11,9 @@ import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
 import com.hedera.hcs.sxc.interfaces.MirrorSubscriptionInterface;
 import com.hedera.hcs.sxc.plugins.Plugins;
 import com.hedera.hcs.sxc.utils.ByteUtil;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessage;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessageChunk;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessageId;
+import com.hedera.hcs.sxc.proto.ApplicationMessage;
+import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
+import com.hedera.hcs.sxc.proto.ApplicationMessageId;
 
 import java.time.Instant;
 import java.util.ArrayList;

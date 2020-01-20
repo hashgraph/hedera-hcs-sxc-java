@@ -16,7 +16,7 @@ import com.hedera.hashgraph.sdk.consensus.ConsensusClient.Subscription;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackFromMirror;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessageChunk;
+import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 
 /**
  * 

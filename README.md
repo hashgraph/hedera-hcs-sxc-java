@@ -194,7 +194,7 @@ to build this hibernate component with the appropriate vendor's dependencies, ad
 
 Example:
 ```
-mvnw clean install -Dcom.hedera.hashgraph.sdk.experimental=true -Pdocker -Ppostgres
+mvnw clean install -Pdocker -Ppostgres
 ```
 
 the `h2` profile is the default profile
@@ -469,6 +469,7 @@ These are merely sample lines of code, please refer to the example projects for 
 ### Pre-requisites
 
 - The project is built on java 10.
+- [Protobuf compiler](https://github.com/protocolbuffers/protobuf) version 3.11.2. (check with `protoc --version` in a command prompt).
 - Docker and Docker-Compose
 
 ### Compilation steps
@@ -488,7 +489,7 @@ These are merely sample lines of code, please refer to the example projects for 
 From the top of the project, issue the following command to compile docker images
 
 ```shell
-mvnw clean install -Dcom.hedera.hashgraph.sdk.experimental=true -Pdocker
+mvnw clean install -Pdocker
 ```
 
 *Note: a `mvnw` executable is provided in the project in the event you don't have maven installed*
@@ -498,16 +499,14 @@ mvnw clean install -Dcom.hedera.hashgraph.sdk.experimental=true -Pdocker
 From the top of the project, issue the following command to create fat jars
 
 ```shell
-mvnw clean install -Dcom.hedera.hashgraph.sdk.experimental=true -Pfatjar
+mvnw clean install -Pfatjar
 ```
 
 *Note: a `mvnw` executable is provided in the project in the event you don't have maven installed*
 
 ## Running the project in your IDE
 
-Note that you need to add the following to your VM Arguments `-Dcom.hedera.hashgraph.sdk.experimental=true`.
-
-You may also need to setup environment variables to match those in the `.env` and `docker-compose.yml` files.
+You may need to setup environment variables to match those in the `.env` and `docker-compose.yml` files.
 
 ## Examples
 
@@ -623,7 +622,7 @@ Whenever a participant performs and action in the UI, this results in a HCS tran
 To run the examples outside of docker and override `.env` variables and the database location/name run:
 
 ```
-mvnw exec:java -Dexec.mainClass="com.hedera.hcsapp.Application" -Dserver.port=8081 -Dcom.hedera.hashgraph.sdk.experimental=true -Pfatjar -Dspring.datasource.url="jdbc:h2:./h2data/settlement-demo-8081" -DAPP_ID=1 -DOPERATOR_ID=0.0.1010 -DOPERATOR_KEY=302e0208...94329fb
+mvnw exec:java -Dexec.mainClass="com.hedera.hcsapp.Application" -Dserver.port=8081 -Pfatjar -Dspring.datasource.url="jdbc:h2:./h2data/settlement-demo-8081" -DAPP_ID=1 -DOPERATOR_ID=0.0.1010 -DOPERATOR_KEY=302e0208...94329fb
 ```
 where 
 

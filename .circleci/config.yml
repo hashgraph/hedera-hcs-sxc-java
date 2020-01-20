@@ -34,11 +34,11 @@ jobs:
           command: cd sdk; git clone -b "292-ConsensusMessage-doesn't-have-a-public-constructor" https://github.com/hashgraph/hedera-sdk-java
       - run:
           name: Running maven (install - skipping tests) for hcs java sdk
-          command: cd sdk/hedera-sdk-java; mvn install -Dcom.hedera.hashgraph.sdk.experimental=true -DskipTests
+          command: cd sdk/hedera-sdk-java; mvn install -DskipTests
 #HCS lib
       - run:
           name: Running maven (validate, compile, test, package)
-          command: mvn package -Dcom.hedera.hashgraph.sdk.experimental=true
+          command: mvn package 
       # - save_cache:
       #     key: maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
       #     paths:

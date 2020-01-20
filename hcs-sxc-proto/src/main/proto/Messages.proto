@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package proto;
 
-option java_package = "com.hedera.hcs.sxc.proto.java";
+option java_package = "com.hedera.hcs.sxc.proto";
 option java_multiple_files = true;
 
 message AccountID {
@@ -11,14 +11,14 @@ message AccountID {
     int64 accountNum = 3; //A nonnegative account number unique within its realm
 }
 
-message ApplicationMessageId  {
-    Timestamp validStart = 1; 
-    AccountID accountID = 2; //The Account ID that paid for this transaction
-}
-
 message Timestamp {
     int64 seconds = 1; // Number of complete seconds since the start of the epoch
     int32 nanos = 2; // Number of nanoseconds since the start of the last second
+}
+
+message ApplicationMessageId {
+    Timestamp validStart = 1; 
+    AccountID accountID = 2; //The Account ID that paid for this transaction
 }
 
 // a complete message containing data provided by an app to the core component

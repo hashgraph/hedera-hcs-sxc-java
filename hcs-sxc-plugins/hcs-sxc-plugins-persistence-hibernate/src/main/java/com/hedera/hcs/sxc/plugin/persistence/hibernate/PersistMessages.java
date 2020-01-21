@@ -96,14 +96,14 @@ implements SxcMessagePersistence{
                 .setParameter("timestamp", timestamp)
                 .getSingleResult();
 
-      ConsensusTopicResponse consensusTopicResponse = ConsensusTopicResponse.newBuilder()
-              .setConsensusTimestamp(Timestamp.newBuilder().setSeconds(mirrorResponse.getTimestampSeconds()).setNanos(mirrorResponse.getTimestampNanos()).build())
-              .setMessage(ByteString.copyFrom(mirrorResponse.getMessage()))
-              .setRunningHash(ByteString.copyFrom(mirrorResponse.getRunningHash()))
-              .setSequenceNumber(mirrorResponse.getSequenceNumber())
-              .build();
-
-      SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage(mirrorResponse.getTopicId(), consensusTopicResponse);
+         ConsensusTopicResponse consensusTopicResponse = ConsensusTopicResponse.newBuilder()
+                .setConsensusTimestamp(Timestamp.newBuilder().setSeconds(mirrorResponse.getTimestampSeconds()).setNanos(mirrorResponse.getTimestampNanos()).build())
+                .setMessage(ByteString.copyFrom(mirrorResponse.getMessage()))
+                .setRunningHash(ByteString.copyFrom(mirrorResponse.getRunningHash()))
+                .setSequenceNumber(mirrorResponse.getSequenceNumber())
+                .build();
+        
+        SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage(mirrorResponse.getTopicId(), consensusTopicResponse);
 
         return sxcConsensusMessage;
     }
@@ -141,14 +141,16 @@ implements SxcMessagePersistence{
                 .getResultList();
 
         mirrorResponses.forEach(mirrorResponse -> {
-            SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage();
-            sxcConsensusMessage.setConsensusTimeStampSeconds(mirrorResponse.getTimestampSeconds());
-            sxcConsensusMessage.setConsensusTimeStampNanos(mirrorResponse.getTimestampNanos());
-            sxcConsensusMessage.setMessage(mirrorResponse.getMessage());
-            sxcConsensusMessage.setRunningHash(mirrorResponse.getRunningHash());
-            sxcConsensusMessage.setSequenceNumber(mirrorResponse.getSequenceNumber());
-            sxcConsensusMessage.setTopicId(mirrorResponse.getTopicId());
-
+            
+            ConsensusTopicResponse consensusTopicResponse = ConsensusTopicResponse.newBuilder()
+                    .setConsensusTimestamp(Timestamp.newBuilder().setSeconds(mirrorResponse.getTimestampSeconds()).setNanos(mirrorResponse.getTimestampNanos()).build())
+                    .setMessage(ByteString.copyFrom(mirrorResponse.getMessage()))
+                    .setRunningHash(ByteString.copyFrom(mirrorResponse.getRunningHash()))
+                    .setSequenceNumber(mirrorResponse.getSequenceNumber())
+                    .build();
+            
+            SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage(mirrorResponse.getTopicId(), consensusTopicResponse);
+            
             responseList.put(mirrorResponse.getTimestamp(), sxcConsensusMessage);
         });
 

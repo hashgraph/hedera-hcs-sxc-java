@@ -17,24 +17,6 @@ jobs:
           MAVEN_OPTS: -Xmx3200m
     steps:
       - checkout #HCS SXC
-      # - restore_cache:
-      #     keys:
-      #       - maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
-      #       - maven-v1-{{ .Branch }}
-      #       - maven-v1-
-#HCS java SDK
-      # - run:
-      #     name: create directory for hcs java sdk
-      #     command: mkdir sdk
-      # - run:
-      #     name: git init for hcs java sdk
-      #     command: cd sdk; git init
-      # - run:
-      #     name: Running git pull on hcs java sdk
-      #     command: cd sdk; git clone -b "292-ConsensusMessage-doesn't-have-a-public-constructor" https://github.com/hashgraph/hedera-sdk-java
-      # - run:
-      #     name: Running maven (install - skipping tests) for hcs java sdk
-      #     command: cd sdk/hedera-sdk-java; mvn install -DskipTests
 #HCS SXC
       - run:
           name: Running maven (validate, compile, test, package)

@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
+import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;
@@ -50,8 +50,9 @@ public final class CreateHCSTopic {
      * @throws HederaException
      * @throws IOException 
      * @throws FileNotFoundException 
+     * @throws HederaStatusException 
      */
-    public ConsensusTopicId execute() throws HederaNetworkException, IllegalArgumentException, HederaException, FileNotFoundException, IOException {
+    public ConsensusTopicId execute() throws HederaNetworkException, IllegalArgumentException, FileNotFoundException, IOException, HederaStatusException {
 
         Config config = new Config();
         Client client = new Client(this.nodeMap);

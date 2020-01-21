@@ -34,7 +34,6 @@ public final class HCSCore {
     private boolean catchupHistory;
     private MessagePersistenceLevel messagePersistenceLevel;
     private String mirrorAddress;
-    private int reconnectDelay = 0;
     private Map<String, String> hibernateConfig = new HashMap<String, String>();
 
     /**
@@ -52,7 +51,6 @@ public final class HCSCore {
 
         MirrorNode mirrorNode = yamlConfig.getMirrorNode();
         this.mirrorAddress = mirrorNode.getAddress();
-        this.reconnectDelay = mirrorNode.getReconnectDelay();
         
         AppNet appnet = yamlConfig.getAppNet();
         this.signMessages = appnet.getSignMessages();
@@ -135,9 +133,6 @@ public final class HCSCore {
     }
     public boolean getCatchupHistory() {
         return this.catchupHistory;
-    }
-    public int getMirrorReconnectDelay() {
-        return this.reconnectDelay;
     }
     public void setMessagePersistence(SxcMessagePersistence persistence) {
         HCSCore.persistence = persistence;

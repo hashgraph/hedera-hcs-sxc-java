@@ -59,8 +59,7 @@ public class ConfigTest extends AbstractConfigTest {
                  () -> assertEquals(100000000, hcsTransactionFee),
                  () -> assertEquals("FULL", appNet.getPersistenceLevel().name()),
                  () -> assertTrue(appNet.getCatchupHistory()),
-                 () -> assertEquals("34.66.214.12:6552", yamlConfig.getMirrorNode().getAddress()),
-                 () -> assertEquals(10, yamlConfig.getMirrorNode().getReconnectDelay())
+                 () -> assertEquals("34.66.214.12:6552", yamlConfig.getMirrorNode().getAddress())
          );
     }
 }

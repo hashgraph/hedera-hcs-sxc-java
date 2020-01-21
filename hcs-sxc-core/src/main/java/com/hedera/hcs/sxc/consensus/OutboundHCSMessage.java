@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.HederaException;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
@@ -21,11 +20,11 @@ import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
 import com.hedera.hcs.sxc.plugins.Plugins;
-import com.hedera.hcs.sxc.proto.java.AccountID;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessage;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessageChunk;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessageId;
-import com.hedera.hcs.sxc.proto.java.Timestamp;
+import com.hedera.hcs.sxc.proto.AccountID;
+import com.hedera.hcs.sxc.proto.ApplicationMessage;
+import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
+import com.hedera.hcs.sxc.proto.ApplicationMessageId;
+import com.hedera.hcs.sxc.proto.Timestamp;
 
 import java.util.Arrays;
 
@@ -104,9 +103,9 @@ public final class OutboundHCSMessage {
      * @param message
      * @throws HederaNetworkException
      * @throws IllegalArgumentException
-     * @throws HederaException
+     * @throws Exception
      */
-    public TransactionId sendMessage(int topicIndex, byte[] message) throws HederaNetworkException, IllegalArgumentException, HederaException {
+    public TransactionId sendMessage(int topicIndex, byte[] message) throws Exception {
 
         if (signMessages) {
 

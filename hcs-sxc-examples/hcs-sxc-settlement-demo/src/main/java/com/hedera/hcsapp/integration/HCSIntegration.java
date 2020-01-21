@@ -28,7 +28,7 @@ import com.hedera.hcsapp.repository.CreditRepository;
 import com.hedera.hcsapp.repository.SettlementItemRepository;
 import com.hedera.hcsapp.repository.SettlementRepository;
 import com.hedera.hcsapp.repository.Util;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessage;
+import com.hedera.hcs.sxc.proto.ApplicationMessage;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.env.Environment;
@@ -42,8 +42,6 @@ import proto.SettleInitBPM;
 import proto.SettlePaidBPM;
 import proto.SettleProposeBPM;
 import proto.SettlementBPM;
-
-
 
 @Log4j2
 @Component

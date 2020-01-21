@@ -209,3 +209,13 @@ pre { padding: 5px; margin: 5px; }
 .bold-text-notification{
     font-weight: bolder!important;
 }
+
+.hh-avatar {
+    width:36px; 
+    height:36px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center; 
+    border-radius: 90px;
+    color:white; background-color: #e4e7e8;
+}

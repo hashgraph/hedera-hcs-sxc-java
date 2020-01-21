@@ -24,13 +24,13 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.proto.Timestamp;
 import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
-import com.hedera.hashgraph.sdk.consensus.ConsensusMessage;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
+import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackFromMirror;
 import com.hedera.hcs.sxc.interfaces.HCSRelayMessage;
 import com.hedera.hcs.sxc.interfaces.MirrorSubscriptionInterface;
 import com.hedera.hcs.sxc.plugin.mirror.config.Config;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessageChunk;
+import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -38,7 +38,7 @@ import lombok.extern.log4j.Log4j2;
 public class MirrorSubscribe implements MirrorSubscriptionInterface {
 
     @Override
-    public void init(HCSCallBackFromMirror onHCSMessageCallback, long applicationId, Optional<Instant> lastConsensusTimestamp, String mirrorAddress, List<ConsensusTopicId> topicIds, int mirrorReconnectDelay) throws Exception {
+    public void init(HCSCallBackFromMirror onHCSMessageCallback, long applicationId, Optional<Instant> lastConsensusTimestamp, String mirrorAddress, List<ConsensusTopicId> topicIds) throws Exception {
         Config  config = new Config();
         log.info("hcs-sxc-plugins-mirror-queue-artemis init");
         String contextFactory = config.getConfig().getQueue().getInitialContextFactory();
@@ -106,7 +106,7 @@ public class MirrorSubscribe implements MirrorSubscriptionInterface {
                                         .setSequenceNumber(rlm.getSequenceNumber())
                                         .build();
                                 ConsensusTopicId topicId = new ConsensusTopicId(rlm.getTopicShard(), rlm.getTopicRealm(), rlm.getTopicNum());
-                                ConsensusMessage consensusMessage = new ConsensusMessage(topicId, consensusTopicResponse);
+                                SxcConsensusMessage consensusMessage = new SxcConsensusMessage(topicId, consensusTopicResponse);
 
                                 onHCSMessageCallback.storeMirrorResponse(consensusMessage);
                                 

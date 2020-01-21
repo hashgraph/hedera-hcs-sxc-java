@@ -15,9 +15,9 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.entities.Settlement;
 import com.hedera.hcsapp.restclasses.SettlementRest;
-import com.hedera.hcs.sxc.proto.java.AccountID;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessageId;
-import com.hedera.hcs.sxc.proto.java.Timestamp;
+import com.hedera.hcs.sxc.proto.AccountID;
+import com.hedera.hcs.sxc.proto.ApplicationMessageId;
+import com.hedera.hcs.sxc.proto.Timestamp;
 
 import proto.CreditBPM;
 import proto.Money;

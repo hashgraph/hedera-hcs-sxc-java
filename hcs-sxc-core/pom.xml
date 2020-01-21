@@ -27,13 +27,6 @@
             <artifactId>hcs-sxc-interfaces</artifactId>
             <version>${hcs-sxc-interfaces.version}</version>
         </dependency>
-        
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-netty</artifactId>
-            <version>${grpc-netty.version}</version>
-        </dependency>
-        
         <!-- PLUGINS for testing -->
         <dependency>
             <groupId>com.hedera</groupId>

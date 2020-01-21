@@ -1,13 +1,12 @@
 package com.hedera.hcs.sxc.plugin.persistence.inmemory;
 
 import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.consensus.ConsensusMessage;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
-import com.hedera.hcs.sxc.interfaces.SxcConsensusMessage;
+import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessage;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessageChunk;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessageId;
+import com.hedera.hcs.sxc.proto.ApplicationMessage;
+import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
+import com.hedera.hcs.sxc.proto.ApplicationMessageId;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -46,11 +45,9 @@ public class PersistMessages
 //  
     // Mirror responses
     @Override
-    public void storeMirrorResponse(ConsensusMessage mirrorTopicMessageResponse) {
-        
-        SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage(mirrorTopicMessageResponse);
-        mirrorTopicMessages.put(mirrorTopicMessageResponse.consensusTimestamp.toString(), sxcConsensusMessage);
-        log.info("storeMirrorResponse " + mirrorTopicMessageResponse.consensusTimestamp.toString() + "-" + mirrorTopicMessageResponse);
+    public void storeMirrorResponse(SxcConsensusMessage consensusMessage) {
+        mirrorTopicMessages.put(consensusMessage.consensusTimestamp.toString(), consensusMessage);
+        log.info("storeMirrorResponse " + consensusMessage.consensusTimestamp.toString() + "-" + consensusMessage);
     }
     
     @Override 
@@ -62,6 +59,20 @@ public class PersistMessages
     public Map<String, SxcConsensusMessage> getMirrorResponses() {
         return mirrorTopicMessages;
     }
+    
+    @Override
+    public Map<String, SxcConsensusMessage> getMirrorResponses(String fromTimestamp, String toTimestamp) {
+        Map<String, SxcConsensusMessage> response = new HashMap<String, SxcConsensusMessage>();
+        
+        mirrorTopicMessages.forEach((key,value) -> {
+            if ((key.compareTo(fromTimestamp) >= 0) && (key.compareTo(toTimestamp) <= 0) ) {
+                response.put(key, value);            
+            }
+        }); 
+        
+        return response;
+    }
+    
 
     // Transactions
     @Override
@@ -145,8 +156,8 @@ public class PersistMessages
 
         Instant lastConsensusTimestamp = Instant.EPOCH;
         for (Map.Entry<String, SxcConsensusMessage> mirrorTopicMessage : mirrorTopicMessages.entrySet()) {
-            long seconds = mirrorTopicMessage.getValue().getConsensusTimeStampSeconds();
-            int nanos = mirrorTopicMessage.getValue().getConsensusTimeStampNanos();
+            long seconds = mirrorTopicMessage.getValue().consensusTimestamp.getEpochSecond();
+            int nanos = mirrorTopicMessage.getValue().consensusTimestamp.getNano();
             
             if (lastConsensusTimestamp.getEpochSecond() < seconds) {
                 lastConsensusTimestamp = Instant.ofEpochSecond(seconds, nanos);

@@ -798,21 +798,13 @@
             }
             
             async function openAuditThread(threadId){
-                
                 event.preventDefault();
-                
                 main = document.getElementById('main-panel-holder');
                 main.innerHTML="";
                 document.getElementById('header-title').innerHTML = "<a href='#audit' class='mdc-button'><i style='font-size:26px;' class='material-icons'>arrow_back</i></a> <span style='position:relative;top:2px'>Audit Thread ID: " + threadId + " Details</span>";
                 location.hash='audit-detail';
-                //$auditThreadDialog =  document.getElementById('audit-thread-dialog');
-                
-                //auditThreadDialog  = new mdc.dialog.MDCDialog($auditThreadDialog);
-                //$auditThreadDialog.querySelector("#thread-id").innerHTML = threadId;
-                
                 let response = await fetch('audit/'+threadId);
                 let responseJSON = await  response.json();
-                //$auditThreadDialog.querySelector("#audit-thread-panel-holder").innerHTML="";
                 let auditApplicationMessages = responseJSON.auditApplicationMessages;
                 for (z=0; z < auditApplicationMessages.length ; z++) {
                     let response = await fetch('audit/'+threadId+"/"+auditApplicationMessages[z].applicationMessageId);
@@ -886,92 +878,49 @@
                     i_Settlements = responseSettlementsL[z];
                     clonedRow = tableBodyTemplate.content.cloneNode(true);
                     clonedRow.getElementById("row-role").innerHTML = "<b>Settlement "+((z*1)+1)+"</b>"; 
-                    
-                    threadId = i_Settlements.threadId;
+                    let threadId = i_Settlements.threadId;
                     clonedRow.getElementById("threadId").innerHTML =formatThreadId(threadId);
                     clonedRow.getElementById("threadId").title = threadId;
                     clonedRow.getElementById("threadId").setAttribute("data-thread-id", threadId );
-
                     clonedRow.getElementById("recipient").innerHTML = i_Settlements.recipientName;
                     clonedRow.getElementById("payer").innerHTML = i_Settlements.payerName;
                     clonedRow.getElementById("reference").innerHTML = "";
-                    
                     clonedRow.getElementById("amount-net").innerHTML = "Net " + i_Settlements.netValue;
-                
                     clonedRow.getElementById("date-time").innerHTML = i_Settlements.createdDateTime;
                     clonedRow.getElementById("status").innerHTML =  i_Settlements.displayStatus + (i_Settlements.paymentChannelName===null?"":" (with "+ i_Settlements.paymentChannelName +")");
-                    //clonedRow.getElementById("status").style.textTransform = "capitalize";
                     
                     
-                    
+                    let newButton = document.createElement("button");
+                    newButton.classList.add("mdc-button");
+                    newButton.classList.add("mdc-button--outlined");
                     if(i_Settlements.payerName === userName && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_PROPOSED'){ //SETTLEMENT_PROPOSED
-                        let threadId = i_Settlements.threadId;
-                        newButton = document.createElement("button");
                         newButton.innerHTML = "Accept";
-                        newButton.classList.add("mdc-button");
-                        newButton.classList.add("mdc-button--outlined");
                         newButton.addEventListener("click", function(){openConfirmSettlementDialog(threadId,userName);});
-                        clonedRow.getElementById("action").appendChild(newButton);
                     } else if (i_Settlements.payerName === thisuserName  && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_AGREED'){
-                        let threadId = i_Settlements.threadId;
-                        newButton = document.createElement("button");
                         newButton.innerHTML = "Propose Pay Channel";
-                        newButton.classList.add("mdc-button");
-                        newButton.classList.add("mdc-button--outlined");
                         newButton.addEventListener("click", function(){openSelectPaychannelDialog(threadId,userName);});
-                        clonedRow.getElementById("action").appendChild(newButton);
                     } else if (i_Settlements.payerName === userName && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_PAY_CHANNEL_PROPOSED'  ){
-                        let threadId = i_Settlements.threadId;
-                        newButton = document.createElement("button");
                         newButton.innerHTML = "Accept";
-                        newButton.classList.add("mdc-button");
-                        newButton.classList.add("mdc-button--outlined");
                         let cname = i_Settlements.paymentChannelName;
                         newButton.addEventListener("click", function(){openAcceptPaychannelDialog(threadId,userName,cname );});
-                        clonedRow.getElementById("action").appendChild(newButton);
                     } else if (i_Settlements.payerName === thisuserName  && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_PAY_CHANNEL_AGREED'){
-                        let threadId = i_Settlements.threadId;
-                        newButton = document.createElement("button");
                         newButton.innerHTML = "Init Payment";
-                        newButton.classList.add("mdc-button");
-                        newButton.classList.add("mdc-button--outlined");
                         newButton.addEventListener("click", function(){openInitPayDialog(threadId,userName,i_Settlements.paymentChannelName );});
-                        clonedRow.getElementById("action").appendChild(newButton);
                     } else if ( hasRole(thisuserName,'PAYCHANNEL') && i_Settlements.status === 'SETTLE_PAY_PROPOSED'){
-                        // Diana Agree Payment
-                        let threadId = i_Settlements.threadId;
-                        newButton = document.createElement("button");
                         newButton.innerHTML = "Accept";
-                        newButton.classList.add("mdc-button");
-                        newButton.classList.add("mdc-button--outlined");
                         newButton.addEventListener("click", function(){openAcceptPaymentDialog(threadId,userName );});
-                        clonedRow.getElementById("action").appendChild(newButton);
                     }  else if (i_Settlements.payerName === thisuserName  &&  hasRole(thisuserName,'BUYER') && i_Settlements.status === 'SETTLE_PAY_ACK'){
-                        //Alice confirm payment
-                        let threadId = i_Settlements.threadId;
-                        newButton = document.createElement("button");
                         newButton.innerHTML = "Request Receipt";
-                        newButton.classList.add("mdc-button");
-                        newButton.classList.add("mdc-button--outlined");
                         newButton.addEventListener("click", function(){openSettlementPaymentMadeDialog(threadId,userName,i_Settlements.paymentChannelName );});
-                        clonedRow.getElementById("action").appendChild(newButton);
                     } else if (i_Settlements.payerName === userName  && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_RCPT_REQUESTED'){
-                        let threadId = i_Settlements.threadId;
-                        newButton = document.createElement("button");
                         newButton.innerHTML = "Confirm Receipt";
-                        newButton.classList.add("mdc-button");
-                        newButton.classList.add("mdc-button--outlined");
                         newButton.addEventListener("click", function(){openAcceptSettlePaymentMade(threadId,userName );});
-                        clonedRow.getElementById("action").appendChild(newButton);
                      } else if (i_Settlements.payerName === thisuserName  && hasRole(thisuserName,'BUYER') && i_Settlements.status === 'SETTLE_RCPT_CONFIRMED'){
-                        let threadId = i_Settlements.threadId;
-                        newButton = document.createElement("button");
                         newButton.innerHTML = "Settlement Completed";
-                        newButton.classList.add("mdc-button");
-                        newButton.classList.add("mdc-button--outlined");
                         newButton.addEventListener("click", function(){openSettlementCompletedDialog(threadId,userName,i_Settlements.paymentChannelName);});
-                        clonedRow.getElementById("action").appendChild(newButton);
-                     }  
+                    }  
+                    
+                    if(newButton.innerHTML!=="") clonedRow.getElementById("action").appendChild(newButton);
                   
                     clonedRow.getElementById("notes").innerHTML = i_Settlements.additionalNotes;
                     tableBody.appendChild(clonedRow);

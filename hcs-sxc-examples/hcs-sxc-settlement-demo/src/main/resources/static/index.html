@@ -203,8 +203,6 @@
                                             <td id="user"       class="mdc-data-table__cell">user</td>
                                             <td id="roles"    class="mdc-data-table__cell">roles</td>
                                             <td id="link"      class="mdc-data-table__cell">link</td>
-<!--                                            <td                class="mdc-data-table__cell" style="text-align: right">  <button id=""  class="mdc-icon-button material-icons " title="More options" data-mdc-ripple-is-unbounded="true">more_vert</button>
-                                            </td>-->
                                         </tr>
                                     </template>
                                 </tbody>
@@ -529,7 +527,7 @@
             allAddresses = [];
             buyerSellersAddress= [];
             paymentChannels = [];
-            notificationList = [];
+            notificationList = []; //TODO: holds all incoming notifications - replace with session storage
             document.addEventListener("DOMContentLoaded", init);
             
             async function init ()  {
@@ -557,7 +555,7 @@
                 addressBookBs  = await responseAddressBookBs.json(); 
                 buyerSellersAddress = addressBookBs;
                 
-                // redirect  subviews on browserRefresh - only one atm
+                // redirect  subviews on browser refresh - only one atm
                 switch(location.hash){
                     case "#audit-detail": 
                         location.hash="audit";
@@ -622,13 +620,45 @@
             
        </script>
       
-       <script>
-   
-            
-        </script>
 
-        
-        <script>                                 
+        <script> 
+                                        
+            /*
+             * Routines to render the main sections, one function for each 
+             * 
+             * {@link renderOverviewTab()} 
+             * {@link renderCreditsPanel()}  
+             * {@link renderSettlementsPanel()
+             * {@link renderAuditIndexTable() and it's sub-panel {@link openAuditThread()}
+              */
+            
+            async function renderOverviewTab(){
+                var panelTemplate = document.getElementById("overview-template");
+                var clonedTableTemplate = panelTemplate.content.cloneNode(true);
+                clonedTableTemplate.getElementById("this-user").innerHTML = thisuserName;
+                clonedTableTemplate.getElementById("this-user-avatar").style.backgroundImage = 'url(images/'+thisAppId+'-100.png)';
+                clonedTableTemplate.getElementById("this-role").innerHTML = thisRoles.replace(/,/g,", ");;;
+                clonedTableTemplate.getElementById("this-pk").innerHTML = thisPK;
+                if(!thisRoles.includes("PAYCHANNEL")) clonedTableTemplate.getElementById("overview-credits-debits-button").style.display='block';
+                var url = window.location.protocol + "//" + window.location.hostname + ":" +thisPort;
+                var tableBodyTemplate = clonedTableTemplate.getElementById("overview-table-body-template");
+                var tableBody = clonedTableTemplate.getElementById("overview-table-body");
+                
+                for(z=0; z < allAddresses.length ; z++){
+                    clonedRow = tableBodyTemplate.content.cloneNode(true);
+                    clonedRow.getElementById("user").innerHTML = allAddresses[z].name;
+                    clonedRow.getElementById("roles").innerHTML = allAddresses[z].roles.toLowerCase().replace(/,/g,", ");;
+                    clonedRow.getElementById("roles").style.textTransform = "capitalize";
+                    clonedRow.getElementById("link").innerHTML =  allAddresses[z].paymentAccountDetails ;
+                    clonedRow.getElementById('user-avatar').style.backgroundImage = "url(images/" + allAddresses[z].appId + ".png)";
+                    tableBody.appendChild(clonedRow);
+                }     
+                clonedTableTemplate.getElementById("location").onclick = function(){alert(url);};
+                document.getElementById("main-panel-holder").appendChild(clonedTableTemplate);
+                
+            }
+            
+            
             async function  renderCreditsPanel(userName){
                 var panelTemplate = document.getElementById("credits-and-debits-panel");
                 var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
@@ -655,16 +685,10 @@
                         }
                     );
                 }
-                    
-               
-
                 var tableBody = clonedPanelTemplate.getElementById("credit-table-body");
                 var tableBodyTemplate = clonedPanelTemplate.getElementById("credit-table-body-template");
-
                 var responseCredits = await fetch(`credits/${userName}`);
                 var i_UserCredits = await responseCredits.json();
-                
-                
                 for(z=0; z < i_UserCredits.length ; z++){
                     clonedRow = tableBodyTemplate.content.cloneNode(true);
                     if(i_UserCredits[z].status === 'CREDIT_AGREED' ){
@@ -703,8 +727,6 @@
                     clonedPanelTemplate.querySelector("details").setAttribute("open","true");
                     existingPanel.replaceWith(clonedPanelTemplate);
                 }
-                
-                
                 
                 var thisUserPays = 0;
                 var otherUserPays = 0;
@@ -808,21 +830,21 @@
                         clonedCreditRow.querySelector("tr").style.border=0;
                         clonedCreditRow.getElementById("row-role").innerHTML = "Credit " + (c*1+1); 
                         
-                        threadId = credit.threadId;
-                        clonedCreditRow.getElementById("threadId").innerHTML =formatThreadId(threadId);
-                        clonedCreditRow.getElementById("threadId").title = threadId;
-                        clonedCreditRow.getElementById("threadId").setAttribute("data-thread-id", threadId );
+                        let threadId = credit.threadId;
+                            clonedCreditRow.getElementById("threadId").innerHTML =formatThreadId(threadId);
+                            clonedCreditRow.getElementById("threadId").title = threadId;
+                            clonedCreditRow.getElementById("threadId").setAttribute("data-thread-id", threadId );
 
-                        clonedCreditRow.getElementById("recipient").innerHTML = credit.recipientName;
-                        clonedCreditRow.getElementById("payer").innerHTML = credit.payerName;
-                        clonedCreditRow.getElementById("reference").innerHTML = credit.reference;
-                        clonedCreditRow.getElementById("amount-net").innerHTML = credit.amount;
-                        clonedCreditRow.getElementById("notes").innerHTML = credit.additionalNotes;
-                        
-                        clonedCreditRow.getElementById("date-time").innerHTML = credit.createdDateTime;
-                        clonedCreditRow.getElementById("status").innerHTML =  credit.displayStatus;
-                    
-                        tableBody.appendChild(clonedCreditRow);
+                            clonedCreditRow.getElementById("recipient").innerHTML = credit.recipientName;
+                            clonedCreditRow.getElementById("payer").innerHTML = credit.payerName;
+                            clonedCreditRow.getElementById("reference").innerHTML = credit.reference;
+                            clonedCreditRow.getElementById("amount-net").innerHTML = credit.amount;
+                            clonedCreditRow.getElementById("notes").innerHTML = credit.additionalNotes;
+
+                            clonedCreditRow.getElementById("date-time").innerHTML = credit.createdDateTime;
+                            clonedCreditRow.getElementById("status").innerHTML =  credit.displayStatus;
+
+                            tableBody.appendChild(clonedCreditRow);
                     }
                     
                 }     
@@ -836,32 +858,6 @@
 
             }
             
-            async function renderOverviewTab(){
-                var panelTemplate = document.getElementById("overview-template");
-                var clonedTableTemplate = panelTemplate.content.cloneNode(true);
-                clonedTableTemplate.getElementById("this-user").innerHTML = thisuserName;
-                clonedTableTemplate.getElementById("this-user-avatar").style.backgroundImage = 'url(images/'+thisAppId+'-100.png)';
-                clonedTableTemplate.getElementById("this-role").innerHTML = thisRoles.replace(/,/g,", ");;;
-                clonedTableTemplate.getElementById("this-pk").innerHTML = thisPK;
-                if(!thisRoles.includes("PAYCHANNEL")) clonedTableTemplate.getElementById("overview-credits-debits-button").style.display='block';
-                var url = window.location.protocol + "//" + window.location.hostname + ":" +thisPort;
-                var tableBodyTemplate = clonedTableTemplate.getElementById("overview-table-body-template");
-                var tableBody = clonedTableTemplate.getElementById("overview-table-body");
-                
-                for(z=0; z < allAddresses.length ; z++){
-                    clonedRow = tableBodyTemplate.content.cloneNode(true);
-                    clonedRow.getElementById("user").innerHTML = allAddresses[z].name;
-                    clonedRow.getElementById("roles").innerHTML = allAddresses[z].roles.toLowerCase().replace(/,/g,", ");;
-                    clonedRow.getElementById("roles").style.textTransform = "capitalize";
-                    clonedRow.getElementById("link").innerHTML =  allAddresses[z].paymentAccountDetails ;
-                    clonedRow.getElementById('user-avatar').style.backgroundImage = "url(images/" + allAddresses[z].appId + ".png)";
-                    tableBody.appendChild(clonedRow);
-                }     
-                clonedTableTemplate.getElementById("location").onclick = function(){alert(url);};
-                document.getElementById("main-panel-holder").appendChild(clonedTableTemplate);
-                
-            }
-   
             async function renderAuditIndexTable(){
                 var panelTemplate = document.getElementById("audit-table-template");
                 var clonedTableTemplate = panelTemplate.content.cloneNode(true);
@@ -928,6 +924,9 @@
                     });
             });
             
+            /* Introspect a message and only update the relevant part of the UI
+             * - makes left hand side menu item bold to indicate content change 
+             */
             async function onStompMessage(messageOutput) {
                 notificationList.push(messageOutput);
                 notifyUi = messageOutput.context;
@@ -1012,11 +1011,16 @@
             }
         </script>
         <script>    
+            /* 
+             * Actions for local app database functions 
+             * (top right app-bar buttons)  
+             */
+            
+    
             async function recreateData(){
                 restore = confirm("This will delete your data and restore test data");
                 if( restore){
                         await fetch('admin/deletedata');
-                        //await fetch('admin/createtestdata');
                         await location.reload();
                 }
             }
@@ -1025,7 +1029,6 @@
                 restore = confirm("This will take a snapshot of your current database");
                 if( restore){
                         await fetch('admin/stash-database');
-                        //await fetch('admin/createtestdata');
                         await location.reload();
                 }
             }
@@ -1034,7 +1037,6 @@
                 restore = confirm("This will restore the database from a previously taken snapshot");
                 if( restore){
                         await fetch('admin/stash-pop-database');
-                        //await fetch('admin/createtestdata');
                         await location.reload();
                 }
             } 
@@ -1042,7 +1044,7 @@
         
         
         <script>
-            /* Visual effects for components. */
+            /* Material Design component initialisations and visual sugar coating. */
            
             leftDrawer = mdc.drawer.MDCDrawer.attachTo(document.getElementById('left-drawer'));
             leftDrawer.open = true;
@@ -1115,7 +1117,6 @@
                     return '<span class="' + cls + '">' + match + '</span>';
                 });
             }
-            
             
             function formatThreadId(threadId){
                  return   threadId.substring(0,2) + "..." + threadId.substring(threadId.length - 4,threadId.length);

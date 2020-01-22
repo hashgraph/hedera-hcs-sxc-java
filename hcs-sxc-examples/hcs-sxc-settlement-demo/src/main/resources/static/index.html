@@ -546,11 +546,8 @@
                 document.getElementById("this-user").innerHTML=whoami.name +"<span style='color:#aaa; font-size:12px;'> ("+whoami.roles+")</span>";
                 document.getElementById("this-user-avatar").style.backgroundImage= "url(images/"+whoami.appId+".png)";
                 if(thisRoles.includes("BUYER")) document.querySelector("#lhs-menu .credits-and-debits").style.display='flex';
-                
                 responsePaymentChannel = await fetch('addressbook/paychannel/');
                 paymentChannels  = await responsePaymentChannel.json(); 
-                
-                
                 responseAddressBookBs = await fetch('addressbook/buyerseller/');
                 addressBookBs  = await responseAddressBookBs.json(); 
                 buyerSellersAddress = addressBookBs;
@@ -658,7 +655,6 @@
                 
             }
             
-            
             async function  renderCreditsPanel(userName){
                 var panelTemplate = document.getElementById("credits-and-debits-panel");
                 var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
@@ -666,7 +662,6 @@
                 clonedPanelTemplate.getElementById("credits-and-debits-user").innerHTML = userName ;
                 clonedPanelTemplate.getElementById("credits-and-debits-user-avatar").style.backgroundImage =  "url(images/"+addressBookBs.find(e => e.name === userName).appId+".png)";
                 clonedPanelTemplate.getElementById("credits-and-debits-seen").innerHTML = (notificationList.filter(el => (el.payer === userName || el.recipient === userName) && el.context === "credits" ).length > 0 ? 'updated': '');
-               
                 clonedPanelTemplate.querySelector("details").addEventListener("toggle", e => {
                     o = notificationList.find(notification => (notification.payer === userName || notification.recipient === userName  ) && notification.context === "credits");
                     notificationList = notificationList.filter(notification => notification !== o);
@@ -834,19 +829,15 @@
                             clonedCreditRow.getElementById("threadId").innerHTML =formatThreadId(threadId);
                             clonedCreditRow.getElementById("threadId").title = threadId;
                             clonedCreditRow.getElementById("threadId").setAttribute("data-thread-id", threadId );
-
                             clonedCreditRow.getElementById("recipient").innerHTML = credit.recipientName;
                             clonedCreditRow.getElementById("payer").innerHTML = credit.payerName;
                             clonedCreditRow.getElementById("reference").innerHTML = credit.reference;
                             clonedCreditRow.getElementById("amount-net").innerHTML = credit.amount;
                             clonedCreditRow.getElementById("notes").innerHTML = credit.additionalNotes;
-
                             clonedCreditRow.getElementById("date-time").innerHTML = credit.createdDateTime;
                             clonedCreditRow.getElementById("status").innerHTML =  credit.displayStatus;
-
                             tableBody.appendChild(clonedCreditRow);
                     }
-                    
                 }     
                 if (document.getElementById(userName) === null) { // check if panel exists
                     document.getElementById("main-panel-holder").appendChild(clonedPanelTemplate);
@@ -855,17 +846,14 @@
                     clonedPanelTemplate.querySelector("details").setAttribute("open","true");
                     existingPanel.replaceWith(clonedPanelTemplate);
                 }
-
             }
             
             async function renderAuditIndexTable(){
                 var panelTemplate = document.getElementById("audit-table-template");
                 var clonedTableTemplate = panelTemplate.content.cloneNode(true);
-                
                 let responseThreadIds = await fetch('audit/');
                 let threadIdsJson = await  responseThreadIds.json();
                 var tableBodyTemplate = clonedTableTemplate.getElementById("audit-table-body-template");
-                
                 var tableBody = clonedTableTemplate.getElementById("audit-table-body");
                 threadIdsJson.threadIds.forEach(
                     t=>{
@@ -994,6 +982,9 @@
                             styleButtons();
                         }
                         break;
+                    case "admin":
+                        location.reload();
+                        break;
                     default: alert("wrong target element");
                 }
                 document.getElementById("notification-badge").innerHTML = document.getElementById("notification-badge").innerHTML * 1.0 + 1;
@@ -1020,25 +1011,27 @@
             async function recreateData(){
                 restore = confirm("This will delete your data and restore test data");
                 if( restore){
-                        await fetch('admin/deletedata');
-                        await location.reload();
+                    await fetch('admin/deletedata');
+                    await alert("We have sent this message to all participants. Please wait for the page to reload");
+
                 }
             }
             
             async function saveData(){
                 restore = confirm("This will take a snapshot of your current database");
                 if( restore){
-                        await fetch('admin/stash-database');
-                        await location.reload();
+                    await fetch('admin/stash-database');
+                    await alert("We have sent this message to all participants. Please wait for the page to reload");
+        
                 }
             }
             
             async function restoreData(){
                 restore = confirm("This will restore the database from a previously taken snapshot");
                 if( restore){
-                        await fetch('admin/stash-pop-database');
-                        await location.reload();
-                }
+                    await fetch('admin/stash-pop-database');
+                     await alert("We have sent this message to all participants. Please wait for the page to reload");
+                 }
             } 
         </script>
         
@@ -1121,7 +1114,6 @@
             function formatThreadId(threadId){
                  return   threadId.substring(0,2) + "..." + threadId.substring(threadId.length - 4,threadId.length);
             }
-            
         </script>
         
     </body>

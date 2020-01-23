@@ -64,8 +64,8 @@ public final class AppData {
         AppData.hcsCore = new HCSCore(appId);
         DockerCompose dockerCompose = DockerComposeReader.parse();
 
-        if ( System.getProperty("local.server.port") != null ) { 
-            this.webPort = Integer.parseInt(System.getProperty("local.server.port"));
+        if ( System.getProperty("server.port") != null ) { 
+            this.webPort = Integer.parseInt(System.getProperty("server.port"));
             log.info("PORT=" + this.webPort + " found in command line parameter server.port");
         } else {
             this.webPort = dockerCompose.getPortForId(this.appId);
@@ -75,6 +75,11 @@ public final class AppData {
         this.publicKey = dockerCompose.getPublicKeyForId(this.appId);
         this.userName = dockerCompose.getNameForId(this.appId);
         this.topicIndex = 0;
+        
+        if (publicKey.equalsIgnoreCase("not found") || publicKey.equalsIgnoreCase("not found")){
+            log.error("The chosen APP_ID must be present in the docker-compose config file. Exiting ...");
+            System.exit(0);
+        }
 
         for (Map.Entry<String, DockerService> service : dockerCompose.getServices().entrySet()) {
             DockerService dockerService = service.getValue();

@@ -64,8 +64,8 @@ public final class AppData {
         AppData.hcsCore = new HCSCore(appId);
         DockerCompose dockerCompose = DockerComposeReader.parse();
 
-        if ( System.getProperty("local.server.port") != null ) { 
-            this.webPort = Integer.parseInt(System.getProperty("local.server.port"));
+        if ( System.getProperty("server.port") != null ) { 
+            this.webPort = Integer.parseInt(System.getProperty("server.port"));
             log.info("PORT=" + this.webPort + " found in command line parameter server.port");
         } else {
             this.webPort = dockerCompose.getPortForId(this.appId);

@@ -628,31 +628,26 @@ Whenever a participant performs and action in the UI, this results in a HCS tran
 
 #### Without docker (useful when debugging)
 
-To run the examples outside of docker and override `.env` variables and the database location/name run:
+To run the examples outside of docker and override `.env` variables run:
 
 ```
-mvnw exec:java -Dexec.mainClass="com.hedera.hcsapp.Application" -Dserver.port=8081 -Pfatjar -Dspring.datasource.url="jdbc:h2:./h2data/settlement-demo-8081" -DAPP_ID=1 -DOPERATOR_ID=0.0.1010 -DOPERATOR_KEY=302e0208...94329fb
+mvnw exec:java -Dexec.mainClass="com.hedera.hcsapp.Application"  -Pfatjar  -DAPP_ID=1 -DOPERATOR_ID=0.0.1010 -DOPERATOR_KEY=302e0208...94329fb
 ```
-where 
+If you want to run multiple clients from the command line simultaneously then make sure the server ports are not occupied.
+
+Note that the  `docker-compose.yaml` file is consulted even when running from then command line. If you specify the `-DAPP_ID`  argument then the port mapping is selected from the `yaml` file. 
+You can override the port by setting:
+
 
 ```-Dserver.port=8081```
 
-is the server port to use and
 
-```-Dspring.datasource.url="jdbc:h2:./h2data/settlement-demo-8081"```
 
-is the name of the database. If the database is not available then a new one will be generated.
+The demo provides helper functions to delete save and restore the local demo database however, these have undefined behavior when `hcs-sxc-plugins-persistence-in-memory` is chosen.
 
-If you want to run multiple clients from the command line simultaneously then you must
-
-- use the `hcs-sxc-java-plugins-persistence-in-memory` plugin 
-- make sure that the database locations and the server ports don't overlap. 
-
-Note that the demo provides helper functions to delete save and restore the local database however, these have no effect when `hcs-sxc-java-plugins-persistence-in-memory` is chosen.
 
 You can also specify these `-D` input values in your IDE so that you can run several instances of the application in the IDE, this can help when debugging. To enable the debugger use the `-Djpda.listen=maven` flag.
 
-Note: while this configuration runs outside the docker container, it still consults the `docker-compose.yaml` file in the `resources` folder to build the address book of all participants and therefore the `APP_ID` you set here with the `-D` flag must match the one in that file.  
 
 ## Contributing
 

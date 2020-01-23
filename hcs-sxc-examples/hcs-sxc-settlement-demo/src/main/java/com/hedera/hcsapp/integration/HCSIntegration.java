@@ -480,7 +480,7 @@ public class HCSIntegration {
             stompClient.setMessageConverter(new MappingJackson2MessageConverter());
             StompSessionHandler sessionHandler = new CustomStompSessionHandler(); 
             try {
-                this.stompSession = stompClient.connect("ws://localhost:"+ environment.getProperty("local.server.port")+"/notifications", sessionHandler).get();
+                this.stompSession = stompClient.connect("ws://localhost:"+ this.appData.getWebPort() +"/notifications", sessionHandler).get();
             } catch (InterruptedException | ExecutionException e) {
                 log.error(e);
             }

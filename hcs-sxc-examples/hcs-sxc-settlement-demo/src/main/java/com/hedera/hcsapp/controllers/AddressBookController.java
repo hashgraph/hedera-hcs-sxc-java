@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.dockercomposereader.DockerCompose;
 import com.hedera.hcsapp.dockercomposereader.DockerComposeReader;
-import com.hedera.hcsapp.dockercomposereader.Service;
+import com.hedera.hcsapp.dockercomposereader.DockerService;
 import com.hedera.hcsapp.entities.AddressBook;
 import com.hedera.hcsapp.repository.AddressBookRepository;
 import com.hedera.hcsapp.restclasses.AddressBookRest;
@@ -52,19 +52,19 @@ public class AddressBookController {
         
         DockerCompose dockerCompose = DockerComposeReader.parse();
         
-        for (Map.Entry<String, Service> dockerService : dockerCompose.getServices().entrySet()) {
-            Service service = dockerService.getValue();
+        for (Map.Entry<String, DockerService> dockerService : dockerCompose.getServices().entrySet()) {
+            DockerService service = dockerService.getValue();
             if ((null != service.getEnvironment()) && (service.getEnvironment().containsKey("APP_ID"))) {
                 
                 String name = service.getContainer_name();
                 String publicKey = service.getEnvironment().get("PUBKEY");
                 String roles = service.getEnvironment().get("ROLES");
                 String paymentAccountDetails = service.getEnvironment().get("PAYMENT_ACCOUNT_DETAILS");
-                String[] publicPort = service.getPorts().get(0).split(":");
                 String color = service.getEnvironment().get("COLOR");
-                int port = Integer.parseInt(publicPort[0]);
+                long port = Long.parseLong(service.getPort());
+                long appId = Long.parseLong(service.getEnvironment().get("APP_ID"));
                 
-                restResponse.add(new AddressBookRest(name, publicKey, roles, paymentAccountDetails, port, color));
+                restResponse.add(new AddressBookRest(name, publicKey, roles, paymentAccountDetails, port, color, appId));
             }
             
         }

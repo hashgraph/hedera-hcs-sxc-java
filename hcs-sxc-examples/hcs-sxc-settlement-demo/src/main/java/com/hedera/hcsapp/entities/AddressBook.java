@@ -17,4 +17,5 @@ public class AddressBook {
     private String paymentAccountDetails;
     private String color;
     private int appId;
+    private int port;
 }

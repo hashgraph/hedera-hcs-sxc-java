@@ -327,14 +327,17 @@ message SettleCompleteAckBPM {
 
 // Message to signal a deletion of all data from local persistent storage, this is purely for demonstration purposes.
 message AdminDeleteBPM {
+    bool delete = 1; // messages need at least one value to compile
 }
 
 // Message to signal stashing (creating copy) of database, this is purely for demonstration purposes.
 message AdminStashDatabaseBPM {
+    bool delete = 1; // messages need at least one value to compile
 }
 
 // Message to signal popping a stashed database and replacing the existing one, this is purely for demonstration purposes.
 message AdminStashPopDatabaseBPM {
+    bool delete = 1; // messages need at least one value to compile
 }
 
 

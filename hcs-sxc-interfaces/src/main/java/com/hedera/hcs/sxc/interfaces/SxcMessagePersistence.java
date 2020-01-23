@@ -2,11 +2,11 @@ package com.hedera.hcs.sxc.interfaces;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.consensus.ConsensusMessage;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessage;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessageChunk;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessageId;
+import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
+import com.hedera.hcs.sxc.proto.ApplicationMessage;
+import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
+import com.hedera.hcs.sxc.proto.ApplicationMessageId;
 
 import java.time.Instant;
 import java.util.List;
@@ -23,7 +23,7 @@ public interface SxcMessagePersistence {
     public void removeParts(ApplicationMessageId messageEnvelopeId);
     
     // mirror message persistence
-    void storeMirrorResponse(ConsensusMessage mirrorTopicMessageResponse);
+    void storeMirrorResponse(SxcConsensusMessage mirrorTopicMessageResponse);
     public SxcConsensusMessage getMirrorResponse(String timestamp);
     public Map<String, SxcConsensusMessage> getMirrorResponses(String fromTimestamp, String toTimestamp);
     public Map<String, SxcConsensusMessage> getMirrorResponses();

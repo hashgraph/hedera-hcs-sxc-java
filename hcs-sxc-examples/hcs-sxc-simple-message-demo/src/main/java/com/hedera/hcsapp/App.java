@@ -1,7 +1,5 @@
 package com.hedera.hcsapp;
 
-import com.hedera.hashgraph.sdk.HederaException;
-import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
@@ -68,7 +66,7 @@ public final class App {
                         .sendMessage(topicIndex, userInput.getBytes());
     
                     System.out.println("Message sent successfully.");
-                } catch (HederaNetworkException | IllegalArgumentException | HederaException e) {
+                } catch (Exception e) {
                     log.error(e);
                 }
             }

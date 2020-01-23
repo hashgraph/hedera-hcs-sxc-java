@@ -1,0 +1,10 @@
+/Users/gregscullard/dev/github.com/hashgraph/hcs-sxc/hcs-lib/src/test/java/com/hedera/hcslib/HCSLibTests.java
+/Users/gregscullard/dev/github.com/hashgraph/hcs-sxc/hcs-lib/src/test/java/com/hedera/hcslib/hashing/HashingTest.java
+/Users/gregscullard/dev/github.com/hashgraph/hcs-sxc/hcs-lib/src/test/java/com/hedera/hcslib/config/AbstractConfigTest.java
+/Users/gregscullard/dev/github.com/hashgraph/hcs-sxc/hcs-lib/src/test/java/com/hedera/hcslib/utils/ByteUtilTest.java
+/Users/gregscullard/dev/github.com/hashgraph/hcs-sxc/hcs-lib/src/test/java/com/hedera/hcslib/consensus/OutboundHCSMessageTest.java
+/Users/gregscullard/dev/github.com/hashgraph/hcs-sxc/hcs-lib/src/test/java/com/hedera/hcslib/cryptography/CryptographyTest.java
+/Users/gregscullard/dev/github.com/hashgraph/hcs-sxc/hcs-lib/src/test/java/com/hedera/hcslib/callback/OnHCSMessageCallbackTest.java
+/Users/gregscullard/dev/github.com/hashgraph/hcs-sxc/hcs-lib/src/test/java/com/hedera/hcslib/config/ConfigTest.java
+/Users/gregscullard/dev/github.com/hashgraph/hcs-sxc/hcs-lib/src/test/java/com/hedera/hcslib/config/AppNetTest.java
+/Users/gregscullard/dev/github.com/hashgraph/hcs-sxc/hcs-lib/src/test/java/com/hedera/hcslib/cryptography/KeyRotationTest.java

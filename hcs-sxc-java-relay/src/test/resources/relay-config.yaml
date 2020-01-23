@@ -1,0 +1,7 @@
+mirrorAddress: "35.222.103.151:6551"
+topics:
+  - topic: "0.0.10"
+  - topic: "0.0.11"
+queue:
+  initialContextFactory: "org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory"
+  tcpConnectionFactory: "tcp://hcs-sxc-java-queue:61616"

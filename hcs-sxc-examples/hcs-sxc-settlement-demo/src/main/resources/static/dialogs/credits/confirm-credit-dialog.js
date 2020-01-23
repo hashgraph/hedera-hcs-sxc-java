@@ -1,5 +1,6 @@
 function openConfirmCreditDialog(threadId,otherUserId) {
                 event.preventDefault();
+                styleTextFields();
                 confirmCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('confirm-credit-dialog'));
 
                 $confirmCreditDialog = document.getElementById('confirm-credit-dialog');

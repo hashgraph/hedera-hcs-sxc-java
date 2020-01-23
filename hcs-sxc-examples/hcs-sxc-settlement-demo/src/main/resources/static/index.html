@@ -12,6 +12,11 @@
         <link rel="stylesheet" href="styles/custom.css"/>
       
         <script>
+            /*
+             * Function to include external html files. 
+             * The UI implements a number of modal popups which
+             * are imported on page load.
+             */
             function includeHTML() {
                 var z, i, elmnt, file, xhttp;
                 z = document.getElementsByTagName("*");
@@ -21,26 +26,24 @@
                   if (file) {
                     xhttp = new XMLHttpRequest();
                     xhttp.onreadystatechange = function() {
-                        if (this.readyState == 4) {
-                            if (this.status == 200) {
+                        if (this.readyState === 4) {
+                            if (this.status === 200) {
                                 elmnt.innerHTML = this.responseText;
                             }
-                            if (this.status == 404) {
+                            if (this.status === 404) {
                                 elmnt.innerHTML = "Page not found.";
                             }
                             elmnt.removeAttribute("hh-include-html");
                                 includeHTML();
                             }
-                        }
+                        };
                         xhttp.open("GET", file, true);
                         xhttp.send();
-                        /* Exit the function: */
                         return;
                     }
                 }
             }
         </script> 
-        
     </head>
     <body>
         <header class="mdc-top-app-bar app-bar mdc-top-app-bar--fixed" id="app-bar">     
@@ -110,8 +113,7 @@
                                   mdc-typography--body1
                                   "
                                   style="padding: 8px;padding-left:24px; text-transform: capitalize"
-                                  >Alice</span>
-                            
+                                  >{{Alice}}</span>
                         </section>
                     </div>           
                 </header>
@@ -129,26 +131,13 @@
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">verified_user</i>
                         <span class="mdc-list-item__text">Settlements</span>
                     </a>
-<!--                    <a class="mdc-list-item" href="#addresses" aria-current="page">
-                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">group</i>
-                        <span class="mdc-list-item__text">Addresses</span>
-                    </a>-->
-                    
-                    <!--<a class="audit mdc-list-item" href="#audit" aria-current="page">
-                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">attach_money</i>
-                        <span class="mdc-list-item__text">Payments</span>
-                    </a>
-                    -->
                     <a class="audit mdc-list-item" href="#audit" aria-current="page">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">remove_red_eye</i>
                         <span class="mdc-list-item__text">Audit</span>
                     </a>
                     
                     <div role="separator" class="mdc-list-divider"></div>
-<!--                    <a class="mdc-list-item" href="#" aria-current="page">
-                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">account_box</i>
-                        <span class="mdc-list-item__text">Account</span>
-                    </a>-->
+
                 </div>
             </div>
         </aside>
@@ -207,22 +196,13 @@
                                     <template id="overview-table-body-template">
                                         <tr class="mdc-data-table__row">
                                             <td  class="mdc-data-table__cell">
-                                                <span class="mdc-typography--headline6" 
-                                                    id="user-avatar"
-                                                    style="width:36px; height:36px;
-                                                    display:block;
-                                                    background-repeat: no-repeat;
-                                                    background-size: cover;
-                                                    background-position: center; 
-                                                    border-radius: 90px;
-                                                    color:white; background-color: #e4e7e8;
-                                                    "></span>
+                                                <span class="hh-avatar mdc-typography--headline6" 
+                                                      style="display: block;"
+                                                      id="user-avatar"></span>
                                             </td>
                                             <td id="user"       class="mdc-data-table__cell">user</td>
                                             <td id="roles"    class="mdc-data-table__cell">roles</td>
                                             <td id="link"      class="mdc-data-table__cell">link</td>
-<!--                                            <td                class="mdc-data-table__cell" style="text-align: right">  <button id=""  class="mdc-icon-button material-icons " title="More options" data-mdc-ripple-is-unbounded="true">more_vert</button>
-                                            </td>-->
                                         </tr>
                                     </template>
                                 </tbody>
@@ -248,20 +228,8 @@
                             <summary>
                                 <div class="message-container" style="margin-left:16px">
                                     <div style="display: flex; align-items: center">
-                                        
-                                        
-                                        <span class="mdc-typography--headline6" 
-                                              id="credits-and-debits-user-avatar"
-                                              style="width:36px; height:36px;
-                                              background-repeat: no-repeat;
-                                              background-size: cover;
-                                              background-position: center; 
-                                              border-radius: 90px;
-                                             
-                                              color:white; background-color: #e4e7e8;
-                                              ">
-                                      
-                                        </span>
+                                        <span class="hh-avatar mdc-typography--headline6" 
+                                              id="credits-and-debits-user-avatar"></span>
                                         
                                         <span 
                                             id="credits-and-debits-user"
@@ -369,18 +337,8 @@
                             <summary>
                                 <div class="message-container" style="margin-left:16px; margin-right: 16px;">
                                     <div style="display: flex; align-items: center">
-                                        <span class="mdc-typography--headline6" 
-                                              id="settlements-user-avatar"
-                                              style="width:36px; height:36px;
-                                              background-repeat: no-repeat;
-                                              background-size: cover;
-                                              background-position: center; 
-                                              border-radius: 90px;
-                                             
-                                              color:white; background-color: #e4e7e8;
-                                              ">
-                                      
-                                        </span>
+                                        <span class="hh-avatar mdc-typography--headline6" 
+                                              id="settlements-user-avatar"></span>
                                         
                                         <span 
                                             id="settlements-user"
@@ -542,91 +500,13 @@
         <div hh-include-html="dialogs/settlements/settlement-completed-dialog.html"></div> 
         <script src="dialogs/settlements/settlement-completed-dialog.js"></script>
         
-       
-        
-        <div id="pay-sent-dialog" 
-           
-            class="mdc-dialog"
-             role="alertdialog"
-             aria-modal="true"
-             aria-labelledby="my-dialog-title"
-             aria-describedby="my-dialog-content">
-            <div class="mdc-dialog__container">
-                <div class="mdc-dialog__surface" >
-                    <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
-                    <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
-                    -->Payment Sent<!--
-                    --></h2>
-                    <div class="mdc-dialog__content" id="my-dialog-content" >
-                       <br/>
-                        
-                        <div style="display:fex; flex-direction: column">
-                            
-                            <form id="pay-sent-dialog-form">
-                                
-                                
-                                <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text"
-                                           id="thread-id"
-                                           value="{threadId}"
-                                           disabled
-                                           id="my-text-field" class="mdc-text-field__input">
-                                    <label class="mdc-floating-label" for="pay-payer-details">
-                                        threadId
-                                    </label>
-                                </div>
-                                <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text"
-                                           id="pay-sent-reference"
-                                           value="{paymentReference}"
-                                         
-                                           id="my-text-field" class="mdc-text-field__input">
-                                    <label class="mdc-floating-label" for="pay-sent-reference">
-                                        Reference
-                                    </label>
-                                </div>
-                               
-                                <div class="mdc-text-field mdc-text-field--full-width">
-                                    <input type="text"
-                                           id="pay-sent-additional-notes"
-                                           required minlength=4
-                                           id="my-text-field" class="mdc-text-field__input">
-                                    <label class="mdc-floating-label" for="pay-sent-additional-notes">
-                                        Additional Notes
-                                    </label>
-                                </div>
-                                
-                                <div class="mdc-text-field-helper-line">
-                                    <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">
-                                        Field is required and must be at least 4 characters long
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <footer class="mdc-dialog__actions" style="padding:24px">
-                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
-                            <span class="mdc-button__label">Cancel</span>
-                        </button>
-                        <button id="pay-sent-send" type="button" 
-                                class="mdc-button mdc-button--raised  mdc-dialog__button" 
-                        >
-                            <span class="mdc-button__label">Send Now</span>
-                        </button>
-                    </footer>
-                </div>
-
-            </div>
-        </div><div class="mdc-dialog-scrim"></div>
-        
-        
+        <!-- pay sent was here -->
       
         <div id="snackbar" class="mdc-snackbar">
                 <div class="mdc-snackbar__surface">
                     <div class="mdc-snackbar__label"
                         role="status"
                         aria-live="polite">
-                       
                     </div>
                     <div class="mdc-snackbar__actions">
                         <button type="button" class="mdc-button mdc-snackbar__action">Ok</button>
@@ -647,7 +527,7 @@
             allAddresses = [];
             buyerSellersAddress= [];
             paymentChannels = [];
-            notificationList = [];
+            notificationList = []; //TODO: holds all incoming notifications - replace with session storage
             document.addEventListener("DOMContentLoaded", init);
             
             async function init ()  {
@@ -666,16 +546,13 @@
                 document.getElementById("this-user").innerHTML=whoami.name +"<span style='color:#aaa; font-size:12px;'> ("+whoami.roles+")</span>";
                 document.getElementById("this-user-avatar").style.backgroundImage= "url(images/"+whoami.appId+".png)";
                 if(thisRoles.includes("BUYER")) document.querySelector("#lhs-menu .credits-and-debits").style.display='flex';
-                
                 responsePaymentChannel = await fetch('addressbook/paychannel/');
                 paymentChannels  = await responsePaymentChannel.json(); 
-                
-                
                 responseAddressBookBs = await fetch('addressbook/buyerseller/');
                 addressBookBs  = await responseAddressBookBs.json(); 
                 buyerSellersAddress = addressBookBs;
                 
-                // redirect  subviews on browserRefresh - only one atm
+                // redirect  subviews on browser refresh - only one atm
                 switch(location.hash){
                     case "#audit-detail": 
                         location.hash="audit";
@@ -740,7 +617,18 @@
             
        </script>
       
-       <script>
+
+        <script> 
+                                        
+            /*
+             * Routines to render the main sections, one function for each 
+             * 
+             * {@link renderOverviewTab()} 
+             * {@link renderCreditsPanel()}  
+             * {@link renderSettlementsPanel()
+             * {@link renderAuditIndexTable() and it's sub-panel {@link openAuditThread()}
+              */
+            
             async function renderOverviewTab(){
                 var panelTemplate = document.getElementById("overview-template");
                 var clonedTableTemplate = panelTemplate.content.cloneNode(true);
@@ -762,103 +650,103 @@
                     clonedRow.getElementById('user-avatar').style.backgroundImage = "url(images/" + allAddresses[z].appId + ".png)";
                     tableBody.appendChild(clonedRow);
                 }     
-                
                 clonedTableTemplate.getElementById("location").onclick = function(){alert(url);};
                 document.getElementById("main-panel-holder").appendChild(clonedTableTemplate);
                 
             }
-       </script>
-       <script>
-            async function renderAuditIndexTable(){
-                var panelTemplate = document.getElementById("audit-table-template");
-                var clonedTableTemplate = panelTemplate.content.cloneNode(true);
-                
-                let responseThreadIds = await fetch('audit/');
-                let threadIdsJson = await  responseThreadIds.json();
-                var tableBodyTemplate = clonedTableTemplate.getElementById("audit-table-body-template");
-                
-                var tableBody = clonedTableTemplate.getElementById("audit-table-body");
-                threadIdsJson.threadIds.forEach(
-                    t=>{
-                        clonedRow = tableBodyTemplate.content.cloneNode(true);
-                        tr = clonedRow.querySelector("tr");
-                        tr.cells.threadId.textContent=formatThreadId(t.threadId);
-                        tr.cells.context.textContent=t.context;
-                        tr.cells.status.textContent=t.status;
-                        tr.cells.topicId.textContent=t.topicId;
-                        tr.cells.createdDate.textContent=t.createdDate;
-                        tr.cells.createdTime.textContent=t.createdTime;
-                        tr.querySelector("#audit-table-row-expand").onclick=function(){
-                            openAuditThread(t.threadId);
-                        };
-                        tableBody.appendChild(tr);
-                    }
-                );
-                document.getElementById("main-panel-holder").appendChild(clonedTableTemplate);
-            }
             
-            async function openAuditThread(threadId){
-                
-                event.preventDefault();
-                
-                main = document.getElementById('main-panel-holder');
-                main.innerHTML="";
-                document.getElementById('header-title').innerHTML = "<a href='#audit' class='mdc-button'><i style='font-size:26px;' class='material-icons'>arrow_back</i></a> <span style='position:relative;top:2px'>Audit Thread ID: " + threadId + " Details</span>";
-                location.hash='audit-detail';
-                //$auditThreadDialog =  document.getElementById('audit-thread-dialog');
-                
-                //auditThreadDialog  = new mdc.dialog.MDCDialog($auditThreadDialog);
-                //$auditThreadDialog.querySelector("#thread-id").innerHTML = threadId;
-                
-                let response = await fetch('audit/'+threadId);
-                let responseJSON = await  response.json();
-                //$auditThreadDialog.querySelector("#audit-thread-panel-holder").innerHTML="";
-                let auditApplicationMessages = responseJSON.auditApplicationMessages;
-                for (z=0; z < auditApplicationMessages.length ; z++) {
-                    let response = await fetch('audit/'+threadId+"/"+auditApplicationMessages[z].applicationMessageId);
-                    let responseJSON = await  response.json();
-                    responseJSON = responseJSON.auditHCSMessages;
-                    clonedTemplate = document.getElementById("audit-thread-template").content.cloneNode(true);
-                    clonedTemplate.querySelector("#audit-thread-message-id").innerHTML=auditApplicationMessages[z].applicationMessageId;
-                    clonedTemplate.querySelector("#audit-thread-message-text").innerHTML=syntaxHighlight(auditApplicationMessages[z].message);//.substring(0,180)+"...";
-                    clonedTemplate.querySelector("#audit-thread-message-parts-json").innerHTML=syntaxHighlight(responseJSON);
-                    main.appendChild(clonedTemplate);
-                }
-        
-                //auditThreadDialog.open();
-                return false;
-            }
-            
-            function syntaxHighlight(json) {
-                
-                if (typeof json !== 'string') {
-                     json = JSON.stringify(json, undefined, 2);
-                }
-               
-                json = json.replace(/([^ -~-\n]+)/g, "Ħ");
-                json = json.replace(/\\n/g, '\n\t\t');
-                json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-                    var cls = 'number';
-                    if (/^"/.test(match)) {
-                        if (/:$/.test(match)) {
-                            cls = 'key';
-                        } else {
-                            cls = 'string';
-                        }
-                    } else if (/true|false/.test(match)) {
-                        cls = 'boolean';
-                    } else if (/null/.test(match)) {
-                        cls = 'null';
-                    }
-                    return '<span class="' + cls + '">' + match + '</span>';
+            async function  renderCreditsPanel(userName){
+                var panelTemplate = document.getElementById("credits-and-debits-panel");
+                var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
+                clonedPanelTemplate.querySelector(".panel").id=userName;    
+                clonedPanelTemplate.getElementById("credits-and-debits-user").innerHTML = userName ;
+                clonedPanelTemplate.getElementById("credits-and-debits-user-avatar").style.backgroundImage =  "url(images/"+addressBookBs.find(e => e.name === userName).appId+".png)";
+                clonedPanelTemplate.getElementById("credits-and-debits-seen").innerHTML = (notificationList.filter(el => (el.payer === userName || el.recipient === userName) && el.context === "credits" ).length > 0 ? 'updated': '');
+                clonedPanelTemplate.querySelector("details").addEventListener("toggle", e => {
+                    o = notificationList.find(notification => (notification.payer === userName || notification.recipient === userName  ) && notification.context === "credits");
+                    notificationList = notificationList.filter(notification => notification !== o);
+                    document.querySelector("#"+userName+" #credits-and-debits-seen").innerHTML ='';
                 });
-            }
+                
+                let userNameP = userName; {
+                    clonedPanelTemplate.getElementById("new-credit-button").addEventListener("click",
+                        function(){
+                            openNewCreditDialog(userNameP);
+                        }
+                    );
+                    clonedPanelTemplate.getElementById("settle-now-button").addEventListener("click",
+                        function(){
+                           openSettleNowDialog(userNameP);
+                        }
+                    );
+                }
+                var tableBody = clonedPanelTemplate.getElementById("credit-table-body");
+                var tableBodyTemplate = clonedPanelTemplate.getElementById("credit-table-body-template");
+                var responseCredits = await fetch(`credits/${userName}`);
+                var i_UserCredits = await responseCredits.json();
+                for(z=0; z < i_UserCredits.length ; z++){
+                    clonedRow = tableBodyTemplate.content.cloneNode(true);
+                    if(i_UserCredits[z].status === 'CREDIT_AGREED' ){
+                        clonedPanelTemplate.getElementById("settle-now-button").removeAttribute("disabled");
+                        clonedRow.getElementById("settle-check").style.visibility="visible";
+                        clonedRow.getElementById("checkbox-1").checked="true";
+                    }
+                    threadId = i_UserCredits[z].threadId;
+                    clonedRow.getElementById("threadId").innerHTML =formatThreadId(threadId);
+                    clonedRow.getElementById("threadId").title = threadId;
+                    clonedRow.getElementById("threadId").setAttribute("data-thread-id", threadId );
+                    clonedRow.getElementById("recipient").innerHTML = i_UserCredits[z].recipientName;
+                    clonedRow.getElementById("payer").innerHTML = i_UserCredits[z].payerName;
+                    clonedRow.getElementById("reference").innerHTML = i_UserCredits[z].reference;
+                    clonedRow.getElementById("amount").innerHTML = i_UserCredits[z].currency + ' '+ i_UserCredits[z].amount;
+                    clonedRow.getElementById("amount").setAttribute("data-amount", i_UserCredits[z].amount );
+                    clonedRow.getElementById("amount").setAttribute("data-currency", i_UserCredits[z].currency );
+                    clonedRow.getElementById("date-time").innerHTML = i_UserCredits[z].createdDateTime;
+                    clonedRow.getElementById("status").innerHTML =  i_UserCredits[z].displayStatus;
+                    if(i_UserCredits[z].payerName === userName &&  i_UserCredits[z].status === 'CREDIT_PROPOSED'){
+                      let threadId = i_UserCredits[z].threadId;
+                      newButton = document.createElement("button");
+                      newButton.innerHTML = "Accept";
+                      newButton.classList.add("mdc-button");
+                      newButton.classList.add("mdc-button--outlined");
+                      newButton.addEventListener("click", function(){openConfirmCreditDialog(threadId,userName);});
+                      clonedRow.getElementById("action").appendChild(newButton);
+                    } 
+                    clonedRow.getElementById("notes").innerHTML = i_UserCredits[z].additionalNotes;
+                    tableBody.appendChild(clonedRow);
+                }     
+                if (document.getElementById(userName) === null) { // check if panel exists
+                    document.getElementById("main-panel-holder").appendChild(clonedPanelTemplate);
+                } else {
+                    existingPanel = document.getElementById(userName);
+                    clonedPanelTemplate.querySelector("details").setAttribute("open","true");
+                    existingPanel.replaceWith(clonedPanelTemplate);
+                }
+                
+                var thisUserPays = 0;
+                var otherUserPays = 0;
+                var threadIds=[];    
+                document.querySelectorAll("#"+userName+" .mdc-data-table__row").forEach(
+                    r=>{
+                         if(r.cells.settlebox.querySelector("input").checked){
+                             threadIds.push(r.cells.threadId.title);
+                             rowAmount = 1*r.cells.amount.getAttribute("data-amount");
+                             if (r.cells.payer.textContent!==userName){
+                                thisUserPays += rowAmount ;
+                            } else {
+                                otherUserPays += rowAmount ; 
+                            }
+                         }
+                     }
+                );
+        
+                if(thisUserPays - otherUserPays) {
+                    document.querySelector("#"+userName+" #settle-total").innerHTML = 
+                        ("Total (USD): " + thisUserPays + " - " + otherUserPays + " = " + (thisUserPays - otherUserPays) );
+                }
+            } // render Credits panel
             
-        </script>
-        
-        
-        <script>
+            
             async function  renderSettlementsPanel(userName){
                 //if (document.getElementById(userName) === null) {
                 var panelTemplate = document.getElementById("settlements-panel");
@@ -886,95 +774,50 @@
                     i_Settlements = responseSettlementsL[z];
                     clonedRow = tableBodyTemplate.content.cloneNode(true);
                     clonedRow.getElementById("row-role").innerHTML = "<b>Settlement "+((z*1)+1)+"</b>"; 
-                    
-                    threadId = i_Settlements.threadId;
-                    clonedRow.getElementById("threadId").innerHTML =formatThreadId(threadId);
-                    clonedRow.getElementById("threadId").title = threadId;
-                    clonedRow.getElementById("threadId").setAttribute("data-thread-id", threadId );
+                    let threadId = i_Settlements.threadId;
+                        clonedRow.getElementById("threadId").innerHTML =formatThreadId(threadId);
+                        clonedRow.getElementById("threadId").title = threadId;
+                        clonedRow.getElementById("threadId").setAttribute("data-thread-id", threadId );
+                        clonedRow.getElementById("recipient").innerHTML = i_Settlements.recipientName;
+                        clonedRow.getElementById("payer").innerHTML = i_Settlements.payerName;
+                        clonedRow.getElementById("reference").innerHTML = "";
+                        clonedRow.getElementById("amount-net").innerHTML = "Net " + i_Settlements.netValue;
+                        clonedRow.getElementById("date-time").innerHTML = i_Settlements.createdDateTime;
+                        clonedRow.getElementById("status").innerHTML =  i_Settlements.displayStatus + (i_Settlements.paymentChannelName===null?"":" (with "+ i_Settlements.paymentChannelName +")");
+                        clonedRow.getElementById("notes").innerHTML = i_Settlements.additionalNotes;
+                        let newButton = document.createElement("button");
+                            newButton.classList.add("mdc-button");
+                            newButton.classList.add("mdc-button--outlined");
+                            if(i_Settlements.payerName === userName && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_PROPOSED'){ //SETTLEMENT_PROPOSED
+                                newButton.innerHTML = "Accept";
+                                newButton.addEventListener("click", function(){openConfirmSettlementDialog(threadId,userName);});
+                            } else if (i_Settlements.payerName === thisuserName  && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_AGREED'){
+                                newButton.innerHTML = "Propose Pay Channel";
+                                newButton.addEventListener("click", function(){openSelectPaychannelDialog(threadId,userName);});
+                            } else if (i_Settlements.payerName === userName && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_PAY_CHANNEL_PROPOSED'  ){
+                                newButton.innerHTML = "Accept";
+                                let cname = i_Settlements.paymentChannelName;
+                                newButton.addEventListener("click", function(){openAcceptPaychannelDialog(threadId,userName,cname );});
+                            } else if (i_Settlements.payerName === thisuserName  && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_PAY_CHANNEL_AGREED'){
+                                newButton.innerHTML = "Init Payment";
+                                newButton.addEventListener("click", function(){openInitPayDialog(threadId,userName,i_Settlements.paymentChannelName );});
+                            } else if ( hasRole(thisuserName,'PAYCHANNEL') && i_Settlements.status === 'SETTLE_PAY_PROPOSED'){
+                                newButton.innerHTML = "Accept";
+                                newButton.addEventListener("click", function(){openAcceptPaymentDialog(threadId,userName );});
+                            }  else if (i_Settlements.payerName === thisuserName  &&  hasRole(thisuserName,'BUYER') && i_Settlements.status === 'SETTLE_PAY_ACK'){
+                                newButton.innerHTML = "Request Receipt";
+                                newButton.addEventListener("click", function(){openSettlementPaymentMadeDialog(threadId,userName,i_Settlements.paymentChannelName );});
+                            } else if (i_Settlements.payerName === userName  && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_RCPT_REQUESTED'){
+                                newButton.innerHTML = "Confirm Receipt";
+                                newButton.addEventListener("click", function(){openAcceptSettlePaymentMade(threadId,userName );});
+                             } else if (i_Settlements.payerName === thisuserName  && hasRole(thisuserName,'BUYER') && i_Settlements.status === 'SETTLE_RCPT_CONFIRMED'){
+                                newButton.innerHTML = "Settlement Completed";
+                                newButton.addEventListener("click", function(){openSettlementCompletedDialog(threadId,userName,i_Settlements.paymentChannelName);});
+                            }  
 
-                    clonedRow.getElementById("recipient").innerHTML = i_Settlements.recipientName;
-                    clonedRow.getElementById("payer").innerHTML = i_Settlements.payerName;
-                    clonedRow.getElementById("reference").innerHTML = "";
-                    
-                    clonedRow.getElementById("amount-net").innerHTML = "Net " + i_Settlements.netValue;
-                
-                    clonedRow.getElementById("date-time").innerHTML = i_Settlements.createdDateTime;
-                    clonedRow.getElementById("status").innerHTML =  i_Settlements.displayStatus + (i_Settlements.paymentChannelName===null?"":" (with "+ i_Settlements.paymentChannelName +")");
-                    //clonedRow.getElementById("status").style.textTransform = "capitalize";
-                    
-                    
-                    
-                    if(i_Settlements.payerName === userName && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_PROPOSED'){ //SETTLEMENT_PROPOSED
-                        let threadId = i_Settlements.threadId;
-                        newButton = document.createElement("button");
-                        newButton.innerHTML = "Accept";
-                        newButton.classList.add("mdc-button");
-                        newButton.classList.add("mdc-button--outlined");
-                        newButton.addEventListener("click", function(){openConfirmSettlementDialog(threadId,userName);});
-                        clonedRow.getElementById("action").appendChild(newButton);
-                    } else if (i_Settlements.payerName === thisuserName  && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_AGREED'){
-                        let threadId = i_Settlements.threadId;
-                        newButton = document.createElement("button");
-                        newButton.innerHTML = "Propose Pay Channel";
-                        newButton.classList.add("mdc-button");
-                        newButton.classList.add("mdc-button--outlined");
-                        newButton.addEventListener("click", function(){openSelectPaychannelDialog(threadId,userName);});
-                        clonedRow.getElementById("action").appendChild(newButton);
-                    } else if (i_Settlements.payerName === userName && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_PAY_CHANNEL_PROPOSED'  ){
-                        let threadId = i_Settlements.threadId;
-                        newButton = document.createElement("button");
-                        newButton.innerHTML = "Accept";
-                        newButton.classList.add("mdc-button");
-                        newButton.classList.add("mdc-button--outlined");
-                        let cname = i_Settlements.paymentChannelName;
-                        newButton.addEventListener("click", function(){openAcceptPaychannelDialog(threadId,userName,cname );});
-                        clonedRow.getElementById("action").appendChild(newButton);
-                    } else if (i_Settlements.payerName === thisuserName  && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_PAY_CHANNEL_AGREED'){
-                        let threadId = i_Settlements.threadId;
-                        newButton = document.createElement("button");
-                        newButton.innerHTML = "Init Payment";
-                        newButton.classList.add("mdc-button");
-                        newButton.classList.add("mdc-button--outlined");
-                        newButton.addEventListener("click", function(){openInitPayDialog(threadId,userName,i_Settlements.paymentChannelName );});
-                        clonedRow.getElementById("action").appendChild(newButton);
-                    } else if ( hasRole(thisuserName,'PAYCHANNEL') && i_Settlements.status === 'SETTLE_PAY_PROPOSED'){
-                        // Diana Agree Payment
-                        let threadId = i_Settlements.threadId;
-                        newButton = document.createElement("button");
-                        newButton.innerHTML = "Accept";
-                        newButton.classList.add("mdc-button");
-                        newButton.classList.add("mdc-button--outlined");
-                        newButton.addEventListener("click", function(){openAcceptPaymentDialog(threadId,userName );});
-                        clonedRow.getElementById("action").appendChild(newButton);
-                    }  else if (i_Settlements.payerName === thisuserName  &&  hasRole(thisuserName,'BUYER') && i_Settlements.status === 'SETTLE_PAY_ACK'){
-                        //Alice confirm payment
-                        let threadId = i_Settlements.threadId;
-                        newButton = document.createElement("button");
-                        newButton.innerHTML = "Request Receipt";
-                        newButton.classList.add("mdc-button");
-                        newButton.classList.add("mdc-button--outlined");
-                        newButton.addEventListener("click", function(){openSettlementPaymentMadeDialog(threadId,userName,i_Settlements.paymentChannelName );});
-                        clonedRow.getElementById("action").appendChild(newButton);
-                    } else if (i_Settlements.payerName === userName  && hasRole(thisuserName,'BUYER') &&  i_Settlements.status === 'SETTLE_RCPT_REQUESTED'){
-                        let threadId = i_Settlements.threadId;
-                        newButton = document.createElement("button");
-                        newButton.innerHTML = "Confirm Receipt";
-                        newButton.classList.add("mdc-button");
-                        newButton.classList.add("mdc-button--outlined");
-                        newButton.addEventListener("click", function(){openAcceptSettlePaymentMade(threadId,userName );});
-                        clonedRow.getElementById("action").appendChild(newButton);
-                     } else if (i_Settlements.payerName === thisuserName  && hasRole(thisuserName,'BUYER') && i_Settlements.status === 'SETTLE_RCPT_CONFIRMED'){
-                        let threadId = i_Settlements.threadId;
-                        newButton = document.createElement("button");
-                        newButton.innerHTML = "Settlement Completed";
-                        newButton.classList.add("mdc-button");
-                        newButton.classList.add("mdc-button--outlined");
-                        newButton.addEventListener("click", function(){openSettlementCompletedDialog(threadId,userName,i_Settlements.paymentChannelName);});
-                        clonedRow.getElementById("action").appendChild(newButton);
-                     }  
-                  
-                    clonedRow.getElementById("notes").innerHTML = i_Settlements.additionalNotes;
-                    tableBody.appendChild(clonedRow);
+                            if(newButton.innerHTML!=="") clonedRow.getElementById("action").appendChild(newButton);
+                        tableBody.appendChild(clonedRow);
+                        
                     for(c in i_Settlements.credits){
                         credit = i_Settlements.credits[c];
                         clonedCreditRow = tableBodyTemplate.content.cloneNode(true);
@@ -982,23 +825,19 @@
                         clonedCreditRow.querySelector("tr").style.border=0;
                         clonedCreditRow.getElementById("row-role").innerHTML = "Credit " + (c*1+1); 
                         
-                        threadId = credit.threadId;
-                        clonedCreditRow.getElementById("threadId").innerHTML =formatThreadId(threadId);
-                        clonedCreditRow.getElementById("threadId").title = threadId;
-                        clonedCreditRow.getElementById("threadId").setAttribute("data-thread-id", threadId );
-
-                        clonedCreditRow.getElementById("recipient").innerHTML = credit.recipientName;
-                        clonedCreditRow.getElementById("payer").innerHTML = credit.payerName;
-                        clonedCreditRow.getElementById("reference").innerHTML = credit.reference;
-                        clonedCreditRow.getElementById("amount-net").innerHTML = credit.amount;
-                        clonedCreditRow.getElementById("notes").innerHTML = credit.additionalNotes;
-                        
-                        clonedCreditRow.getElementById("date-time").innerHTML = credit.createdDateTime;
-                        clonedCreditRow.getElementById("status").innerHTML =  credit.displayStatus;
-                    
-                        tableBody.appendChild(clonedCreditRow);
+                        let threadId = credit.threadId;
+                            clonedCreditRow.getElementById("threadId").innerHTML =formatThreadId(threadId);
+                            clonedCreditRow.getElementById("threadId").title = threadId;
+                            clonedCreditRow.getElementById("threadId").setAttribute("data-thread-id", threadId );
+                            clonedCreditRow.getElementById("recipient").innerHTML = credit.recipientName;
+                            clonedCreditRow.getElementById("payer").innerHTML = credit.payerName;
+                            clonedCreditRow.getElementById("reference").innerHTML = credit.reference;
+                            clonedCreditRow.getElementById("amount-net").innerHTML = credit.amount;
+                            clonedCreditRow.getElementById("notes").innerHTML = credit.additionalNotes;
+                            clonedCreditRow.getElementById("date-time").innerHTML = credit.createdDateTime;
+                            clonedCreditRow.getElementById("status").innerHTML =  credit.displayStatus;
+                            tableBody.appendChild(clonedCreditRow);
                     }
-                    
                 }     
                 if (document.getElementById(userName) === null) { // check if panel exists
                     document.getElementById("main-panel-holder").appendChild(clonedPanelTemplate);
@@ -1007,208 +846,75 @@
                     clonedPanelTemplate.querySelector("details").setAttribute("open","true");
                     existingPanel.replaceWith(clonedPanelTemplate);
                 }
-
             }
-        </script>
-        
-        
-        
-        <script>
-            async function  renderCreditsPanel(userName){
-                var panelTemplate = document.getElementById("credits-and-debits-panel");
-                var clonedPanelTemplate = panelTemplate.content.cloneNode(true);
-                clonedPanelTemplate.querySelector(".panel").id=userName;    
-                clonedPanelTemplate.getElementById("credits-and-debits-user").innerHTML = userName ;
-                clonedPanelTemplate.getElementById("credits-and-debits-user-avatar").style.backgroundImage =  "url(images/"+addressBookBs.find(e => e.name === userName).appId+".png)";
-                clonedPanelTemplate.getElementById("credits-and-debits-seen").innerHTML = (notificationList.filter(el => (el.payer === userName || el.recipient === userName) && el.context === "credits" ).length > 0 ? 'updated': '');
-               
-                clonedPanelTemplate.querySelector("details").addEventListener("toggle", e => {
-                    o = notificationList.find(notification => (notification.payer === userName || notification.recipient === userName  ) && notification.context === "credits");
-                    notificationList = notificationList.filter(notification => notification !== o);
-                    document.querySelector("#"+userName+" #credits-and-debits-seen").innerHTML ='';
-                });
-                
-                let userNameP = userName; {
-                    clonedPanelTemplate.getElementById("new-credit-button").addEventListener("click",
-                        function(){
-                            openNewCreditDialog(userNameP);
-                        }
-                    );
-                    clonedPanelTemplate.getElementById("settle-now-button").addEventListener("click",
-                        function(){
-                           openSettleNowDialog(userNameP);
-                        }
-                    );
-                }
-                    
-               
-
-                var tableBody = clonedPanelTemplate.getElementById("credit-table-body");
-                var tableBodyTemplate = clonedPanelTemplate.getElementById("credit-table-body-template");
-
-                var responseCredits = await fetch(`credits/${userName}`);
-                var i_UserCredits = await responseCredits.json();
-                
-                
-                
-                
-                for(z=0; z < i_UserCredits.length ; z++){
-                    clonedRow = tableBodyTemplate.content.cloneNode(true);
-                    if(i_UserCredits[z].status === 'CREDIT_AGREED' ){
-                        clonedPanelTemplate.getElementById("settle-now-button").removeAttribute("disabled");
-                        clonedRow.getElementById("settle-check").style.visibility="visible";
-                        clonedRow.getElementById("checkbox-1").checked="true";
+            
+            async function renderAuditIndexTable(){
+                var panelTemplate = document.getElementById("audit-table-template");
+                var clonedTableTemplate = panelTemplate.content.cloneNode(true);
+                let responseThreadIds = await fetch('audit/');
+                let threadIdsJson = await  responseThreadIds.json();
+                var tableBodyTemplate = clonedTableTemplate.getElementById("audit-table-body-template");
+                var tableBody = clonedTableTemplate.getElementById("audit-table-body");
+                threadIdsJson.threadIds.forEach(
+                    t=>{
+                        clonedRow = tableBodyTemplate.content.cloneNode(true);
+                        tr = clonedRow.querySelector("tr");
+                        tr.cells.threadId.textContent=formatThreadId(t.threadId);
+                        tr.cells.context.textContent=t.context;
+                        tr.cells.status.textContent=t.status;
+                        tr.cells.topicId.textContent=t.topicId;
+                        tr.cells.createdDate.textContent=t.createdDate;
+                        tr.cells.createdTime.textContent=t.createdTime;
+                        tr.querySelector("#audit-table-row-expand").onclick=function(){
+                            openAuditThread(t.threadId);
+                        };
+                        tableBody.appendChild(tr);
                     }
-                    threadId = i_UserCredits[z].threadId;
-                    clonedRow.getElementById("threadId").innerHTML =formatThreadId(threadId);
-                    clonedRow.getElementById("threadId").title = threadId;
-                    clonedRow.getElementById("threadId").setAttribute("data-thread-id", threadId );
-
-                    clonedRow.getElementById("recipient").innerHTML = i_UserCredits[z].recipientName;
-                    clonedRow.getElementById("payer").innerHTML = i_UserCredits[z].payerName;
-                    clonedRow.getElementById("reference").innerHTML = i_UserCredits[z].reference;
-                    clonedRow.getElementById("amount").innerHTML = i_UserCredits[z].currency + ' '+ i_UserCredits[z].amount;
-                    clonedRow.getElementById("amount").setAttribute("data-amount", i_UserCredits[z].amount );
-                    clonedRow.getElementById("amount").setAttribute("data-currency", i_UserCredits[z].currency );
-
-
-                    clonedRow.getElementById("date-time").innerHTML = i_UserCredits[z].createdDateTime;
-                    clonedRow.getElementById("status").innerHTML =  i_UserCredits[z].displayStatus;
-                    //clonedRow.getElementById("status").innerHTML =  i_UserCredits[z].status.toLowerCase().replace(/_/g," ");
-                    //clonedRow.getElementById("status").style.textTransform = "capitalize";
-
-                    if(i_UserCredits[z].payerName === userName &&  i_UserCredits[z].status === 'CREDIT_PROPOSED'){
-                      let threadId = i_UserCredits[z].threadId;
-                      newButton = document.createElement("button");
-                      newButton.innerHTML = "Accept";
-                      newButton.classList.add("mdc-button");
-                      newButton.classList.add("mdc-button--outlined");
-                      newButton.addEventListener("click", function(){openConfirmCreditDialog(threadId,userName);});
-                      clonedRow.getElementById("action").appendChild(newButton);
-                    } 
-                  
-                    clonedRow.getElementById("notes").innerHTML = i_UserCredits[z].additionalNotes;
-                    tableBody.appendChild(clonedRow);
-                }     
-                if (document.getElementById(userName) === null) { // check if panel exists
-                    document.getElementById("main-panel-holder").appendChild(clonedPanelTemplate);
-                } else {
-                    existingPanel = document.getElementById(userName);
-                    clonedPanelTemplate.querySelector("details").setAttribute("open","true");
-                    existingPanel.replaceWith(clonedPanelTemplate);
-                }
-                
-                
-                
-                var thisUserPays = 0;
-                var otherUserPays = 0;
-              
-                var threadIds=[];    
-                document.querySelectorAll("#"+userName+" .mdc-data-table__row").forEach(
-                    r=>{
-                         if(r.cells.settlebox.querySelector("input").checked){
-                             threadIds.push(r.cells.threadId.title);
-                             rowAmount = 1*r.cells.amount.getAttribute("data-amount");
-                             if (r.cells.payer.textContent!==userName){
-                                thisUserPays += rowAmount ;
-                            } else {
-                                otherUserPays += rowAmount ; 
-                            }
-                         }
-                     }
                 );
-        
-                if(thisUserPays - otherUserPays)
-                    document.querySelector("#"+userName+" #settle-total").innerHTML = 
-                        ("Total (USD): " + thisUserPays + " - " + otherUserPays + " = " + (thisUserPays - otherUserPays) );
-
+                document.getElementById("main-panel-holder").appendChild(clonedTableTemplate);
             }
             
-            
-            
-            
-            
-            
-                
-        
-            
-
-            
-
-            
-            
-            
-        </script>
-            
-
-        
-        <script>
-            /* Visual effects for components. This script does not apply an client long. */
-           
-            leftDrawer = mdc.drawer.MDCDrawer.attachTo(document.getElementById('left-drawer'));
-            leftDrawer.open = true;
-            //list = mdc.list.MDCList.attachTo(document.querySelector('.mdc-list'));
-
-            topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
-            topAppBar.setScrollTarget(document.getElementById('main-content'));
-            topAppBar.listen('MDCTopAppBar:nav', () => {
-                leftDrawer.open = !leftDrawer.open;
-            });
-            
-            
-            includeHTML();
-            styleButtons();
-            styleTextFields();
-            styleTextFieldIcons();
-       
-
-            function styleButtons(){
-                buttons = document.querySelectorAll('.mdc-button');
-                for (i = 0; i < buttons.length; i++) {
-                    buttons[i].innerHTML = "<span class='mdc-button__ripple'></span>" + buttons[i].innerHTML;
-                    d_button = new mdc.ripple.MDCRipple(buttons[i]);
+            async function openAuditThread(threadId){
+                event.preventDefault();
+                main = document.getElementById('main-panel-holder');
+                main.innerHTML="";
+                document.getElementById('header-title').innerHTML = "<a href='#audit' class='mdc-button'><i style='font-size:26px;' class='material-icons'>arrow_back</i></a> <span style='position:relative;top:2px'>Audit Thread ID: " + threadId + " Details</span>";
+                location.hash='audit-detail';
+                let response = await fetch('audit/'+threadId);
+                let responseJSON = await  response.json();
+                let auditApplicationMessages = responseJSON.auditApplicationMessages;
+                for (z=0; z < auditApplicationMessages.length ; z++) {
+                    let response = await fetch('audit/'+threadId+"/"+auditApplicationMessages[z].applicationMessageId);
+                    let responseJSON = await  response.json();
+                    responseJSON = responseJSON.auditHCSMessages;
+                    clonedTemplate = document.getElementById("audit-thread-template").content.cloneNode(true);
+                    clonedTemplate.querySelector("#audit-thread-message-id").innerHTML=auditApplicationMessages[z].applicationMessageId;
+                    clonedTemplate.querySelector("#audit-thread-message-text").innerHTML=syntaxHighlight(auditApplicationMessages[z].message);//.substring(0,180)+"...";
+                    clonedTemplate.querySelector("#audit-thread-message-parts-json").innerHTML=syntaxHighlight(responseJSON);
+                    main.appendChild(clonedTemplate);
                 }
+                return false;
             }
-
-            function styleTextFields(){
-                textFields = document.querySelectorAll('.mdc-text-field');
-                for (i = 0; i < textFields.length; i++) {
-                    //textFields[i].insertAdjacentHTML("afterend",'<div class="mdc-text-field-helper-line"><div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">helpme</div></div>');
-                    textFields[i].innerHTML = "<span class='mdc-line-ripple'></span>" + textFields[i].innerHTML;
-                    d_textFieldHelperText = new mdc.textField.MDCTextFieldHelperText(textFields[i].parentElement.querySelector('.mdc-text-field-helper-text'));
-                    d_textField = new mdc.textField.MDCTextField(textFields[i]);
-                }
-            }
-            
-            function styleTextFieldIcons(){
-                textFieldIcons = document.querySelectorAll('.mdc-text-field-icon');
-                for (i = 0; i < textFieldIcons.length; i++) {
-                    d_textFieldIcon = new mdc.textFieldIcon.MDCTextFieldIcon(textFieldIcons[i]);
-                }
-            }
-    
-            function styleDataTables(){
-                dataTables = document.querySelector('.mdc-data-table');
-                for (i = 0; i < dataTables.length; i++) {
-                    d_textFieldIcon = new mdc.textFieldIcon.MDCTextFieldIcon(textFieldIcons[i]);
-                    d_dataTable = new mdc.dataTable.MDCDataTable(dataTables[i]);
-                }
-            }
-            
         </script>
         
         <script>
+           /* 
+            * Actions performed in response to websocket messages 
+            */ 
+                                                             
             var socket = new SockJS('/notifications');
                 stompClient = Stomp.over(socket);  
                 stompClient.debug = null;
                 stompClient.connect({}, function(frame) {
                   
-                    //console.log('Connected: ' + frame);
                     stompClient.subscribe('/notifications/messages', function(messageOutput) {
                         onStompMessage(JSON.parse(messageOutput.body));
                     });
             });
             
+            /* Introspect a message and only update the relevant part of the UI
+             * - makes left hand side menu item bold to indicate content change 
+             */
             async function onStompMessage(messageOutput) {
                 notificationList.push(messageOutput);
                 notifyUi = messageOutput.context;
@@ -1276,6 +982,9 @@
                             styleButtons();
                         }
                         break;
+                    case "admin":
+                        location.reload();
+                        break;
                     default: alert("wrong target element");
                 }
                 document.getElementById("notification-badge").innerHTML = document.getElementById("notification-badge").innerHTML * 1.0 + 1;
@@ -1291,38 +1000,120 @@
                 snackbar.open();
             
             }
+        </script>
+        <script>    
+            /* 
+             * Actions for local app database functions 
+             * (top right app-bar buttons)  
+             */
             
+    
             async function recreateData(){
                 restore = confirm("This will delete your data and restore test data");
                 if( restore){
-                        await fetch('admin/deletedata');
-                        //await fetch('admin/createtestdata');
-                        await location.reload();
+                    await fetch('admin/deletedata');
+                    await alert("We have sent this message to all participants. Please wait for the page to reload");
+
                 }
             }
             
             async function saveData(){
                 restore = confirm("This will take a snapshot of your current database");
                 if( restore){
-                        await fetch('admin/stash-database');
-                        //await fetch('admin/createtestdata');
-                        await location.reload();
+                    await fetch('admin/stash-database');
+                    await alert("We have sent this message to all participants. Please wait for the page to reload");
+        
                 }
             }
             
             async function restoreData(){
                 restore = confirm("This will restore the database from a previously taken snapshot");
                 if( restore){
-                        await fetch('admin/stash-pop-database');
-                        //await fetch('admin/createtestdata');
-                        await location.reload();
+                    await fetch('admin/stash-pop-database');
+                     await alert("We have sent this message to all participants. Please wait for the page to reload");
+                 }
+            } 
+        </script>
+        
+        
+        <script>
+            /* Material Design component initialisations and visual sugar coating. */
+           
+            leftDrawer = mdc.drawer.MDCDrawer.attachTo(document.getElementById('left-drawer'));
+            leftDrawer.open = true;
+            topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
+            topAppBar.setScrollTarget(document.getElementById('main-content'));
+            topAppBar.listen('MDCTopAppBar:nav', () => {
+                leftDrawer.open = !leftDrawer.open;
+            });
+            
+            includeHTML();
+            styleButtons();
+            styleTextFields();
+            styleTextFieldIcons();
+       
+            function styleButtons(){
+                buttons = document.querySelectorAll('.mdc-button');
+                for (i = 0; i < buttons.length; i++) {
+                    buttons[i].innerHTML = "<span class='mdc-button__ripple'></span>" + buttons[i].innerHTML;
+                    d_button = new mdc.ripple.MDCRipple(buttons[i]);
                 }
+            }
+
+            function styleTextFields(){
+                textFields = document.querySelectorAll('.mdc-text-field');
+                for (i = 0; i < textFields.length; i++) {
+                    //textFields[i].insertAdjacentHTML("afterend",'<div class="mdc-text-field-helper-line"><div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg">helpme</div></div>');
+                    textFields[i].innerHTML = "<span class='mdc-line-ripple'></span>" + textFields[i].innerHTML;
+                    d_textFieldHelperText = new mdc.textField.MDCTextFieldHelperText(textFields[i].parentElement.querySelector('.mdc-text-field-helper-text'));
+                    d_textField = new mdc.textField.MDCTextField(textFields[i]);
+                }
+            }
+            
+            function styleTextFieldIcons(){
+                textFieldIcons = document.querySelectorAll('.mdc-text-field-icon');
+                for (i = 0; i < textFieldIcons.length; i++) {
+                    d_textFieldIcon = new mdc.textFieldIcon.MDCTextFieldIcon(textFieldIcons[i]);
+                }
+            }
+    
+            function styleDataTables(){
+                dataTables = document.querySelector('.mdc-data-table');
+                for (i = 0; i < dataTables.length; i++) {
+                    d_textFieldIcon = new mdc.textFieldIcon.MDCTextFieldIcon(textFieldIcons[i]);
+                    d_dataTable = new mdc.dataTable.MDCDataTable(dataTables[i]);
+                }
+            }
+            
+            function syntaxHighlight(json) {
+                
+                if (typeof json !== 'string') {
+                     json = JSON.stringify(json, undefined, 2);
+                }
+               
+                json = json.replace(/([^ -~-\n]+)/g, "Ħ");
+                json = json.replace(/\\n/g, '\n\t\t');
+                json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                    var cls = 'number';
+                    if (/^"/.test(match)) {
+                        if (/:$/.test(match)) {
+                            cls = 'key';
+                        } else {
+                            cls = 'string';
+                        }
+                    } else if (/true|false/.test(match)) {
+                        cls = 'boolean';
+                    } else if (/null/.test(match)) {
+                        cls = 'null';
+                    }
+                    return '<span class="' + cls + '">' + match + '</span>';
+                });
             }
             
             function formatThreadId(threadId){
                  return   threadId.substring(0,2) + "..." + threadId.substring(threadId.length - 4,threadId.length);
             }
-            
         </script>
         
     </body>

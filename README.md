@@ -650,7 +650,9 @@ If you want to run multiple clients from the command line simultaneously then yo
 
 Note that the demo provides helper functions to delete save and restore the local database however, these have no effect when `hcs-sxc-plugins-persistence-in-memory` is chosen.
 
-You can also specify these `-D` input values in your IDE so that you can run several instances of the application in the IDE, this can help when debugging.
+You can also specify these `-D` input values in your IDE so that you can run several instances of the application in the IDE, this can help when debugging. To enable the debugger use the `-Djpda.listen=maven` flag.
+
+Note: while this configuration runs outside the docker container, it still consults the `docker-compose.yaml` file in the `resources` folder to build the address book of all participants and therefore the `APP_ID` you set here with the `-D` flag must match the one in that file.  
 
 ## Contributing
 

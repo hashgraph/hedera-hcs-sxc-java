@@ -121,7 +121,7 @@ The choice of a plug-in architecture is to enable additional plugins to be devel
 
 This plugin provides a direct subscription to a mirror node which implements the same subscription API as the [open source mirror node project provided by Hedera] (https://github.com/hashgraph/hedera-mirror-node). Other mirror node projects may have different subscription APIs in which case new plug ins conforming to those mirror nodes' subscription APIs would be required.
 
-When in use, the plug in uses the configuration parameters from `config.yaml` (defined in the application's `src/main/resources`) to identify the IP address and port of the mirror node to subscribe to.
+When in use, the plug in uses the configuration parameters from a `config.yaml` file to identify the IP address and port of the mirror node to subscribe to.
 
 #### HCS-SXC-plugins-mirror-queue-artemis
 
@@ -131,7 +131,7 @@ This plugin provides a subscription to an Artemis Active MQ from which it will r
 
 This plugin provides persistence of HCS transactions and mirror notifications into a database via hibernate. The default project configuration uses H2 as a database, but others can easily be implemented.
 
-To configure a different database, edit the `coreHibernate` section of the `config.yaml` file found in `src/main/resources` of the application.
+To configure a different database, edit the `coreHibernate` section of the `config.yaml` file of the application.
 
 Example configuration for h2:
 
@@ -264,11 +264,23 @@ for in database
 
 A number of configuration files are necessary in order to provide the components the necessary information such as which TopicId(s) to use or subscribe to, etc... These files are listed and explained below.
 
+Sample configuration files are located in the `./src/main/resources` of each project where a configuration file may be necessary.
+
+### Order of precedence
+
+Some configuration file data may be overridden with environment variables and/or command line paramters. The location of a configuration file may also vary depending on use cases. The order of precedence is below for all components:
+- command line parameters
+- host environment variables
+- `.env` file
+- `./config` folder (this is so that a persisted volume can be easily mounted for docker deployments)
+- `./` folder (mostly useful in static (fat jar) deployments)
+- `./src/main/resources` for IDE development
+
+Component logs will generally indicate where the configuration was obtained.
+
 ### HCS-sxc-relay
 
-The `relay-config.yaml` file contains the necessary configuration for the `hcs-sxc-relay` component and is found in `/src/main/resources` of the corresponding java project. A sample file is provided as a starting point.
-
-*Note: If a `relay-config.yaml` file is found in the root of the project, it will override the file from `src/main/resources`*
+The `relay-config.yaml` file contains the necessary configuration for the `hcs-sxc-relay` component.
 
 ```
 # Address of the mirror node's subscription end point
@@ -292,9 +304,7 @@ queue:
 
 ### hcs-sxc-plugins-mirror-queue-artemis
 
-The `queue-config.yaml` file contains the necessary configuration for the `hcs-sxc-plugins-mirror-queue-artemis` component and is found in the `/src/main/resources` of the corresponding java project. A sample file is provided as a starting point.
-
-*Note: If a `queue-config.yaml` file is found in the root of the project, it will override the file from `src/main/resources`*
+The `queue-config.yaml` file contains the necessary configuration for the `hcs-sxc-plugins-mirror-queue-artemis` component
 
 ```
 queue:
@@ -304,9 +314,7 @@ queue:
 
 ### Applications
 
-Applications will vary in use cases, however the `hcs-sxc-core` expects the application to provide a number of configurable parameters, these are defined in the `config.yaml` file which resides in the `/src/main/resources` folder of the application's project.
-
-*Note: If a `config.yaml` file is found in the root of the project, it will override the file from `src/main/resources`*
+Applications will vary in use cases, however the `hcs-sxc-core` expects the application to provide a number of configurable parameters, these are defined in the `config.yaml`.
 
 Example `config.yaml`
 
@@ -517,10 +525,10 @@ The project comes with two examples to get you started, these are fully function
 
 This is a simple messaging demo between two participants. All messages sent from one participant are pushed to the Hedera HCS service and each participant subscribes to a mirror node to receive the consensus messages.
 
-To run the demo, first create a new HCS topic using the SDK and edit the `src/main/resources/config.yaml` file to reflect the new topic id. This is to ensure that when you run the demo, you don't receive messages from someone else who you may be sharing a topic id with - although that could be fun.
+To run the demo, first create a new HCS topic using the SDK and edit the `config.yaml` file to reflect the new topic id. This is to ensure that when you run the demo, you don't receive messages from someone else who you may be sharing a topic id with - although that could be fun.
 Also check other details such as the mirror node, hedera network, etc... are correct.
 
-You will also need to ensure the same topic id is reflected in `hcs-sxc-relay/src/main/resources/relay-config.yaml`
+You will also need to ensure the same topic id is reflected in `relay-config.yaml`
 
 Also create a `.env` file with the following information
 
@@ -575,10 +583,10 @@ Both applications see the sent message, this is because both applications subscr
 
 This is a more complex application which is based on spring boot with a web UI. Each instance of the application represents a participant in a settlement use case where participants can issue credit notes to each other, approve them, group them to reach a settlement amount, employ a third party to effect the payment and finally both original parties confirm the payment was completed. In addition to this, an audit log is provided so that the full history of messages between participants can be consulted.
 
-To run the demo, first create a new HCS topic using the SDK and edit the `src/main/resources/config.yaml` file to reflect the new topic id. This is to ensure that when you run the demo, you don't receive messages from someone else who you may be sharing a topic id with - although that could be fun.
+To run the demo, first create a new HCS topic using the SDK and edit the `config.yaml` file to reflect the new topic id. This is to ensure that when you run the demo, you don't receive messages from someone else who you may be sharing a topic id with - although that could be fun.
 Also check other details such as the mirror node, hedera network, etc... are correct.
 
-In order to reduce the load on your computer, you may want to comment out some sections of the `src/main/resources/docker-compose.yml` file too. Comment out the containers for Erica, Farouk, Grace and Henry, they're not strictly necessary to run the example.
+In order to reduce the load on your computer, you may want to comment out some sections of the `docker-compose.yml` file too. Comment out the containers for Erica, Farouk, Grace and Henry, they're not strictly necessary to run the example.
 
 Also create a `.env` file with the following information
 
@@ -611,10 +619,10 @@ And from there, open a new page for each of the participants
 * Bob http://localhost:8082
 * Carlos http://localhost:8083
 * Diana http://localhost:8084
-* Erica http://localhost:8085 (if enabled in `src/main/resources/docker-compose.yml`)
-* Farouk http://localhost:8086 (if enabled in `src/main/resources/docker-compose.yml`)
-* Grace http://localhost:8087 (if enabled in `src/main/resources/docker-compose.yml`)
-* Henry http://localhost:8088 (if enabled in `src/main/resources/docker-compose.yml`)
+* Erica http://localhost:8085 (if enabled in `docker-compose.yml`)
+* Farouk http://localhost:8086 (if enabled in `docker-compose.yml`)
+* Grace http://localhost:8087 (if enabled in `docker-compose.yml`)
+* Henry http://localhost:8088 (if enabled in `docker-compose.yml`)
 
 Whenever a participant performs and action in the UI, this results in a HCS transaction containing an `application-message` which itself contains a `business-message` containing the user's intent. Once the transaction has reached consensus, it's broadcast to all participants since they all subscribe to the same topic on a mirror node.
 

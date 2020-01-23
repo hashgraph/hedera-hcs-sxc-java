@@ -11,7 +11,7 @@
         <version>0.0.3-SNAPSHOT</version>
 
     <name>hcs-sxc</name>
-    <description>HCS Secure eXchange Communication</description>
+    <description>HCS SDX eXtension Components</description>
 
     <ciManagement>
         <system>CircleCI</system>
@@ -44,7 +44,7 @@
         <maven.compiler.source>10</maven.compiler.source>
         <maven.compiler.target>10</maven.compiler.target>
         <java.version>10</java.version>
-        
+
         <!-- dependencies -->
         <artemis-jms-client-all.version>2.10.1</artemis-jms-client-all.version>
         <asm.version>6.2</asm.version>
@@ -64,11 +64,8 @@
         <hcs-sxc-core.version>0.0.3-SNAPSHOT</hcs-sxc-core.version>
         <hcs-sxc-proto.version>0.0.3-SNAPSHOT</hcs-sxc-proto.version>
         <hcs-sxc-interfaces.version>0.0.3-SNAPSHOT</hcs-sxc-interfaces.version>
-<!-- 
-        <hedera-sdk.version>0.9.0-beta-3</hedera-sdk.version>
-         -->
         <hedera-sdk.version>1.0.0-hcs-2</hedera-sdk.version>
-        
+
         <h2.version>1.4.199</h2.version>
 
         <jackson-databind.version>2.10.0</jackson-databind.version>
@@ -111,14 +108,14 @@
             <artifactId>log4j-core</artifactId>
           <version>${log4j.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>compile</scope>
           <version>${lombok.version}</version>
         </dependency>
-       
+
       <dependency>
           <groupId>com.google.guava</groupId>
           <artifactId>guava</artifactId>
@@ -140,7 +137,7 @@
           <artifactId>jackson-databind</artifactId>
           <version>${jackson-databind.version}</version>
       </dependency>
-      
+
       <dependency>
           <groupId>org.apache.commons</groupId>
           <artifactId>commons-lang3</artifactId>
@@ -168,7 +165,7 @@
           <artifactId>sdk</artifactId>
           <version>${hedera-sdk.version}</version>
       </dependency>
-      
+
       <dependency>
           <groupId>io.github.cdimascio</groupId>
           <artifactId>java-dotenv</artifactId>
@@ -260,7 +257,7 @@
             </dependencies>
         </plugin>
 
-       
+
       	<plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>

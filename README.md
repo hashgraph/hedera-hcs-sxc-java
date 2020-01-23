@@ -604,7 +604,7 @@ Compile the project (see above) and open a console terminal and switch to the fo
 Then switch to `src/main/resources` and run the docker images as follows
 
 ```shell
-docker-compose -f docker-compose-direct.yml up --remove-orphans
+docker-compose up --remove-orphans
 ```
 
 once the components are up and running (this may take a while), you can navigate to the UIs of the respective application users. Note: An instance of the `hcs-sxc-settlement-demo` application is run for each of the users and offered up on a separate http port.

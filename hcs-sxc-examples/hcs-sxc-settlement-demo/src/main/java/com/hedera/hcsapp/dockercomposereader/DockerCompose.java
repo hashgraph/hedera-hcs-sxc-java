@@ -4,7 +4,7 @@ import java.util.Map;
 
 public final class DockerCompose {
     private String version;
-    private Map<String, Service> services;
+    private Map<String, DockerService> services;
     
     public String getVersion() {
         return this.version;
@@ -12,16 +12,16 @@ public final class DockerCompose {
     public void setVersion(String version) {
         this.version = version;
     }
-    public Map<String, Service> getServices() {
+    public Map<String, DockerService> getServices() {
         return this.services;
     }
-    public void setServices(Map<String, Service> services) {
+    public void setServices(Map<String, DockerService> services) {
         this.services = services;
     }
     public String getNameForId(long appId) {
         String name = "not found";
-        for (Map.Entry<String, Service> service : this.services.entrySet()) {
-            Service dockerService = service.getValue();
+        for (Map.Entry<String, DockerService> service : this.services.entrySet()) {
+            DockerService dockerService = service.getValue();
             if (dockerService.getEnvironment() != null) {
                 if (dockerService.getEnvironment().containsKey("APP_ID")) {
                     if (dockerService.getEnvironment().get("APP_ID").contentEquals(String.valueOf(appId))) {
@@ -33,9 +33,9 @@ public final class DockerCompose {
         return name;
     }
     public String getPublicKeyForId(long appId) {
-        String name = "not found";
-        for (Map.Entry<String, Service> service : this.services.entrySet()) {
-            Service dockerService = service.getValue();
+        String key = "not found";
+        for (Map.Entry<String, DockerService> service : this.services.entrySet()) {
+            DockerService dockerService = service.getValue();
             if (dockerService.getEnvironment() != null) {
                 if (dockerService.getEnvironment().containsKey("PUBKEY")) {
                     if (dockerService.getEnvironment().get("APP_ID").contentEquals(String.valueOf(appId))) {
@@ -44,6 +44,21 @@ public final class DockerCompose {
                 }
             }
         }
-        return name;
+        return key;
+    }
+    public int getPortForId(long appId) {
+        int port = 0;
+        for (Map.Entry<String, DockerService> service : this.services.entrySet()) {
+            DockerService dockerService = service.getValue();
+            if (dockerService.getEnvironment() != null) {
+                if (dockerService.getEnvironment().get("APP_ID").contentEquals(String.valueOf(appId))) {
+                    port = dockerService.getPortAsInteger();
+                }
+            }
+        }
+        return port;
+    }
+    public int getPortForId(String appId) {
+        return getPortForId(Long.parseLong(appId));
     }
 }

@@ -4,6 +4,7 @@ import com.hedera.hcsapp.appconfig.AppClient;
 import com.hedera.hcsapp.entities.AddressBook;
 import com.hedera.hcsapp.repository.AddressBookRepository;
 
+import java.util.Collections;
 
 import javax.annotation.Resource;
 import org.springframework.boot.CommandLineRunner;
@@ -18,8 +19,14 @@ public class Application {
     @Resource
     AddressBookRepository addressBookRepository;
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+    public static void main(String[] args) throws Exception {
+
+        AppData appData = new AppData();
+        
+        SpringApplication app = new SpringApplication(Application.class);
+        app.setDefaultProperties(Collections
+          .singletonMap("server.port", appData.getWebPort()));
+        app.run(args);
     }
     
     @Bean
@@ -40,6 +47,7 @@ public class Application {
                 addressBook.setPaymentAccountDetails(appClient.getPaymentAccountDetails());
                 addressBook.setColor(appClient.getColor());
                 addressBook.setAppId(appClient.getAppId());
+                addressBook.setPort(appClient.getWebPort());
                 addressBookRepository.save(addressBook);
             }
         };

@@ -7,6 +7,7 @@ public class AppClient {
     private String paymentAccountDetails = "";
     private String color = "";
     private int appId = 0;
+    private int webPort = 8080;
     
     public String getClientName() {
         return this.clientName;
@@ -43,5 +44,11 @@ public class AppClient {
     }
     public void setAppId(int appId) {
         this.appId = appId;
+    }
+    public int getWebPort() {
+        return this.webPort;
+    }
+    public void setWebPort(int port) {
+        this.webPort = port;
     }
 }

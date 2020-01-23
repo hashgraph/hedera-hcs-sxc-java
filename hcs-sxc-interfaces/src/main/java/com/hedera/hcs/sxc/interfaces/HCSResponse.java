@@ -1,6 +1,6 @@
 package com.hedera.hcs.sxc.interfaces;
 
-import com.hedera.hcs.sxc.proto.java.ApplicationMessageId;
+import com.hedera.hcs.sxc.proto.ApplicationMessageId;
 
 public class HCSResponse {
     private ApplicationMessageId applicationMessageId;

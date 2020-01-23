@@ -3,7 +3,7 @@ package com.hedera.hcs.sxc.consensus;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessageChunk;
+import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 import java.util.List;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;

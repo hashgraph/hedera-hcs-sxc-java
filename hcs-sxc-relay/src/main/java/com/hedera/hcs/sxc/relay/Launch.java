@@ -44,7 +44,6 @@ public final class Launch {
                         , topic
                         , config.getConfig().getCatchupHistory()
                         , config.getConfig().getLastConsensusTimeFile()
-                        , config.getConfig().getMirorReconnectDelay()
                 );
                 Thread subscriberThread = new Thread(subscriber);
                 subscriberThread.start();

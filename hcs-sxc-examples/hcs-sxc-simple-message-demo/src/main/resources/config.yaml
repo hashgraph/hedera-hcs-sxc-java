@@ -12,8 +12,6 @@ HCSTransactionFee: 100000000
 
 mirrorNode:
   address: "34.66.214.12:6552"
-  # automatically disconnect/reconnect from mirror node every reconnectDelay minutes
-  reconnectDelay: 10  
 
 nodes:
   - address: 34.66.214.12:50211

@@ -2,8 +2,8 @@ package com.hedera.hcs.sxc.callback;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.consensus.ConsensusMessage;
 import com.hedera.hcs.sxc.HCSCore;
+import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackFromMirror;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackToAppInterface;
 import com.hedera.hcs.sxc.interfaces.HCSResponse;
@@ -11,9 +11,9 @@ import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
 import com.hedera.hcs.sxc.interfaces.MirrorSubscriptionInterface;
 import com.hedera.hcs.sxc.plugins.Plugins;
 import com.hedera.hcs.sxc.utils.ByteUtil;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessage;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessageChunk;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessageId;
+import com.hedera.hcs.sxc.proto.ApplicationMessage;
+import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
+import com.hedera.hcs.sxc.proto.ApplicationMessageId;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -44,9 +44,9 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
 
         if (this.hcsCore.getCatchupHistory()) {
             Optional<Instant> lastConsensusTimestamp = Optional.of(this.hcsCore.getMessagePersistence().getLastConsensusTimestamp());
-            mirrorSubscription.init(this, this.hcsCore.getApplicationId(), lastConsensusTimestamp, this.hcsCore.getMirrorAddress(), this.hcsCore.getTopicIds(), this.hcsCore.getMirrorReconnectDelay());
+            mirrorSubscription.init(this, this.hcsCore.getApplicationId(), lastConsensusTimestamp, this.hcsCore.getMirrorAddress(), this.hcsCore.getTopicIds());
         } else {
-            mirrorSubscription.init(this, this.hcsCore.getApplicationId(), Optional.empty(), this.hcsCore.getMirrorAddress(), this.hcsCore.getTopicIds(), this.hcsCore.getMirrorReconnectDelay());
+            mirrorSubscription.init(this, this.hcsCore.getApplicationId(), Optional.empty(), this.hcsCore.getMirrorAddress(), this.hcsCore.getTopicIds());
         }
     }
     /**
@@ -66,7 +66,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
         hcsResponse.setMessage(message);
         observers.forEach(listener -> listener.onMessage(hcsResponse));
     }
-    public void storeMirrorResponse(ConsensusMessage consensusMessage) {
+    public void storeMirrorResponse(SxcConsensusMessage consensusMessage) {
         hcsCore.getMessagePersistence().storeMirrorResponse(consensusMessage);
     }
     public void partialMessage(ApplicationMessageChunk messagePart) throws InvalidProtocolBufferException {

@@ -28,7 +28,7 @@ import com.hedera.hcsapp.repository.CreditRepository;
 import com.hedera.hcsapp.repository.SettlementItemRepository;
 import com.hedera.hcsapp.repository.SettlementRepository;
 import com.hedera.hcsapp.repository.Util;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessage;
+import com.hedera.hcs.sxc.proto.ApplicationMessage;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.env.Environment;
@@ -42,8 +42,6 @@ import proto.SettleInitBPM;
 import proto.SettlePaidBPM;
 import proto.SettleProposeBPM;
 import proto.SettlementBPM;
-
-
 
 @Log4j2
 @Component
@@ -482,7 +480,7 @@ public class HCSIntegration {
             stompClient.setMessageConverter(new MappingJackson2MessageConverter());
             StompSessionHandler sessionHandler = new CustomStompSessionHandler(); 
             try {
-                this.stompSession = stompClient.connect("ws://localhost:"+ environment.getProperty("local.server.port")+"/notifications", sessionHandler).get();
+                this.stompSession = stompClient.connect("ws://localhost:"+ this.appData.getWebPort() +"/notifications", sessionHandler).get();
             } catch (InterruptedException | ExecutionException e) {
                 log.error(e);
             }

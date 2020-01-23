@@ -1,21 +1,23 @@
 package com.hedera.hcs.sxc.plugin.persistence.hibernate;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.proto.Timestamp;
 import com.hedera.hashgraph.proto.TransactionBody;
+import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.consensus.ConsensusMessage;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hcs.sxc.plugin.persistence.entities.HCSApplicationMessage;
 import com.hedera.hcs.sxc.plugin.persistence.entities.HCSTransaction;
 import com.hedera.hcs.sxc.plugin.persistence.entities.MirrorResponse;
-import com.hedera.hcs.sxc.interfaces.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
+import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessage;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessageChunk;
-import com.hedera.hcs.sxc.proto.java.ApplicationMessageId;
+import com.hedera.hcs.sxc.proto.ApplicationMessage;
+import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
+import com.hedera.hcs.sxc.proto.ApplicationMessageId;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -60,7 +62,7 @@ implements SxcMessagePersistence{
     //
     // Mirror responses
     @Override
-    public void storeMirrorResponse(ConsensusMessage mirrorTopicMessageResponse) {
+    public void storeMirrorResponse(SxcConsensusMessage mirrorTopicMessageResponse) {
 
         MirrorResponse mirrorResponse = new MirrorResponse();
 
@@ -94,13 +96,14 @@ implements SxcMessagePersistence{
                 .setParameter("timestamp", timestamp)
                 .getSingleResult();
 
-        SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage();
-        sxcConsensusMessage.setConsensusTimeStampSeconds(mirrorResponse.getTimestampSeconds());
-        sxcConsensusMessage.setConsensusTimeStampNanos(mirrorResponse.getTimestampNanos());
-        sxcConsensusMessage.setMessage(mirrorResponse.getMessage());
-        sxcConsensusMessage.setRunningHash(mirrorResponse.getRunningHash());
-        sxcConsensusMessage.setSequenceNumber(mirrorResponse.getSequenceNumber());
-        sxcConsensusMessage.setTopicId(mirrorResponse.getTopicId());
+         ConsensusTopicResponse consensusTopicResponse = ConsensusTopicResponse.newBuilder()
+                .setConsensusTimestamp(Timestamp.newBuilder().setSeconds(mirrorResponse.getTimestampSeconds()).setNanos(mirrorResponse.getTimestampNanos()).build())
+                .setMessage(ByteString.copyFrom(mirrorResponse.getMessage()))
+                .setRunningHash(ByteString.copyFrom(mirrorResponse.getRunningHash()))
+                .setSequenceNumber(mirrorResponse.getSequenceNumber())
+                .build();
+        
+        SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage(mirrorResponse.getTopicId(), consensusTopicResponse);
 
         return sxcConsensusMessage;
     }
@@ -112,15 +115,16 @@ implements SxcMessagePersistence{
         final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         List < MirrorResponse > mirrorResponses = session.createQuery("from MirrorResponse mr order by mr.timestamp desc", MirrorResponse.class).list();
         mirrorResponses.forEach(mirrorResponse -> {
-            SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage();
-            sxcConsensusMessage.setConsensusTimeStampSeconds(mirrorResponse.getTimestampSeconds());
-            sxcConsensusMessage.setConsensusTimeStampNanos(mirrorResponse.getTimestampNanos());
-            sxcConsensusMessage.setMessage(mirrorResponse.getMessage());
-            sxcConsensusMessage.setRunningHash(mirrorResponse.getRunningHash());
-            sxcConsensusMessage.setSequenceNumber(mirrorResponse.getSequenceNumber());
-            sxcConsensusMessage.setTopicId(mirrorResponse.getTopicId());
+            ConsensusTopicResponse consensusTopicResponse = ConsensusTopicResponse.newBuilder()
+                    .setConsensusTimestamp(Timestamp.newBuilder().setSeconds(mirrorResponse.getTimestampSeconds()).setNanos(mirrorResponse.getTimestampNanos()).build())
+                    .setMessage(ByteString.copyFrom(mirrorResponse.getMessage()))
+                    .setRunningHash(ByteString.copyFrom(mirrorResponse.getRunningHash()))
+                    .setSequenceNumber(mirrorResponse.getSequenceNumber())
+                    .build();
 
-            responseList.put(mirrorResponse.getTimestamp(), sxcConsensusMessage);
+            SxcConsensusMessage consensusMessage = new SxcConsensusMessage(mirrorResponse.getTopicId(), consensusTopicResponse);
+
+            responseList.put(mirrorResponse.getTimestamp(), consensusMessage);
         });
 
         return responseList;
@@ -137,14 +141,16 @@ implements SxcMessagePersistence{
                 .getResultList();
 
         mirrorResponses.forEach(mirrorResponse -> {
-            SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage();
-            sxcConsensusMessage.setConsensusTimeStampSeconds(mirrorResponse.getTimestampSeconds());
-            sxcConsensusMessage.setConsensusTimeStampNanos(mirrorResponse.getTimestampNanos());
-            sxcConsensusMessage.setMessage(mirrorResponse.getMessage());
-            sxcConsensusMessage.setRunningHash(mirrorResponse.getRunningHash());
-            sxcConsensusMessage.setSequenceNumber(mirrorResponse.getSequenceNumber());
-            sxcConsensusMessage.setTopicId(mirrorResponse.getTopicId());
-
+            
+            ConsensusTopicResponse consensusTopicResponse = ConsensusTopicResponse.newBuilder()
+                    .setConsensusTimestamp(Timestamp.newBuilder().setSeconds(mirrorResponse.getTimestampSeconds()).setNanos(mirrorResponse.getTimestampNanos()).build())
+                    .setMessage(ByteString.copyFrom(mirrorResponse.getMessage()))
+                    .setRunningHash(ByteString.copyFrom(mirrorResponse.getRunningHash()))
+                    .setSequenceNumber(mirrorResponse.getSequenceNumber())
+                    .build();
+            
+            SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage(mirrorResponse.getTopicId(), consensusTopicResponse);
+            
             responseList.put(mirrorResponse.getTimestamp(), sxcConsensusMessage);
         });
 
@@ -192,35 +198,35 @@ implements SxcMessagePersistence{
                 .getSingleResult();
 
         try {
-            TransactionBody body = TransactionBody.parseFrom(hcsTransaction.getBodyBytes());
+          TransactionBody body = TransactionBody.parseFrom(hcsTransaction.getBodyBytes());
 
-            ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction();
+          ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction();
 
-            tx.setMemo(body.getMemo());
-            tx.setMessage(body.getConsensusSubmitMessage().getMessage().toByteArray());
-            AccountId accountId = new AccountId(body.getNodeAccountID().getShardNum()
-                    ,body.getNodeAccountID().getRealmNum()
-                    ,body.getNodeAccountID().getAccountNum()
-                    );
-            tx.setNodeAccountId(accountId);
+          tx.setTransactionMemo(body.getMemo());
+          tx.setMessage(body.getConsensusSubmitMessage().getMessage().toByteArray());
+          AccountId accountId = new AccountId(body.getNodeAccountID().getShardNum()
+                  ,body.getNodeAccountID().getRealmNum()
+                  ,body.getNodeAccountID().getAccountNum()
+          );
+          tx.setNodeAccountId(accountId);
 
-            ConsensusTopicId topicId = new ConsensusTopicId(body.getConsensusSubmitMessage().getTopicID().getShardNum()
-                    ,body.getConsensusSubmitMessage().getTopicID().getRealmNum()
-                    ,body.getConsensusSubmitMessage().getTopicID().getTopicNum()
-                    );
+          ConsensusTopicId topicId = new ConsensusTopicId(body.getConsensusSubmitMessage().getTopicID().getShardNum()
+                  ,body.getConsensusSubmitMessage().getTopicID().getRealmNum()
+                  ,body.getConsensusSubmitMessage().getTopicID().getTopicNum()
+          );
 
-            tx.setTopicId(topicId);
+          tx.setTopicId(topicId);
 
-            tx.setMaxTransactionFee(body.getTransactionFee());
+          tx.setMaxTransactionFee(body.getTransactionFee());
 
-            Instant start = Instant.ofEpochSecond(body.getTransactionID().getTransactionValidStart().getSeconds(), body.getTransactionID().getTransactionValidStart().getNanos());
-            TransactionId txId = new TransactionId(accountId, start);
-            tx.setTransactionId(txId);
-            Duration validDuration = Duration.ofSeconds(body.getTransactionValidDuration().getSeconds());
+          Instant start = Instant.ofEpochSecond(body.getTransactionID().getTransactionValidStart().getSeconds(), body.getTransactionID().getTransactionValidStart().getNanos());
+          TransactionId txId = TransactionId.withValidStart(accountId, start);
+          tx.setTransactionId(txId);
+          Duration validDuration = Duration.ofSeconds(body.getTransactionValidDuration().getSeconds());
 
-            tx.setTransactionValidDuration(validDuration);
+          tx.setTransactionValidDuration(validDuration);
 
-            return tx;
+          return tx;
         } catch (InvalidProtocolBufferException e) {
             log.error(e);
             return null;
@@ -241,7 +247,7 @@ implements SxcMessagePersistence{
                 ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction();
 
                 TransactionBody body = TransactionBody.parseFrom(hcsTransaction.getBodyBytes());
-                tx.setMemo(body.getMemo());
+                tx.setTransactionMemo(body.getMemo());
                 tx.setMessage(body.getConsensusSubmitMessage().getMessage().toByteArray());
                 AccountId accountId = new AccountId(body.getNodeAccountID().getShardNum()
                         ,body.getNodeAccountID().getRealmNum()
@@ -259,7 +265,7 @@ implements SxcMessagePersistence{
                 tx.setMaxTransactionFee(body.getTransactionFee());
 
                 Instant start = Instant.ofEpochSecond(body.getTransactionID().getTransactionValidStart().getSeconds(), body.getTransactionID().getTransactionValidStart().getNanos());
-                TransactionId txId = new TransactionId(accountId, start);
+                TransactionId txId = TransactionId.withValidStart(accountId, start);
                 tx.setTransactionId(txId);
                 Duration validDuration = Duration.ofSeconds(body.getTransactionValidDuration().getSeconds());
 

@@ -22,25 +22,23 @@ public final class Config {
         Yaml yaml = new Yaml(new Constructor(YAMLConfig.class));
 
         InputStream inputStream;
-        File configFile = new File("./relay-config.yaml");
+        File configFile = new File("./config/relay-config.yaml");
         if (configFile.exists()) {
+            log.info("Loading relay-config.yaml from ./config");
             // config file exists outside of jar, use it
-            try {
-                log.info("Loading config from ./relay-config.yaml");
-                inputStream = new FileInputStream(configFile.getCanonicalPath());
-            } catch (FileNotFoundException e) {
-                log.error(e);
-                throw new Exception ("Unable to locate ./relay-config.yaml file");
-            } catch (IOException e) {
-                log.error(e);
-                throw new Exception ("Error reading ./relay-config.yaml file");
-            }
+            inputStream = new FileInputStream(configFile.getCanonicalPath());
         } else {
-            log.info("Loading config from ./src/main/resources/relay-config.yaml");
-            inputStream = this.getClass()
-                    .getClassLoader()
-                    .getResourceAsStream("relay-config.yaml");
-
+            configFile = new File("./relay-config.yaml");
+            if (configFile.exists()) {
+                log.info("Loading relay-config.yaml from ./");
+                // config file exists outside of jar, use it
+                inputStream = new FileInputStream(configFile.getCanonicalPath());
+            } else {
+                inputStream = this.getClass()
+                        .getClassLoader()
+                        .getResourceAsStream("relay-config.yaml");
+                log.info("Loading relay-config.yaml from src/main/resources");
+            }
         }
         yamlConfig = yaml.load(inputStream);
     }

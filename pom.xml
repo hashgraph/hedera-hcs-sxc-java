@@ -6,12 +6,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.hedera</groupId>
-    <artifactId>hcs-sxc</artifactId>
+    <artifactId>hcs-sxc-java</artifactId>
     <packaging>pom</packaging>
         <version>0.0.3-SNAPSHOT</version>
 
-    <name>hcs-sxc</name>
-    <description>HCS SDX eXtension Components</description>
+    <name>hcs-sxc-java</name>
+    <description>HCS SDK eXtension Components</description>
 
     <ciManagement>
         <system>CircleCI</system>
@@ -271,11 +271,11 @@
     </plugins>
   </build>
     <modules>
-      <module>hcs-sxc-core</module>
-      <module>hcs-sxc-relay</module>
-      <module>hcs-sxc-interfaces</module>
-      <module>hcs-sxc-examples</module>
-      <module>hcs-sxc-proto</module>
-      <module>hcs-sxc-plugins</module>
+      <module>hcs-sxc-java-core</module>
+      <module>hcs-sxc-java-relay</module>
+      <module>hcs-sxc-java-interfaces</module>
+      <module>hcs-sxc-java-examples</module>
+      <module>hcs-sxc-java-proto</module>
+      <module>hcs-sxc-java-plugins</module>
     </modules>
 </project>

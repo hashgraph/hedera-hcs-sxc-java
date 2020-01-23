@@ -12,7 +12,7 @@ services:
       COLOR: 0a2c5a
     tty: true
     ports:
-      - 8081:8080
+      - 8081:8081
 
   Bob:
     container_name: Bob
@@ -26,36 +26,38 @@ services:
       COLOR: 0d431f
     tty: true
     ports:
-      - 8082:8080
+      - 8082:8082
 
-  Carlos:
-    container_name: Carlos
-    image: hederahashgraph/hcs-sxc-settlement-demo:latest
-    restart: on-failure
-    environment:
-      APP_ID: 2
-      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6c
-      ROLES: "BUYER,SELLER"
-      PAYMENT_ACCOUNT_DETAILS: "22-11-14 70925098"
-      COLOR: 275f4f
-    tty: true
-    ports:
-      - 8083:8080
-
-  Diana:
-    container_name: Diana
-    image: hederahashgraph/hcs-sxc-settlement-demo:latest
-    restart: on-failure
-    environment:
-      APP_ID: 3
-      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6d
-      ROLES: "PAYCHANNEL"
-      PAYMENT_ACCOUNT_DETAILS: "12-52-23 26789524"
-      COLOR: 3f370b
-    tty: true
-    ports:
-      - 8084:8080
-
+  # Carlos:
+  #   container_name: Carlos
+  #   image: hederahashgraph/hcs-sxc-settlement-demo:latest
+  #   restart: on-failure
+  #   environment:
+  #     APP_ID: 2
+  #     PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6c
+  #     ROLES: "BUYER,SELLER"
+  #     PAYMENT_ACCOUNT_DETAILS: "22-11-14 70925098"
+  #     COLOR: 275f4f
+  #     PORT: 8083
+  #   tty: true
+  #   ports:
+  #     - 8083:8083
+  #
+  # Diana:
+  #   container_name: Diana
+  #   image: hederahashgraph/hcs-sxc-settlement-demo:latest
+  #   restart: on-failure
+  #   environment:
+  #     APP_ID: 3
+  #     PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6d
+  #     ROLES: "PAYCHANNEL"
+  #     PAYMENT_ACCOUNT_DETAILS: "12-52-23 26789524"
+  #     COLOR: 3f370b
+  #     PORT: 8084
+  #   tty: true
+  #   ports:
+  #     - 8084:8084
+  #
   # Erica:
   #   container_name: Erica
   #   image: hederahashgraph/hcs-sxc-settlement-demo:latest
@@ -66,9 +68,10 @@ services:
   #     ROLES: "BUYER,SELLER"
   #     PAYMENT_ACCOUNT_DETAILS: "09-34-21 46324354"
   #     COLOR: 49200e
+  #     PORT: 8085
   #   tty: true
   #   ports:
-  #     - 8085:8080
+  #     - 8085:8085
   #
   # Farouk:
   #   container_name: Farouk
@@ -80,9 +83,10 @@ services:
   #     ROLES: "ARBITER,AUDITOR"
   #     PAYMENT_ACCOUNT_DETAILS: "10-69-43 86535765"
   #     COLOR: 2c0f4f
+  #     PORT: 8086
   #   tty: true
   #   ports:
-  #     - 8086:8080
+  #     - 8086:8086
   #
   # Grace:
   #   container_name: Grace
@@ -94,9 +98,10 @@ services:
   #     ROLES: "DEMO"
   #     PAYMENT_ACCOUNT_DETAILS: "10-32-52 55424452"
   #     COLOR: 4f0500
+  #     PORT: 8087
   #   tty: true
   #   ports:
-  #     - 8087:8080
+  #     - 8087:8087
   #
   # Harry:
   #   container_name: Harry
@@ -108,6 +113,7 @@ services:
   #     ROLES: "PAYCHANNEL"
   #     PAYMENT_ACCOUNT_DETAILS: "10-21-33 98321542"
   #     COLOR: 4d4c1f
+  #     PORT: 8088
   #   tty: true
   #   ports:
-  #     - 8088:8080
+  #     - 8088:8088

@@ -19,16 +19,21 @@ public final class Environment {
     public Environment(String fileName) {
         this.dotEnv = Dotenv.configure().filename(fileName).ignoreIfMissing().load();        
     }
+    
+    private String getEnvValue(String environmentVariable) {
+        String value = System.getProperty(environmentVariable);
+        if (value == null){
+            value = dotEnv.get(environmentVariable);
+        }
+        return value;
+    }
 
     /** 
      * Returns an Ed25519PrivateKey from the OPERATOR_KEY environment variable
      * @return Ed25519PrivateKey
      */
     public Ed25519PrivateKey getOperatorKey() {
-        String operatorKey = System.getProperty("OPERATOR_KEY");
-        if (operatorKey == null){
-            operatorKey = dotEnv.get("OPERATOR_KEY");
-        }
+        String operatorKey = getEnvValue("OPERATOR_KEY");
         return Ed25519PrivateKey.fromString(operatorKey);
     }
 
@@ -37,11 +42,7 @@ public final class Environment {
      * @return String
      */
     public String getOperatorAccount() {
-        String operatorId = System.getProperty("OPERATOR_ID");
-        if (operatorId == null){
-            operatorId = dotEnv.get("OPERATOR_ID");
-        }
-        return operatorId;
+        return getEnvValue("OPERATOR_ID");
     }
 
     /** 
@@ -49,10 +50,7 @@ public final class Environment {
      * @return AccountId
      */
     public AccountId getOperatorAccountId() {
-        String operatorId = System.getProperty("OPERATOR_ID");
-        if (operatorId == null){
-            operatorId = dotEnv.get("OPERATOR_ID");
-        }
+        String operatorId = getEnvValue("OPERATOR_ID");
         return AccountId.fromString(operatorId);
     }
     
@@ -60,10 +58,6 @@ public final class Environment {
      * Returns the app id
      */
     public int getAppId() {
-        String appId = System.getProperty("APP_ID");
-        if(appId == null){
-            appId = dotEnv.get("APP_ID");
-        }
-        return Integer.parseInt(appId);
+        return Integer.parseInt(getEnvValue("APP_ID"));
     }
 }

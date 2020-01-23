@@ -10,9 +10,8 @@ services:
       ROLES: "BUYER,SELLER"
       PAYMENT_ACCOUNT_DETAILS: "10-11-12 80640665"
       COLOR: 0a2c5a
-    tty: true
     ports:
-      - 8081:8080
+      - 8081:8081
 
   Bob:
     container_name: Bob
@@ -24,9 +23,8 @@ services:
       ROLES: "BUYER,SELLER"
       PAYMENT_ACCOUNT_DETAILS: "13-01-32 79832564"
       COLOR: 0d431f
-    tty: true
     ports:
-      - 8082:8080
+      - 8082:8082
 
  Carlos:
    container_name: Carlos
@@ -38,9 +36,8 @@ services:
      ROLES: "BUYER,SELLER"
      PAYMENT_ACCOUNT_DETAILS: "22-11-14 70925098"
      COLOR: 275f4f
-   tty: true
    ports:
-     - 8083:8080
+     - 8083:8083
 
   Diana:
     container_name: Diana
@@ -52,9 +49,8 @@ services:
       ROLES: "PAYCHANNEL"
       PAYMENT_ACCOUNT_DETAILS: "12-52-23 26789524"
       COLOR: 3f370b
-    tty: true
     ports:
-      - 8084:8080
+      - 8084:8084
 
  Erica:
    container_name: Erica
@@ -66,9 +62,8 @@ services:
      ROLES: "BUYER,SELLER"
      PAYMENT_ACCOUNT_DETAILS: "09-34-21 46324354"
      COLOR: 49200e
-   tty: true
    ports:
-     - 8085:8080
+     - 8085:8085
 
  Farouk:
    container_name: Farouk
@@ -80,9 +75,8 @@ services:
      ROLES: "ARBITER,AUDITOR"
      PAYMENT_ACCOUNT_DETAILS: "10-69-43 86535765"
      COLOR: 2c0f4f
-   tty: true
    ports:
-     - 8086:8080
+     - 8086:8086
 
  Grace:
    container_name: Grace
@@ -94,9 +88,8 @@ services:
      ROLES: "DEMO"
      PAYMENT_ACCOUNT_DETAILS: "10-32-52 55424452"
      COLOR: 4f0500
-   tty: true
    ports:
-     - 8087:8080
+     - 8087:8087
 
   Harry:
     container_name: Harry
@@ -108,6 +101,5 @@ services:
       ROLES: "PAYCHANNEL"
       PAYMENT_ACCOUNT_DETAILS: "10-21-33 98321542"
       COLOR: 4d4c1f
-    tty: true
     ports:
-      - 8088:8080
+      - 8088:8088

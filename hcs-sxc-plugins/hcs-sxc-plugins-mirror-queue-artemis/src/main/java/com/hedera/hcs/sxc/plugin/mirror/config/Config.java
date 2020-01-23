@@ -22,16 +22,23 @@ public final class Config {
         
         InputStream inputStream;
         
-        File configFile = new File("./queue-config.yaml");
+        File configFile = new File("./config/queue-config.yaml");
         if (configFile.exists()) {
+            log.info("Loading queue-config.yaml from ./config");
             // config file exists outside of jar, use it
-            log.info("Loading config from ./queue-config.yaml");
             inputStream = new FileInputStream(configFile.getCanonicalPath());
         } else {
-            log.info("Loading config from ./src/main/resources/queue-config.yaml");
-            inputStream = this.getClass()
-                    .getClassLoader()
-                    .getResourceAsStream("queue-config.yaml");
+            configFile = new File("./queue-config.yaml");
+            if (configFile.exists()) {
+                log.info("Loading queue-config.yaml from ./");
+                // config file exists outside of jar, use it
+                inputStream = new FileInputStream(configFile.getCanonicalPath());
+            } else {
+                inputStream = this.getClass()
+                        .getClassLoader()
+                        .getResourceAsStream("queue-config.yaml");
+                log.info("Loading queue-config.yaml from src/main/resources");
+            }
         }
         yamlConfig = yaml.load(inputStream);
     }

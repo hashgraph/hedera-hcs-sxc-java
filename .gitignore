@@ -69,3 +69,4 @@ hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/.project
 hcs-sxc-java-examples/.settings
 
 hcs-sxc-java-proto/target
+hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/src/main/resources/config.yaml

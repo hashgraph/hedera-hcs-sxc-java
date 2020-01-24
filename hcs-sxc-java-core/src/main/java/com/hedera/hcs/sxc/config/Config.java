@@ -17,7 +17,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public final class Config {
     private YAMLConfig yamlConfig = new YAMLConfig();
-    
+
     public Config() throws FileNotFoundException, IOException {
         this("./config/config.yaml");
     }
@@ -30,6 +30,8 @@ public final class Config {
             log.info("Loading config.yaml from " + configFilePath);
             InputStream inputStream = new FileInputStream(configFile.getCanonicalPath());
             yamlConfig = yaml.load(inputStream);
+        } else {
+            log.error("Unable to find file " + configFilePath);
         }
     }
 

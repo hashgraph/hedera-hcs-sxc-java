@@ -17,7 +17,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public final class Config {
     private YAMLConfig yamlConfig = new YAMLConfig();
-    
+
     public Config() throws FileNotFoundException, IOException {
         this("./config/config.yaml");
     }

@@ -15,17 +15,17 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public final class DockerComposeReader {
-    
+
     public static DockerCompose parse() throws Exception {
         InputStream inputStream = null;
-        
+
         log.info("Loading app net configuration from docker-compose.yml");
-        
+
         File configFile = new File("./config/docker-compose.yml");
         if (configFile.exists()) {
             log.info("Found app net configuration in ./config/docker-compose.yml");
             inputStream = new FileInputStream(configFile.getCanonicalPath());
-        } 
+        }
         if (inputStream != null) {
             Representer representer = new Representer();
             representer.getPropertyUtils().setSkipMissingProperties(true);

@@ -20,11 +20,11 @@ public final class Config {
     public Config() throws FileNotFoundException, IOException {
         this("./config/relay-config.yaml");
     }
-    
+
     // constructor with parameter for testing
     public Config(String configFilePath) throws FileNotFoundException, IOException {
         Yaml yaml = new Yaml(new Constructor(YAMLConfig.class));
-        
+
         File configFile = new File(configFilePath);
         if (configFile.exists()) {
             log.info("Loading apps.yaml from " + configFilePath);

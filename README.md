@@ -154,7 +154,7 @@ coreHibernate:
 The list of configuration entries is variable, you may add or remove entries as necessary for your particular database.
 Also, if `{appid}` is found in any of the values, it will be swapped at run time for the id of the instance of the application being run.
 
-Further, to ensure the appropriate database vendors' dependencies are available when compiling, the `hcs-sxc-java-plugins-persistence-hibernate` project makes use of profiles in its `pom.xml`. 
+Further, to ensure the appropriate database vendors' dependencies are available when compiling, the `hcs-sxc-java-plugins-persistence-hibernate` project makes use of profiles in its `pom.xml`.
 
 For example:
 
@@ -205,7 +205,7 @@ mvnw clean install -Pdocker -Ppostgres
 
 the `h2` profile is the default profile
 
-*Note: Repeated compilations with the `docker` profile may lead to a large number of images being created in the docker repository. Be sure to remove them from time to time `docker image prune -a`.
+*Note: Repeated compilations with the `docker` profile may lead to a large number of images being created in the docker repository. Be sure to remove them from time to time `docker image prune -a`.*
 
 #### hcs-sxc-java-plugins-persistence-in-memory
 
@@ -639,7 +639,7 @@ mvnw exec:java -Dexec.mainClass="com.hedera.hcsapp.Application"  -Pfatjar  -DAPP
 ```
 If you want to run multiple clients from the command line simultaneously then make sure the server ports are not occupied.
 
-Note that the  `./config/docker-compose.yaml` file is consulted even when running from then command line. If you specify the `-DAPP_ID` argument then the port mapping is selected from the `yaml` file. 
+Note that the  `./config/docker-compose.yaml` file is consulted even when running from then command line. If you specify the `-DAPP_ID` argument then the port mapping is selected from the `yaml` file.
 
 You can override the port by setting:
 

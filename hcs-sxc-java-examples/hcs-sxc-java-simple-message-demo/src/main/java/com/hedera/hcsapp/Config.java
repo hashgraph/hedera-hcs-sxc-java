@@ -16,15 +16,15 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public final class Config {
     private AppYAML yamlConfig = new AppYAML();
-    
+
     public Config() throws FileNotFoundException, IOException {
         this("./config/apps.yaml");
     }
-    
+
     // constructor with parameter for testing
     public Config(String configFilePath) throws FileNotFoundException, IOException {
         Yaml yaml = new Yaml(new Constructor(AppYAML.class));
-        
+
         File configFile = new File(configFilePath);
         if (configFile.exists()) {
             log.info("Loading apps.yaml from " + configFilePath);

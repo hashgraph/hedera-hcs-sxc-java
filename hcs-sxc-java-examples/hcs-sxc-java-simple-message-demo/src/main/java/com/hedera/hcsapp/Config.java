@@ -18,31 +18,22 @@ public final class Config {
     private AppYAML yamlConfig = new AppYAML();
     
     public Config() throws FileNotFoundException, IOException {
+        this("./config/apps.yaml");
+    }
+    
+    // constructor with parameter for testing
+    public Config(String filePath) throws FileNotFoundException, IOException {
         Yaml yaml = new Yaml(new Constructor(AppYAML.class));
         
-        InputStream inputStream = this.getClass()
-                .getClassLoader()
-                .getResourceAsStream("apps.yaml");
-        
-        File configFile = new File("./config/apps.yaml");
+        File configFile = new File(filePath);
         if (configFile.exists()) {
-            log.info("Loading apps.yaml from ./config");
+            log.info("Loading apps.yaml from " + filePath);
             // config file exists outside of jar, use it
-            inputStream = new FileInputStream(configFile.getCanonicalPath());
-        } else {
-
-            configFile = new File("./apps.yaml");
-            if (configFile.exists()) {
-                log.info("Loading apps.yaml from ./");
-                // config file exists outside of jar, use it
-                inputStream = new FileInputStream(configFile.getCanonicalPath());
-            } else {
-                log.info("Loading apps.yaml from src/main/resources");
-            }
+            InputStream inputStream = new FileInputStream(configFile.getCanonicalPath());
+            yamlConfig = yaml.load(inputStream);
         }
-
-        yamlConfig = yaml.load(inputStream);
     }
+
     public AppYAML getConfig() {
         return this.yamlConfig;
     }

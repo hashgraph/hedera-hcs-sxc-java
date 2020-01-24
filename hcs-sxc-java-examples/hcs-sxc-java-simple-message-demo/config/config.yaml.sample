@@ -1,0 +1,24 @@
+appNet:
+  signMessages: false
+  encryptMessages: false
+  rotateKeys: false
+  rotateKeyFrequency: 0
+  topics:
+    - topic: 0.0.999
+  persistenceLevel: "FULL"
+  catchupHistory: true
+
+HCSTransactionFee: 100000000
+
+mirrorNode:
+  address: api.testnet.kabuto.sh:50211
+
+nodes:
+- address: 0.testnet.hedera.com:50211
+  account: 0.0.3
+- address: 1.testnet.hedera.com:50211
+  account: 0.0.4
+- address: 2.testnet.hedera.com:50211
+  account: 0.0.5
+- address: 3.testnet.hedera.com:50211
+  account: 0.0.6

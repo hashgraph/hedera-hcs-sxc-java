@@ -30,7 +30,7 @@ public class ConfigTest extends AbstractConfigTest {
 
     @BeforeEach
     public void init() throws FileNotFoundException, IOException {
-        config = new Config();
+        config = new Config("./src/test/resources/config.yaml");
         yamlConfig = config.getConfig();
         appNet = yamlConfig.getAppNet();
         nodeList = yamlConfig.getNodes();

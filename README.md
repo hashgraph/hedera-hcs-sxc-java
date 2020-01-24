@@ -264,17 +264,16 @@ for in database
 
 A number of configuration files are necessary in order to provide the components the necessary information such as which TopicId(s) to use or subscribe to, etc... These files are listed and explained below.
 
-Sample configuration files are located in the `./src/main/resources` of each project where a configuration file may be necessary.
+Sample configuration files are located in the `./config` folder of each project where a configuration file may be necessary.
 
 ### Order of precedence
 
 Some configuration file data may be overridden with environment variables and/or command line paramters. The location of a configuration file may also vary depending on use cases. The order of precedence is below for all components:
+
 - command line parameters
 - host environment variables
-- `.env` file
-- `./config` folder (this is so that a persisted volume can be easily mounted for docker deployments)
-- `./` folder (mostly useful in static (fat jar) deployments)
-- `./src/main/resources` for IDE development
+- environment variables found in `./config/.env` file
+- `./config` folder for other configuration files
 
 Component logs will generally indicate where the configuration was obtained.
 
@@ -484,13 +483,14 @@ These are merely sample lines of code, please refer to the example projects for 
 ### Compilation steps
 
 - Ensure the necessary configuration files are complete and accurate
-    - hcs-sxc-java-relay/src/main/resources/relay-config.yaml (use relay-config.yaml.sample as a starting point)
-    - hcs-sxc-java-plugins/hcs-sxc-java-plugins-mirror-queue-artemis/src/main/resources/queue-config.yaml (use queue-config.yaml.sample as a starting point)
-    - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/src/main/resources/.env (use dotenv.sample as a starting point)
-    - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/src/main/resources/.config.yaml (use config.yaml.sample as a starting point)
-    - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/src/main/resources/docker-compose.yml
-    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/src/main/resources/apps.yaml (use apps.yaml.sample as a starting point)
-    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/src/main/resources/config.yaml (use config.yaml.sample as a starting point)
+    - hcs-sxc-java-relay/config/relay-config.yaml (use relay-config.yaml.sample as a starting point)
+    - hcs-sxc-java-plugins/hcs-sxc-java-plugins-mirror-queue-artemis/config/queue-config.yaml (use queue-config.yaml.sample as a starting point)
+    - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/.env (use dotenv.sample as a starting point)
+    - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/.config.yaml (use config.yaml.sample as a starting point)
+    - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/docker-compose.yml
+
+    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/apps.yaml (use apps.yaml.sample as a starting point)
+    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/config.yaml (use config.yaml.sample as a starting point)
     - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/docker-compose.yml
 
 #### Compile docker images
@@ -601,7 +601,7 @@ This demo does not use the queue and relay components, although it's possible to
 
 Compile the project (see above) and open a console terminal and switch to the folder/directory containing the `hcs-sxc-java-settlement-demo` example on your computer.
 
-Then switch to `src/main/resources` and run the docker images as follows
+Then switch to `./config` and run the docker images as follows
 
 ```shell
 docker-compose up --remove-orphans

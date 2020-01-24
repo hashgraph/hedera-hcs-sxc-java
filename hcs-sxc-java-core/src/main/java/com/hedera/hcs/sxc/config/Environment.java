@@ -18,18 +18,6 @@ public final class Environment {
         this.dotEnv = Dotenv.configure().directory("./config").ignoreIfMissing().load();
         if (this.dotEnv != null) {
             log.info("Found .env file in ./config");
-        } else {
-            this.dotEnv = Dotenv.configure().directory("./").ignoreIfMissing().load();
-            if (this.dotEnv != null) {
-                log.info("Found .env file in ./");
-            } else {
-                this.dotEnv = Dotenv.configure().directory("./src/main/resources").ignoreIfMissing().load();
-                if (this.dotEnv != null) {
-                    log.info("Found .env file in ./src/main/resources");
-                } else {
-                    log.warn("No .env file found in searched locations (./config, ./, ./src/main/resources");
-                }
-            }
         }
     }
     public Environment(String fileName) {

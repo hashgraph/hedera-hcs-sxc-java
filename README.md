@@ -373,7 +373,7 @@ In addition to the `config.yaml` file, a `.env` file may be provided (or environ
 
 ```
 OPERATOR_KEY=
-OPERATOR_ID=0.0.2
+OPERATOR_ID=0.0.xxxx
 # APP Net
 APP_ID=0
 ```
@@ -525,7 +525,7 @@ The project comes with two examples to get you started, these are fully function
 
 This is a simple messaging demo between two participants. All messages sent from one participant are pushed to the Hedera HCS service and each participant subscribes to a mirror node to receive the consensus messages.
 
-To run the demo, first create a new HCS topic using the SDK and edit the `config.yaml` file to reflect the new topic id. This is to ensure that when you run the demo, you don't receive messages from someone else who you may be sharing a topic id with - although that could be fun.
+To run the demo, first create a new HCS topic using the CreateTopic class in the examples and edit the `config.yaml` file to reflect the new topic id. This is to ensure that when you run the demo, you don't receive messages from someone else who you may be sharing a topic id with - although that could be fun.
 Also check other details such as the mirror node, hedera network, etc... are correct.
 
 You will also need to ensure the same topic id is reflected in `relay-config.yaml`
@@ -534,7 +534,7 @@ Also create a `.env` file with the following information
 
 ```
 OPERATOR_KEY=
-OPERATOR_ID=0.0.2
+OPERATOR_ID=0.0.xxxx
 ```
 
 This demo uses the queue and relay components. For the apps to connect to the queue, an entry in your hosts file needs to be added as follows:
@@ -592,7 +592,7 @@ Also create a `.env` file with the following information
 
 ```
 OPERATOR_KEY=
-OPERATOR_ID=0.0.2
+OPERATOR_ID=0.0.xxxx
 # APP Net
 APP_ID=0
 ```
@@ -631,7 +631,7 @@ Whenever a participant performs and action in the UI, this results in a HCS tran
 To run the examples outside of docker and override `.env` variables run:
 
 ```
-mvnw exec:java -Dexec.mainClass="com.hedera.hcsapp.Application"  -Pfatjar  -DAPP_ID=1 -DOPERATOR_ID=0.0.1010 -DOPERATOR_KEY=302e0208...94329fb
+mvnw exec:java -Dexec.mainClass="com.hedera.hcsapp.Application"  -Pfatjar  -DAPP_ID=1 -DOPERATOR_ID=0.0.xxxx -DOPERATOR_KEY=302e0208...94329fb
 ```
 If you want to run multiple clients from the command line simultaneously then make sure the server ports are not occupied.
 

@@ -137,7 +137,7 @@ public final class OutboundHCSMessage {
             TransactionId transactionId = firstTransactionId;
             int count = 1;
             for (ApplicationMessageChunk messageChunk : parts) {
-                log.info("Sending message part " + count + " of " + parts.size());
+                log.info("Sending message part " + count + " of " + parts.size() + " to topic " + this.topicIds.get(topicIndex));
                 count++;
                 ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction()
                     .setMessage(messageChunk.toByteArray())

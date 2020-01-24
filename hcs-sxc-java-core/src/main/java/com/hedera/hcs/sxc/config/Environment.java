@@ -15,13 +15,15 @@ public final class Environment {
     private Dotenv dotEnv;
 
     public Environment() {
-        this.dotEnv = Dotenv.configure().directory("./config").ignoreIfMissing().load();
-        if (this.dotEnv != null) {
-            log.info("Found .env file in ./config");
-        }
+        this("./config/.env");
     }
     public Environment(String fileName) {
-        this.dotEnv = Dotenv.configure().filename(fileName).ignoreIfMissing().load();        
+        try {
+            this.dotEnv = Dotenv.configure().filename(fileName).load();        
+            log.info("Found .env file in " + fileName);
+        } catch (Exception e) {
+            log.warn("No " + fileName + " found.");
+        }
     }
     
     private String getEnvValue(String environmentVariable) {

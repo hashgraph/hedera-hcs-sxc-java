@@ -15,7 +15,7 @@ public class MirrorSubscribe implements MirrorSubscriptionInterface {
 
     @Override
     public void init(HCSCallBackFromMirror onHCSMessageCallback, long applicationId, Optional<Instant> lastConsensusTimestamp, String mirrorAddress, List<ConsensusTopicId> topicIds) throws Exception {
-        log.info("hcs-sxc-plugins-mirror-direct init");
+        log.info("hcs-sxc-java-plugins-mirror-direct init");
         // subscribe
         
         String[] mirrorDetails = mirrorAddress.split(":");

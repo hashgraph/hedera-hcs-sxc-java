@@ -25,7 +25,7 @@ public final class DockerComposeReader {
         if (configFile.exists()) {
             log.info("Found app net configuration in ./config/docker-compose.yml");
             inputStream = new FileInputStream(configFile.getCanonicalPath());
-        }
+        } 
         if (inputStream != null) {
             Representer representer = new Representer();
             representer.getPropertyUtils().setSkipMissingProperties(true);

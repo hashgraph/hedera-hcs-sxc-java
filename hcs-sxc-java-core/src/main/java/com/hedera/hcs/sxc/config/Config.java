@@ -30,6 +30,8 @@ public final class Config {
             log.info("Loading config.yaml from " + configFilePath);
             InputStream inputStream = new FileInputStream(configFile.getCanonicalPath());
             yamlConfig = yaml.load(inputStream);
+        } else {
+            log.error("Unable to find file " + configFilePath);
         }
     }
 

@@ -28,6 +28,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import com.hedera.hcs.sxc.utils.StringUtils;
+import javax.crypto.spec.GCMParameterSpec;
 
 @Log4j2
 public class Cryptography {
@@ -55,8 +56,8 @@ public class Cryptography {
             UnsupportedEncodingException, 
             InvalidAlgorithmParameterException{
         SecretKeySpec aesKey = new SecretKeySpec(sharedSecret, 0, 16, "AES");
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, aesKey,new IvParameterSpec(new byte[16]));
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        cipher.init(Cipher.ENCRYPT_MODE, aesKey, new GCMParameterSpec(128, new byte[16]));
         byte[] ciphertext = cipher.doFinal(StringUtils.stringToByteArray(cleartext));
         return ciphertext;
     }
@@ -86,8 +87,8 @@ public class Cryptography {
             IOException
     {
         SecretKeySpec aesKey = new SecretKeySpec(sharedSecret,0, 16, "AES"); 
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, aesKey,new IvParameterSpec(new byte[16]));
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        cipher.init(Cipher.DECRYPT_MODE, aesKey, new GCMParameterSpec(128, new byte[16]));
         return cipher.doFinal(ciphertext);  
     }
     

@@ -22,6 +22,7 @@
             <artifactId>hcs-sxc-java-core</artifactId>
             <version>${hcs-sxc-core.version}</version>
         </dependency>
+        <!--  PLUGINS -->
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-plugins-persistence-in-memory</artifactId>
@@ -30,6 +31,16 @@
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-plugins-mirror-queue-artemis</artifactId>
+            <version>0.0.3-SNAPSHOT</version>
+        </dependency>
+		<dependency>
+            <groupId>com.hedera</groupId>
+            <artifactId>hcs-sxc-java-plugins-encryption-noop</artifactId>
+            <version>0.0.3-SNAPSHOT</version>
+        </dependency>
+         <dependency>
+            <groupId>com.hedera</groupId>
+            <artifactId>hcs-sxc-java-plugins-keyrotation-noop</artifactId>
             <version>0.0.3-SNAPSHOT</version>
         </dependency>
     </dependencies>

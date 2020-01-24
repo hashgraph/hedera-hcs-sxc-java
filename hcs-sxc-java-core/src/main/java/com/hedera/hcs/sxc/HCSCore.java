@@ -35,6 +35,7 @@ public final class HCSCore {
     private MessagePersistenceLevel messagePersistenceLevel;
     private String mirrorAddress;
     private Map<String, String> hibernateConfig = new HashMap<String, String>();
+	 private byte[] messageEncryptionKey = new byte[0];
 
     /**
      * Constructor for HCS Core
@@ -77,6 +78,10 @@ public final class HCSCore {
         this.encryptMessages = encryptMessages;
         return this;
     }
+    public HCSCore withMessageEncryptionKey(byte[] messageEncryptionKey) {
+        this.messageEncryptionKey = messageEncryptionKey;
+        return this;
+    }
     public HCSCore withKeyRotation(boolean keyRotation, int frequency) {
         this.rotateKeys = keyRotation;
         this.rotationFrequency = frequency;
@@ -103,6 +108,9 @@ public final class HCSCore {
     }
     public boolean getEncryptMessages() {
         return this.encryptMessages;
+    }
+    public byte[] getMessageEncryptionKey() {
+        return this.messageEncryptionKey;
     }
     public boolean getRotateKeys() {
         return this.rotateKeys;

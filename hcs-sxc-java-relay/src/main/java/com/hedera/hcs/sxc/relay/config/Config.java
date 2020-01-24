@@ -20,17 +20,18 @@ public final class Config {
     public Config() throws FileNotFoundException, IOException {
         this("./config/relay-config.yaml");
     }
-    
+
     // constructor with parameter for testing
-    public Config(String filePath) throws FileNotFoundException, IOException {
+    public Config(String configFilePath) throws FileNotFoundException, IOException {
         Yaml yaml = new Yaml(new Constructor(YAMLConfig.class));
-        
-        File configFile = new File(filePath);
+
+        File configFile = new File(configFilePath);
         if (configFile.exists()) {
-            log.info("Loading apps.yaml from " + filePath);
-            // config file exists outside of jar, use it
+            log.info("Loading apps.yaml from " + configFilePath);
             InputStream inputStream = new FileInputStream(configFile.getCanonicalPath());
             yamlConfig = yaml.load(inputStream);
+        } else {
+            log.error("Unable to find file " + configFilePath);
         }
     }
 

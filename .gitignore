@@ -73,3 +73,4 @@ hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/src/main/resources/config.yam
 hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config
 hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/config.yaml
 hcs-sxc-java-relay/config/relay-config.yaml
+hcs-sxc-java-queue/config/queue-config.yaml

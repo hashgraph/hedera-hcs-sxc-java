@@ -4,7 +4,8 @@ import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 
 import io.github.cdimascio.dotenv.Dotenv;
-
+import lombok.extern.log4j.Log4j2;
+@Log4j2
 public final class Environment {
     
     /** 
@@ -14,7 +15,22 @@ public final class Environment {
     private Dotenv dotEnv;
 
     public Environment() {
-        this.dotEnv = Dotenv.configure().ignoreIfMissing().load();        
+        this.dotEnv = Dotenv.configure().directory("./config").ignoreIfMissing().load();
+        if (this.dotEnv != null) {
+            log.info("Found .env file in ./config");
+        } else {
+            this.dotEnv = Dotenv.configure().directory("./").ignoreIfMissing().load();
+            if (this.dotEnv != null) {
+                log.info("Found .env file in ./");
+            } else {
+                this.dotEnv = Dotenv.configure().directory("./src/main/resources").ignoreIfMissing().load();
+                if (this.dotEnv != null) {
+                    log.info("Found .env file in ./src/main/resources");
+                } else {
+                    log.warn("No .env file found in searched locations (./config, ./, ./src/main/resources");
+                }
+            }
+        }
     }
     public Environment(String fileName) {
         this.dotEnv = Dotenv.configure().filename(fileName).ignoreIfMissing().load();        
@@ -59,5 +75,9 @@ public final class Environment {
      */
     public int getAppId() {
         return Integer.parseInt(getEnvValue("APP_ID"));
+    }
+    
+    public Dotenv getDotEnv() {
+        return this.dotEnv;
     }
 }

@@ -18,28 +18,28 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public final class AppData {
 
-    private static HCSCore hcsCore;
+    private HCSCore hcsCore;
     private int topicIndex = 0; // refers to the first topic ID in the config.yaml
     private String publicKey = "";
     private String userName = "";
     private long appId = 0;
     List<AppClient> appClients = new ArrayList<>();
     private int webPort = 8080;
-    private Dotenv dotEnv = Dotenv.configure().ignoreIfMissing().load();
+    private Dotenv dotEnv;
     
     private String getEnvValue(String varName) throws Exception {
         String value = "";
         if ( System.getProperty(varName) != null ) { 
             value = System.getProperty(varName);
             log.info(varName + " found in command line parameters");
-        } else if ((dotEnv.get(varName) == null) || (dotEnv.get(varName).isEmpty())) {
+        } else if ((this.dotEnv.get(varName) == null) || (this.dotEnv.get(varName).isEmpty())) {
             log.error(varName + " environment variable is not set");
             log.error(varName + " environment variable not found in ./.env");
             log.error(varName + " environment variable not found in ./src/main/resources/.env");
             log.error(varName + " environment variable not found in command line parameters");
         } else {
-            value = dotEnv.get(varName);
-            log.info(varName + "=" + value + " found in environment variables");
+            value = this.dotEnv.get(varName);
+            log.info(varName + " found in environment variables");
         }
         return value;
     }
@@ -51,17 +51,15 @@ public final class AppData {
     }
     public AppData() throws Exception {
         
-        if ((dotEnv.get("APP_ID") == null) || (dotEnv.get("APP_ID").isEmpty())) {
-            // no environment variables found in environment or ./.env, try ./src/main/resource/.env
-            dotEnv = Dotenv.configure().directory("./src/main/resources").ignoreIfMissing().load();
-        }
+        this.hcsCore = new HCSCore(appId);
 
+        this.dotEnv = hcsCore.getEnvironment();
+        
         this.appId = getEnvValueLong("APP_ID");
         
         // just check if set
         getEnvValue("OPERATOR_KEY");
         
-        AppData.hcsCore = new HCSCore(appId);
         DockerCompose dockerCompose = DockerComposeReader.parse();
 
         if ( System.getProperty("server.port") != null ) { 
@@ -102,7 +100,7 @@ public final class AppData {
     }
 
     public HCSCore getHCSCore() {
-        return AppData.hcsCore;
+        return this.hcsCore;
     }
 
     public long getAppId() {

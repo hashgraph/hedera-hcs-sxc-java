@@ -69,7 +69,7 @@ This is to ensure application state does not end up out of sync with other appli
 
 Looking through the java project, we have the following Maven components/artifacts.
 
-* HCS-SXC-Java
+* hcs-sxc-java
     * hcs-sxc-java-core
     * hcs-sxc-java-relay
     * hcs-sxc-java-interfaces
@@ -91,7 +91,7 @@ This component does the bulk of the work and is imported into a project (see exa
 
 This component subscribes to topic(s) from a mirror node and forwards messages to a message queue. `AppNet` participants subscribe to the queue to receive messages.
 
-### HCS-interfaces
+### hcs-sxc-java-interfaces
 
 A set of standard interfaces or structures for the various components to communicate with each other. Listed below are those that are used in the context of plug-ins which have to satisfy particular interface requirements.
 
@@ -100,7 +100,7 @@ A set of standard interfaces or structures for the various components to communi
 * MirrorSubscriptionInterface - so that plugins can be made to subscribe to mirror notifications
 * SxcMessagePersistence - so that plugins can be used to persist data
 
-Defined in the `HCS-Interfaces` project, these are data structures that are shared between components.
+Defined in the `hcs-sxc-java-Interfaces` project, these are data structures that are shared between components.
 
 * HCSRelayMessage - a message from the `hcs-sxc-java-relay` components
 * HCSResponse - a application message id and message

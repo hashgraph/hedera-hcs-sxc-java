@@ -34,8 +34,7 @@ public final class AppData {
             log.info(varName + " found in command line parameters");
         } else if ((this.dotEnv.get(varName) == null) || (this.dotEnv.get(varName).isEmpty())) {
             log.error(varName + " environment variable is not set");
-            log.error(varName + " environment variable not found in ./.env");
-            log.error(varName + " environment variable not found in ./src/main/resources/.env");
+            log.error(varName + " environment variable not found in ./config/.env");
             log.error(varName + " environment variable not found in command line parameters");
         } else {
             value = this.dotEnv.get(varName);

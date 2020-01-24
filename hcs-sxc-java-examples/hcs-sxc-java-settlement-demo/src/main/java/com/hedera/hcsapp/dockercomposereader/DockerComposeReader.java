@@ -25,18 +25,6 @@ public final class DockerComposeReader {
         if (configFile.exists()) {
             log.info("Found app net configuration in ./config/docker-compose.yml");
             inputStream = new FileInputStream(configFile.getCanonicalPath());
-        } else {
-            configFile = new File("./docker-compose.yml");
-            if (configFile.exists()) {
-                log.info("Found app net configuration in ./docker-compose.yml");
-                inputStream = new FileInputStream(configFile.getCanonicalPath());
-            } else {
-                log.info("Loading app net configuration from ./src/main/resource/docker-compose.yml");
-                inputStream = DockerComposeReader.class
-                    .getClassLoader()
-                    .getResourceAsStream("docker-compose.yml");
-            
-            }
         }
         if (inputStream != null) {
             Representer representer = new Representer();
@@ -44,7 +32,7 @@ public final class DockerComposeReader {
             Yaml yaml = new Yaml(new Constructor(DockerCompose.class),representer);
             return yaml.load(inputStream);
         } else {
-            throw new Exception("Docker compose file not found in ./ or ./src/main/resources.");
+            throw new Exception("Docker compose file not found in ./config");
         }
     }
 }

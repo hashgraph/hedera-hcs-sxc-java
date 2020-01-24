@@ -9,8 +9,8 @@ appNet:
   rotateKeyFrequency: 0
   # HCS topics to be used
   topics:
-    - topic: 0.0.1072
-    - topic: 0.0.1088
+    - topic: 0.0.998
+    - topic: 0.0.999
   # Which level of persistence should be used
   persistenceLevel: "FULL"
   # Should history of messages be caught up
@@ -21,7 +21,7 @@ HCSTransactionFee: 100000000
 
 mirrorNode:
   # Address of the mirror node's subscription end point
-  address: "34.66.214.12:6552"
+  address: "mirror:6552"
 
 # List of Hedera Nodes to send HCS messages to, if more than one is specified, the SDK will randomly choose a node with each transaction
 nodes:
@@ -29,4 +29,8 @@ nodes:
     account: 0.0.3
   - address: 1.testnet.hedera.com:50211
     account: 0.0.4
+  - address: 2.testnet.hedera.com:50211
+    account: 0.0.5
+  - address: 3.testnet.hedera.com:50211
+    account: 0.0.6
     

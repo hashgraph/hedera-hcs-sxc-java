@@ -30,8 +30,6 @@ public class OnHCSMessageCallbackTest {
     @BeforeEach
     public void setup() throws IOException{
         
-        //Optional<Module> findModule = ModuleLayer.boot().findModule("abcde");
-        //findModule.get().getResourceAsStream("xyz");
         txId = new TransactionId(new AccountId(1234L));
         persistence = new PersistMessages(); 
     }

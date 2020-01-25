@@ -1,9 +1,9 @@
 # Address of the mirror node's subscription end point
-mirrorAddress: "34.66.214.12:6552"
+mirrorAddress: api.testnet.kabuto.sh:50211
 
 # The topic IDs to subscribe to
 topics:
-  - topic: "0.0.1044"
+  - topic: 0.0.999
 
 # Should relay catch up with message history on startup
 catchupHistory: true

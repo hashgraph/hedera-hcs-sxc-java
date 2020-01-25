@@ -1,5 +1,4 @@
-package com.hedera.hcs.sxc.cryptography;
-
+package com.hedera.hcs.sxc.plugin.cryptography.cryptography;
 import com.hedera.hcs.sxc.utils.StringUtils;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -39,13 +38,13 @@ public class CryptographyTest {
     
     @Test
     public void encryptAndDecrypt() throws Exception {
-        byte[] encrypt = Cryptography.encrypt(secretKey, cleartext);
+        byte[] encrypt = Cryptography.load().encrypt(secretKey, StringUtils.stringToByteArray(cleartext));
         String encryptHex = StringUtils.byteArrayToHexString(encrypt);
         byte[] encryptPrime = StringUtils.hexStringToByteArray(encryptHex);
         assertArrayEquals(encrypt, encryptPrime);
-        byte[] decrypt = Cryptography.decrypt(secretKey, encrypt);
+        byte[] decrypt = Cryptography.load().decrypt(secretKey, encrypt);
         assertTrue(Arrays.equals(StringUtils.stringToByteArray(cleartext), decrypt)); 
         assertEquals(cleartext, StringUtils.byteArrayToString(decrypt));
-        assertEquals(cleartext, Cryptography.decryptToClearText(secretKey, encrypt));
+        assertEquals(cleartext, Cryptography.load().decryptToClearText(secretKey, encrypt));
     }
 }

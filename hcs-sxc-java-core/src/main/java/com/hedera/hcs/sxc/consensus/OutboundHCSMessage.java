@@ -64,11 +64,10 @@ public final class OutboundHCSMessage {
         // load persistence implementation at runtime
         Class<?> persistenceClass = Plugins.find("com.hedera.hcs.sxc.plugin.persistence.*", "com.hedera.hcs.sxc.interfaces.SxcMessagePersistence", true);
         this.persistencePlugin = (SxcMessagePersistence)persistenceClass.newInstance();
-        Class<?> messageEncryptionClass = Plugins.find("com.hedera.hsc.sxc.plugins.cryptography.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
+        Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
+                                                        
         this.messageEncryptionPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
-        Class<?> keyRotationClass = Plugins.find("com.hedera.hsc.sxc.plugins.cryptography.keyrotation.*", "com.hedera.hcs.sxc.interfaces.SxcKeyRotation", true);
-        this.keyRotationPlugin = (SxcKeyRotation)keyRotationClass.newInstance();
-    }
+      }
 
     public OutboundHCSMessage overrideMessageSignature(boolean signMessages) {
         this.signMessages = signMessages;

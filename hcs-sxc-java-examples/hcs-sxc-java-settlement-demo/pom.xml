@@ -110,17 +110,15 @@
             <version>${hcs-sxc.version}</version>
         </dependency>
         -->
-		<dependency>
+      
+        <dependency>
             <groupId>com.hedera</groupId>
-            <artifactId>hcs-sxc-java-plugins-encryption-noop</artifactId>
+            <artifactId>hcs-sxc-java-plugins-cryptography</artifactId>
             <version>0.0.3-SNAPSHOT</version>
         </dependency>
 
-         <dependency>
-            <groupId>com.hedera</groupId>
-            <artifactId>hcs-sxc-java-plugins-keyrotation-noop</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
-        </dependency>
+     
+       
     </dependencies>
 
     <build>

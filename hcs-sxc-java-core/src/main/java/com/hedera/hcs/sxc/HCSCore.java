@@ -16,6 +16,9 @@ import com.hedera.hcs.sxc.config.Environment;
 import com.hedera.hcs.sxc.config.MirrorNode;
 import com.hedera.hcs.sxc.config.YAMLConfig;
 import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
+
+import io.github.cdimascio.dotenv.Dotenv;
+
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
 
 public final class HCSCore {
@@ -35,8 +38,9 @@ public final class HCSCore {
     private MessagePersistenceLevel messagePersistenceLevel;
     private String mirrorAddress;
     private Map<String, String> hibernateConfig = new HashMap<String, String>();
-	 private byte[] messageEncryptionKey = new byte[0];
-
+	private byte[] messageEncryptionKey = new byte[0];
+	private Environment environment = new Environment();
+	
     /**
      * Constructor for HCS Core
      * @param applicationId - unique value per app instance using the component, if the app generates this value and stops/starts,
@@ -45,7 +49,6 @@ public final class HCSCore {
     public HCSCore(long applicationId) throws FileNotFoundException, IOException {
         Config config = new Config();
         YAMLConfig yamlConfig = config.getConfig();
-        Environment environment = new Environment();
 
         this.nodeMap = yamlConfig.getNodesMap();
         this.hcsTransactionFee = yamlConfig.getHCSTransactionFee();
@@ -61,8 +64,8 @@ public final class HCSCore {
         this.catchupHistory = appnet.getCatchupHistory();
         this.messagePersistenceLevel = appnet.getPersistenceLevel();
 
-        this.operatorAccountId = environment.getOperatorAccountId();
-        this.ed25519PrivateKey = environment.getOperatorKey();
+        this.operatorAccountId = this.environment.getOperatorAccountId();
+        this.ed25519PrivateKey = this.environment.getOperatorKey();
 
         this.applicationId = applicationId;
         
@@ -153,5 +156,9 @@ public final class HCSCore {
     
     public Map<String, String> getHibernateConfig() {
         return this.hibernateConfig;
+    }
+    
+    public Dotenv getEnvironment() {
+        return this.environment.getDotEnv();
     }
 }

@@ -16,33 +16,26 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public final class Config {
     private AppYAML yamlConfig = new AppYAML();
-    
+
     public Config() throws FileNotFoundException, IOException {
-        Yaml yaml = new Yaml(new Constructor(AppYAML.class));
-        
-        InputStream inputStream = this.getClass()
-                .getClassLoader()
-                .getResourceAsStream("apps.yaml");
-        
-        File configFile = new File("./config/apps.yaml");
-        if (configFile.exists()) {
-            log.info("Loading apps.yaml from ./config");
-            // config file exists outside of jar, use it
-            inputStream = new FileInputStream(configFile.getCanonicalPath());
-        } else {
-
-            configFile = new File("./apps.yaml");
-            if (configFile.exists()) {
-                log.info("Loading apps.yaml from ./");
-                // config file exists outside of jar, use it
-                inputStream = new FileInputStream(configFile.getCanonicalPath());
-            } else {
-                log.info("Loading apps.yaml from src/main/resources");
-            }
-        }
-
-        yamlConfig = yaml.load(inputStream);
+        this("./config/apps.yaml");
     }
+
+    // constructor with parameter for testing
+    public Config(String configFilePath) throws FileNotFoundException, IOException {
+        Yaml yaml = new Yaml(new Constructor(AppYAML.class));
+
+        File configFile = new File(configFilePath);
+        if (configFile.exists()) {
+            log.info("Loading apps.yaml from " + configFilePath);
+            // config file exists outside of jar, use it
+            InputStream inputStream = new FileInputStream(configFile.getCanonicalPath());
+            yamlConfig = yaml.load(inputStream);
+        } else {
+            log.error("Unable to find file " + configFilePath);
+        }
+    }
+
     public AppYAML getConfig() {
         return this.yamlConfig;
     }

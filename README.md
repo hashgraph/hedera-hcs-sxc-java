@@ -69,7 +69,7 @@ This is to ensure application state does not end up out of sync with other appli
 
 Looking through the java project, we have the following Maven components/artifacts.
 
-* HCS-SXC-Java
+* hcs-sxc-java
     * hcs-sxc-java-core
     * hcs-sxc-java-relay
     * hcs-sxc-java-interfaces
@@ -91,7 +91,7 @@ This component does the bulk of the work and is imported into a project (see exa
 
 This component subscribes to topic(s) from a mirror node and forwards messages to a message queue. `AppNet` participants subscribe to the queue to receive messages.
 
-### HCS-interfaces
+### hcs-sxc-java-interfaces
 
 A set of standard interfaces or structures for the various components to communicate with each other. Listed below are those that are used in the context of plug-ins which have to satisfy particular interface requirements.
 
@@ -100,7 +100,7 @@ A set of standard interfaces or structures for the various components to communi
 * MirrorSubscriptionInterface - so that plugins can be made to subscribe to mirror notifications
 * SxcMessagePersistence - so that plugins can be used to persist data
 
-Defined in the `HCS-Interfaces` project, these are data structures that are shared between components.
+Defined in the `hcs-sxc-java-Interfaces` project, these are data structures that are shared between components.
 
 * HCSRelayMessage - a message from the `hcs-sxc-java-relay` components
 * HCSResponse - a application message id and message
@@ -205,8 +205,9 @@ mvnw clean install -Pdocker -Ppostgres
 
 the `h2` profile is the default profile
 
-#### hcs-sxc-java-plugins-persistence-in-memory
+*Note: Repeated compilations with the `docker` profile may lead to a large number of images being created in the docker repository. Be sure to remove them from time to time `docker image prune -a`.*
 
+#### hcs-sxc-java-plugins-persistence-in-memory
 
 ### hcs-sxc-java proto
 
@@ -264,17 +265,16 @@ for in database
 
 A number of configuration files are necessary in order to provide the components the necessary information such as which TopicId(s) to use or subscribe to, etc... These files are listed and explained below.
 
-Sample configuration files are located in the `./src/main/resources` of each project where a configuration file may be necessary.
+Sample configuration files are located in the `./config` folder of each project where a configuration file may be necessary.
 
 ### Order of precedence
 
 Some configuration file data may be overridden with environment variables and/or command line paramters. The location of a configuration file may also vary depending on use cases. The order of precedence is below for all components:
+
 - command line parameters
 - host environment variables
-- `.env` file
-- `./config` folder (this is so that a persisted volume can be easily mounted for docker deployments)
-- `./` folder (mostly useful in static (fat jar) deployments)
-- `./src/main/resources` for IDE development
+- environment variables found in `./config/.env` file
+- `./config` folder for other configuration files
 
 Component logs will generally indicate where the configuration was obtained.
 
@@ -373,7 +373,7 @@ In addition to the `config.yaml` file, a `.env` file may be provided (or environ
 
 ```
 OPERATOR_KEY=
-OPERATOR_ID=0.0.2
+OPERATOR_ID=0.0.xxxx
 # APP Net
 APP_ID=0
 ```
@@ -484,13 +484,15 @@ These are merely sample lines of code, please refer to the example projects for 
 ### Compilation steps
 
 - Ensure the necessary configuration files are complete and accurate
-    - hcs-sxc-java-relay/src/main/resources/relay-config.yaml (use relay-config.yaml.sample as a starting point)
-    - hcs-sxc-java-plugins/hcs-sxc-java-plugins-mirror-queue-artemis/src/main/resources/queue-config.yaml (use queue-config.yaml.sample as a starting point)
-    - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/src/main/resources/.env (use dotenv.sample as a starting point)
-    - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/src/main/resources/.config.yaml (use config.yaml.sample as a starting point)
-    - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/src/main/resources/docker-compose.yml
-    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/src/main/resources/apps.yaml (use apps.yaml.sample as a starting point)
-    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/src/main/resources/config.yaml (use config.yaml.sample as a starting point)
+    - hcs-sxc-java-relay/config/relay-config.yaml (use relay-config.yaml.sample as a starting point)
+    - hcs-sxc-java-plugins/hcs-sxc-java-plugins-mirror-queue-artemis/config/queue-config.yaml (use queue-config.yaml.sample as a starting point)
+    - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/.env (use dotenv.sample as a starting point)
+    - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/.config.yaml (use config.yaml.sample as a starting point)
+    - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/docker-compose.yml
+
+    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/apps.yaml (use apps.yaml.sample as a starting point)
+    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/config.yaml (use config.yaml.sample as a starting point)
+    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/queue-config.yaml
     - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/docker-compose.yml
 
 #### Compile docker images
@@ -502,6 +504,8 @@ mvnw clean install -Pdocker
 ```
 
 *Note: a `mvnw` executable is provided in the project in the event you don't have maven installed*
+
+*Note: Repeated compilations with the `docker` profile may lead to a large number of images being created in the docker repository. Be sure to remove them from time to time `docker image prune -a`.
 
 #### Compile "fat" jars
 
@@ -525,7 +529,7 @@ The project comes with two examples to get you started, these are fully function
 
 This is a simple messaging demo between two participants. All messages sent from one participant are pushed to the Hedera HCS service and each participant subscribes to a mirror node to receive the consensus messages.
 
-To run the demo, first create a new HCS topic using the SDK and edit the `config.yaml` file to reflect the new topic id. This is to ensure that when you run the demo, you don't receive messages from someone else who you may be sharing a topic id with - although that could be fun.
+To run the demo, first create a new HCS topic using the CreateTopic class in the examples and edit the `config.yaml` file to reflect the new topic id. This is to ensure that when you run the demo, you don't receive messages from someone else who you may be sharing a topic id with - although that could be fun.
 Also check other details such as the mirror node, hedera network, etc... are correct.
 
 You will also need to ensure the same topic id is reflected in `relay-config.yaml`
@@ -534,7 +538,7 @@ Also create a `.env` file with the following information
 
 ```
 OPERATOR_KEY=
-OPERATOR_ID=0.0.2
+OPERATOR_ID=0.0.xxxx
 ```
 
 This demo uses the queue and relay components. For the apps to connect to the queue, an entry in your hosts file needs to be added as follows:
@@ -592,7 +596,7 @@ Also create a `.env` file with the following information
 
 ```
 OPERATOR_KEY=
-OPERATOR_ID=0.0.2
+OPERATOR_ID=0.0.xxxx
 # APP Net
 APP_ID=0
 ```
@@ -601,7 +605,7 @@ This demo does not use the queue and relay components, although it's possible to
 
 Compile the project (see above) and open a console terminal and switch to the folder/directory containing the `hcs-sxc-java-settlement-demo` example on your computer.
 
-Then switch to `src/main/resources` and run the docker images as follows
+Then switch to `./config` folder and run the docker images as follows
 
 ```shell
 docker-compose up --remove-orphans

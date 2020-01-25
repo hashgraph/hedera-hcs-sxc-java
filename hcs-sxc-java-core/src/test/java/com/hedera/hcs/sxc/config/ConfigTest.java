@@ -30,7 +30,7 @@ public class ConfigTest extends AbstractConfigTest {
 
     @BeforeEach
     public void init() throws FileNotFoundException, IOException {
-        config = new Config();
+        config = new Config("./src/test/resources/config.yaml");
         yamlConfig = config.getConfig();
         appNet = yamlConfig.getAppNet();
         nodeList = yamlConfig.getNodes();
@@ -46,20 +46,22 @@ public class ConfigTest extends AbstractConfigTest {
                  () -> assertFalse(appNet.getRotateKeys()),
                  () -> assertEquals(0, appNet.getRotateKeyFrequency()),
                  () -> assertEquals(2, appNet.getTopics().size()),
-                 () -> assertEquals("0.0.1072", appNet.getTopics().get(0).getTopic()),
-                 () -> assertEquals("0.0.1088", appNet.getTopics().get(1).getTopic()),
-                 () -> assertEquals(2, nodeList.size()),
+                 () -> assertEquals("0.0.998", appNet.getTopics().get(0).getTopic()),
+                 () -> assertEquals("0.0.999", appNet.getTopics().get(1).getTopic()),
+                 () -> assertEquals(4, nodeList.size()),
                  () -> assertEquals("0.testnet.hedera.com:50211", nodeList.get(0).getAddress()),
                  () -> assertEquals("0.0.3", nodeList.get(0).getAccount()),
                  () -> assertEquals("1.testnet.hedera.com:50211", nodeList.get(1).getAddress()),
                  () -> assertEquals("0.0.4", nodeList.get(1).getAccount()),
-                 () -> assertEquals(2, nodeMap.size()),
+                 () -> assertEquals(4, nodeMap.size()),
                  () -> assertEquals("0.testnet.hedera.com:50211", nodeMap.get(AccountId.fromString("0.0.3"))),
                  () -> assertEquals("1.testnet.hedera.com:50211", nodeMap.get(AccountId.fromString("0.0.4"))),
+                 () -> assertEquals("2.testnet.hedera.com:50211", nodeMap.get(AccountId.fromString("0.0.5"))),
+                 () -> assertEquals("3.testnet.hedera.com:50211", nodeMap.get(AccountId.fromString("0.0.6"))),
                  () -> assertEquals(100000000, hcsTransactionFee),
                  () -> assertEquals("FULL", appNet.getPersistenceLevel().name()),
                  () -> assertTrue(appNet.getCatchupHistory()),
-                 () -> assertEquals("34.66.214.12:6552", yamlConfig.getMirrorNode().getAddress())
+                 () -> assertEquals("mirror:6552", yamlConfig.getMirrorNode().getAddress())
          );
     }
 }

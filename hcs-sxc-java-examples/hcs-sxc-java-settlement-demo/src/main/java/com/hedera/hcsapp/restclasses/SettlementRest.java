@@ -44,7 +44,7 @@ public final class SettlementRest {
         this.currency = settlement.getCurrency();
         this.status = settlement.getStatus();
         this.createdDateTime = settlement.getCreatedDate() + " " + settlement.getCreatedTime();
-        this.topicId = appData.getHCSCore().getTopicIds().get(appData.getTopicIndex()).toString();
+        this.topicId = appData.getHCSCore().getTopics().get(appData.getTopicIndex()).getTopic();
         this.displayStatus = States.valueOf(this.status).getDisplayForSettlement();
         this.paymentChannelName = settlement.getPaymentChannelName();
         this.payerAccountDetails = settlement.getPayerAccountDetails();

@@ -12,8 +12,8 @@ public class CreateTopic {
     public static void main(String[] args) throws Exception {
         HCSCore hcsCore = new HCSCore(0L);
         // create topics on HCS
-        CreateHCSTopic createHCSTopic = new CreateHCSTopic(hcsCore);
-        ConsensusTopicId topicId = createHCSTopic.execute();
+        ConsensusTopicId topicId = new CreateHCSTopic(hcsCore)
+                .execute();
         log.info(topicId.toString());
     }
 

@@ -51,20 +51,6 @@ public final class AppNet {
     public void setTopics(List<Topic> topics) {
         this.topics = topics;
     }
-    /** 
-     * Returns a list of ConsensusTopicId
-     * @return List<ConsensusTopicId> 
-     */
-    public List<ConsensusTopicId> getTopicIds() {
-        List<ConsensusTopicId> topicIds = new ArrayList<ConsensusTopicId>();
-        
-        for (Topic topic : this.topics) {
-            topicIds.add(topic.getConsensusTopicId());
-        }
-        
-        return topicIds;
-    }
-
     public MessagePersistenceLevel getPersistenceLevel() {
         return persistenceLevel;
     }

@@ -30,6 +30,7 @@ public class CryptographyTest {
         try {
             KeyPair kp = Cryptography.generateRsaKeyPair();
             secretKey =  kp.getPrivate().getEncoded();
+            //System.out.println(StringUtils.byteArrayToHexString(secretKey));
         } catch (Exception ex) {
             Logger.getLogger(CryptographyTest.class.getName()).log(Level.SEVERE, null, ex);
         }

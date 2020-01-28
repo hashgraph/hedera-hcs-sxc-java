@@ -27,24 +27,25 @@ public final class HCSCore {
     private boolean encryptMessages = false;
     private boolean rotateKeys = false;
     private int rotationFrequency = 0;
-    private Map<AccountId, String> nodeMap = new HashMap<AccountId, String>();
+    private Map<AccountId, String> nodeMap = new HashMap<>();
     private AccountId operatorAccountId = new AccountId(0, 0, 0); 
     private Ed25519PrivateKey ed25519PrivateKey;
-    private List<ConsensusTopicId> topicIds = new ArrayList<ConsensusTopicId>();
+    private List<ConsensusTopicId> topicIds = new ArrayList<>();
     private long hcsTransactionFee = 0;
     private long applicationId = 0;
     private static SxcMessagePersistence persistence;
-    private boolean catchupHistory;
-    private MessagePersistenceLevel messagePersistenceLevel;
-    private String mirrorAddress;
-    private Map<String, String> hibernateConfig = new HashMap<String, String>();
-	private byte[] messageEncryptionKey = new byte[0];
-	private Environment environment = new Environment();
+    private final boolean catchupHistory;
+    private final MessagePersistenceLevel messagePersistenceLevel;
+    private final String mirrorAddress;
+    private final Map<String, String> hibernateConfig = new HashMap<>();
+    private byte[] messageEncryptionKey = new byte[0];
+    private final Environment environment = new Environment();
 	
     /**
      * Constructor for HCS Core
      * @param applicationId - unique value per app instance using the component, if the app generates this value and stops/starts,
      * it must reuse the same applicationId to ensure consistent message delivery
+     * @throws java.io.FileNotFoundException
      */
     public HCSCore(long applicationId) throws FileNotFoundException, IOException {
         Config config = new Config();
@@ -66,7 +67,7 @@ public final class HCSCore {
 
         this.operatorAccountId = this.environment.getOperatorAccountId();
         this.ed25519PrivateKey = this.environment.getOperatorKey();
-
+        this.messageEncryptionKey = this.environment.getMessageEncryptionKey();
         this.applicationId = applicationId;
         
         String appId = Long.toString(this.applicationId);

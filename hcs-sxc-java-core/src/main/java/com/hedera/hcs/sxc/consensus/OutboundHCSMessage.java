@@ -39,10 +39,10 @@ public final class OutboundHCSMessage {
     private boolean encryptMessages = false;
     private boolean rotateKeys = false;
     private int rotationFrequency = 0;
-    private Map<AccountId, String> nodeMap = new HashMap<AccountId, String>();
+    private Map<AccountId, String> nodeMap = new HashMap<>();
     private AccountId operatorAccountId = new AccountId(0, 0, 0);
     private Ed25519PrivateKey ed25519PrivateKey;
-    private List<ConsensusTopicId> topicIds = new ArrayList<ConsensusTopicId>();
+    private List<ConsensusTopicId> topicIds = new ArrayList<>();
     private long hcsTransactionFee = 0L;
     private TransactionId transactionId = null;
     private SxcMessagePersistence persistencePlugin;
@@ -65,7 +65,6 @@ public final class OutboundHCSMessage {
         Class<?> persistenceClass = Plugins.find("com.hedera.hcs.sxc.plugin.persistence.*", "com.hedera.hcs.sxc.interfaces.SxcMessagePersistence", true);
         this.persistencePlugin = (SxcMessagePersistence)persistenceClass.newInstance();
         Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
-                                                        
         this.messageEncryptionPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
       }
 
@@ -113,6 +112,7 @@ public final class OutboundHCSMessage {
      * @throws HederaNetworkException
      * @throws IllegalArgumentException
      * @throws Exception
+     * @return TransactionId
      */
     public TransactionId sendMessage(int topicIndex, byte[] message) throws Exception {
 

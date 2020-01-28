@@ -35,7 +35,7 @@ public final class CreditRest {
             this.additionalNotes = credit.getAdditionalNotes();
             this.status = credit.getStatus();
             this.createdDateTime = credit.getCreatedDate() + " " + credit.getCreatedTime();
-            this.topicId = appData.getHCSCore().getTopicIds().get(appData.getTopicIndex()).toString();
+            this.topicId = appData.getHCSCore().getTopics().get(appData.getTopicIndex()).getTopic();
             this.displayStatus = States.valueOf(this.status).getDisplayForCredit();
         } catch (Exception e) {
             log.error(e);

@@ -72,6 +72,8 @@ public class HCSIntegration {
         // create a callback object to receive the message
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(this.appData.getHCSCore());
         onHCSMessageCallback.addObserver(hcsMessage -> {
+            
+            
             processHCSMessage(hcsMessage);
         });
     }
@@ -79,7 +81,6 @@ public class HCSIntegration {
     public void processHCSMessage(HCSResponse hcsResponse) {
         try {
             ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(hcsResponse.getMessage());
-
             SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessage.getBusinessProcessMessage().toByteArray());
             // (CREDIT_PENDING , r ,threadId ,credit) => (CREDIT_AWAIT_ACK ,r ,threadId , credit[threadId].txId=r.MessageId)
             String threadId = settlementBPM.getThreadId();
@@ -244,8 +245,10 @@ public class HCSIntegration {
         
                                 settlementRepository.save(settlement);
         
-                                new OutboundHCSMessage(appData.getHCSCore()).overrideEncryptedMessages(false)
-                                        .overrideMessageSignature(false).sendMessage(appData.getTopicIndex(), newSettlementBPM.toByteArray());
+                                OutboundHCSMessage o =  new OutboundHCSMessage(appData.getHCSCore());
+                                        o.overrideEncryptedMessages(true);
+                                        o.overrideMessageSignature(false);
+                                        o.sendMessage(appData.getTopicIndex(), newSettlementBPM.toByteArray());
         
                                 log.info("Message sent successfully.");
                                 notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);

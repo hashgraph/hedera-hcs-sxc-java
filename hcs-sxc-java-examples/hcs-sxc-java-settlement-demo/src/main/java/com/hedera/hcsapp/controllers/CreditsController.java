@@ -173,7 +173,7 @@ public class CreditsController {
             
             credit = creditRepository.save(credit);
             new OutboundHCSMessage(appData.getHCSCore())
-                  .overrideEncryptedMessages(false)
+                  .overrideEncryptedMessages(true)
                   .overrideMessageSignature(false)
                   .withFirstTransactionId(transactionId)
                   .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());

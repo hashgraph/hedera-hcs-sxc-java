@@ -12,72 +12,55 @@ import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.consensus.ConsensusTopicCreateTransaction;
+import com.hedera.hashgraph.sdk.consensus.ConsensusTopicDeleteTransaction;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
-import com.hedera.hashgraph.sdk.crypto.PublicKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcs.sxc.HCSCore;
     
-public final class CreateHCSTopic {
+public final class DeleteHCSTopic {
     private Map<AccountId, String> nodeMap = new HashMap<AccountId, String>();
     private AccountId operatorAccountId = new AccountId(0, 0, 0); 
     private Ed25519PrivateKey ed25519PrivateKey;
-    ConsensusTopicCreateTransaction tx = new ConsensusTopicCreateTransaction();
+    private ConsensusTopicDeleteTransaction tx = new ConsensusTopicDeleteTransaction();
     
-    public CreateHCSTopic(HCSCore hcsCore) {
+    public DeleteHCSTopic(HCSCore hcsCore) {
         this.nodeMap = hcsCore.getNodeMap();
         this.operatorAccountId = hcsCore.getOperatorAccountId();
         this.ed25519PrivateKey = hcsCore.getEd25519PrivateKey();
         this.tx.setMaxTransactionFee(hcsCore.getMaxTransactionFee());
     }
     
-    public CreateHCSTopic overrideNodeMap(Map<AccountId, String> nodeMap) {
+    public DeleteHCSTopic overrideNodeMap(Map<AccountId, String> nodeMap) {
         this.nodeMap = nodeMap;
         return this;
     }
-    public CreateHCSTopic overrideOperatorAccountId(AccountId operatorAccountId) {
+    public DeleteHCSTopic overrideOperatorAccountId(AccountId operatorAccountId) {
         this.operatorAccountId = operatorAccountId;
         return this;
     }
-    public CreateHCSTopic overrideOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
+    public DeleteHCSTopic overrideOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
         this.ed25519PrivateKey = ed25519PrivateKey;
         return this;
     }
-    public CreateHCSTopic setMaxTransactionFee(Long maxTansactionFee) {
+    public DeleteHCSTopic setMaxTransactionFee(Long maxTansactionFee) {
         this.tx.setMaxTransactionFee(maxTansactionFee);
         return this;
     }
-    public CreateHCSTopic setTopicMemo (String topicMemo) {
-        this.tx.setTopicMemo(topicMemo);
-        return this;
-    }
-    public CreateHCSTopic setSubmitKey(PublicKey submitKey) {
-        this.tx.setSubmitKey(submitKey);
-        return this;
-    }
-    public CreateHCSTopic setAdminKey(PublicKey adminKey) {
-        this.tx.setAdminKey(adminKey);
-        return this;
-    }
-    public CreateHCSTopic setAutoRenewAccountId(AccountId autoRenewAccountId) {
-        this.tx.setAutoRenewAccountId(autoRenewAccountId);
-        return this;
-    }
-    public CreateHCSTopic setAutoRenewAccountId(String autoRenewAccountId) {
-        this.tx.setAutoRenewAccountId(AccountId.fromString(autoRenewAccountId));
-        return this;
-    }
-    public CreateHCSTopic setDuration(Duration autoRenewPeriod) {
-        this.tx.setAutoRenewPeriod(autoRenewPeriod);
-        return this;
-    }
-    public CreateHCSTopic setTransactionMemo(String transactionMemo) {
+    public DeleteHCSTopic setTransactionMemo(String transactionMemo) {
         this.tx.setTransactionMemo(transactionMemo);
         return this;
     }
-
+    public DeleteHCSTopic setTopicId(ConsensusTopicId topicId) {
+        this.tx.setTopicId(topicId);
+        return this;
+    }
+    public DeleteHCSTopic setTopicId(String topicId) {
+        this.tx.setTopicId(ConsensusTopicId.fromString(topicId));
+        return this;
+    }
+    
     /**
-     * Creates a new topic on a Hedera network
+     * Deletes a topic on a Hedera network
      * @return ConsensusTopicId
      * @throws HederaNetworkException
      * @throws IllegalArgumentException
@@ -93,7 +76,7 @@ public final class CreateHCSTopic {
             this.operatorAccountId
             ,this.ed25519PrivateKey
         );
-    
+        
         TransactionId txId = tx.execute(client);
         TransactionReceipt receipt = txId.getReceipt(client, Duration.ofSeconds(30));
         

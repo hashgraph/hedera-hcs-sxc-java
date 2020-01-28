@@ -14,6 +14,7 @@ import com.hedera.hcs.sxc.config.AppNet;
 import com.hedera.hcs.sxc.config.Config;
 import com.hedera.hcs.sxc.config.Environment;
 import com.hedera.hcs.sxc.config.MirrorNode;
+import com.hedera.hcs.sxc.config.Topic;
 import com.hedera.hcs.sxc.config.YAMLConfig;
 import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
 
@@ -27,19 +28,22 @@ public final class HCSCore {
     private boolean encryptMessages = false;
     private boolean rotateKeys = false;
     private int rotationFrequency = 0;
+   
     private Map<AccountId, String> nodeMap = new HashMap<>();
     private AccountId operatorAccountId = new AccountId(0, 0, 0); 
     private Ed25519PrivateKey ed25519PrivateKey;
     private List<ConsensusTopicId> topicIds = new ArrayList<>();
     private long hcsTransactionFee = 0;
+    private long maxTransactionFee =0;
     private long applicationId = 0;
+    private List<Topic> topics;
     private static SxcMessagePersistence persistence;
-    private final boolean catchupHistory;
-    private final MessagePersistenceLevel messagePersistenceLevel;
-    private final String mirrorAddress;
-    private final Map<String, String> hibernateConfig = new HashMap<>();
+    private boolean catchupHistory;
+    private MessagePersistenceLevel messagePersistenceLevel;
+    private String mirrorAddress;
+    private Map<String, String> hibernateConfig = new HashMap<>();
     private byte[] messageEncryptionKey = new byte[0];
-    private final Environment environment = new Environment();
+    private Environment environment = new Environment();
 	
     /**
      * Constructor for HCS Core
@@ -52,7 +56,7 @@ public final class HCSCore {
         YAMLConfig yamlConfig = config.getConfig();
 
         this.nodeMap = yamlConfig.getNodesMap();
-        this.hcsTransactionFee = yamlConfig.getHCSTransactionFee();
+        this.maxTransactionFee = yamlConfig.getHCSTransactionFee();
 
         MirrorNode mirrorNode = yamlConfig.getMirrorNode();
         this.mirrorAddress = mirrorNode.getAddress();
@@ -61,7 +65,7 @@ public final class HCSCore {
         this.signMessages = appnet.getSignMessages();
         this.encryptMessages = appnet.getEncryptMessages();
         this.rotateKeys = appnet.getRotateKeys();
-        this.topicIds = appnet.getTopicIds();
+        this.topics = appnet.getTopics();
         this.catchupHistory = appnet.getCatchupHistory();
         this.messagePersistenceLevel = appnet.getPersistenceLevel();
 
@@ -103,8 +107,8 @@ public final class HCSCore {
         this.ed25519PrivateKey = ed25519PrivateKey;
         return this;
     }
-    public HCSCore withTopicList(List<ConsensusTopicId> topicIds) {
-        this.topicIds = topicIds;
+    public HCSCore withTopicList(List<Topic> topics) {
+        this.topics = topics;
         return this;
     }
     public boolean getSignMessages() {
@@ -131,11 +135,11 @@ public final class HCSCore {
     public Ed25519PrivateKey getEd25519PrivateKey() {
         return this.ed25519PrivateKey;
     } 
-    public List<ConsensusTopicId> getTopicIds() {
-        return this.topicIds;
+    public List<Topic> getTopics() {
+        return this.topics;
     }
-    public long getHCSTransactionFee() {
-        return this.hcsTransactionFee;
+    public long getMaxTransactionFee() {
+        return this.maxTransactionFee;
     }
     public long getApplicationId() {
         return this.applicationId;
@@ -161,5 +165,12 @@ public final class HCSCore {
     
     public Dotenv getEnvironment() {
         return this.environment.getDotEnv();
+    }
+    public List<ConsensusTopicId> getConsensusTopicIds() {
+        List<ConsensusTopicId> consensusTopicIds = new ArrayList<ConsensusTopicId>();
+        for (Topic topic : this.topics) {
+            consensusTopicIds.add(topic.getConsensusTopicId());
+        }
+        return consensusTopicIds;
     }
 }

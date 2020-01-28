@@ -7,6 +7,7 @@ public final class Topic {
     private long shard = 0;
     private long realm = 0;
     private long num = 0;
+    private String submitKey = "";
     
     public String getTopic() {
         return this.topic;
@@ -20,5 +21,11 @@ public final class Topic {
     }
     public ConsensusTopicId getConsensusTopicId() {
         return new ConsensusTopicId(shard, realm, num);
+    }
+    public void setSubmitKey(String submitKey) {
+        this.submitKey = submitKey;
+    }
+    public String getSubmitKey() {
+        return this.submitKey;
     }
 }

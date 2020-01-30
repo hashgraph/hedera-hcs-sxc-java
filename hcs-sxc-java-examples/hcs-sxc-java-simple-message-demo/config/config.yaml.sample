@@ -11,7 +11,7 @@ appNet:
 HCSTransactionFee: 100000000
 
 mirrorNode:
-  address: api.testnet.kabuto.sh:50211
+  address: "hcs.testnet.mirrornode.hedera.com:5600"
 
 nodes:
 - address: 0.testnet.hedera.com:50211

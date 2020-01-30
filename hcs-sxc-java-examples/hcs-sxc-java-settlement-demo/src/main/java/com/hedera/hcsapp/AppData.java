@@ -50,12 +50,12 @@ public final class AppData {
     }
     public AppData() throws Exception {
         
-        this.hcsCore = new HCSCore(appId);
-
-        this.dotEnv = hcsCore.getEnvironment();
         
+     
         this.appId = getEnvValueLong("APP_ID");
         
+        this.hcsCore = new HCSCore(this.appId);
+        this.dotEnv = hcsCore.getEnvironment();        
         // just check if set
         getEnvValue("OPERATOR_KEY");
         

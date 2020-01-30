@@ -76,3 +76,8 @@ hcs-sxc-java-queue/config/queue-config.yaml
 hcs-sxc-java-plugins/hcs-sxc-java-plugins-mirror-queue-artemis/config/queue-config.yaml
 hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/config.yaml
 hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/queue-config.yaml
+hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/relay-config.yaml
+hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/apps.yaml
+hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/docker-compose.yml
+hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/lastConsensusTime.txt
+hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/docker-compose.yml

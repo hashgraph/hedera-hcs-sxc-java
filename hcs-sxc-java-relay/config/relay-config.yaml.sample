@@ -1,5 +1,5 @@
 # Address of the mirror node's subscription end point
-mirrorAddress: api.testnet.kabuto.sh:50211
+mirrorAddress: "hcs.testnet.mirrornode.hedera.com:5600"
 
 # The topic IDs to subscribe to
 topics:

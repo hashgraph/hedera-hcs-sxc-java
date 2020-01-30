@@ -409,10 +409,10 @@ services:
       - "activemq-data:/opt/jmx-exporter/etc-override"
 
     environment:
-      DISABLE_SECURITY: true
+      DISABLE_SECURITY: "true"
       ARTEMIS_USERNAME: hcsdemo
       ARTEMIS_PASSWORD: hcsdemo
-      RESTORE_CONFIGURATION: true
+      RESTORE_CONFIGURATION: "true"
 
   hcs-sxc-java-relay:
     container_name: hcs-sxc-java-relay

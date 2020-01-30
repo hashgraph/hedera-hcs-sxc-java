@@ -145,7 +145,7 @@ public final class OutboundHCSMessage {
                     .setTopicId(this.topics.get(topicIndex).getConsensusTopicId())
                     .setTransactionId(transactionId);
                 
-                if ((this.topics.get(topicIndex).getSubmitKey() != null) && (this.topics.get(topicIndex).getSubmitKey().isEmpty())) {
+                if ((this.topics.get(topicIndex).getSubmitKey() != null) && (! this.topics.get(topicIndex).getSubmitKey().isEmpty())) {
                     // sign if we have a submit key
                     tx.build(client).sign(Ed25519PrivateKey.fromString(this.topics.get(topicIndex).getSubmitKey()));
                 }
@@ -173,6 +173,7 @@ public final class OutboundHCSMessage {
             // do nothing
         } catch (Exception e) {
             log.error(e);
+            throw e;
         }
 
         return firstTransactionId;

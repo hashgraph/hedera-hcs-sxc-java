@@ -30,7 +30,7 @@ services:
     volumes:
       - ./:/config
 
- Carlos:
+  Carlos:
    container_name: Carlos
    image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
    restart: on-failure
@@ -60,7 +60,7 @@ services:
     volumes:
       - ./:/config
 
- Erica:
+  Erica:
    container_name: Erica
    image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
    restart: on-failure
@@ -75,7 +75,7 @@ services:
    volumes:
      - ./:/config
 
- Farouk:
+  Farouk:
    container_name: Farouk
    image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
    restart: on-failure
@@ -90,7 +90,7 @@ services:
    volumes:
      - ./:/config
 
- Grace:
+  Grace:
    container_name: Grace
    image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
    restart: on-failure

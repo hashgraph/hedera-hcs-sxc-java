@@ -18,6 +18,7 @@ import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcs.sxc.HCSCore;
+import com.hedera.hcs.sxc.config.Topic;
 import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
 import com.hedera.hcs.sxc.plugins.Plugins;
 import com.hedera.hcs.sxc.proto.AccountID;
@@ -40,7 +41,7 @@ public final class OutboundHCSMessage {
     private Map<AccountId, String> nodeMap = new HashMap<AccountId, String>();
     private AccountId operatorAccountId = new AccountId(0, 0, 0);
     private Ed25519PrivateKey ed25519PrivateKey;
-    private List<ConsensusTopicId> topicIds = new ArrayList<ConsensusTopicId>();
+    private List<Topic> topics = new ArrayList<Topic>();
     private long hcsTransactionFee = 0L;
     private TransactionId transactionId = null;
     private SxcMessagePersistence persistence;
@@ -52,8 +53,8 @@ public final class OutboundHCSMessage {
         this.nodeMap = hcsCore.getNodeMap();
         this.operatorAccountId = hcsCore.getOperatorAccountId();
         this.ed25519PrivateKey = hcsCore.getEd25519PrivateKey();
-        this.topicIds = hcsCore.getTopicIds();
-        this.hcsTransactionFee = hcsCore.getHCSTransactionFee();
+        this.topics = hcsCore.getTopics();
+        this.hcsTransactionFee = hcsCore.getMaxTransactionFee();
 
         // load persistence implementation at runtime
         Class<?> persistenceClass = Plugins.find("com.hedera.hcs.sxc.plugin.persistence.*", "com.hedera.hcs.sxc.interfaces.SxcMessagePersistence", true);
@@ -99,7 +100,7 @@ public final class OutboundHCSMessage {
     /**
      * Sends a single cleartext message
      *
-     * @param topicIndex the index reference in one of {@link #topicIds}
+     * @param topicIndex the index reference in one of {@link #topics}
      * @param message
      * @throws HederaNetworkException
      * @throws IllegalArgumentException
@@ -137,17 +138,13 @@ public final class OutboundHCSMessage {
             TransactionId transactionId = firstTransactionId;
             int count = 1;
             for (ApplicationMessageChunk messageChunk : parts) {
-                log.info("Sending message part " + count + " of " + parts.size() + " to topic " + this.topicIds.get(topicIndex));
+                log.info("Sending message part " + count + " of " + parts.size() + " to topic " + this.topics.get(topicIndex));
                 count++;
                 ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction()
                     .setMessage(messageChunk.toByteArray())
-                    .setTopicId(this.topicIds.get(topicIndex))
+                    .setTopicId(this.topics.get(topicIndex).getConsensusTopicId())
                     .setTransactionId(transactionId);
-<<<<<<< HEAD
 
-=======
-                
->>>>>>> fix npe
                 if ((this.topics.get(topicIndex).getSubmitKey() != null) && (! this.topics.get(topicIndex).getSubmitKey().isEmpty())) {
                     // sign if we have a submit key
                     tx.build(client).sign(Ed25519PrivateKey.fromString(this.topics.get(topicIndex).getSubmitKey()));

@@ -422,6 +422,8 @@ services:
     restart: on-failure
     networks:
       - backing-services
+    volumes:
+      - ./config:/config
 
 volumes:
   activemq-data: {}
@@ -483,17 +485,16 @@ These are merely sample lines of code, please refer to the example projects for 
 
 ### Compilation steps
 
-- Ensure the necessary configuration files are complete and accurate
-    - hcs-sxc-java-relay/config/relay-config.yaml (use relay-config.yaml.sample as a starting point)
-    - hcs-sxc-java-plugins/hcs-sxc-java-plugins-mirror-queue-artemis/config/queue-config.yaml (use queue-config.yaml.sample as a starting point)
-    - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/.env (use dotenv.sample as a starting point)
-    - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/.config.yaml (use config.yaml.sample as a starting point)
+- Ensure the necessary configuration files are complete and accurate (use provided samples as starting points)
+    - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/.env
+    - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/.config.yaml
     - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/docker-compose.yml
 
-    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/apps.yaml (use apps.yaml.sample as a starting point)
-    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/config.yaml (use config.yaml.sample as a starting point)
-    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/queue-config.yaml
+    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/apps.yaml
+    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/config.yaml
     - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/docker-compose.yml
+    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/queue-config.yaml
+    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/relay-config.yaml
 
 #### Compile docker images
 

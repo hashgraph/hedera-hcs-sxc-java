@@ -28,6 +28,14 @@
           <version>${artemis-jms-client-all.version}</version>
       </dependency>
     </dependencies>
+    <build>
+      <plugins>
+        <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+        </plugin>
+      </plugins>
+    </build>
     <profiles>
         <!-- profile which adds the possibility to build docker images Call
             "mvn clean install -Pdocker" to invoke this additional plugin in the maven

@@ -10,7 +10,7 @@
 
   <artifactId>hcs-sxc-java-plugins-persistence-hibernate</artifactId>
 
-  <name>hcs-sxc-java-plugins-persistence-in-hibernate</name>
+  <name>hcs-sxc-java-plugins-persistence-hibernate</name>
 
     <dependencies>
         <dependency>
@@ -34,6 +34,14 @@
             <version>${hcs-sxc-interfaces.version}</version>
         </dependency>
     </dependencies>
+    <build>
+      <plugins>
+        <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+        </plugin>
+      </plugins>
+    </build>
 
     <profiles>
         <profile>

@@ -1,5 +1,5 @@
 [![CircleCI](https://circleci.com/gh/hashgraph/hedera-hcs-sxc-java.svg?style=svg&circle-token=4f151711fb43e44d3d469cc1fbeaa17de4ab0c23)](https://circleci.com/gh/hashgraph/hedera-hcs-sxc)
-[![codecov](https://img.shields.io/codecov/c/github/hashgraph/hedera-hcs-sxc-java/master)](https://codecov.io/gh/hashgraph/hedera-hcs-sxc)
+[![codecov](https://codecov.io/gh/hashgraph/hedera-hcs-sxc-java/branch/master/graph/badge.svg)](https://codecov.io/gh/hashgraph/hedera-hcs-sxc-java)
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
 
 # HCS-SXC-Java

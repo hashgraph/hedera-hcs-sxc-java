@@ -26,4 +26,7 @@ jobs:
       #     paths:
       #       - ~/.m2
       - store_test_results:
-          path: target/surefire-reports
+          path: ./hcs-sxc-java-coverage/target/site/jacoco-aggregate
+      - run:
+          name: Upload Code Coverage
+          command: bash <(curl -s https://codecov.io/bash)

@@ -21,8 +21,16 @@ import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public final class HCSCore {
+public enum HCSCore { // singleton implementation
+    
+    INSTANCE();
+    
+    public HCSCore getInstance(){
+        return INSTANCE;
+    }
 
     private boolean signMessages = false;
     private boolean encryptMessages = false;
@@ -32,24 +40,30 @@ public final class HCSCore {
     private AccountId operatorAccountId = new AccountId(0, 0, 0); 
     private Ed25519PrivateKey ed25519PrivateKey;
     private List<Topic> topics = new ArrayList<Topic>();
-    private long maxTransactionFee = 0;
-    private long applicationId = 0;
+    private long maxTransactionFee = 0L;
+    private long applicationId = 0L;
     private static SxcMessagePersistence persistence;
     private boolean catchupHistory;
     private MessagePersistenceLevel messagePersistenceLevel;
     private String mirrorAddress;
     private Map<String, String> hibernateConfig = new HashMap<String, String>();
     private Environment environment = new Environment();
+    private YAMLConfig yamlConfig;
     
     /**
      * Constructor for HCS Core
      * @param applicationId - unique value per app instance using the component, if the app generates this value and stops/starts,
      * it must reuse the same applicationId to ensure consistent message delivery
      */
-    public HCSCore(long applicationId) throws FileNotFoundException, IOException {
-        Config config = new Config();
-        YAMLConfig yamlConfig = config.getConfig();
-
+    private  HCSCore() throws  ExceptionInInitializerError {
+        
+        try {
+            Config config = new Config();
+            yamlConfig = config.getConfig();
+  
+        } catch (IOException ex) {
+            throw new ExceptionInInitializerError (ex);
+        }
         this.nodeMap = yamlConfig.getNodesMap();
         this.maxTransactionFee = yamlConfig.getHCSTransactionFee();
 
@@ -66,13 +80,23 @@ public final class HCSCore {
 
         this.operatorAccountId = this.environment.getOperatorAccountId();
         this.ed25519PrivateKey = this.environment.getOperatorKey();
-
-        this.applicationId = applicationId;
-        
         String appId = Long.toString(this.applicationId);
         // replace hibernate configuration {appid}
         yamlConfig.getCoreHibernate().forEach((key,value) -> this.hibernateConfig.put(key, value.replace("{appid}", appId))); 
+        
     }
+
+    public HCSCore withAppId(long applicationId) {
+        if (this.applicationId == 0L){
+            this.applicationId = applicationId;
+            String appId = Long.toString(this.applicationId);
+            // replace hibernate configuration {appid}
+            yamlConfig.getCoreHibernate().forEach((key,value) -> this.hibernateConfig.put(key, value.replace("{appid}", appId))); 
+        }
+        return this;
+    }
+    
+    
     public HCSCore withMessageSignature(boolean signMessages) {
         this.signMessages = signMessages;
         return this;

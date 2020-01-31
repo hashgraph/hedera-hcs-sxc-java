@@ -10,7 +10,7 @@ import lombok.extern.log4j.Log4j2;
 public class CreateTopic {
 
     public static void main(String[] args) throws Exception {
-        HCSCore hcsCore = new HCSCore(0);
+        HCSCore hcsCore = HCSCore.INSTANCE.getInstance();
         // create topics on HCS
         CreateHCSTopic createHCSTopic = new CreateHCSTopic(hcsCore);
         ConsensusTopicId topicId = createHCSTopic.execute();

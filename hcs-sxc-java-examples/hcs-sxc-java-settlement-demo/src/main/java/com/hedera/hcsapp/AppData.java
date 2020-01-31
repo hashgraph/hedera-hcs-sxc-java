@@ -54,7 +54,8 @@ public final class AppData {
      
         this.appId = getEnvValueLong("APP_ID");
         
-        this.hcsCore = new HCSCore(this.appId);
+        this.hcsCore = HCSCore.INSTANCE.getInstance().withAppId(appId);
+        
         this.dotEnv = hcsCore.getEnvironment();        
         // just check if set
         getEnvValue("OPERATOR_KEY");

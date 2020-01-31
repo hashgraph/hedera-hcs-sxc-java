@@ -27,3 +27,7 @@ jobs:
       #       - ~/.m2
       - store_test_results:
           path: target/surefire-reports
+      - run:
+          name: Upload Code Coverage
+          command: bash <(curl -s https://codecov.io/bash)
+          

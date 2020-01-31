@@ -9,9 +9,9 @@ package com.hedera.hcsapp;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,10 +46,10 @@ public final class AppData {
     List<AppClient> appClients = new ArrayList<>();
     private int webPort = 8080;
     private Dotenv dotEnv;
-    
+
     private String getEnvValue(String varName) throws Exception {
         String value = "";
-        if ( System.getProperty(varName) != null ) { 
+        if ( System.getProperty(varName) != null ) {
             value = System.getProperty(varName);
             log.info(varName + " found in command line parameters");
         } else if ((this.dotEnv.get(varName) == null) || (this.dotEnv.get(varName).isEmpty())) {
@@ -69,19 +69,16 @@ public final class AppData {
         return Integer.parseInt(getEnvValue(varName));
     }
     public AppData() throws Exception {
-        
-        this.hcsCore = new HCSCore(appId);
 
-        this.dotEnv = hcsCore.getEnvironment();
-        
-        this.appId = getEnvValueLong("APP_ID");
-        
+      this.appId = getEnvValueLong("APP_ID");
+      this.hcsCore = new HCSCore(this.appId);
+      this.dotEnv = hcsCore.getEnvironment();
         // just check if set
         getEnvValue("OPERATOR_KEY");
-        
+
         DockerCompose dockerCompose = DockerComposeReader.parse();
 
-        if ( System.getProperty("server.port") != null ) { 
+        if ( System.getProperty("server.port") != null ) {
             this.webPort = Integer.parseInt(System.getProperty("server.port"));
             log.info("PORT=" + this.webPort + " found in command line parameter server.port");
         } else {
@@ -92,7 +89,7 @@ public final class AppData {
         this.publicKey = dockerCompose.getPublicKeyForId(this.appId);
         this.userName = dockerCompose.getNameForId(this.appId);
         this.topicIndex = 0;
-        
+
         if (publicKey.equalsIgnoreCase("not found") || publicKey.equalsIgnoreCase("not found")){
             log.error("The chosen APP_ID must be present in the docker-compose config file. Exiting ...");
             System.exit(0);
@@ -141,7 +138,7 @@ public final class AppData {
     public List<AppClient> getAppClients() {
         return this.appClients;
     }
-    
+
     public int getWebPort() {
         return this.webPort;
     }

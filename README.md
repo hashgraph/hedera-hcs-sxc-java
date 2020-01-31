@@ -119,7 +119,7 @@ The choice of a plug-in architecture is to enable additional plugins to be devel
 
 #### hcs-sxc-java-plugins-mirror-direct
 
-This plugin provides a direct subscription to a mirror node which implements the same subscription API as the [open source mirror node project provided by Hedera] (https://github.com/hashgraph/hedera-mirror-node). Other mirror node projects may have different subscription APIs in which case new plug ins conforming to those mirror nodes' subscription APIs would be required.
+This plugin provides a direct subscription to a mirror node which implements the same subscription API as the [open source mirror node project provided by Hedera](https://github.com/hashgraph/hedera-mirror-node). Other mirror node projects may have different subscription APIs in which case new plug ins conforming to those mirror nodes' subscription APIs would be required.
 
 When in use, the plug in uses the configuration parameters from a `config.yaml` file to identify the IP address and port of the mirror node to subscribe to.
 
@@ -269,7 +269,7 @@ Sample configuration files are located in the `./config` folder of each project 
 
 ### Order of precedence
 
-Some configuration file data may be overridden with environment variables and/or command line paramters. The location of a configuration file may also vary depending on use cases. The order of precedence is below for all components:
+Some configuration file data may be overridden with environment variables and/or command line parameters. The location of a configuration file may also vary depending on use cases. The order of precedence is below for all components:
 
 - command line parameters
 - host environment variables
@@ -284,7 +284,7 @@ The `relay-config.yaml` file contains the necessary configuration for the `hcs-s
 
 ```
 # Address of the mirror node's subscription end point
-mirrorAddress: "34.66.214.12:6552"
+mirrorAddress: "hcs.testnet.mirrornode.hedera.com:5600"
 
 # The topic IDs to subscribe to
 topics:
@@ -355,18 +355,18 @@ HCSTransactionFee: 100000000
 
 mirrorNode:
   # Address of the mirror node's subscription end point
-  address: "34.66.214.12:6552"
+  address: "hcs.testnet.mirrornode.hedera.com:5600"
 
 # List of Hedera Nodes to send HCS messages to, if more than one is specified, the SDK will randomly choose a node with each transaction
 nodes:
-  - address: 34.66.214.12:50211
+  - address: 0.testnet.hedera.com:50211
+    account: 0.0.3
+  - address: 1.testnet.hedera.com:50211
     account: 0.0.4
-#  - address: 1.testnet.hedera.com:50211
-#    account: 0.0.4
-#  - address: 2.testnet.hedera.com:50211
-#    account: 0.0.5
-#  - address: 3.testnet.hedera.com:50211
-#    account: 0.0.6
+  - address: 2.testnet.hedera.com:50211
+    account: 0.0.5
+  - address: 3.testnet.hedera.com:50211
+    account: 0.0.6
 ```
 
 In addition to the `config.yaml` file, a `.env` file may be provided (or environment variables set) for the application to be able to submit transactions to Hedera. Again, a sample file is provided with the examples (`dotenv.sample`).
@@ -409,10 +409,10 @@ services:
       - "activemq-data:/opt/jmx-exporter/etc-override"
 
     environment:
-      DISABLE_SECURITY: true
+      DISABLE_SECURITY: "true"
       ARTEMIS_USERNAME: hcsdemo
       ARTEMIS_PASSWORD: hcsdemo
-      RESTORE_CONFIGURATION: true
+      RESTORE_CONFIGURATION: "true"
 
   hcs-sxc-java-relay:
     container_name: hcs-sxc-java-relay
@@ -422,6 +422,8 @@ services:
     restart: on-failure
     networks:
       - backing-services
+    volumes:
+      - ./config:/config
 
 volumes:
   activemq-data: {}
@@ -483,17 +485,16 @@ These are merely sample lines of code, please refer to the example projects for 
 
 ### Compilation steps
 
-- Ensure the necessary configuration files are complete and accurate
-    - hcs-sxc-java-relay/config/relay-config.yaml (use relay-config.yaml.sample as a starting point)
-    - hcs-sxc-java-plugins/hcs-sxc-java-plugins-mirror-queue-artemis/config/queue-config.yaml (use queue-config.yaml.sample as a starting point)
-    - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/.env (use dotenv.sample as a starting point)
-    - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/.config.yaml (use config.yaml.sample as a starting point)
+- Ensure the necessary configuration files are complete and accurate (use provided samples as starting points)
+    - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/.env
+    - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/.config.yaml
     - hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/docker-compose.yml
 
-    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/apps.yaml (use apps.yaml.sample as a starting point)
-    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/config.yaml (use config.yaml.sample as a starting point)
-    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/queue-config.yaml
+    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/apps.yaml
+    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/config.yaml
     - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/docker-compose.yml
+    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/queue-config.yaml
+    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/relay-config.yaml
 
 #### Compile docker images
 

@@ -1,4 +1,5 @@
 package com.hedera.hcsapp;
+
 /*-
  * ‌
  * hcs-sxc-java
@@ -69,13 +70,9 @@ public final class AppData {
     }
     public AppData() throws Exception {
 
-
-
-        this.appId = getEnvValueLong("APP_ID");
-
-        this.hcsCore = HCSCore.INSTANCE.getInstance().withAppId(appId);
-
-        this.dotEnv = hcsCore.getEnvironment();
+      this.appId = getEnvValueLong("APP_ID");
+      this.hcsCore = new HCSCore(this.appId);
+      this.dotEnv = hcsCore.getEnvironment();
         // just check if set
         getEnvValue("OPERATOR_KEY");
 

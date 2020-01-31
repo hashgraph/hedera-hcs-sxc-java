@@ -10,7 +10,7 @@
 
   <artifactId>hcs-sxc-java-plugins-persistence-hibernate</artifactId>
 
-  <name>hcs-sxc-java-plugins-persistence-in-hibernate</name>
+  <name>hcs-sxc-java-plugins-persistence-hibernate</name>
 
     <dependencies>
         <dependency>

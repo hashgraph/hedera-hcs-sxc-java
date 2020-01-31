@@ -32,11 +32,13 @@
         <artifactId>hcs-sxc-java-simple-message-demo</artifactId>
         <version>0.0.3-SNAPSHOT</version>
       </dependency>
+<!-- no need to test interfaces
       <dependency>
         <groupId>com.hedera</groupId>
         <artifactId>hcs-sxc-java-interfaces</artifactId>
         <version>0.0.3-SNAPSHOT</version>
       </dependency>
+-->
       <dependency>
         <groupId>com.hedera</groupId>
         <artifactId>hcs-sxc-java-plugins-mirror-direct</artifactId>
@@ -57,11 +59,13 @@
         <artifactId>hcs-sxc-java-plugins-persistence-in-memory</artifactId>
         <version>0.0.3-SNAPSHOT</version>
       </dependency>
+<!-- no need to test proto files
       <dependency>
         <groupId>com.hedera</groupId>
         <artifactId>hcs-sxc-java-proto</artifactId>
         <version>0.0.3-SNAPSHOT</version>
       </dependency>
+-->
       <dependency>
         <groupId>com.hedera</groupId>
         <artifactId>hcs-sxc-java-relay</artifactId>

@@ -30,6 +30,7 @@ import com.hedera.hcs.sxc.proto.ApplicationMessageId;
 import com.hedera.hcs.sxc.proto.Timestamp;
 
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -38,6 +39,7 @@ public final class OutboundHCSMessage {
 
     private boolean signMessages = false;
     private boolean encryptMessages = false;
+    private byte[] overrideMessageEncryptionKey = null; 
     private boolean rotateKeys = false;
     private int rotationFrequency = 0;
     private Map<AccountId, String> nodeMap = new HashMap<>();
@@ -49,7 +51,7 @@ public final class OutboundHCSMessage {
     private TransactionId transactionId = null;
     private SxcMessagePersistence persistencePlugin;
     private SxcMessageEncryption messageEncryptionPlugin;
-    private static SxcKeyRotation keyRotationPlugin;
+    private SxcKeyRotation keyRotationPlugin;
     private HCSCore hcsCore;
 
     public OutboundHCSMessage(HCSCore hcsCore) throws Exception {
@@ -66,15 +68,25 @@ public final class OutboundHCSMessage {
         // load persistence implementation at runtime
         Class<?> persistenceClass = Plugins.find("com.hedera.hcs.sxc.plugin.persistence.*", "com.hedera.hcs.sxc.interfaces.SxcMessagePersistence", true);
         this.persistencePlugin = (SxcMessagePersistence)persistenceClass.newInstance();
-        Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
-        this.messageEncryptionPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
-      }
+        
+        if(this.encryptMessages){
+            Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
+            this.messageEncryptionPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
+        }
+        
+        if(this.rotateKeys){
+            Class<?> messageKeyRotationClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcKeyRotation", true);
+            this.keyRotationPlugin = (SxcKeyRotation)messageKeyRotationClass.newInstance();
+        }
+    }
 
     public OutboundHCSMessage overrideMessageSignature(boolean signMessages) {
         this.signMessages = signMessages;
         return this;
     }
 
+ 
+    
     public OutboundHCSMessage overrideEncryptedMessages(boolean encryptMessages) {
         this.encryptMessages = encryptMessages;
         return this;
@@ -100,7 +112,12 @@ public final class OutboundHCSMessage {
         this.ed25519PrivateKey = ed25519PrivateKey;
         return this;
     }
-
+    
+    public OutboundHCSMessage overrideMessageEncryptionKey (byte[] messageEncryptionKey){
+        this.overrideMessageEncryptionKey = messageEncryptionKey;
+        return this;
+    }
+    
     public OutboundHCSMessage withFirstTransactionId(TransactionId transactionId) {
         this.transactionId = transactionId;
         return this;
@@ -122,14 +139,19 @@ public final class OutboundHCSMessage {
 
         }
         if (encryptMessages) {
-            message = messageEncryptionPlugin.encrypt(hcsCore.getMessageEncryptionKey(), message);
-        }
-
-        if (rotateKeys) {
-            int messageCount = 0; //TODO - keep track of messages app-wide, not just here. ( per topic )
-            if (messageCount > rotationFrequency) {
+            if (this.overrideMessageEncryptionKey != null) {
+                byte[] messageEncryptionKey = this.overrideMessageEncryptionKey;
+                message = messageEncryptionPlugin.encrypt(messageEncryptionKey, message);
+     
+            } else if (hcsCore.getMessageEncryptionKey() != null){ // get it from .env
+                byte[] messageEncryptionKey = hcsCore.getMessageEncryptionKey();
+                message = messageEncryptionPlugin.encrypt(messageEncryptionKey, message);
+            } else {
+                throw new NoSuchElementException("Encryption set to true, but key not found, neither in .env nor provided by builder");
             }
         }
+
+   
 
         // generate TXId for main and first message it not already set by caller
         TransactionId firstTransactionId = (this.transactionId == null) ? new TransactionId(this.operatorAccountId) : this.transactionId;
@@ -184,6 +206,18 @@ public final class OutboundHCSMessage {
             // do nothing
         } catch (Exception e) {
             log.error(e);
+        } finally {
+            if (rotateKeys) {
+                int messageCount = 0; //TODO - keep track of messages pair-wise, not just here. ( per topic )
+                if (messageCount > rotationFrequency) {
+                    //1) lookup the pair from addressbook to find you you've talked to
+                    //2) Send a KR1  Message so that his onHCSMessage can pick it up
+                    //3) If onHCSMessage receives KR1 then update key and KR2
+                    //4) If onHCSMessage receives KR2 then update key using stored IV
+                    
+
+                }
+            }
         }
 
         return firstTransactionId;

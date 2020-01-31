@@ -107,7 +107,6 @@
                             <extraDirectories>
                                 <paths>
                                     <path>src/main/resources</path>
-                                    <path>.</path>
                                     <path>../../hcs-sxc-plugins/hcs-sxc-java-plugins-persistence-in-memory/target</path>
                                 </paths>
                             </extraDirectories>

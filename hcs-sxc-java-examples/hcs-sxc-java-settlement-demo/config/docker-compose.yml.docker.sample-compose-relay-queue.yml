@@ -33,6 +33,8 @@ services:
     restart: on-failure
     networks:
       - backing-services
+    volumes:
+      - ./:/config
 
   Alice:
     container_name: Alice
@@ -51,6 +53,8 @@ services:
       - 8081:8081
     networks:
       - backing-services
+    volumes:
+      - ./:/config
 
   Bob:
     container_name: Bob
@@ -69,6 +73,8 @@ services:
       - 8082:8082
     networks:
       - backing-services
+    volumes:
+      - ./:/config
 
   Carlos:
     container_name: Carlos
@@ -87,6 +93,8 @@ services:
       - 8083:8083
     networks:
       - backing-services
+    volumes:
+      - ./:/config
 
   Diana:
     container_name: Diana
@@ -105,6 +113,8 @@ services:
       - 8084:8084
     networks:
       - backing-services
+    volumes:
+      - ./:/config
 
   Erica:
     container_name: Erica
@@ -123,6 +133,8 @@ services:
       - 8085:8085
     networks:
       - backing-services
+    volumes:
+      - ./:/config
 
   Farouk:
     container_name: Farouk
@@ -141,6 +153,8 @@ services:
       - 8086:8086
     networks:
       - backing-services
+    volumes:
+      - ./:/config
 
   Grace:
     container_name: Grace
@@ -159,6 +173,8 @@ services:
       - 8087:8087
     networks:
       - backing-services
+    volumes:
+      - ./:/config
 
   Harry:
     container_name: Harry
@@ -177,6 +193,8 @@ services:
       - 8088:8088
     networks:
       - backing-services
+    volumes:
+      - ./:/config
 
 volumes:
   activemq-data: {}

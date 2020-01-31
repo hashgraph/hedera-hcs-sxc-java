@@ -83,6 +83,7 @@ public enum HCSCore { // singleton implementation
 
         this.operatorAccountId = this.environment.getOperatorAccountId();
         this.ed25519PrivateKey = this.environment.getOperatorKey();
+        this.messageEncryptionKey  = this.environment.getMessageEncryptionKey();
         String appId = Long.toString(this.applicationId);
         // replace hibernate configuration {appid}
         yamlConfig.getCoreHibernate().forEach((key,value) -> this.hibernateConfig.put(key, value.replace("{appid}", appId))); 

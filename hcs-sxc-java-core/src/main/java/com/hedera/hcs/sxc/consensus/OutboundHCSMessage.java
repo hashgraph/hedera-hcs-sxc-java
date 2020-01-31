@@ -180,7 +180,7 @@ public final class OutboundHCSMessage {
     }
 
     public static  List<ApplicationMessageChunk> chunk(TransactionId transactionId,  byte[] message) {
-
+        
         ApplicationMessageId transactionID = ApplicationMessageId.newBuilder()
                 .setAccountID(AccountID.newBuilder()
                         .setShardNum(transactionId.accountId.shard)

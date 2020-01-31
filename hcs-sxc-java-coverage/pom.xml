@@ -20,74 +20,74 @@
       <dependency>
         <groupId>com.hedera</groupId>
         <artifactId>hcs-sxc-java-core</artifactId>
-        <version>0.0.3-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.hedera</groupId>
         <artifactId>hcs-sxc-java-settlement-demo</artifactId>
-        <version>0.0.3-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.hedera</groupId>
         <artifactId>hcs-sxc-java-simple-message-demo</artifactId>
-        <version>0.0.3-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
 <!-- no need to test interfaces
       <dependency>
         <groupId>com.hedera</groupId>
         <artifactId>hcs-sxc-java-interfaces</artifactId>
-        <version>0.0.3-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
 -->
       <dependency>
         <groupId>com.hedera</groupId>
         <artifactId>hcs-sxc-java-plugins-mirror-direct</artifactId>
-        <version>0.0.3-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.hedera</groupId>
         <artifactId>hcs-sxc-java-plugins-mirror-queue-artemis</artifactId>
-        <version>0.0.3-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.hedera</groupId>
         <artifactId>hcs-sxc-java-plugins-persistence-hibernate</artifactId>
-        <version>0.0.3-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.hedera</groupId>
         <artifactId>hcs-sxc-java-plugins-persistence-in-memory</artifactId>
-        <version>0.0.3-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
 <!-- no need to test proto files
       <dependency>
         <groupId>com.hedera</groupId>
         <artifactId>hcs-sxc-java-proto</artifactId>
-        <version>0.0.3-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
 -->
       <dependency>
         <groupId>com.hedera</groupId>
         <artifactId>hcs-sxc-java-relay</artifactId>
-        <version>0.0.3-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
     </dependencies>
 
     <build>
       <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.19.1</version>
-                <configuration>
-                    <!-- Jacoco prepare-agent builds some command-line params without -->
-                    <!-- which jacoco will not instrument. Hence it is important to add -->
-                    <!-- those command-line params here (${argLine} holds those params) -->
-                    <argLine>${argLine} -Xms256m -Xmx2048m</argLine>
-                    <forkCount>1</forkCount>
-                    <runOrder>random</runOrder>
-                </configuration>
-          </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.19.1</version>
+              <configuration>
+                  <!-- Jacoco prepare-agent builds some command-line params without -->
+                  <!-- which jacoco will not instrument. Hence it is important to add -->
+                  <!-- those command-line params here (${argLine} holds those params) -->
+                  <argLine>${argLine} -Xms256m -Xmx2048m</argLine>
+                  <forkCount>1</forkCount>
+                  <runOrder>random</runOrder>
+              </configuration>
+        </plugin>
         <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
@@ -103,5 +103,4 @@
         </plugin>
       </plugins>
     </build>
-
   </project>

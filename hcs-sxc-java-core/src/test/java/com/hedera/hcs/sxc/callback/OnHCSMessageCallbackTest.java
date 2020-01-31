@@ -1,6 +1,4 @@
 package com.hedera.hcs.sxc.callback;
-//import com.hedera.plugin.persistence.inmemory.JavaInMemoryPersistenceMoveMeOutOfLib;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
@@ -17,28 +15,16 @@ import org.apache.commons.lang3.RandomStringUtils;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class OnHCSMessageCallbackTest {    
     
-    public OnHCSMessageCallbackTest() {
-    }
-    TransactionId txId ;
-    SxcMessagePersistence persistence;
-    
-    @BeforeEach
-    public void setup() throws IOException{
-        
-        txId = new TransactionId(new AccountId(1234L));
-        persistence = new PersistMessages(); 
-    }
-    
     @Test
-    public void testSingleChunking() throws InvalidProtocolBufferException {
+    public void testSingleChunking() throws IOException {
         byte[] message = "Single Chunk Message".getBytes();
-        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(txId,message);
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),message);
         assertTrue(chunks.size() == 1);
+        SxcMessagePersistence persistence = new PersistMessages(); 
         Optional<ApplicationMessage> messageOptional
                 = OnHCSMessageCallback.pushUntilCompleteMessage(chunks.get(0), persistence);
         assertTrue(messageOptional.isPresent());
@@ -48,12 +34,13 @@ public class OnHCSMessageCallbackTest {
     }
     
     @Test
-    public void testMultiChunking() throws InvalidProtocolBufferException {
+    public void testMultiChunking() throws IOException {
         byte[] longString = RandomStringUtils.random(5000, true, true).getBytes();
-        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(txId,longString);
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),longString);
         assertTrue(chunks.size() == 2);
         
         Optional<ApplicationMessage> messageOptional = null;
+        SxcMessagePersistence persistence = new PersistMessages(); 
         for (ApplicationMessageChunk messagePart : chunks){
             messageOptional = OnHCSMessageCallback.pushUntilCompleteMessage(messagePart, persistence);;
         }

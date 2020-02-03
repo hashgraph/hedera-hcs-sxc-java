@@ -22,11 +22,8 @@ package com.hedera.hcsapp.controllers;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -37,14 +34,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 import com.hedera.hcsapp.AppData;
-import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.Utils;
 import com.hedera.hcsapp.entities.Settlement;
-import com.hedera.hcsapp.entities.SettlementItem;
-import com.hedera.hcsapp.entities.SettlementItemId;
 import com.hedera.hcsapp.integration.HCSMessages;
 import com.hedera.hcsapp.repository.CreditRepository;
 import com.hedera.hcsapp.repository.SettlementItemRepository;
@@ -56,17 +48,6 @@ import com.hedera.hcsapp.restclasses.SettlementProposal;
 import com.hedera.hcsapp.restclasses.SettlementRest;
 
 import lombok.extern.log4j.Log4j2;
-import proto.Money;
-import proto.PaymentInitAckBPM;
-import proto.PaymentInitBPM;
-import proto.SettleCompleteBPM;
-import proto.SettleInitAckBPM;
-import proto.SettleInitBPM;
-import proto.SettlePaidAckBPM;
-import proto.SettlePaidBPM;
-import proto.SettleProposeAckBPM;
-import proto.SettleProposeBPM;
-import proto.SettlementBPM;
 
 @Log4j2
 @RestController
@@ -111,7 +92,7 @@ public class SettlementsController {
     public ResponseEntity<SettlementRest> settlementNew(@RequestBody SettlementProposal settleProposal)
             throws Exception {
         try {
-            SettlementRest settlementResponse = HCSMessages.settlementNew(appData, creditRepository, settlementRepository, settlementItemRepository, settleProposal, false);
+            SettlementRest settlementResponse = HCSMessages.settlementNew(appData, creditRepository, settlementRepository, settlementItemRepository, settleProposal);
             return new ResponseEntity<>(settlementResponse, headers, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e);

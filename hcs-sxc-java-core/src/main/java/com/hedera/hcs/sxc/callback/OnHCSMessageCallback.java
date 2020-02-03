@@ -31,6 +31,9 @@ import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
 import com.hedera.hcs.sxc.interfaces.MirrorSubscriptionInterface;
 import com.hedera.hcs.sxc.plugins.Plugins;
 import com.hedera.hcs.sxc.utils.ByteUtil;
+
+import lombok.extern.log4j.Log4j2;
+
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 import com.hedera.hcs.sxc.proto.ApplicationMessageID;
@@ -46,6 +49,7 @@ import java.util.Optional;
  * Implements callback registration and notification capabilities to support apps
  *
  */
+@Log4j2
 public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
 
     private final List<HCSCallBackToAppInterface> observers = new ArrayList<>();
@@ -63,10 +67,12 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
         MirrorSubscriptionInterface mirrorSubscription = ((MirrorSubscriptionInterface)callbackClass.newInstance());
 
         if (this.hcsCore.getCatchupHistory()) {
+            log.info("catching up with mirror history");
             Optional<Instant> lastConsensusTimestamp = Optional.of(this.hcsCore.getMessagePersistence().getLastConsensusTimestamp());
             mirrorSubscription.init(this, this.hcsCore.getApplicationId(), lastConsensusTimestamp, this.hcsCore.getMirrorAddress(), this.hcsCore.getConsensusTopicIds());
         } else {
-            mirrorSubscription.init(this, this.hcsCore.getApplicationId(), Optional.empty(), this.hcsCore.getMirrorAddress(), this.hcsCore.getConsensusTopicIds());
+            log.info("NOT catching up with mirror history");
+            mirrorSubscription.init(this, this.hcsCore.getApplicationId(), Optional.of(Instant.now()), this.hcsCore.getMirrorAddress(), this.hcsCore.getConsensusTopicIds());
         }
     }
     /**

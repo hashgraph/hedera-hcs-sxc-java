@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.core.env.Environment;
-
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcsapp.appconfig.AppClient;
 import com.hedera.hcsapp.dockercomposereader.DockerCompose;
@@ -49,7 +47,8 @@ public final class AppData {
 
     private String getEnvValue(String varName) throws Exception {
         String value = "";
-        if ( System.getProperty(varName) != null ) {
+        log.info("Looking for " + varName + " in environment variables");
+        if (System.getProperty(varName) != null) {
             value = System.getProperty(varName);
             log.info(varName + " found in command line parameters");
         } else if ((this.dotEnv.get(varName) == null) || (this.dotEnv.get(varName).isEmpty())) {
@@ -62,23 +61,28 @@ public final class AppData {
         }
         return value;
     }
+
     private long getEnvValueLong(String varName) throws Exception {
         return Long.parseLong(getEnvValue(varName));
     }
+
     private int getEnvValueInt(String varName) throws Exception {
         return Integer.parseInt(getEnvValue(varName));
     }
+
     public AppData() throws Exception {
 
-      this.appId = getEnvValueLong("APP_ID");
-      this.hcsCore = new HCSCore(this.appId);
-      this.dotEnv = hcsCore.getEnvironment();
+        this.hcsCore = new HCSCore(this.appId);
+        this.dotEnv = hcsCore.getEnvironment();
         // just check if set
         getEnvValue("OPERATOR_KEY");
-
+        this.appId = getEnvValueLong("APP_ID");
+        if (this.appId != 0) {
+            this.hcsCore = new HCSCore(this.appId);
+        }
         DockerCompose dockerCompose = DockerComposeReader.parse();
 
-        if ( System.getProperty("server.port") != null ) {
+        if (System.getProperty("server.port") != null) {
             this.webPort = Integer.parseInt(System.getProperty("server.port"));
             log.info("PORT=" + this.webPort + " found in command line parameter server.port");
         } else {
@@ -90,7 +94,7 @@ public final class AppData {
         this.userName = dockerCompose.getNameForId(this.appId);
         this.topicIndex = 0;
 
-        if (publicKey.equalsIgnoreCase("not found") || publicKey.equalsIgnoreCase("not found")){
+        if (publicKey.equalsIgnoreCase("not found") || publicKey.equalsIgnoreCase("not found")) {
             log.error("The chosen APP_ID must be present in the docker-compose config file. Exiting ...");
             System.exit(0);
         }

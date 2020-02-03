@@ -51,7 +51,6 @@ import com.hedera.hcsapp.repository.Util;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 
 import lombok.extern.log4j.Log4j2;
-import org.springframework.core.env.Environment;
 import proto.CreditBPM;
 import proto.PaymentInitBPM;
 import proto.PaymentSentAckBPM;
@@ -68,10 +67,6 @@ import proto.SettlementBPM;
 public class HCSIntegration {
     
     private AppData appData;
-    
-    @Autowired
-    private Environment environment;
-            
     
     @Autowired
     private Util repositoryUtil;
@@ -130,7 +125,20 @@ public class HCSIntegration {
                         }
                 );
                 
-            // (CREDIT_AWAIT_ACK , r , threadId ,credit) => (CREDIT_ACK , r , threadId , credit[threadId].status=CREDIT_ACK)
+                if (settlementBPM.getAutomatic()) {
+                    // automatic processing, send ACK if appropriate
+                    if (creditBPM.getRecipientName().contentEquals(appData.getUserName())) {
+                        // lets make sure credit was recorded in the first place
+                        creditRepository.findById(threadId).ifPresent(
+                            (credit) -> {
+                                try {
+                                    HCSMessages.creditAck(this.appData, creditRepository, threadId, true);
+                                } catch (Exception e) {
+                                    log.error(e);
+                                }
+                    });
+                    }
+                }
             } else if (settlementBPM.hasCreditAck()) {
                 updateCredit(threadId, States.CREDIT_PROPOSED, States.CREDIT_AGREED);
             } else if (settlementBPM.hasSettlePropose()) {

@@ -25,7 +25,6 @@
         <javax.inject.version>1</javax.inject.version>
         <org.hibernate.validator.version>6.1.0.Final</org.hibernate.validator.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
-        <hcs-sxc.version>0.0.3-SNAPSHOT</hcs-sxc.version>
     </properties>
 
     <dependencies>
@@ -52,7 +51,7 @@
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-core</artifactId>
-            <version>${hcs-sxc-core.version}</version>
+            <version>${hcs-sxc.version}</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -83,7 +82,7 @@
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-interfaces</artifactId>
-            <version>${hcs-sxc-interfaces.version}</version>
+            <version>${hcs-sxc.version}</version>
         </dependency>
 
         <!-- PLUGINS -->
@@ -130,7 +129,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>${build-helper-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>

@@ -102,7 +102,7 @@ public class HCSIntegration {
 
             SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessage.getBusinessProcessMessage().toByteArray());
             // (CREDIT_PENDING , r ,threadId ,credit) => (CREDIT_AWAIT_ACK ,r ,threadId , credit[threadId].txId=r.MessageId)
-            String threadId = settlementBPM.getThreadId();
+            String threadId = settlementBPM.getThreadID();
             if (settlementBPM.hasCredit()) {
                 String priorState = States.CREDIT_PROPOSED_PENDING.name();
                 String nextState = States.CREDIT_PROPOSED.name();
@@ -158,7 +158,7 @@ public class HCSIntegration {
                             settlementRepository.save(settlement);
                             log.info("Adding new settlement to Database: " + threadId);
 
-                            for (String settleThreadId : settleProposeBPM.getThreadIdsList()) {
+                            for (String settleThreadId : settleProposeBPM.getThreadIDsList()) {
                                 SettlementItem settlementItem = new SettlementItem();
                                 settlementItem.setId(new SettlementItemId(settleThreadId, threadId));
                                 settlementItemRepository.save(settlementItem);
@@ -249,7 +249,7 @@ public class HCSIntegration {
                                     .setPaymentReference(payref)
                                     .setNetValue(Utils.moneyFromSettlement(settlement));
         
-                            SettlementBPM newSettlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
+                            SettlementBPM newSettlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
                                     .setPaymentSent(paymentSentBPM).build();
         
                             States newState = States.SETTLE_PAY_MADE;
@@ -302,7 +302,7 @@ public class HCSIntegration {
 
                                         PaymentSentAckBPM.Builder paymentSentAckBPM = PaymentSentAckBPM.newBuilder().setPaymentSent(paymentSentBPM);
                     
-                                        SettlementBPM newSettlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
+                                        SettlementBPM newSettlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
                                                 .setPaymentSentAck(paymentSentAckBPM).build();
                     
                                         States newState = States.SETTLE_PAY_ACK;
@@ -435,7 +435,7 @@ public class HCSIntegration {
                                     SettleCompleteAckBPM.Builder settleCompleteAckBPM = SettleCompleteAckBPM.newBuilder()
                                             .setSettlePaid(settleCompleteBPM);
                                     
-                                    SettlementBPM ackSettlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
+                                    SettlementBPM ackSettlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
                                             .setSettleCompleteAck(settleCompleteAckBPM).build();
 
                                     try {

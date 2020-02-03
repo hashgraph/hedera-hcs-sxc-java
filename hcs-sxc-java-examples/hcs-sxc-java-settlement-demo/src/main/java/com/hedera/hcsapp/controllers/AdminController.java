@@ -76,7 +76,7 @@ public class AdminController {
 
         AdminDeleteBPM adminDeleteBPM = AdminDeleteBPM.newBuilder().build();
         SettlementBPM settlementBPM = SettlementBPM.newBuilder()
-                .setThreadId("admin")
+                .setThreadID("admin")
                 .setAdminDelete(adminDeleteBPM)
                 .build();
         try {
@@ -101,7 +101,7 @@ public class AdminController {
 
         AdminStashDatabaseBPM adminStashDatabaseBPM = AdminStashDatabaseBPM.newBuilder().build();
         SettlementBPM settlementBPM = SettlementBPM.newBuilder()
-                .setThreadId("admin")
+                .setThreadID("admin")
                 .setAdminStashDatabaseBPM(adminStashDatabaseBPM)
                 .build();
         try {
@@ -124,7 +124,7 @@ public class AdminController {
 
          AdminStashPopDatabaseBPM adminStashPopDatabaseBPM = AdminStashPopDatabaseBPM.newBuilder().build();
         SettlementBPM settlementBPM = SettlementBPM.newBuilder()
-                .setThreadId("admin")
+                .setThreadID("admin")
                 .setAdminStashPopDatabaseBPM(adminStashPopDatabaseBPM)
                 .build();
         try {

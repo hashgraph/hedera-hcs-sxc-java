@@ -127,10 +127,10 @@ public class SettlementsController {
                 .setCreatedTime(Utils.TimestampToTime(seconds, nanos)).setNetValue(value);
 
         for (String proposedThreadId : settleProposal.getThreadIds()) {
-            settleProposeBPM.addThreadIds(proposedThreadId);
+            settleProposeBPM.addThreadIDs(proposedThreadId);
         }
 
-        SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
+        SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
                 .setSettlePropose(settleProposeBPM.build()).build();
 
         try {
@@ -195,13 +195,13 @@ public class SettlementsController {
     
                 List<SettlementItem> settlementItems = settlementItemRepository.findAllSettlementItems(threadId);
                 for (SettlementItem settlementItem : settlementItems) {
-                    settleProposeBPM.addThreadIds(settlementItem.getId().getSettledThreadId());
+                    settleProposeBPM.addThreadIDs(settlementItem.getId().getSettledThreadId());
                 }
     
                 SettleProposeAckBPM settleProposeAck = SettleProposeAckBPM.newBuilder()
                         .setSettlePropose(settleProposeBPM.build()).build();
     
-                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
+                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
                         .setSettleProposeAck(settleProposeAck).build();
     
                 return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_AGREED);
@@ -236,7 +236,7 @@ public class SettlementsController {
                         .setRecipientName(settlement.get().getRecipientName())
                         .setPaymentChannelName(settlementChannelProposal.getPaymentChannelName());
     
-                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId).setSettleInit(settleInitBPM)
+                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId).setSettleInit(settleInitBPM)
                         .build();
     
                 return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAY_CHANNEL_PROPOSED);
@@ -267,7 +267,7 @@ public class SettlementsController {
     
                 SettleInitAckBPM.Builder settleInitAckBPM = SettleInitAckBPM.newBuilder().setSettleInit(settleInitBPM);
     
-                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
+                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
                         .setSettleInitAck(settleInitAckBPM).build();
     
                 return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAY_CHANNEL_AGREED);
@@ -301,7 +301,7 @@ public class SettlementsController {
                         .setAdditionalNotes(settlementPaymentInit.getAdditionalNotes())
                         .setNetValue(Utils.moneyFromSettlement(settlement.get()));
     
-                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
+                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
                         .setPaymentInit(paymentInitBPM).build();
     
                 return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAY_PROPOSED);
@@ -332,7 +332,7 @@ public class SettlementsController {
     
                 PaymentInitAckBPM.Builder paymentInitAckBPM = PaymentInitAckBPM.newBuilder().setPaymentInit(paymentInitBPM);
     
-                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
+                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
                         .setPaymentInitAck(paymentInitAckBPM).build();
     
                 return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAY_AGREED);
@@ -363,7 +363,7 @@ public class SettlementsController {
                         .setPaymentReference(settlement.get().getPaymentReference())
                         .setNetValue(Utils.moneyFromSettlement(settlement.get()));
     
-                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
+                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
                         .setSettlePayment(settlePaidBPM).build();
     
                 return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_RCPT_REQUESTED);
@@ -395,7 +395,7 @@ public class SettlementsController {
                 SettlePaidAckBPM.Builder settlePaidAckBPM = SettlePaidAckBPM.newBuilder()
                         .setSettlePaid(settlePaidBPM);
                 
-                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
+                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
                         .setSettlePaymentAck(settlePaidAckBPM).build();
     
                 return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_RCPT_CONFIRMED);
@@ -425,7 +425,7 @@ public class SettlementsController {
                         .setPaymentReference(settlement.get().getPaymentReference())
                         .setNetValue(Utils.moneyFromSettlement(settlement.get()));
     
-                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadId(threadId)
+                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
                         .setSettleComplete(settleCompleteBPM).build();
     
                 return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAY_CONFIRMED);

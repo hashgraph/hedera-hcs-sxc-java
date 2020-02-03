@@ -370,5 +370,7 @@ message SettlementBPM {
         AdminStashDatabaseBPM adminStashDatabaseBPM = 17;
         AdminStashPopDatabaseBPM adminStashPopDatabaseBPM = 18;
     }
+    // automatic processing
+    bool automatic = 19;
 }
 

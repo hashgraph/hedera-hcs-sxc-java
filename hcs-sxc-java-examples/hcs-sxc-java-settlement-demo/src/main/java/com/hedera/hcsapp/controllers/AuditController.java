@@ -138,7 +138,7 @@ public class AuditController {
         for (String applicationMessageId : applicationMessageIds) {
            SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessages.get(applicationMessageId).getBusinessProcessMessage());
 
-           if (settlementBPM.getThreadId().equals(threadId)) {
+           if (settlementBPM.getThreadID().equals(threadId)) {
                AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
                auditApplicationMessage.setApplicationMessageId(applicationMessageId);
                auditApplicationMessage.setMessage(settlementBPM.toString());

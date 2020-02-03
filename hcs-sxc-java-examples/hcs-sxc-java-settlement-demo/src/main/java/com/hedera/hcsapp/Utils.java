@@ -81,7 +81,7 @@ public final class Utils {
         credit.setPayerName(creditBPM.getPayerName());
         credit.setRecipientName(creditBPM.getRecipientName());
         credit.setReference(creditBPM.getServiceRef());
-        credit.setApplicationMessageId(creditBPM.getApplicationMessageId());
+        credit.setApplicationMessageId(creditBPM.getApplicationMessageID());
         credit.setCreatedDate(creditBPM.getCreatedDate());
         credit.setCreatedTime(creditBPM.getCreatedTime());
         credit.setAmount(creditBPM.getValue().getUnits());
@@ -102,7 +102,7 @@ public final class Utils {
                 .setPayerName(credit.getPayerName())
                 .setRecipientName(credit.getRecipientName())
                 .setServiceRef(credit.getReference())
-                .setApplicationMessageId(credit.getApplicationMessageId())
+                .setApplicationMessageID(credit.getApplicationMessageId())
                 .setCreatedDate(credit.getCreatedDate())
                 .setCreatedTime(credit.getCreatedTime())
                 .setValue(value)

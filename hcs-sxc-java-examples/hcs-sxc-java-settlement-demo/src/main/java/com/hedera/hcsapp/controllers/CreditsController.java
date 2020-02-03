@@ -105,7 +105,7 @@ public class CreditsController {
                 .build();
 
         SettlementBPM settlementBPM = SettlementBPM.newBuilder()
-                .setThreadId(threadId)
+                .setThreadID(threadId)
                 .setCreditAck(creditAckBPM)
                 .build();
 
@@ -159,7 +159,7 @@ public class CreditsController {
                 .setCreatedTime(Utils.TimestampToTime(seconds, nanos))
                 .build();
         SettlementBPM settlementBPM = SettlementBPM.newBuilder()
-                .setThreadId(threadId)
+                .setThreadID(threadId)
                 .setCredit(creditBPM)
                 .build();
 

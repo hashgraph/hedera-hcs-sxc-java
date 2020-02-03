@@ -45,6 +45,7 @@ import com.hedera.hcsapp.Utils;
 import com.hedera.hcsapp.entities.Settlement;
 import com.hedera.hcsapp.entities.SettlementItem;
 import com.hedera.hcsapp.entities.SettlementItemId;
+import com.hedera.hcsapp.integration.HCSMessages;
 import com.hedera.hcsapp.repository.CreditRepository;
 import com.hedera.hcsapp.repository.SettlementItemRepository;
 import com.hedera.hcsapp.repository.SettlementRepository;
@@ -106,363 +107,117 @@ public class SettlementsController {
 
     }
 
-//    @Transactional
     @PostMapping(value = "/settlements", consumes = "application/json", produces = "application/json")
     public ResponseEntity<SettlementRest> settlementNew(@RequestBody SettlementProposal settleProposal)
             throws Exception {
-        log.debug("POST to /settlements/");
-
-        Instant now = Instant.now();
-        Long seconds = now.getEpochSecond();
-        int nanos = now.getNano();
-
-        String threadId = Utils.getThreadId();
-
-        Money value = Money.newBuilder().setCurrencyCode(settleProposal.getCurrency())
-                .setUnits(settleProposal.getNetValue()).build();
-        SettleProposeBPM.Builder settleProposeBPM = SettleProposeBPM.newBuilder()
-                .setAdditionalNotes(settleProposal.getAdditionalNotes()).setPayerName(settleProposal.getPayerName())
-                .setRecipientName(settleProposal.getRecipientName())
-                .setCreatedDate(Utils.TimestampToDate(seconds, nanos))
-                .setCreatedTime(Utils.TimestampToTime(seconds, nanos)).setNetValue(value);
-
-        for (String proposedThreadId : settleProposal.getThreadIds()) {
-            settleProposeBPM.addThreadIDs(proposedThreadId);
-        }
-
-        SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
-                .setSettlePropose(settleProposeBPM.build()).build();
-
         try {
-            TransactionId transactionId = new TransactionId(appData.getHCSCore().getOperatorAccountId());
-
-            Settlement settlement = new Settlement();
-            // copy data
-            settlement.setAdditionalNotes(settleProposal.getAdditionalNotes());
-            settlement.setCurrency(settleProposal.getCurrency());
-            settlement.setNetValue(settleProposal.getNetValue());
-            settlement.setPayerName(settleProposal.getPayerName());
-            settlement.setRecipientName(settleProposal.getRecipientName());
-            settlement.setThreadId(threadId);
-            settlement.setApplicationMessageId(Utils.TransactionIdToString(transactionId));
-            settlement.setCreatedDate(Utils.TimestampToDate(seconds, nanos));
-            settlement.setCreatedTime(Utils.TimestampToTime(seconds, nanos));
-
-            settlement = settlementRepository.save(settlement);
-
-            settlement = settlementRepository.findById(threadId).get();
-            if ((settlement.getStatus() == null)
-                    || (!settlement.getStatus().contentEquals(States.SETTLE_PROPOSED.name()))) {
-                settlement.setStatus(States.SETTLE_PROPOSED_PENDING.name());
-                settlement = settlementRepository.save(settlement);
-            } else {
-                log.error("Settlement state is already SETTLEMENT_PROPOSED");
-            }
-
-            // now settlement items
-            for (String settledThreadId : settleProposal.getThreadIds()) {
-                SettlementItem settlementItem = new SettlementItem();
-                settlementItem.setId(new SettlementItemId(settledThreadId, threadId));
-                settlementItem = settlementItemRepository.save(settlementItem);
-            }
-
-            new OutboundHCSMessage(appData.getHCSCore()).overrideEncryptedMessages(false).overrideMessageSignature(false)
-                    .withFirstTransactionId(transactionId).sendMessage(topicIndex, settlementBPM.toByteArray());
-
-            log.info("Message sent successfully.");
-
-            SettlementRest settlementResponse = new SettlementRest(settlement, appData, settlementItemRepository,
-                    creditRepository);
+            SettlementRest settlementResponse = HCSMessages.settlementNew(appData, creditRepository, settlementRepository, settlementItemRepository, settleProposal, false);
             return new ResponseEntity<>(settlementResponse, headers, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e);
-            throw e;
+            return Utils.serverError();
         }
     }
 
-//    @Transactional
     @PostMapping(value = "/settlements/ack/{threadId}", produces = "application/json")
     public ResponseEntity<SettlementRest> settleProposeAck(@PathVariable String threadId) throws Exception {
 
-        Optional<Settlement> settlement = settlementRepository.findById(threadId);
-
-        if (settlement.isPresent()) {
-            if (settlement.get().getStatus().contentEquals(States.SETTLE_PROPOSED.name())) {
-                SettleProposeBPM.Builder settleProposeBPM = SettleProposeBPM.newBuilder()
-                        .setAdditionalNotes(settlement.get().getAdditionalNotes()).setNetValue(Utils.moneyFromSettlement(settlement.get()))
-                        .setPayerName(settlement.get().getPayerName())
-                        .setRecipientName(settlement.get().getRecipientName());
-    
-                List<SettlementItem> settlementItems = settlementItemRepository.findAllSettlementItems(threadId);
-                for (SettlementItem settlementItem : settlementItems) {
-                    settleProposeBPM.addThreadIDs(settlementItem.getId().getSettledThreadId());
-                }
-    
-                SettleProposeAckBPM settleProposeAck = SettleProposeAckBPM.newBuilder()
-                        .setSettlePropose(settleProposeBPM.build()).build();
-    
-                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
-                        .setSettleProposeAck(settleProposeAck).build();
-    
-                return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_AGREED);
-            } else {
-                log.error("Status is not " + States.SETTLE_PROPOSED.name() + ", not performing update");
-                return Utils.serverError();
-            }
-        } else {
+        try {
+            SettlementRest settlementRest = HCSMessages.settlementAck(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, false);
+            return new ResponseEntity<>(settlementRest, headers, HttpStatus.OK);
+        } catch (Exception e) {
             return Utils.serverError();
         }
-
     }
 
-//    @Transactional
     @PostMapping(value = "/settlements/proposechannel", consumes = "application/json", produces = "application/json")
     public ResponseEntity<SettlementRest> settleProposeChannel(
             @RequestBody SettlementChannelProposal settlementChannelProposal) throws Exception {
 
+        String additionalNotes = settlementChannelProposal.getAdditionalNotes();
+        String paymentChannelName = settlementChannelProposal.getPaymentChannelName();
+
         String threadId = settlementChannelProposal.getThreadId();
-        Optional<Settlement> settlement = settlementRepository.findById(threadId);
-
-        if (settlement.isPresent()) {
-
-            if (settlement.get().getStatus().contentEquals(States.SETTLE_AGREED.name())) {
-                settlement.get().setAdditionalNotes(settlementChannelProposal.getAdditionalNotes());
-                settlement.get().setPaymentChannelName(settlementChannelProposal.getPaymentChannelName());
-    
-                SettleInitBPM.Builder settleInitBPM = SettleInitBPM.newBuilder()
-                        .setAdditionalNotes(settlementChannelProposal.getAdditionalNotes())
-                        .setNetValue(Utils.moneyFromSettlement(settlement.get()))
-                        .setPayerName(settlement.get().getPayerName())
-                        .setRecipientName(settlement.get().getRecipientName())
-                        .setPaymentChannelName(settlementChannelProposal.getPaymentChannelName());
-    
-                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId).setSettleInit(settleInitBPM)
-                        .build();
-    
-                return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAY_CHANNEL_PROPOSED);
-            } else {
-                log.error("Status is not " + States.SETTLE_AGREED.name() + ", not performing update");
-                return Utils.serverError();
-            }
-        } else {
+        try {
+            SettlementRest settlementRest = HCSMessages.settlementInit(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, false, additionalNotes, paymentChannelName);
+            return new ResponseEntity<>(settlementRest, headers, HttpStatus.OK);
+        } catch (Exception e) {
             return Utils.serverError();
         }
-
     }
 
-//    @Transactional
     @PostMapping(value = "/settlements/proposechannel/ack/{threadId}", produces = "application/json")
     public ResponseEntity<SettlementRest> settleProposeChannelAck(@PathVariable String threadId) throws Exception {
-
-        Optional<Settlement> settlement = settlementRepository.findById(threadId);
-
-        if (settlement.isPresent()) {
-            if (settlement.get().getStatus().contentEquals(States.SETTLE_PAY_CHANNEL_PROPOSED.name())) {
-                SettleInitBPM.Builder settleInitBPM = SettleInitBPM.newBuilder()
-                        .setAdditionalNotes(settlement.get().getAdditionalNotes())
-                        .setNetValue(Utils.moneyFromSettlement(settlement.get()))
-                        .setPayerName(settlement.get().getPayerName())
-                        .setRecipientName(settlement.get().getRecipientName())
-                        .setPaymentChannelName(settlement.get().getPaymentChannelName());
-    
-                SettleInitAckBPM.Builder settleInitAckBPM = SettleInitAckBPM.newBuilder().setSettleInit(settleInitBPM);
-    
-                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
-                        .setSettleInitAck(settleInitAckBPM).build();
-    
-                return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAY_CHANNEL_AGREED);
-            } else {
-                log.error("Status is not " + States.SETTLE_PAY_CHANNEL_PROPOSED.name() + ", not performing update");
-                return Utils.serverError();
-            }
-        } else {
+        try {
+            SettlementRest settlementRest = HCSMessages.settleProposeChannelAck(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, false);
+            return new ResponseEntity<>(settlementRest, headers, HttpStatus.OK);
+        } catch (Exception e) {
             return Utils.serverError();
         }
-
     }
 
-//    @Transactional
     @PostMapping(value = "/settlements/paymentInit", consumes = "application/json", produces = "application/json")
     public ResponseEntity<SettlementRest> settlePaymentInit(@RequestBody SettlementPaymentInit settlementPaymentInit)
             throws Exception {
 
         String threadId = settlementPaymentInit.getThreadId();
-
-        Optional<Settlement> settlement = settlementRepository.findById(threadId);
-
-        if (settlement.isPresent()) {
-            if (settlement.get().getStatus().contentEquals(States.SETTLE_PAY_CHANNEL_AGREED.name())) {
-    
-                PaymentInitBPM.Builder paymentInitBPM = PaymentInitBPM.newBuilder()
-                        .setPayerName(settlement.get().getPayerName())
-                        .setRecipientName(settlement.get().getRecipientName())
-                        .setPayerAccountDetails(settlementPaymentInit.getPayerAccountDetails())
-                        .setRecipientAccountDetails(settlementPaymentInit.getRecipientAccountDetails())
-                        .setAdditionalNotes(settlementPaymentInit.getAdditionalNotes())
-                        .setNetValue(Utils.moneyFromSettlement(settlement.get()));
-    
-                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
-                        .setPaymentInit(paymentInitBPM).build();
-    
-                return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAY_PROPOSED);
-            } else {
-                log.error("Status is not " + States.SETTLE_PAY_CHANNEL_AGREED.name() + ", not performing update");
-                return Utils.serverError();
-            }
-        } else {
+        String payerAccountDetails = settlementPaymentInit.getPayerAccountDetails();
+        String recipientAccountDetails = settlementPaymentInit.getRecipientAccountDetails();
+        String additionalNotes = settlementPaymentInit.getAdditionalNotes();
+        
+        try {
+            SettlementRest settlementRest = HCSMessages.settlePaymentInit(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, false, payerAccountDetails, recipientAccountDetails, additionalNotes);
+            return new ResponseEntity<>(settlementRest, headers, HttpStatus.OK);
+        } catch (Exception e) {
             return Utils.serverError();
         }
     }
 
-//    @Transactional
     @PostMapping(value = "/settlements/paymentInit/ack/{threadId}", produces = "application/json")
     public ResponseEntity<SettlementRest> settlePaymentInitAck(@PathVariable String threadId) throws Exception {
 
-        Optional<Settlement> settlement = settlementRepository.findById(threadId);
-
-        if (settlement.isPresent()) {
-            if (settlement.get().getStatus().contentEquals(States.SETTLE_PAY_PROPOSED.name())) {
-                PaymentInitBPM.Builder paymentInitBPM = PaymentInitBPM.newBuilder()
-                        .setPayerName(settlement.get().getPayerName())
-                        .setRecipientName(settlement.get().getRecipientName())
-                        .setPayerAccountDetails(settlement.get().getPayerAccountDetails())
-                        .setRecipientAccountDetails(settlement.get().getRecipientAccountDetails())
-                        .setAdditionalNotes(settlement.get().getAdditionalNotes())
-                        .setNetValue(Utils.moneyFromSettlement(settlement.get()));
-    
-                PaymentInitAckBPM.Builder paymentInitAckBPM = PaymentInitAckBPM.newBuilder().setPaymentInit(paymentInitBPM);
-    
-                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
-                        .setPaymentInitAck(paymentInitAckBPM).build();
-    
-                return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAY_AGREED);
-            } else {
-                log.error("Status is not " + States.SETTLE_PAY_PROPOSED.name() + ", not performing update");
-                return Utils.serverError();
-            }
-        } else {
+        try {
+            SettlementRest settlementRest = HCSMessages.settlePaymentInitAck(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, false);
+            return new ResponseEntity<>(settlementRest, headers, HttpStatus.OK);
+        } catch (Exception e) {
             return Utils.serverError();
         }
-
     }
 
-//  @Transactional
     @PostMapping(value = "/settlements/paid", consumes = "application/json", produces = "application/json")
     public ResponseEntity<SettlementRest> paid(@RequestBody SettlementPaidOrComplete settlementPaid) throws Exception {
 
         String threadId = settlementPaid.getThreadId();
-
-        Optional<Settlement> settlement = settlementRepository.findById(threadId);
-
-        if (settlement.isPresent()) {
-            if (settlement.get().getStatus().contentEquals(States.SETTLE_PAY_ACK.name())) {
-                SettlePaidBPM.Builder settlePaidBPM = SettlePaidBPM.newBuilder()
-                        .setPayerName(settlement.get().getPayerName())
-                        .setRecipientName(settlement.get().getRecipientName())
-                        .setAdditionalNotes(settlementPaid.getAdditionalNotes())
-                        .setPaymentReference(settlement.get().getPaymentReference())
-                        .setNetValue(Utils.moneyFromSettlement(settlement.get()));
-    
-                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
-                        .setSettlePayment(settlePaidBPM).build();
-    
-                return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_RCPT_REQUESTED);
-            } else {
-                log.error("Status is not " + States.SETTLE_PAY_ACK.name() + ", not performing update");
-                return Utils.serverError();
-            }
-        } else {
+        String additionalNotes = settlementPaid.getAdditionalNotes();
+        try {
+            SettlementRest settlementRest = HCSMessages.settlePaymentPaid(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, false, additionalNotes);
+            return new ResponseEntity<>(settlementRest, headers, HttpStatus.OK);
+        } catch (Exception e) {
             return Utils.serverError();
         }
-
     }
 
-  //@Transactional
     @PostMapping(value = "/settlements/paid/ack/{threadId}", produces = "application/json")
     public ResponseEntity<SettlementRest> paidAck(@PathVariable String threadId) throws Exception {
 
-        Optional<Settlement> settlement = settlementRepository.findById(threadId);
-
-        if (settlement.isPresent()) {
-            if (settlement.get().getStatus().contentEquals(States.SETTLE_RCPT_REQUESTED.name())) {
-                SettlePaidBPM.Builder settlePaidBPM = SettlePaidBPM.newBuilder()
-                        .setPayerName(settlement.get().getPayerName())
-                        .setRecipientName(settlement.get().getRecipientName())
-                        .setAdditionalNotes(settlement.get().getAdditionalNotes())
-                        .setPaymentReference(settlement.get().getPaymentReference())
-                        .setNetValue(Utils.moneyFromSettlement(settlement.get()));
-    
-                SettlePaidAckBPM.Builder settlePaidAckBPM = SettlePaidAckBPM.newBuilder()
-                        .setSettlePaid(settlePaidBPM);
-                
-                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
-                        .setSettlePaymentAck(settlePaidAckBPM).build();
-    
-                return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_RCPT_CONFIRMED);
-            } else {
-                log.error("Status is not " + States.SETTLE_RCPT_REQUESTED.name() + ", not performing update");
-                return Utils.serverError();
-            }
-        } else {
+        try {
+            SettlementRest settlementRest = HCSMessages.settlePaymentPaidAck(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, false);
+            return new ResponseEntity<>(settlementRest, headers, HttpStatus.OK);
+        } catch (Exception e) {
             return Utils.serverError();
         }
     }
 
-//  @Transactional
     @PostMapping(value = "/settlements/complete", consumes = "application/json", produces = "application/json")
     public ResponseEntity<SettlementRest> complete(@RequestBody SettlementPaidOrComplete settlementPaid) throws Exception {
         
         String threadId = settlementPaid.getThreadId();
-
-        Optional<Settlement> settlement = settlementRepository.findById(threadId);
-
-        if (settlement.isPresent()) {
-            if (settlement.get().getStatus().contentEquals(States.SETTLE_RCPT_CONFIRMED.name())) {
-                SettleCompleteBPM.Builder settleCompleteBPM = SettleCompleteBPM.newBuilder()
-                        .setPayerName(settlement.get().getPayerName())
-                        .setRecipientName(settlement.get().getRecipientName())
-                        .setAdditionalNotes(settlementPaid.getAdditionalNotes())
-                        .setPaymentReference(settlement.get().getPaymentReference())
-                        .setNetValue(Utils.moneyFromSettlement(settlement.get()));
-    
-                SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
-                        .setSettleComplete(settleCompleteBPM).build();
-    
-                return saveAndSendSettlement(settlementBPM, settlement.get(), States.SETTLE_PAY_CONFIRMED);
-            } else {
-                log.error("Status is not " + States.SETTLE_RCPT_CONFIRMED.name() + ", not performing update");
-                return Utils.serverError();
-            }
-        } else {
-            return Utils.serverError();
-        }
-
-    }
-
-    private ResponseEntity<SettlementRest> saveAndSendSettlement(SettlementBPM settlementBPM, Settlement settlement,
-            States newState) throws Exception {
-        
+        String additionalNotes = settlementPaid.getAdditionalNotes();
         try {
-
-            if ( ! settlement.getStatus().contentEquals(newState.name())) {
-                settlement.setStatus(newState.name() + "_PENDING");
-            } else {
-                log.error("Settlement state is already " + newState.name());
-            }
-
-            Settlement newSettlement = settlementRepository.save(settlement);
-
-            new OutboundHCSMessage(appData.getHCSCore()).overrideEncryptedMessages(false)
-                    .overrideMessageSignature(false).sendMessage(topicIndex, settlementBPM.toByteArray());
-
-            log.info("Message sent successfully.");
-
-            SettlementRest settlementResponse = new SettlementRest(newSettlement, appData, settlementItemRepository, creditRepository);
-            return new ResponseEntity<>(settlementResponse, headers, HttpStatus.OK);
-
+            SettlementRest settlementRest = HCSMessages.settlePaymentComplete(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, false, additionalNotes);
+            return new ResponseEntity<>(settlementRest, headers, HttpStatus.OK);
         } catch (Exception e) {
-            log.error(e);
-            throw e;
+            return Utils.serverError();
         }
     }
 }

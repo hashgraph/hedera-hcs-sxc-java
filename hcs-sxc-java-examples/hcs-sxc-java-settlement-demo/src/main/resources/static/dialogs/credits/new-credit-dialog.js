@@ -1,5 +1,6 @@
 function openNewCreditDialog(recipient) {
 
+
     /* Functions for the new credit dialog. () */
     newCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('new-credit-dialog'));
     event.preventDefault();
@@ -22,6 +23,8 @@ function openNewCreditDialog(recipient) {
                  if (! ls[i].checkValidity()){ls[i].focus();isFormValid=false;break;  }
 
             }
+            var automate = (document.getElementById('new-credit-automatic').value === "on");
+            automate = true;
             if(isFormValid){
                 postBody = `{
                               "payerName"       : "${thisuserName}"
@@ -30,9 +33,8 @@ function openNewCreditDialog(recipient) {
                             , "amount"          : ${document.getElementById('new-credit-amount').value * 1}
                             , "currency"        : "USD"
                             , "additionalNotes" :"${document.getElementById('new-credit-additional-notes').value}"
+                            , "automatic"       : ${automate}
                             }`;
-
-                newCreditDialog.close();
                 el = document.getElementById(recipient);
                 el.style.opacity=0.4;
                 el.style.pointerEvents =  'none';

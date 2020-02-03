@@ -21,12 +21,12 @@
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-proto</artifactId>
-            <version>${hcs-sxc-proto.version}</version>
+            <version>${hcs-sxc.version}</version>
         </dependency>
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-interfaces</artifactId>
-            <version>${hcs-sxc-interfaces.version}</version>
+            <version>${hcs-sxc.version}</version>
         </dependency>
     </dependencies>
     <build>

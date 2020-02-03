@@ -84,28 +84,36 @@ implements SxcMessagePersistence{
     @Override
     public void storeMirrorResponse(SxcConsensusMessage mirrorTopicMessageResponse) {
 
-        MirrorResponse mirrorResponse = new MirrorResponse();
-
-        mirrorResponse.setMessage(mirrorTopicMessageResponse.message);
-        mirrorResponse.setRunningHash(mirrorTopicMessageResponse.runningHash);
-        mirrorResponse.setSequenceNumber(mirrorTopicMessageResponse.sequenceNumber);
-        mirrorResponse.setTopicId(mirrorTopicMessageResponse.topicId.toString());
-        mirrorResponse.setTimestamp(mirrorTopicMessageResponse.consensusTimestamp.toString());
-        mirrorResponse.setTimestampSeconds(mirrorTopicMessageResponse.consensusTimestamp.getEpochSecond());
-        mirrorResponse.setTimestampNanos(mirrorTopicMessageResponse.consensusTimestamp.getNano());
-        long timestampNS = mirrorTopicMessageResponse.consensusTimestamp.getEpochSecond() * SCALAR + mirrorTopicMessageResponse.consensusTimestamp.getNano();
-        mirrorResponse.setTimestampNS(timestampNS);
-
-        Transaction dbTransaction = null;
         final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
-        // start a transaction
-        dbTransaction = session.beginTransaction();
-        // save the student objects
-        session.save(mirrorResponse);
-        // commit transaction
-        dbTransaction.commit();
 
-        log.info("storeMirrorResponse " + mirrorTopicMessageResponse.toString());
+        MirrorResponse mirrorResponse = session.createQuery("from MirrorResponse mr where mr.timestamp = :timestamp", MirrorResponse.class)
+                .setParameter("timestamp", mirrorTopicMessageResponse.consensusTimestamp.toString())
+                .getResultList()
+                .stream().findFirst().orElse(null);
+        if (mirrorResponse == null) {
+            mirrorResponse = new MirrorResponse();
+            mirrorResponse.setMessage(mirrorTopicMessageResponse.message);
+            mirrorResponse.setRunningHash(mirrorTopicMessageResponse.runningHash);
+            mirrorResponse.setSequenceNumber(mirrorTopicMessageResponse.sequenceNumber);
+            mirrorResponse.setTopicId(mirrorTopicMessageResponse.topicId.toString());
+            mirrorResponse.setTimestamp(mirrorTopicMessageResponse.consensusTimestamp.toString());
+            mirrorResponse.setTimestampSeconds(mirrorTopicMessageResponse.consensusTimestamp.getEpochSecond());
+            mirrorResponse.setTimestampNanos(mirrorTopicMessageResponse.consensusTimestamp.getNano());
+            long timestampNS = mirrorTopicMessageResponse.consensusTimestamp.getEpochSecond() * SCALAR + mirrorTopicMessageResponse.consensusTimestamp.getNano();
+            mirrorResponse.setTimestampNS(timestampNS);
+    
+            Transaction dbTransaction = null;
+            // start a transaction
+            dbTransaction = session.beginTransaction();
+            // save the student objects
+            session.save(mirrorResponse);
+            // commit transaction
+            dbTransaction.commit();
+    
+            log.info("storeMirrorResponse " + mirrorTopicMessageResponse.toString());
+        } else {
+            log.info("Skipping duplicate mirror response entry");
+        }
     }
 
     @Override
@@ -114,7 +122,11 @@ implements SxcMessagePersistence{
         final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         MirrorResponse mirrorResponse = session.createQuery("from MirrorResponse mr where mr.timestamp = :timestamp", MirrorResponse.class)
                 .setParameter("timestamp", timestamp)
-                .getSingleResult();
+                .getResultList()
+                .stream().findFirst().orElse(null);
+        if (mirrorResponse == null) {
+            return null;
+        }
 
          ConsensusTopicResponse consensusTopicResponse = ConsensusTopicResponse.newBuilder()
                 .setConsensusTimestamp(Timestamp.newBuilder().setSeconds(mirrorResponse.getTimestampSeconds()).setNanos(mirrorResponse.getTimestampNanos()).build())
@@ -215,7 +227,11 @@ implements SxcMessagePersistence{
         final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         HCSTransaction hcsTransaction = session.createQuery("from HCSTransaction t where t.transactionId = :transactionId", HCSTransaction.class)
                 .setParameter("transactionId", transactionId)
-                .getSingleResult();
+                .getResultList()
+                .stream().findFirst().orElse(null);
+        if (hcsTransaction == null) {
+            return null;
+        }
 
         try {
           TransactionBody body = TransactionBody.parseFrom(hcsTransaction.getBodyBytes());
@@ -314,18 +330,27 @@ implements SxcMessagePersistence{
                 + "-" + applicationMessageId.getValidStart().getSeconds()
                 + "-" + applicationMessageId.getValidStart().getNanos();
 
-        HCSApplicationMessage hcsApplicationMessage = new HCSApplicationMessage();
-
-        hcsApplicationMessage.setApplicationMessageId(appMessageId);
-        hcsApplicationMessage.setApplicationMessage(applicationMessage.toByteArray());
-
-        Transaction dbTransaction = null;
         final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
-        dbTransaction = session.beginTransaction();
-        session.save(hcsApplicationMessage);
-        dbTransaction.commit();
+        HCSApplicationMessage hcsApplicationMessage = session.createQuery("from HCSApplicationMessage m where m.applicationMessageId = :applicationMessageId", HCSApplicationMessage.class)
+                .setParameter("applicationMessageId", appMessageId)
+                .getResultList()
+                .stream().findFirst().orElse(null);
+        
+        if (hcsApplicationMessage == null) {
+            hcsApplicationMessage = new HCSApplicationMessage();
 
-        log.info("storeApplicationMessage " + appMessageId + "-" + applicationMessage);
+            hcsApplicationMessage.setApplicationMessageId(appMessageId);
+            hcsApplicationMessage.setApplicationMessage(applicationMessage.toByteArray());
+    
+            Transaction dbTransaction = null;
+            dbTransaction = session.beginTransaction();
+            session.save(hcsApplicationMessage);
+            dbTransaction.commit();
+    
+            log.info("storeApplicationMessage " + appMessageId + "-" + applicationMessage);
+        } else {
+            log.info("Application message already in database");
+        }
     }
 
     @Override
@@ -334,7 +359,11 @@ implements SxcMessagePersistence{
         try {
             HCSApplicationMessage applicationMessage = session.createQuery("from HCSApplicationMessage m where m.applicationMessageId = :applicationMessageId", HCSApplicationMessage.class)
                     .setParameter("applicationMessageId", applicationMessageId)
-                    .getSingleResult();
+                    .getResultList()
+                    .stream().findFirst().orElse(null);
+            if (applicationMessage == null) {
+                return null;
+            }
             return ApplicationMessage.parseFrom(applicationMessage.getApplicationMessage());
         } catch (InvalidProtocolBufferException e) {
             log.error(e);
@@ -402,7 +431,6 @@ implements SxcMessagePersistence{
 
         Query<Long> query = session.createQuery(criteriaQuery);
         Long maxTimestamp = query.getSingleResult();
-
         if (maxTimestamp == null) {
             lastConsensusTimestamp = Instant.EPOCH;
         } else {

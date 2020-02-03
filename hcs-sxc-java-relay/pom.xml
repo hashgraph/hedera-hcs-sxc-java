@@ -20,7 +20,7 @@
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-core</artifactId>
-            <version>${hcs-sxc-core.version}</version>
+            <version>${hcs-sxc.version}</version>
         </dependency>
       <dependency>
           <groupId>org.apache.activemq</groupId>

@@ -26,7 +26,7 @@ import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
-import com.hedera.hcs.sxc.proto.ApplicationMessageId;
+import com.hedera.hcs.sxc.proto.ApplicationMessageID;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -40,7 +40,7 @@ import java.util.Map;
 public class PersistMessages 
         implements com.hedera.hcs.sxc.interfaces.SxcMessagePersistence{
     
-    private Map<ApplicationMessageId, List<ApplicationMessageChunk>> partialMessages;
+    private Map<ApplicationMessageID, List<ApplicationMessageChunk>> partialMessages;
     private Map<String, ConsensusMessageSubmitTransaction> transactions;
     private Map<String, SxcConsensusMessage> mirrorTopicMessages;
     private Map<String, ApplicationMessage> applicationMessages;
@@ -118,12 +118,12 @@ public class PersistMessages
     }
     
     @Override
-    public List<ApplicationMessageChunk> getParts(ApplicationMessageId applicationMessageId) {
+    public List<ApplicationMessageChunk> getParts(ApplicationMessageID applicationMessageId) {
         return this.partialMessages.get(applicationMessageId);
     }
 
     @Override
-    public void storeApplicationMessage(ApplicationMessageId applicationMessageId, ApplicationMessage applicationMessage) {
+    public void storeApplicationMessage(ApplicationMessageID applicationMessageId, ApplicationMessage applicationMessage) {
         String appMessageId = applicationMessageId.getAccountID().getShardNum()
                 + "." + applicationMessageId.getAccountID().getRealmNum()
                 + "." + applicationMessageId.getAccountID().getAccountNum()
@@ -146,7 +146,7 @@ public class PersistMessages
     }
 
     @Override
-    public void putParts(ApplicationMessageId applicationMessageId, List<ApplicationMessageChunk> l) {
+    public void putParts(ApplicationMessageID applicationMessageId, List<ApplicationMessageChunk> l) {
         // always keep data to allow for reassembly of messages,
         // part messages can be deleted once full messages have been reconstituted
         // see removeParts
@@ -154,7 +154,7 @@ public class PersistMessages
     }
 
     @Override
-    public void removeParts(ApplicationMessageId applicationMessageId) {
+    public void removeParts(ApplicationMessageID applicationMessageId) {
         switch (persistenceLevel) {
             case FULL:
                 // do not remove stored data

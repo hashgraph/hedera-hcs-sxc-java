@@ -16,14 +16,14 @@ message Timestamp {
     int32 nanos = 2; // Number of nanoseconds since the start of the last second
 }
 
-message ApplicationMessageId {
+message ApplicationMessageID {
     Timestamp validStart = 1; 
     AccountID accountID = 2; //The Account ID that paid for this transaction
 }
 
 // a complete message containing data provided by an app to the core component
 message ApplicationMessage {
-    ApplicationMessageId applicationMessageId = 1;
+    ApplicationMessageID applicationMessageId = 1;
     bytes businessProcessMessage = 2;
     bytes businessProcessHash = 3;
     bytes businessProcessSignature = 4;
@@ -31,7 +31,7 @@ message ApplicationMessage {
 
 // parts of a complete message
 message ApplicationMessageChunk {
-    ApplicationMessageId applicationMessageId = 1;
+    ApplicationMessageID applicationMessageId = 1;
     int32 chunksCount = 2; // The total number of parts to make up a complete message
     int32 chunkIndex = 3; // This message part index
     bytes messageChunk = 4; // The message part

@@ -36,7 +36,7 @@ import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.entities.Settlement;
 import com.hedera.hcsapp.restclasses.SettlementRest;
 import com.hedera.hcs.sxc.proto.AccountID;
-import com.hedera.hcs.sxc.proto.ApplicationMessageId;
+import com.hedera.hcs.sxc.proto.ApplicationMessageID;
 import com.hedera.hcs.sxc.proto.Timestamp;
 
 import proto.CreditBPM;
@@ -60,7 +60,7 @@ public final class Utils {
         return formattedDate;
     }
     
-    public static String TransactionIdToString(ApplicationMessageId transactionId) {
+    public static String TransactionIdToString(ApplicationMessageID transactionId) {
         String txId = "0.0." + transactionId.getAccountID().getAccountNum()
                 + "-" + transactionId.getValidStart().getSeconds()
                 + "-" + transactionId.getValidStart().getNanos();
@@ -81,7 +81,7 @@ public final class Utils {
         credit.setPayerName(creditBPM.getPayerName());
         credit.setRecipientName(creditBPM.getRecipientName());
         credit.setReference(creditBPM.getServiceRef());
-        credit.setApplicationMessageId(creditBPM.getApplicationMessageId());
+        credit.setApplicationMessageId(creditBPM.getApplicationMessageID());
         credit.setCreatedDate(creditBPM.getCreatedDate());
         credit.setCreatedTime(creditBPM.getCreatedTime());
         credit.setAmount(creditBPM.getValue().getUnits());
@@ -102,7 +102,7 @@ public final class Utils {
                 .setPayerName(credit.getPayerName())
                 .setRecipientName(credit.getRecipientName())
                 .setServiceRef(credit.getReference())
-                .setApplicationMessageId(credit.getApplicationMessageId())
+                .setApplicationMessageID(credit.getApplicationMessageId())
                 .setCreatedDate(credit.getCreatedDate())
                 .setCreatedTime(credit.getCreatedTime())
                 .setValue(value)
@@ -125,7 +125,7 @@ public final class Utils {
         
         return settlement;
     }
-    public static ApplicationMessageId applicationMessageIdFromString(String appMessageId) {
+    public static ApplicationMessageID applicationMessageIdFromString(String appMessageId) {
         String[] messageIdParts = appMessageId.split("-");
         String[] account = messageIdParts[0].split("\\.");
         
@@ -140,7 +140,7 @@ public final class Utils {
                 .setNanos(Integer.parseInt(messageIdParts[2]))
                 .build();
         
-        ApplicationMessageId applicationMessageId = ApplicationMessageId.newBuilder()
+        ApplicationMessageID applicationMessageId = ApplicationMessageID.newBuilder()
                 .setAccountID(accountId)
                 .setValidStart(timestamp)
                 .build();

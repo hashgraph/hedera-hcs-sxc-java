@@ -44,7 +44,7 @@ import com.hedera.hcs.sxc.plugins.Plugins;
 import com.hedera.hcs.sxc.proto.AccountID;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
-import com.hedera.hcs.sxc.proto.ApplicationMessageId;
+import com.hedera.hcs.sxc.proto.ApplicationMessageID;
 import com.hedera.hcs.sxc.proto.Timestamp;
 
 import java.util.Arrays;
@@ -201,7 +201,7 @@ public final class OutboundHCSMessage {
 
     public static  List<ApplicationMessageChunk> chunk(TransactionId transactionId,  byte[] message) {
         
-        ApplicationMessageId transactionID = ApplicationMessageId.newBuilder()
+        ApplicationMessageID transactionID = ApplicationMessageID.newBuilder()
                 .setAccountID(AccountID.newBuilder()
                         .setShardNum(transactionId.accountId.shard)
                         .setRealmNum(transactionId.accountId.realm)

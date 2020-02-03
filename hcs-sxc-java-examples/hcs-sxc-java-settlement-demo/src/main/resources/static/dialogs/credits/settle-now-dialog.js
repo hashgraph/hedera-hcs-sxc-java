@@ -51,6 +51,9 @@
             el.style.pointerEvents =  'none';
             el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
 
+            var automate = (document.getElementById('settle-now-automatic').value === "on");
+            automate = true;
+            
             postBody = `{
                           "payerName"       : "${payerName}"
                         , "recipientName"   : "${recipientName}"  
@@ -58,8 +61,8 @@
                         , "currency"        : "USD"
                         , "threadIds"       : ${JSON.stringify(threadIds)}
                         , "additionalNotes" : "${additionalNotes}"
+                        , "automatic"       : ${automate}
                         }`;
-
 
             showSnackBarMessage("sending new settlement request to HH Network ...");
             fetch('settlements', {

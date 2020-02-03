@@ -33,7 +33,7 @@ import com.hedera.hcs.sxc.plugins.Plugins;
 import com.hedera.hcs.sxc.utils.ByteUtil;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
-import com.hedera.hcs.sxc.proto.ApplicationMessageId;
+import com.hedera.hcs.sxc.proto.ApplicationMessageID;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -80,9 +80,9 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
      * Notifies all observers with the supplied message
      * @param message
      */
-    public void notifyObservers(byte[] message, ApplicationMessageId applicationMessageId) {
+    public void notifyObservers(byte[] message, ApplicationMessageID applicationMessageId) {
         HCSResponse hcsResponse = new HCSResponse();
-        hcsResponse.setApplicationMessageId(applicationMessageId);
+        hcsResponse.setApplicationMessageID(applicationMessageId);
         hcsResponse.setMessage(message);
         observers.forEach(listener -> listener.onMessage(hcsResponse));
     }
@@ -112,7 +112,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
      */
     static Optional<ApplicationMessage> pushUntilCompleteMessage(ApplicationMessageChunk messageChunk, SxcMessagePersistence persistence) throws InvalidProtocolBufferException {
 
-        ApplicationMessageId applicationMessageId = messageChunk.getApplicationMessageId();
+        ApplicationMessageID applicationMessageId = messageChunk.getApplicationMessageId();
         //look up db to find parts received already
         List<ApplicationMessageChunk> chunkList = persistence.getParts(applicationMessageId);
         if (chunkList==null){

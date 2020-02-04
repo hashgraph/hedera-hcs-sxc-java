@@ -1060,6 +1060,14 @@
                 }
             }
 
+            function styleSwitches(){
+                switches = document.querySelectorAll('.mdc-switch');
+                for (i = 0; i < switches.length; i++) {
+                    switchControl_ = new mdc.switchControl.MDCSwitch(switches[i]);
+                }
+               
+            }
+
             function styleTextFields(){
                 textFields = document.querySelectorAll('.mdc-text-field');
                 for (i = 0; i < textFields.length; i++) {

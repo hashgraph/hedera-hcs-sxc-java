@@ -5,6 +5,7 @@ function openNewCreditDialog(recipient) {
     newCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('new-credit-dialog'));
     event.preventDefault();
     styleTextFields();
+    styleSwitches();
     $newCreditDialog = document.getElementById('new-credit-dialog');
     /*Clear styles and values to reuse fields*/
     $newCreditDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
@@ -35,6 +36,8 @@ function openNewCreditDialog(recipient) {
                             , "additionalNotes" :"${document.getElementById('new-credit-additional-notes').value}"
                             , "automatic"       : ${automate}
                             }`;
+
+                newCreditDialog.close();
                 el = document.getElementById(recipient);
                 el.style.opacity=0.4;
                 el.style.pointerEvents =  'none';

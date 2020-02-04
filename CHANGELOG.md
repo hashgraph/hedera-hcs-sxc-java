@@ -5,3 +5,7 @@ Besides bug fixes, some features may have changed with this release which need y
 ## February 3rd 2020
 
 Simple demo simplification. It is now possible to run simple demo without relay and queue components. See README.md for details.
+
+## February 4th 2020
+
+Demo now supports fully automatic processing for credits and settlements (individually selectable). If a credit or settlement is set to automatic in the UI, the demo will proceed without further user input.

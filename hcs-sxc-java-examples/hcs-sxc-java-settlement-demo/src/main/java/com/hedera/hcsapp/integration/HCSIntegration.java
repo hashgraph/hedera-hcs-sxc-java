@@ -32,7 +32,6 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
-import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 import com.hedera.hcs.sxc.interfaces.HCSResponse;
 import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
 import com.hedera.hcsapp.AppData;
@@ -54,9 +53,7 @@ import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import lombok.extern.log4j.Log4j2;
 import proto.CreditBPM;
 import proto.PaymentInitBPM;
-import proto.PaymentSentAckBPM;
 import proto.PaymentSentBPM;
-import proto.SettleCompleteAckBPM;
 import proto.SettleCompleteBPM;
 import proto.SettleInitBPM;
 import proto.SettlePaidBPM;
@@ -100,10 +97,14 @@ public class HCSIntegration {
             // (CREDIT_PENDING , r ,threadId ,credit) => (CREDIT_AWAIT_ACK ,r ,threadId , credit[threadId].txId=r.MessageId)
             String threadId = settlementBPM.getThreadID();
             if (settlementBPM.hasCredit()) {
+                log.info("settlementBPM.hasCredit()");
                 String priorState = States.CREDIT_PROPOSED_PENDING.name();
                 String nextState = States.CREDIT_PROPOSED.name();
 
                 CreditBPM creditBPM = settlementBPM.getCredit();
+                String payerName = creditBPM.getPayerName();
+                String recipientName = creditBPM.getRecipientName();
+                
                 // update the credit state
                 creditRepository.findById(threadId).ifPresentOrElse(
                         (credit) -> {
@@ -111,7 +112,6 @@ public class HCSIntegration {
                                 credit.setStatus(nextState);
                                 credit.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
                                 creditRepository.save(credit);
-                                notify("credits", credit.getPayerName(), credit.getRecipientName(),threadId);
                             } else {
                                 log.error("Credit status should be " + priorState + ", found : " + credit.getStatus());
                             }
@@ -121,10 +121,11 @@ public class HCSIntegration {
                             credit.setStatus(nextState);
                             credit.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
                             creditRepository.save(credit);
-                            notify("credits", credit.getPayerName(), credit.getRecipientName(),threadId);
                             log.info("Adding new credit to Database: " + threadId);
                         }
                 );
+
+                notify("credits", payerName, recipientName, threadId);
                 
                 if (settlementBPM.getAutomatic()) {
                     // automatic processing, send ACK if appropriate
@@ -134,6 +135,7 @@ public class HCSIntegration {
                             (credit) -> {
                                 try {
                                     HCSMessages.creditAck(this.appData, creditRepository, threadId, true);
+                                    notify("credits", payerName, recipientName, threadId);
                                 } catch (Exception e) {
                                     log.error(e);
                                 }
@@ -141,11 +143,15 @@ public class HCSIntegration {
                     }
                 }
             } else if (settlementBPM.hasCreditAck()) {
+                log.info("settlementBPM.hasCreditAck()");
                 updateCredit(threadId, States.CREDIT_PROPOSED, States.CREDIT_AGREED);
             } else if (settlementBPM.hasSettlePropose()) {
+                log.info("settlementBPM.hasSettlePropose()");
                 String nextState = States.SETTLE_PROPOSED.name();
 
                 SettleProposeBPM settleProposeBPM = settlementBPM.getSettlePropose();
+                String payerName = settleProposeBPM.getPayerName();
+                String recipientName = settleProposeBPM.getRecipientName();
                 // update the settlement state
                 settlementRepository.findById(threadId).ifPresentOrElse(
                         (settlement) -> {
@@ -174,11 +180,11 @@ public class HCSIntegration {
                             }
                             // update the credits too
                             updateCreditStateForSettlementItems(threadId, nextState);
-
                             notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
                         }
                 );
-                
+                notify("settlements", payerName, recipientName, threadId);
+
                 if (settlementBPM.getAutomatic()) {
                     // automatic processing, send ACK if appropriate
                     if (settleProposeBPM.getRecipientName().contentEquals(appData.getUserName())) {
@@ -187,6 +193,7 @@ public class HCSIntegration {
                             (settlement) -> {
                                 try {
                                     HCSMessages.settlementAck(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, true);
+                                    notify("settlements", payerName, recipientName, threadId);
                                 } catch (Exception e) {
                                     log.error(e);
                                 }
@@ -195,7 +202,10 @@ public class HCSIntegration {
                 }
                 
             } else if (settlementBPM.hasSettleProposeAck()) {
+                log.info("settlementBPM.hasSettleProposeAck()");
                 updateSettlement(threadId, States.SETTLE_PROPOSED, States.SETTLE_AGREED);
+                String payerName = settlementBPM.getSettleProposeAck().getSettlePropose().getPayerName();
+                String recipientName = settlementBPM.getSettleProposeAck().getSettlePropose().getRecipientName();
                 
                 if (settlementBPM.getAutomatic()) {
                     // automatic processing, send ACK if appropriate
@@ -213,6 +223,7 @@ public class HCSIntegration {
                                         }
                                     }
                                     HCSMessages.settlementInit(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, true, additionalNotes, paymentChannelName);
+                                    notify("settlements", payerName, recipientName, threadId);
                                 }
                             } catch (Exception e) {
                                 log.error(e);
@@ -220,9 +231,12 @@ public class HCSIntegration {
                 });
                 }
             } else if (settlementBPM.hasSettleInit()) { // proposes a pay channel
+                log.info("settlementBPM.hasSettleInit()");
                 String priorState = States.SETTLE_AGREED.name();
                 String nextState = States.SETTLE_PAY_CHANNEL_PROPOSED.name();
-
+                String payerName = settlementBPM.getSettleInit().getPayerName();
+                String recipientName = settlementBPM.getSettleInit().getRecipientName();
+                        
                 SettleInitBPM settleInitBPM = settlementBPM.getSettleInit();
                 // update the settlement state
                 settlementRepository.findById(threadId).ifPresent(
@@ -235,12 +249,13 @@ public class HCSIntegration {
                                 settlementRepository.save(settlement);
                                 // update the credits too
                                 updateCreditStateForSettlementItems(threadId, nextState);
-                                notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
                             } else {
                                 log.error("Settlement status should be " + priorState + " or " + nextState + "_PENDING" + ", found : " + settlement.getStatus());
                             }
                         }
                 );
+                notify("settlements", payerName, recipientName, threadId);
+
                 if (settlementBPM.getAutomatic()) {
                     // automatic processing, send ACK if appropriate
                     settlementRepository.findById(threadId).ifPresent(
@@ -248,6 +263,7 @@ public class HCSIntegration {
                             try {
                                 if (settlement.getRecipientName().contentEquals(appData.getUserName())) {
                                     HCSMessages.settleProposeChannelAck(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, true);
+                                    notify("settlements", payerName, recipientName, threadId);
                                 }
                             } catch (Exception e) {
                                 log.error(e);
@@ -255,7 +271,10 @@ public class HCSIntegration {
                 });
                 }
             } else if (settlementBPM.hasSettleInitAck()) { // agrees pay channel
+                log.info("settlementBPM.hasSettleInitAck()");
                 updateSettlement(threadId, States.SETTLE_PAY_CHANNEL_PROPOSED, States.SETTLE_PAY_CHANNEL_AGREED);
+                String payerName = settlementBPM.getSettleInitAck().getSettleInit().getPayerName();
+                String recipientName = settlementBPM.getSettleInitAck().getSettleInit().getRecipientName();
 
                 if (settlementBPM.getAutomatic()) {
                     // automatic processing, send ACK if appropriate
@@ -275,6 +294,7 @@ public class HCSIntegration {
                                     }
                                     String additionalNotes = "Start payment (automatic)";
                                     HCSMessages.settlePaymentInit(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, true, payerAccountDetails, recipientAccountDetails, additionalNotes);
+                                    notify("settlements", payerName, recipientName, threadId);
                                 }
                             } catch (Exception e) {
                                 log.error(e);
@@ -282,9 +302,14 @@ public class HCSIntegration {
                 });
                 }
             } else if (settlementBPM.hasPaymentInit()) {
+                log.info("settlementBPM.hasPaymentInit()");
                 
                 String priorState = States.SETTLE_PAY_CHANNEL_AGREED.name();
                 String nextState = States.SETTLE_PAY_PROPOSED.name();
+
+                String payerName = settlementBPM.getPaymentInit().getPayerName();
+                String recipientName = settlementBPM.getPaymentInit().getRecipientName();
+                notify("settlements", payerName, recipientName, threadId);
 
                 PaymentInitBPM paymentInitBPM = settlementBPM.getPaymentInit();
                 // update the settlement state
@@ -302,7 +327,7 @@ public class HCSIntegration {
                                     settlementRepository.save(settlement);
                                     // update the credits too
                                     updateCreditStateForSettlementItems(threadId, nextState);
-                                    notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
+                                    notify("settlements", payerName, recipientName, threadId);
                                 } else {
                                     log.error("Settlement status should be " + priorState + " or " + nextState + ", found : " + settlement.getStatus());
                                 }
@@ -317,6 +342,7 @@ public class HCSIntegration {
                             try {
                                 if (settlement.getPaymentChannelName().contentEquals(appData.getUserName())) {
                                     HCSMessages.settlePaymentInitAck(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, true);
+                                    notify("settlements", payerName, recipientName, threadId);
                                 }
                             } catch (Exception e) {
                                 log.error(e);
@@ -324,6 +350,7 @@ public class HCSIntegration {
                 });
                 }
             } else if (settlementBPM.hasPaymentInitAck()) {
+                log.info("settlementBPM.hasPaymentInitAck()");
                 // Pay channel initiates payment (bank transfer between parties) and sends payment made message if
                 // self is responsible for payment
 
@@ -342,6 +369,7 @@ public class HCSIntegration {
                             
                             try {
                                 HCSMessages.settlePaymentSent(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, settlementBPM.getAutomatic(), payref);
+                                notify("settlements", settlement.getPayerName(), settlement.getRecipientName(), threadId);
                             } catch (Exception e) {
                                 log.error(e);
                             }
@@ -349,6 +377,7 @@ public class HCSIntegration {
                     }
                 );
             } else if (settlementBPM.hasPaymentSent()) {
+                log.info("settlementBPM.hasPaymentSent()");
                 String priorState = States.SETTLE_PAY_AGREED.name();
                 String nextState = States.SETTLE_PAY_MADE.name();
 
@@ -373,6 +402,7 @@ public class HCSIntegration {
                                     if (settlement.getPayerName().equals(appData.getUserName())) {
                                         try {
                                             HCSMessages.settlePaymentSentAck(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, settlementBPM.getAutomatic(), paymentSentBPM);
+                                            notify("settlements", settlement.getPayerName(), settlement.getRecipientName(), threadId);
                                         } catch (Exception e) {
                                             log.error(e);
                                         }
@@ -386,6 +416,7 @@ public class HCSIntegration {
                 );
 
             } else if (settlementBPM.hasPaymentSentAck()) {
+                log.info("settlementBPM.hasPaymentSentAck()");
                 
                 settlementRepository.findById(threadId).ifPresent(
                     (settlement) -> {
@@ -398,6 +429,7 @@ public class HCSIntegration {
                                 try {
                                     String additionalNotes = "Settlement paid (automatic)";
                                     HCSMessages.settlePaymentPaid(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, settlementBPM.getAutomatic(), additionalNotes);
+                                    notify("settlements", settlement.getPayerName(), settlement.getRecipientName(), threadId);
                                 } catch (Exception e) {
                                     log.error(e);
                                 }
@@ -407,6 +439,7 @@ public class HCSIntegration {
                 );
                 
             } else if (settlementBPM.hasSettlePayment()) {
+                log.info("settlementBPM.hasSettlePayment()");
                 String priorState = States.SETTLE_PAY_ACK.name();
                 String nextState = States.SETTLE_RCPT_REQUESTED.name();
 
@@ -443,6 +476,7 @@ public class HCSIntegration {
                                 if (settlement.getRecipientName().equals(appData.getUserName())) {
                                     try {
                                         HCSMessages.settlePaymentPaidAck(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, settlementBPM.getAutomatic());
+                                        notify("settlements", settlement.getPayerName(), settlement.getRecipientName(), threadId);
                                     } catch (Exception e) {
                                         log.error(e);
                                     }
@@ -451,31 +485,32 @@ public class HCSIntegration {
                         }
                 );
             } else if (settlementBPM.hasSettlePaymentAck()) {
+                log.info("settlementBPM.hasSettlePaymentAck()");
                 settlementRepository.findById(threadId).ifPresent(
                         (settlement) -> {
                             // only update state if payer or recipient
                             if (settlement.getPayerName().equals(appData.getUserName())) {
                                 updateSettlement(threadId, States.SETTLE_RCPT_REQUESTED, States.SETTLE_RCPT_CONFIRMED);
+                                if (settlementBPM.getAutomatic()) {
+                                    try {
+                                        String additionalNotes = "Payment complete ? (automatic)";
+                                        HCSMessages.settlePaymentComplete(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, settlementBPM.getAutomatic(), additionalNotes);
+                                        notify("settlements", settlement.getPayerName(), settlement.getRecipientName(), threadId);
+                                    } catch (Exception e) {
+                                        log.error(e);
+                                    }
+                                }
                             } else if (settlement.getRecipientName().equals(appData.getUserName())) {
                                 settlement.setStatus(States.SETTLE_COMPLETE.name());
                                 settlementRepository.save(settlement);
                                 // update the credits too
                                 updateCreditStateForSettlementItems(threadId, States.SETTLE_COMPLETE.name());
-                                
-                                if (settlementBPM.getAutomatic()) {
-                                    try {
-                                        String additionalNotes = "Payment complete ? (automatic)";
-                                        HCSMessages.settlePaymentComplete(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, settlementBPM.getAutomatic(), additionalNotes);
-                                    } catch (Exception e) {
-                                        log.error(e);
-                                    }
-                                }
-                                
                                 notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
                             }
                         }
                     );
             } else if (settlementBPM.hasSettleComplete()) {
+                log.info("settlementBPM.hasSettleComplete()");
                 String priorState = States.SETTLE_RCPT_CONFIRMED.name();
                 String nextState = States.SETTLE_PAY_CONFIRMED.name();
 
@@ -510,13 +545,12 @@ public class HCSIntegration {
                                     updateCreditStateForSettlementItems(threadId, nextState);
                                     notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
 
-                                    if (settlementBPM.getAutomatic()) {
-                                        try {
-                                            HCSMessages.settlePaymentCompleteAck(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, settlementBPM.getAutomatic(), settleCompleteBPM);
-                                        } catch (Exception e) {
-                                            log.error(e);
-                                        }
+                                    try {
+                                        HCSMessages.settlePaymentCompleteAck(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, settlementBPM.getAutomatic(), settleCompleteBPM);
+                                    } catch (Exception e) {
+                                        log.error(e);
                                     }
+                                    notify("settlements", settlement.getPayerName(), settlement.getRecipientName(), threadId);
                                 } else {
                                     log.error("Settlement status should be " + nextState + "_PENDING" + " or " + priorState + ", found : " + settlement.getStatus());
                                 }
@@ -524,6 +558,7 @@ public class HCSIntegration {
                         }
                 );
             } else if (settlementBPM.hasSettleCompleteAck()) {
+                log.info("settlementBPM.hasSettleCompleteAck()");
                 settlementRepository.findById(threadId).ifPresent(
                     (settlement) -> {
                         if (settlement.getPayerName().equals(appData.getUserName())) {
@@ -534,13 +569,16 @@ public class HCSIntegration {
                     }
                 );
             } else if (settlementBPM.hasAdminDelete()) {
+                log.info("settlementBPM.hasAdminDelete()");
                 deleteData();
                 notify("admin", "admin", "admin", "admin");
             }  else if (settlementBPM.hasAdminStashDatabaseBPM()) {
+                log.info("settlementBPM.hasAdminStashDatabaseBPM()");
                 stashData();
              
                 notify("admin", "admin", "admin", "admin");
             } else if (settlementBPM.hasAdminStashPopDatabaseBPM()) {
+                log.info("settlementBPM.hasAdminStashPopDatabaseBPM()");
                 stashPopData();
          
                 notify("admin", "admin", "admin", "admin");

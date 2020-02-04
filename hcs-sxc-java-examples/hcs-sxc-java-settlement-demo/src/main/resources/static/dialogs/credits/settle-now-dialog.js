@@ -3,11 +3,13 @@
         settleNowDialog  = new mdc.dialog.MDCDialog(document.getElementById('settle-now-dialog'));
         event.preventDefault();
         styleTextFields();
+        styleSwitches();
         $settleNowDialog = document.getElementById('settle-now-dialog');
 
         $settleNowDialog.querySelector("#settle-now-additional-notes").removeAttribute("disabled");
         $settleNowDialog.querySelector("#settle-now-send").removeAttribute("disabled");
         $settleNowDialog.querySelector(".warning").style.visibility='hidden';
+
         /*
          * Calculate the net amount.
          */
@@ -51,8 +53,7 @@
             el.style.pointerEvents =  'none';
             el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
 
-            var automate = (document.getElementById('settle-now-automatic').value === "on");
-            automate = true;
+            var automate = (document.getElementById('new-credit-automatic').checked);
             
             postBody = `{
                           "payerName"       : "${payerName}"

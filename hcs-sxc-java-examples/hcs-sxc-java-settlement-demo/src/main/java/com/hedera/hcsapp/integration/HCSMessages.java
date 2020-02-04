@@ -44,6 +44,7 @@ import proto.SettlementBPM;
 public final class HCSMessages {
     
     public static CreditRest creditNew(AppData appData, CreditRepository creditRepository, CreditProposal creditCreate) throws Exception {
+        log.info("creditNew");
         Instant now = Instant.now();
         Long seconds = now.getEpochSecond();
         int nanos = now.getNano();
@@ -108,6 +109,7 @@ public final class HCSMessages {
         return new CreditRest(credit, appData);
     }
     public static CreditRest creditAck(AppData appData, CreditRepository creditRepository, String threadId, boolean automatic) throws Exception {
+        log.info("creditAck");
         Credit credit = creditRepository.findById(threadId).get();
 
         CreditBPM creditBPM = Utils.creditBPMFromCredit(credit);
@@ -142,6 +144,7 @@ public final class HCSMessages {
     }
     
     public static SettlementRest settlementNew(AppData appData, CreditRepository creditRepository, SettlementRepository settlementRepository, SettlementItemRepository settlementItemRepository, SettlementProposal settleProposal) throws Exception {
+        log.info("settlementNew");
         Instant now = Instant.now();
         Long seconds = now.getEpochSecond();
         int nanos = now.getNano();
@@ -207,6 +210,7 @@ public final class HCSMessages {
     }
     
     public static SettlementRest settlementAck(AppData appData, SettlementRepository settlementRepository, SettlementItemRepository settlementItemRepository, CreditRepository creditRepository, String threadId, boolean automatic) throws Exception {
+        log.info("settlementAck");
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
         if (settlement.isPresent()) {
@@ -231,7 +235,7 @@ public final class HCSMessages {
     
                 return saveAndSendSettlement(appData, settlementRepository, settlementItemRepository, creditRepository, settlementBPM, settlement.get(), States.SETTLE_AGREED);
             } else {
-                String error = "Status is not " + States.SETTLE_PROPOSED.name() + "but " + settlement.get().getStatus() + ", not performing update";
+                String error = "Status is not " + States.SETTLE_PROPOSED.name() + " but " + settlement.get().getStatus() + ", not performing update";
                 throw new Exception(error);
             }
         } else {
@@ -241,6 +245,7 @@ public final class HCSMessages {
     }
     
     public static SettlementRest settlementInit(AppData appData, SettlementRepository settlementRepository, SettlementItemRepository settlementItemRepository, CreditRepository creditRepository, String threadId, boolean automatic, String additionalNotes, String paymentChannelName) throws Exception {
+        log.info("settlementInit");
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
         if (settlement.isPresent()) {
@@ -264,6 +269,7 @@ public final class HCSMessages {
     }
     
     public static SettlementRest settleProposeChannelAck(AppData appData, SettlementRepository settlementRepository, SettlementItemRepository settlementItemRepository, CreditRepository creditRepository, String threadId, boolean automatic) throws Exception {
+        log.info("settleProposeChannelAck");
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
         if (settlement.isPresent()) {
@@ -284,7 +290,7 @@ public final class HCSMessages {
     
                 return saveAndSendSettlement(appData, settlementRepository, settlementItemRepository, creditRepository, settlementBPM, settlement.get(), States.SETTLE_PAY_CHANNEL_AGREED);
             } else {
-                String error = "Status is not " + States.SETTLE_PAY_CHANNEL_PROPOSED.name() + "but " + settlement.get().getStatus() + ", not performing update";
+                String error = "Status is not " + States.SETTLE_PAY_CHANNEL_PROPOSED.name() + " but " + settlement.get().getStatus() + ", not performing update";
                 throw new Exception(error);
             }
         } else {
@@ -294,6 +300,7 @@ public final class HCSMessages {
     }
     
     public static SettlementRest settlePaymentInit (AppData appData, SettlementRepository settlementRepository, SettlementItemRepository settlementItemRepository, CreditRepository creditRepository, String threadId, boolean automatic, String payerAccountDetails, String recipientAccountDetails, String additionalNotes) throws Exception {
+        log.info("settlePaymentInit");
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
     
         if (settlement.isPresent()) {
@@ -314,7 +321,7 @@ public final class HCSMessages {
     
                 return saveAndSendSettlement(appData, settlementRepository, settlementItemRepository, creditRepository, settlementBPM, settlement.get(), States.SETTLE_PAY_PROPOSED);
             } else {
-                String error = "Status is not " + States.SETTLE_PAY_CHANNEL_AGREED.name() + "but " + settlement.get().getStatus() + ", not performing update";
+                String error = "Status is not " + States.SETTLE_PAY_CHANNEL_AGREED.name() + " but " + settlement.get().getStatus() + ", not performing update";
                 throw new Exception(error);
             }
         } else {
@@ -324,6 +331,7 @@ public final class HCSMessages {
     }
     
     public static SettlementRest settlePaymentInitAck(AppData appData, SettlementRepository settlementRepository, SettlementItemRepository settlementItemRepository, CreditRepository creditRepository, String threadId, boolean automatic) throws Exception {
+        log.info("settlePaymentInitAck");
         
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
@@ -346,7 +354,7 @@ public final class HCSMessages {
     
                 return saveAndSendSettlement(appData, settlementRepository, settlementItemRepository, creditRepository, settlementBPM, settlement.get(), States.SETTLE_PAY_AGREED);
             } else {
-                String error = "Status is not " + States.SETTLE_PAY_PROPOSED.name() + "but " + settlement.get().getStatus() + ", not performing update";
+                String error = "Status is not " + States.SETTLE_PAY_PROPOSED.name() + " but " + settlement.get().getStatus() + ", not performing update";
                 throw new Exception(error);
             }
         } else {
@@ -356,10 +364,11 @@ public final class HCSMessages {
     }
     
     public static SettlementRest settlePaymentSent(AppData appData, SettlementRepository settlementRepository, SettlementItemRepository settlementItemRepository, CreditRepository creditRepository, String threadId, boolean automatic, String payref) throws Exception {
+        log.info("settlePaymentSent");
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
         if (settlement.isPresent()) {
-            if (settlement.get().getStatus().contentEquals(States.SETTLE_PAY_PROPOSED.name())) {
+            if (settlement.get().getStatus().contentEquals(States.SETTLE_PAY_AGREED.name())) {
                 PaymentSentBPM.Builder paymentSentBPM = PaymentSentBPM.newBuilder()
                         .setPayerName(settlement.get().getPayerName())
                         .setRecipientName(settlement.get().getRecipientName())
@@ -377,7 +386,7 @@ public final class HCSMessages {
     
                 return saveAndSendSettlement(appData, settlementRepository, settlementItemRepository, creditRepository, settlementBPM, settlement.get(), States.SETTLE_PAY_MADE);
             } else {
-                String error = "Status is not " + States.SETTLE_PAY_PROPOSED.name() + "but " + settlement.get().getStatus() + ", not performing update";
+                String error = "Status is not " + States.SETTLE_PAY_AGREED.name() + " but " + settlement.get().getStatus() + ", not performing update";
                 throw new Exception(error);
             }
         } else {
@@ -387,11 +396,12 @@ public final class HCSMessages {
     }
     
     public static SettlementRest settlePaymentSentAck(AppData appData, SettlementRepository settlementRepository, SettlementItemRepository settlementItemRepository, CreditRepository creditRepository, String threadId, boolean automatic, PaymentSentBPM paymentSentBPM) throws Exception {
+        log.info("settlePaymentSentAck");
 
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
         if (settlement.isPresent()) {
-            if (settlement.get().getStatus().contentEquals(States.SETTLE_PAY_AGREED.name())) {
+            if (settlement.get().getStatus().contentEquals(States.SETTLE_PAY_MADE.name())) {
                 PaymentSentAckBPM.Builder paymentSentAckBPM = PaymentSentAckBPM.newBuilder().setPaymentSent(paymentSentBPM);
                 
                 SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
@@ -400,7 +410,7 @@ public final class HCSMessages {
 
                 return saveAndSendSettlement(appData, settlementRepository, settlementItemRepository, creditRepository, settlementBPM, settlement.get(), States.SETTLE_PAY_ACK);
             } else {
-                String error = "Status is not " + States.SETTLE_PAY_AGREED.name() + "but " + settlement.get().getStatus() + ", not performing update";
+                String error = "Status is not " + States.SETTLE_PAY_MADE.name() + " but " + settlement.get().getStatus() + ", not performing update";
                 throw new Exception(error);
             }
         } else {
@@ -410,6 +420,7 @@ public final class HCSMessages {
     }
 
     public static SettlementRest settlePaymentPaid(AppData appData, SettlementRepository settlementRepository, SettlementItemRepository settlementItemRepository, CreditRepository creditRepository, String threadId, boolean automatic, String additionalNotes) throws Exception {
+        log.info("settlePaymentPaid");
         
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
@@ -429,7 +440,7 @@ public final class HCSMessages {
     
                 return saveAndSendSettlement(appData, settlementRepository, settlementItemRepository, creditRepository, settlementBPM, settlement.get(), States.SETTLE_RCPT_REQUESTED);
             } else {
-                String error = "Status is not " + States.SETTLE_PAY_ACK.name() + "but " + settlement.get().getStatus() + ", not performing update";
+                String error = "Status is not " + States.SETTLE_PAY_ACK.name() + " but " + settlement.get().getStatus() + ", not performing update";
                 throw new Exception(error);
             }
         } else {
@@ -439,6 +450,7 @@ public final class HCSMessages {
     }
     
     public static SettlementRest settlePaymentPaidAck(AppData appData, SettlementRepository settlementRepository, SettlementItemRepository settlementItemRepository, CreditRepository creditRepository, String threadId, boolean automatic) throws Exception {
+        log.info("settlePaymentPaidAck");
         
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
@@ -461,7 +473,7 @@ public final class HCSMessages {
     
                 return saveAndSendSettlement(appData, settlementRepository, settlementItemRepository, creditRepository, settlementBPM, settlement.get(), States.SETTLE_RCPT_CONFIRMED);
             } else {
-                String error = "Status is not " + States.SETTLE_RCPT_REQUESTED.name() + "but " + settlement.get().getStatus() + ", not performing update";
+                String error = "Status is not " + States.SETTLE_RCPT_REQUESTED.name() + " but " + settlement.get().getStatus() + ", not performing update";
                 throw new Exception(error);
             }
         } else {
@@ -471,6 +483,7 @@ public final class HCSMessages {
     }
     
     public static SettlementRest settlePaymentComplete(AppData appData, SettlementRepository settlementRepository, SettlementItemRepository settlementItemRepository, CreditRepository creditRepository, String threadId, boolean automatic, String additionalNotes) throws Exception {
+        log.info("settlePaymentComplete");
         
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
@@ -490,7 +503,7 @@ public final class HCSMessages {
     
                 return saveAndSendSettlement(appData, settlementRepository, settlementItemRepository, creditRepository, settlementBPM, settlement.get(), States.SETTLE_PAY_CONFIRMED);
             } else {
-                String error = "Status is not " + States.SETTLE_RCPT_CONFIRMED.name() + "but " + settlement.get().getStatus() + ", not performing update";
+                String error = "Status is not " + States.SETTLE_RCPT_CONFIRMED.name() + " but " + settlement.get().getStatus() + ", not performing update";
                 throw new Exception(error);
             }
         } else {
@@ -500,6 +513,7 @@ public final class HCSMessages {
     }
 
     public static SettlementRest settlePaymentCompleteAck(AppData appData, SettlementRepository settlementRepository, SettlementItemRepository settlementItemRepository, CreditRepository creditRepository, String threadId, boolean automatic, SettleCompleteBPM settleCompleteBPM) throws Exception {
+        log.info("settlePaymentCompleteAck");
         
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
@@ -515,7 +529,7 @@ public final class HCSMessages {
     
                 return saveAndSendSettlement(appData, settlementRepository, settlementItemRepository, creditRepository, settlementBPM, settlement.get(), States.SETTLE_COMPLETE);
             } else {
-                String error = "Status is not " + States.SETTLE_PAY_CONFIRMED.name() + "but " + settlement.get().getStatus() + ", not performing update";
+                String error = "Status is not " + States.SETTLE_PAY_CONFIRMED.name() + " but " + settlement.get().getStatus() + ", not performing update";
                 throw new Exception(error);
             }
         } else {

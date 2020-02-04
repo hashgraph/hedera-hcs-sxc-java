@@ -24,8 +24,8 @@ function openNewCreditDialog(recipient) {
                  if (! ls[i].checkValidity()){ls[i].focus();isFormValid=false;break;  }
 
             }
-            var automate = (document.getElementById('new-credit-automatic').value === "on");
-            automate = true;
+            var automate = (document.getElementById('new-credit-automatic').checked);
+
             if(isFormValid){
                 postBody = `{
                               "payerName"       : "${thisuserName}"
@@ -52,15 +52,16 @@ function openNewCreditDialog(recipient) {
                     },
                     body: postBody
                 }).then(function(response) {
-                    return response.json();
-                }).then(function(data) {
-                    showSnackBarMessage("New credit request sent");
-
+                    if (response.status===200){
+                        showSnackBarMessage("Credit request sent");
+                    } else {
+                        alert("Failed to send message to HH network");
+                    }
                 }).catch(function(res){
                     alert(res);
                 });
+                
             }      
-
     };
 
     newCreditDialog.open();

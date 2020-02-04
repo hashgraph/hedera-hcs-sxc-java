@@ -25,10 +25,14 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcs.sxc.HCSCore;
+import com.hedera.hcs.sxc.config.Topic;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
+import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,6 +69,15 @@ public class OutboundHCSMessageTest {
         TransactionId transactionId = TransactionId.withValidStart(AccountId.fromString("0.0.10"), Instant.now());
         
         OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(hcsCore);
+        // test default values
+        assertFalse(outboundHCSMessage.getOverrideEncryptedMessages());
+        assertFalse(outboundHCSMessage.getOverrideKeyRotation());
+        assertEquals(0, outboundHCSMessage.getOverrideKeyRotationFrequency());
+        assertFalse(outboundHCSMessage.getOverrideMessageSignature());
+        assertEquals("0.0.2", outboundHCSMessage.getOverrideOperatorAccountId().toString());
+        assertEquals("302e020100300506032b657004220420abb9499694bad1f081cb2a55a08989303cbc3322fae657db1044fdbf3b9eed65", outboundHCSMessage.getOverrideOperatorKey().toString());
+        assertNull(outboundHCSMessage.getFirstTransactionId());
+        // override defaults
         outboundHCSMessage.overrideEncryptedMessages(true)
             .overrideKeyRotation(true, 5)
             .overrideMessageSignature(true)
@@ -72,7 +85,7 @@ public class OutboundHCSMessageTest {
             .overrideOperatorAccountId(AccountId.fromString("0.0.5"))
             .overrideOperatorKey(ed25519PrivateKey)
             .withFirstTransactionId(transactionId);
-        
+        // test updated values
         assertTrue(outboundHCSMessage.getOverrideEncryptedMessages());
         assertTrue(outboundHCSMessage.getOverrideKeyRotation());
         assertTrue(outboundHCSMessage.getOverrideMessageSignature());

@@ -67,7 +67,18 @@ public final class HCSCore {
      * it must reuse the same applicationId to ensure consistent message delivery
      */
     public HCSCore(long applicationId) throws FileNotFoundException, IOException {
-        Config config = new Config();
+        this(applicationId, "./config/config.yaml", "./config/.env");
+    }
+    /**
+     * Constructor for HCS Core
+     * @param applicationId - unique value per app instance using the component, if the app generates this value and stops/starts,
+     * @param configFilePath - path to the configuration files
+     * it must reuse the same applicationId to ensure consistent message delivery
+     * FOR TESTING PURPOSES ONLY
+     */
+    public HCSCore(long applicationId, String configFilePath, String environmentFilePath) throws FileNotFoundException, IOException {
+        this.environment = new Environment(environmentFilePath);
+        Config config = new Config(configFilePath);
         YAMLConfig yamlConfig = config.getConfig();
 
         this.nodeMap = yamlConfig.getNodesMap();

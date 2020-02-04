@@ -81,14 +81,30 @@ public final class OutboundHCSMessage {
         this.persistence = (SxcMessagePersistence)persistenceClass.newInstance();
     }
 
+    public boolean getOverrideMessageSignature() {
+        return this.signMessages;
+    }
+    
     public OutboundHCSMessage overrideMessageSignature(boolean signMessages) {
         this.signMessages = signMessages;
         return this;
     }
 
+    public boolean getOverrideEncryptedMessages() {
+        return this.encryptMessages;
+    }
+
     public OutboundHCSMessage overrideEncryptedMessages(boolean encryptMessages) {
         this.encryptMessages = encryptMessages;
         return this;
+    }
+
+    public boolean getOverrideKeyRotation() {
+        return this.rotateKeys;
+    }
+ 
+    public int getOverrideKeyRotationFrequency() {
+        return this.rotationFrequency;
     }
 
     public OutboundHCSMessage overrideKeyRotation(boolean keyRotation, int frequency) {
@@ -97,9 +113,17 @@ public final class OutboundHCSMessage {
         return this;
     }
 
+    public Map<AccountId, String> getOverrideNodeMap() {
+        return this.nodeMap;
+    }
+
     public OutboundHCSMessage overrideNodeMap(Map<AccountId, String> nodeMap) {
         this.nodeMap = nodeMap;
         return this;
+    }
+
+    public AccountId getOverrideOperatorAccountId() {
+        return this.operatorAccountId;
     }
 
     public OutboundHCSMessage overrideOperatorAccountId(AccountId operatorAccountId) {
@@ -107,9 +131,17 @@ public final class OutboundHCSMessage {
         return this;
     }
 
+    public Ed25519PrivateKey getOverrideOperatorKey() {
+        return this.ed25519PrivateKey;
+    }
+
     public OutboundHCSMessage overrideOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
         this.ed25519PrivateKey = ed25519PrivateKey;
         return this;
+    }
+
+    public TransactionId getFirstTransactionId() {
+        return this.transactionId;
     }
 
     public OutboundHCSMessage withFirstTransactionId(TransactionId transactionId) {

@@ -59,7 +59,7 @@ public final class HCSCore {
     private MessagePersistenceLevel messagePersistenceLevel;
     private String mirrorAddress;
     private Map<String, String> hibernateConfig = new HashMap<String, String>();
-    private Environment environment = new Environment();
+    private Environment environment;
     
     /**
      * Constructor for HCS Core

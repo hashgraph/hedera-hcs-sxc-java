@@ -68,19 +68,19 @@ public final class AppData {
 
     public AppData() throws Exception {
         this.hcsCore = new HCSCore(this.appId);
-        init();
+        init("./config/config.yaml", "./config/.env");
     }
     public AppData(String configFilePath, String environmentFilePath) throws Exception {
         this.hcsCore = new HCSCore(this.appId, configFilePath, environmentFilePath);
-        init();
+        init(configFilePath, environmentFilePath);
     }
-    private void init() throws Exception {
+    private void init(String configFilePath, String environmentFilePath) throws Exception {
         this.dotEnv = hcsCore.getEnvironment();
         // just check if set
         getEnvValue("OPERATOR_KEY");
         this.appId = getEnvValueLong("APP_ID");
         if (this.appId != 0) {
-            this.hcsCore = new HCSCore(this.appId);
+            this.hcsCore = new HCSCore(this.appId, configFilePath, environmentFilePath);
         }
         DockerCompose dockerCompose = DockerComposeReader.parse();
 

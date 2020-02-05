@@ -38,10 +38,7 @@ function openNewCreditDialog(recipient) {
                             }`;
 
                 newCreditDialog.close();
-                el = document.getElementById(recipient);
-                el.style.opacity=0.4;
-                el.style.pointerEvents =  'none';
-                el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
+                preventInput(recipient);
 
                 showSnackBarMessage("sending new credit to HH Network ...");
                 fetch('credits', {
@@ -57,8 +54,9 @@ function openNewCreditDialog(recipient) {
                     } else {
                         alert("Failed to send message to HH network");
                     }
+                    restoreInput(recipient);
                 }).catch(function(res){
-                    alert(res);
+                    restoreInput(recipient);
                 });
                 
             }      

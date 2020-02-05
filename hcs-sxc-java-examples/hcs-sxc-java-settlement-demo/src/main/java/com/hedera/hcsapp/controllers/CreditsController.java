@@ -48,7 +48,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class CreditsController {
 
     @Autowired
+    HCSMessages hcsMessages;
+    
+    @Autowired
     CreditRepository creditRepository;
+
     @Autowired
     AddressBookRepository addressBookRepository;
 
@@ -87,7 +91,7 @@ public class CreditsController {
         headers.add("Content-Type", "application/json");
 
         try {
-            CreditRest creditRest = HCSMessages.creditAck(appData, creditRepository, threadId, false);
+            CreditRest creditRest = hcsMessages.creditAck(appData, threadId, false);
             return new ResponseEntity<>(creditRest, headers, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e);
@@ -100,7 +104,7 @@ public class CreditsController {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
         try {
-            CreditRest creditRest = HCSMessages.creditNew(appData, creditRepository, creditCreate);
+            CreditRest creditRest = hcsMessages.creditNew(appData, creditCreate);
             return new ResponseEntity<>(creditRest, headers, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e);

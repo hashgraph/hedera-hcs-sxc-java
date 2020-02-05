@@ -67,6 +67,9 @@ public class HCSIntegration {
     private AppData appData;
     
     @Autowired
+    private HCSMessages hcsMessages;
+    
+    @Autowired
     private Util repositoryUtil;
             
     @Autowired
@@ -134,7 +137,7 @@ public class HCSIntegration {
                         creditRepository.findById(threadId).ifPresent(
                             (credit) -> {
                                 try {
-                                    HCSMessages.creditAck(this.appData, creditRepository, threadId, true);
+                                    hcsMessages.creditAck(this.appData, threadId, true);
                                     notify("credits", payerName, recipientName, threadId);
                                 } catch (Exception e) {
                                     log.error(e);
@@ -192,7 +195,7 @@ public class HCSIntegration {
                         settlementRepository.findById(threadId).ifPresent(
                             (settlement) -> {
                                 try {
-                                    HCSMessages.settlementAck(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, true);
+                                    hcsMessages.settlementAck(appData, threadId, true);
                                     notify("settlements", payerName, recipientName, threadId);
                                 } catch (Exception e) {
                                     log.error(e);
@@ -222,7 +225,7 @@ public class HCSIntegration {
                                             break;
                                         }
                                     }
-                                    HCSMessages.settlementInit(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, true, additionalNotes, paymentChannelName);
+                                    hcsMessages.settlementInit(appData, threadId, true, additionalNotes, paymentChannelName);
                                     notify("settlements", payerName, recipientName, threadId);
                                 }
                             } catch (Exception e) {
@@ -262,7 +265,7 @@ public class HCSIntegration {
                         (settlement) -> {
                             try {
                                 if (settlement.getRecipientName().contentEquals(appData.getUserName())) {
-                                    HCSMessages.settleProposeChannelAck(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, true);
+                                    hcsMessages.settleProposeChannelAck(appData, threadId, true);
                                     notify("settlements", payerName, recipientName, threadId);
                                 }
                             } catch (Exception e) {
@@ -293,7 +296,7 @@ public class HCSIntegration {
                                         }
                                     }
                                     String additionalNotes = "Start payment (automatic)";
-                                    HCSMessages.settlePaymentInit(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, true, payerAccountDetails, recipientAccountDetails, additionalNotes);
+                                    hcsMessages.settlePaymentInit(appData, threadId, true, payerAccountDetails, recipientAccountDetails, additionalNotes);
                                     notify("settlements", payerName, recipientName, threadId);
                                 }
                             } catch (Exception e) {
@@ -341,7 +344,7 @@ public class HCSIntegration {
                         (settlement) -> {
                             try {
                                 if (settlement.getPaymentChannelName().contentEquals(appData.getUserName())) {
-                                    HCSMessages.settlePaymentInitAck(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, true);
+                                    hcsMessages.settlePaymentInitAck(appData, threadId, true);
                                     notify("settlements", payerName, recipientName, threadId);
                                 }
                             } catch (Exception e) {
@@ -368,7 +371,7 @@ public class HCSIntegration {
                             String payref = String.format("PAYREF{%05d}",random);
                             
                             try {
-                                HCSMessages.settlePaymentSent(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, settlementBPM.getAutomatic(), payref);
+                                hcsMessages.settlePaymentSent(appData, threadId, settlementBPM.getAutomatic(), payref);
                                 notify("settlements", settlement.getPayerName(), settlement.getRecipientName(), threadId);
                             } catch (Exception e) {
                                 log.error(e);
@@ -401,7 +404,7 @@ public class HCSIntegration {
                                     // only send next message if user is the originator
                                     if (settlement.getPayerName().equals(appData.getUserName())) {
                                         try {
-                                            HCSMessages.settlePaymentSentAck(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, settlementBPM.getAutomatic(), paymentSentBPM);
+                                            hcsMessages.settlePaymentSentAck(appData, threadId, settlementBPM.getAutomatic(), paymentSentBPM);
                                             notify("settlements", settlement.getPayerName(), settlement.getRecipientName(), threadId);
                                         } catch (Exception e) {
                                             log.error(e);
@@ -428,7 +431,7 @@ public class HCSIntegration {
                             if (settlement.getPayerName().equals(appData.getUserName())) {
                                 try {
                                     String additionalNotes = "Settlement paid (automatic)";
-                                    HCSMessages.settlePaymentPaid(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, settlementBPM.getAutomatic(), additionalNotes);
+                                    hcsMessages.settlePaymentPaid(appData, threadId, settlementBPM.getAutomatic(), additionalNotes);
                                     notify("settlements", settlement.getPayerName(), settlement.getRecipientName(), threadId);
                                 } catch (Exception e) {
                                     log.error(e);
@@ -475,7 +478,7 @@ public class HCSIntegration {
                             if (settlementBPM.getAutomatic()) {
                                 if (settlement.getRecipientName().equals(appData.getUserName())) {
                                     try {
-                                        HCSMessages.settlePaymentPaidAck(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, settlementBPM.getAutomatic());
+                                        hcsMessages.settlePaymentPaidAck(appData, threadId, settlementBPM.getAutomatic());
                                         notify("settlements", settlement.getPayerName(), settlement.getRecipientName(), threadId);
                                     } catch (Exception e) {
                                         log.error(e);
@@ -494,7 +497,7 @@ public class HCSIntegration {
                                 if (settlementBPM.getAutomatic()) {
                                     try {
                                         String additionalNotes = "Payment complete ? (automatic)";
-                                        HCSMessages.settlePaymentComplete(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, settlementBPM.getAutomatic(), additionalNotes);
+                                        hcsMessages.settlePaymentComplete(appData, threadId, settlementBPM.getAutomatic(), additionalNotes);
                                         notify("settlements", settlement.getPayerName(), settlement.getRecipientName(), threadId);
                                     } catch (Exception e) {
                                         log.error(e);
@@ -546,7 +549,7 @@ public class HCSIntegration {
                                     notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
 
                                     try {
-                                        HCSMessages.settlePaymentCompleteAck(appData, settlementRepository, settlementItemRepository, creditRepository, threadId, settlementBPM.getAutomatic(), settleCompleteBPM);
+                                        hcsMessages.settlePaymentCompleteAck(appData, threadId, settlementBPM.getAutomatic(), settleCompleteBPM);
                                     } catch (Exception e) {
                                         log.error(e);
                                     }

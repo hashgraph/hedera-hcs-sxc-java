@@ -94,7 +94,7 @@
         <protoc.version>3.11.2</protoc.version>
 
         <snakeyaml.version>1.21</snakeyaml.version>
-        <surefire.version>2.22.0</surefire.version>
+        <surefire.version>2.22.2</surefire.version>
     </properties>
 
     <scm>
@@ -195,6 +195,7 @@
          <plugin>
              <groupId>org.apache.maven.plugins</groupId>
              <artifactId>maven-surefire-plugin</artifactId>
+             <version>${surefire.version}</version>
              <configuration>
                  <!-- Jacoco prepare-agent builds some command-line params without -->
                  <!-- which jacoco will not instrument. Hence it is important to add -->

@@ -46,7 +46,7 @@ import org.junit.jupiter.api.Test;
 public class OnHCSMessageCallbackTest {    
     
     @Test
-    public void instantiation() throws Exception {
+    public void testInstantiation() throws Exception {
         HCSCore hcsCore = new HCSCore(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsCore);
         
@@ -57,7 +57,7 @@ public class OnHCSMessageCallbackTest {
     }
     
     @Test
-    public void addObserverAndNotify() throws Exception {
+    public void testAddObserverAndNotify() throws Exception {
         HCSCore hcsCore = new HCSCore(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsCore);
         onHCSMessageCallback.addObserver(hcsMessage -> {

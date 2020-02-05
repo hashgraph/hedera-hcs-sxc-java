@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AppDataTest {    
     
     @Test
-    public void instantiation() throws Exception {
+    public void testInstantiation() throws Exception {
         AppData appData = new AppData("./src/test/resources/config.yaml.", "./src/test/resources/dotenv.sample");
         assertEquals(4, appData.getAppClients().size());
         assertEquals(1, appData.getAppId());

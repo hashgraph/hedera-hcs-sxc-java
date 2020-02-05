@@ -34,11 +34,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TopicTest {
    
-    public TopicTest() {
-    }
-    
     @Test
-    public void createTopic() throws Exception {
+    public void testCreateTopic() throws Exception {
         Ed25519PrivateKey ed25519PrivateKey = Ed25519PrivateKey.generate();
         Ed25519PrivateKey adminKey = Ed25519PrivateKey.generate();
         Ed25519PrivateKey submitKey = Ed25519PrivateKey.generate();
@@ -77,7 +74,7 @@ public class TopicTest {
     }
 
     @Test
-    public void updateTopic() throws Exception {
+    public void testUpdateTopic() throws Exception {
         Ed25519PrivateKey ed25519PrivateKey = Ed25519PrivateKey.generate();
         Ed25519PrivateKey adminKey = Ed25519PrivateKey.generate();
         Ed25519PrivateKey submitKey = Ed25519PrivateKey.generate();
@@ -124,7 +121,7 @@ public class TopicTest {
     }
 
     @Test
-    public void deleteTopic() throws Exception {
+    public void testDeleteTopic() throws Exception {
         Ed25519PrivateKey ed25519PrivateKey = Ed25519PrivateKey.generate();
         HCSCore hcsCore = new HCSCore(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
 
@@ -157,7 +154,7 @@ public class TopicTest {
     }
 
     @Test
-    public void infoTopic() throws Exception {
+    public void testGetInfoTopic() throws Exception {
         Ed25519PrivateKey ed25519PrivateKey = Ed25519PrivateKey.generate();
         HCSCore hcsCore = new HCSCore(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
 

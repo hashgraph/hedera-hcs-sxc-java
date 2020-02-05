@@ -10,6 +10,7 @@ import com.hedera.hcs.sxc.proto.Timestamp;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.entities.Settlement;
 import com.hedera.hcsapp.restclasses.SettlementRest;
+import com.hedera.hcsapp.restclasses.SettlementRestTest;
 
 import proto.CreditBPM;
 import proto.Money;
@@ -26,21 +27,21 @@ import java.util.Locale;
 public class UtilsTest {    
     
     @Test
-    public void timestampToDate() throws Exception {
+    public void testTimestampToDate() throws Exception {
         Locale.setDefault(Locale.ENGLISH);
         String formattedDate = Utils.timestampToDate(1580914593, 0);
         assertEquals("5 Feb", formattedDate);
     }
 
     @Test
-    public void timestampToTime() throws Exception {
+    public void testTimestampToTime() throws Exception {
         Locale.setDefault(Locale.ENGLISH);
         String formattedTime = Utils.timestampToTime(1580914593, 0);
         assertEquals("14:56", formattedTime);
     }
 
     @Test
-    public void applicationMessageIdToString() {
+    public void testApplicationMessageIdToString() {
         ApplicationMessageID.Builder applicationMessageID = ApplicationMessageID.newBuilder();
         applicationMessageID.setAccountID(AccountID.newBuilder().setAccountNum(2));
         applicationMessageID.setValidStart(Timestamp.newBuilder().setSeconds(10).setNanos(20));
@@ -50,7 +51,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void transactionIdToString() {
+    public void testTransactionIdToString() {
         Instant timeNow = Instant.now();
         String txCompare = "0.0.2-".concat(Long.toString(timeNow.getEpochSecond())).concat("-").concat(Integer.toString(timeNow.getNano()));
         
@@ -62,7 +63,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void creditFromCreditBPM() {
+    public void testCreditFromCreditBPM() {
         CreditBPM.Builder creditBPM = CreditBPM.newBuilder();
         
         creditBPM.setAdditionalNotes("additional notes");
@@ -90,7 +91,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void creditBPMFromCredit() {
+    public void testCreditBPMFromCredit() {
 
         Credit credit = new Credit();
         
@@ -120,7 +121,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void settlementFromSettleProposeBPM() {
+    public void testSettlementFromSettleProposeBPM() {
         SettleProposeBPM.Builder settleBPM = SettleProposeBPM.newBuilder();
         
         settleBPM.setAdditionalNotes("additional notes");
@@ -144,7 +145,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void applicationMessageIdFromString() {
+    public void testApplicationMessageIdFromString() {
         String appString = "0.1.2-10-20";
         ApplicationMessageID applicationMessageID = Utils.applicationMessageIdFromString(appString);
         
@@ -156,13 +157,13 @@ public class UtilsTest {
     }
 
     @Test
-    public void getThreadId() {
+    public void testGetThreadId() {
         String threadId = Utils.getThreadId();
         assertNotNull(threadId);
     }
 
     @Test
-    public void moneyFromSettlement() {
+    public void testMoneyFromSettlement() {
         Settlement settlement = new Settlement();
         settlement.setCurrency("currency");
         settlement.setNetValue(10);
@@ -173,7 +174,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void ResponseEntity() {
+    public void testResponseEntity() {
         ResponseEntity<SettlementRest> response = Utils.serverError();
         assertEquals("application/json", response.getHeaders().get("Content-Type").get(0));
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());

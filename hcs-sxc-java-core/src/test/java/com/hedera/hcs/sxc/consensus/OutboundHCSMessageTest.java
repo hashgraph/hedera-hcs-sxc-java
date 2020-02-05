@@ -40,9 +40,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class OutboundHCSMessageTest {
     
    
-    public OutboundHCSMessageTest() {
-    }
-    
     @Test
     public void testSingleChunking() {
         List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),"Single Chunk Message".getBytes());
@@ -58,7 +55,7 @@ public class OutboundHCSMessageTest {
     }
     
     @Test
-    public void OutBoundMessageBuilder() throws Exception {
+    public void testOutBoundMessageBuilder() throws Exception {
         HCSCore hcsCore = new HCSCore(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
         
         Ed25519PrivateKey ed25519PrivateKey = Ed25519PrivateKey.generate();

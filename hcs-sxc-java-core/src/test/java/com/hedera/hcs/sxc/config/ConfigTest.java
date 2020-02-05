@@ -25,12 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.hedera.hashgraph.sdk.account.AccountId;
@@ -48,18 +45,15 @@ public class ConfigTest extends AbstractConfigTest {
     private static Map<AccountId, String> nodeMap;
     private static long hcsTransactionFee;
 
-    @BeforeEach
-    public void init() throws FileNotFoundException, IOException {
+    @Test
+    public void testLoadConfig() throws Exception {
         config = new Config("./src/test/resources/config.yaml");
         yamlConfig = config.getConfig();
         appNet = yamlConfig.getAppNet();
         nodeList = yamlConfig.getNodes();
         nodeMap = yamlConfig.getNodesMap();
         hcsTransactionFee = yamlConfig.getHCSTransactionFee();
-    }
 
-    @Test
-    public void loadConfig() throws Exception {
         assertAll(
                 () -> assertFalse(appNet.getSignMessages()),
                  () -> assertFalse(appNet.getEncryptMessages()),

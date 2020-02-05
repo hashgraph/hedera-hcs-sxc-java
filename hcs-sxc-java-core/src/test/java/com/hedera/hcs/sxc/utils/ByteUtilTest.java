@@ -29,8 +29,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ByteUtilTest {
-    public ByteUtilTest() {
-    }
 
     /**
      * Test of merge method, of class ByteUtil.

@@ -32,7 +32,7 @@ import com.hedera.hcs.sxc.relay.config.YAMLConfig;
 
 public class YAMLConfigTest {
     @Test
-    public void gettersAndSetters() throws Exception {
+    public void testGettersAndSetters() throws Exception {
         YAMLConfig yamlConfig = new YAMLConfig();
         List<Topic> topics = new ArrayList<Topic>();
         Queue queue = new Queue();

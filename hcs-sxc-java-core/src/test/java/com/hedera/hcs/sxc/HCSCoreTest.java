@@ -21,6 +21,6 @@ package com.hedera.hcs.sxc;
  */
 
 
-class HCSCoreTests {
+class HCSCoreTest {
 
 }

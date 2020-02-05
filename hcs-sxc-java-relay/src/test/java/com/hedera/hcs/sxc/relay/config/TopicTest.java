@@ -29,7 +29,7 @@ import com.hedera.hcs.sxc.relay.config.Topic;
 
 public class TopicTest {
     @Test
-    public void gettersAndSetters() throws Exception {
+    public void testGettersAndSetters() throws Exception {
         Topic topic = new Topic();
         topic.setTopic("topic");
         assertAll(

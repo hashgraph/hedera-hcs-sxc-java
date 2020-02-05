@@ -33,14 +33,11 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class HashingTest {
     
-    public HashingTest() {
-    }
-    
     final String plaintext = "Welcome to the Hedera Hashgraph Concensus Service";
     final String hexOfHashOfPlainText="f39829c128492f289d15580844141549f395fd90292c708abdd1f786d9ce52fa";
 
     @Test
-    public void Sha() {
+    public void testSha() {
         log.info("sha");
         byte[] expResult = StringUtils.hexStringToByteArray(hexOfHashOfPlainText);
         byte[] result = Hashing.sha(plaintext);
@@ -48,7 +45,7 @@ public class HashingTest {
     }
 
     @Test
-    public void matchSHA() {
+    public void testMatchSHA() {
         byte[] sha1 = StringUtils.hexStringToByteArray(hexOfHashOfPlainText);
         byte[] sha2 = Hashing.sha(plaintext);
         boolean expResult = true;
@@ -57,7 +54,7 @@ public class HashingTest {
     }
 
     @Test
-    public void verifySHA() {
+    public void testVerifySHA() {
         byte[] sha = Hashing.sha(plaintext);
         String _plaintext = this.plaintext;
         boolean expResult = true;

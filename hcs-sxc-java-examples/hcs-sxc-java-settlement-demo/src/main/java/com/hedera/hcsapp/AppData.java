@@ -68,13 +68,13 @@ public final class AppData {
 
     public AppData() throws Exception {
         this.hcsCore = new HCSCore(this.appId);
-        init("./config/config.yaml", "./config/.env");
+        init("./config/config.yaml", "./config/.env", "./config/docker-compose.yml");
     }
-    public AppData(String configFilePath, String environmentFilePath) throws Exception {
+    public AppData(String configFilePath, String environmentFilePath, String dockerFilePath) throws Exception {
         this.hcsCore = new HCSCore(this.appId, configFilePath, environmentFilePath);
-        init(configFilePath, environmentFilePath);
+        init(configFilePath, environmentFilePath, dockerFilePath);
     }
-    private void init(String configFilePath, String environmentFilePath) throws Exception {
+    private void init(String configFilePath, String environmentFilePath, String dockerFilePath) throws Exception {
         this.dotEnv = hcsCore.getEnvironment();
         // just check if set
         getEnvValue("OPERATOR_KEY");
@@ -82,7 +82,7 @@ public final class AppData {
         if (this.appId != 0) {
             this.hcsCore = new HCSCore(this.appId, configFilePath, environmentFilePath);
         }
-        DockerCompose dockerCompose = DockerComposeReader.parse();
+        DockerCompose dockerCompose = DockerComposeReader.parse(dockerFilePath);
 
         if (System.getProperty("server.port") != null) {
             this.webPort = Integer.parseInt(System.getProperty("server.port"));

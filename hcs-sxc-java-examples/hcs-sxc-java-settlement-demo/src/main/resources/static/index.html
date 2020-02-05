@@ -1122,6 +1122,20 @@
             function formatThreadId(threadId){
                  return   threadId.substring(0,2) + "..." + threadId.substring(threadId.length - 4,threadId.length);
             }
+            
+            function restoreInput(recipient) {
+                el = document.getElementById(recipient);
+                el.style.opacity=1;
+                el.style.pointerEvents =  'auto';
+                el.querySelector(".mdc-linear-progress").classList.add('mdc-linear-progress--closed');
+            }
+            
+            function preventInput(recipient) {
+                el = document.getElementById(recipient);
+                el.style.opacity=0.4;
+                el.style.pointerEvents =  'none';
+                el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
+            }
         </script>
         
     </body>

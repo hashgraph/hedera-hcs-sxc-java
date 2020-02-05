@@ -48,10 +48,7 @@
             //alert(thisUserPays + " " + otherUserPays);
             settleNowDialog.close();
 
-            el = document.getElementById(otherUserId);
-            el.style.opacity=0.4;
-            el.style.pointerEvents =  'none';
-            el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
+            preventInput(otherUserId);
 
             var automate = (document.getElementById('new-credit-automatic').checked);
             
@@ -79,11 +76,11 @@
                 } else {
                     alert("Failed to send message to HH network");
                 }
+                //restoreInput(otherUserId);
             }).catch(function(res){
                 alert(res);
+                restoreInput(otherUserId);
             });
-
-
         };
         if (payerName === thisuserName) {
             $settleNowDialog.querySelector("#settle-now-send").onclick =  clickFunction;

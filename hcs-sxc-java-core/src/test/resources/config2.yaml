@@ -14,7 +14,7 @@ appNet:
   # Which level of persistence should be used
   persistenceLevel: "FULL"
   # Should history of messages be caught up
-  catchupHistory: true
+  catchupHistory: false
   
 # Default HCS transaction fee in tinybar
 HCSTransactionFee: 100000000

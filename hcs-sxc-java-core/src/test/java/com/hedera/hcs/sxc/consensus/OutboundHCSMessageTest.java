@@ -25,14 +25,10 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcs.sxc.HCSCore;
-import com.hedera.hcs.sxc.config.Topic;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
-import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

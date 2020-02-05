@@ -1,5 +1,6 @@
 package com.hedera.hcs.sxc.callback;
 
+import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
 /*-
  * ‌
  * hcs-sxc-java
@@ -21,14 +22,21 @@ package com.hedera.hcs.sxc.callback;
  */
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
+import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
+import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
+import com.hedera.hcs.sxc.interfaces.HCSResponse;
 import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
 import com.hedera.hcs.sxc.plugin.persistence.inmemory.PersistMessages;
+import com.hedera.hcs.sxc.proto.AccountID;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
+import com.hedera.hcs.sxc.proto.ApplicationMessageID;
+import com.hedera.hcs.sxc.proto.Timestamp;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -38,6 +46,43 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 public class OnHCSMessageCallbackTest {    
+    
+    @Test
+    public void instantiation() throws Exception {
+        HCSCore hcsCore = new HCSCore(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+        OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsCore);
+        
+        hcsCore = new HCSCore(0, "./src/test/resources/config2.yaml", "./src/test/resources/dotenv.test");
+        onHCSMessageCallback = new OnHCSMessageCallback(hcsCore);
+        
+        //public void partialMessage(ApplicationMessageChunk messagePart) throws InvalidProtocolBufferException {
+    }
+    
+    @Test
+    public void addObserverAndNotify() throws Exception {
+        HCSCore hcsCore = new HCSCore(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+        OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsCore);
+        onHCSMessageCallback.addObserver(hcsMessage -> {
+            processHCSMessage(hcsMessage);
+        });
+        ApplicationMessageID applicationMessageID = ApplicationMessageID.newBuilder()
+                .setAccountID(AccountID.newBuilder()
+                        .setShardNum(0)
+                        .setRealmNum(0)
+                        .setAccountNum(1)
+                        .build()
+                )
+                .setValidStart(Timestamp.newBuilder()
+                        .setSeconds(Instant.now().getEpochSecond())
+                        .setNanos(Instant.now().getNano())
+                        .build()
+                ).build();        
+        
+        onHCSMessageCallback.notifyObservers("notification".getBytes(), applicationMessageID);
+    }
+    
+    public void processHCSMessage(HCSResponse hcsResponse) {
+    }
     
     @Test
     public void testSingleChunking() throws IOException {

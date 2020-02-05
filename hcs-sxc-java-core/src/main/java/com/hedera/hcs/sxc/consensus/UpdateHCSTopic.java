@@ -56,13 +56,22 @@ public final class UpdateHCSTopic {
         this.nodeMap = nodeMap;
         return this;
     }
+    public Map<AccountId, String> getOverrideNodeMap() {
+        return this.nodeMap;
+    }
     public UpdateHCSTopic overrideOperatorAccountId(AccountId operatorAccountId) {
         this.operatorAccountId = operatorAccountId;
         return this;
     }
+    public AccountId getOverrideOperatorAccountId() {
+        return this.operatorAccountId;
+    }
     public UpdateHCSTopic overrideOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
         this.ed25519PrivateKey = ed25519PrivateKey;
         return this;
+    }
+    public Ed25519PrivateKey getOverrideOperatorKey() {
+        return this.ed25519PrivateKey;
     }
     public UpdateHCSTopic setMaxTransactionFee(Long maxTansactionFee) {
         this.tx.setMaxTransactionFee(maxTansactionFee);

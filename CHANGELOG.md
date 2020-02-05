@@ -8,4 +8,6 @@ Simple demo simplification. It is now possible to run simple demo without relay 
 
 ## February 4th 2020
 
-Demo now supports fully automatic processing for credits and settlements (individually selectable). If a credit or settlement is set to automatic in the UI, the demo will proceed without further user input.
+* Demo now supports fully automatic processing for credits and settlements (individually selectable). If a credit or settlement is set to automatic in the UI, the demo will proceed without further user input.
+
+* Control returned to user immediately after closing new credit dialog allowing for a new credit to be created without waiting for mirror node response.

@@ -46,28 +46,28 @@ import proto.SettleProposeBPM;
 public final class Utils {
     private static Random random = new Random();
 
-    public static String TimestampToDate(long seconds, int nanos) {
+    public static String timestampToDate(long seconds, int nanos) {
         LocalDateTime dateTime = LocalDateTime.ofEpochSecond(seconds, nanos, ZoneOffset.UTC);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM", Locale.getDefault());
         String formattedDate = dateTime.format(formatter);
         return formattedDate;
     }
     
-    public static String TimestampToTime(long seconds, int nanos) {
+    public static String timestampToTime(long seconds, int nanos) {
         LocalDateTime dateTime = LocalDateTime.ofEpochSecond(seconds, nanos, ZoneOffset.UTC);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm", Locale.getDefault());
         String formattedDate = dateTime.format(formatter);
         return formattedDate;
     }
     
-    public static String TransactionIdToString(ApplicationMessageID transactionId) {
+    public static String applicationMessageIdToString(ApplicationMessageID transactionId) {
         String txId = "0.0." + transactionId.getAccountID().getAccountNum()
                 + "-" + transactionId.getValidStart().getSeconds()
                 + "-" + transactionId.getValidStart().getNanos();
         return txId;
     }
     
-    public static String TransactionIdToString(TransactionId transactionId) {
+    public static String transactionIdToString(TransactionId transactionId) {
         String txId = "0.0." + transactionId.accountId.account
                 + "-" + transactionId.validStart.getEpochSecond()
                 + "-" + transactionId.validStart.getNano();

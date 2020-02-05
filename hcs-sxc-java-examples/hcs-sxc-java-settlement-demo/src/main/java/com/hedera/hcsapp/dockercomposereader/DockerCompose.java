@@ -59,7 +59,7 @@ public final class DockerCompose {
             if (dockerService.getEnvironment() != null) {
                 if (dockerService.getEnvironment().containsKey("PUBKEY")) {
                     if (dockerService.getEnvironment().get("APP_ID").contentEquals(String.valueOf(appId))) {
-                        return dockerService.getContainer_name();
+                        return dockerService.getEnvironment().get("PUBKEY");
                     }
                 }
             }

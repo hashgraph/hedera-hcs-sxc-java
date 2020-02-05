@@ -72,8 +72,8 @@ public final class HCSMessages {
                 .setRecipientName(creditCreate.getRecipientName())
                 .setServiceRef(creditCreate.getReference())
                 .setValue(value)
-                .setCreatedDate(Utils.TimestampToDate(seconds, nanos))
-                .setCreatedTime(Utils.TimestampToTime(seconds, nanos))
+                .setCreatedDate(Utils.timestampToDate(seconds, nanos))
+                .setCreatedTime(Utils.timestampToTime(seconds, nanos))
                 .build();
         SettlementBPM settlementBPM = SettlementBPM.newBuilder()
                 .setThreadID(threadId)
@@ -92,9 +92,9 @@ public final class HCSMessages {
         credit.setRecipientName(creditCreate.getRecipientName());
         credit.setReference(creditCreate.getReference());
 
-        credit.setCreatedDate(Utils.TimestampToDate(seconds, nanos));
-        credit.setCreatedTime(Utils.TimestampToTime(seconds, nanos));
-        credit.setApplicationMessageId(Utils.TransactionIdToString(transactionId));
+        credit.setCreatedDate(Utils.timestampToDate(seconds, nanos));
+        credit.setCreatedTime(Utils.timestampToTime(seconds, nanos));
+        credit.setApplicationMessageId(Utils.transactionIdToString(transactionId));
         credit.setAutomatic(creditCreate.isAutomatic());
         credit.setThreadId(threadId);
         
@@ -168,8 +168,8 @@ public final class HCSMessages {
         SettleProposeBPM.Builder settleProposeBPM = SettleProposeBPM.newBuilder()
                 .setAdditionalNotes(settleProposal.getAdditionalNotes()).setPayerName(settleProposal.getPayerName())
                 .setRecipientName(settleProposal.getRecipientName())
-                .setCreatedDate(Utils.TimestampToDate(seconds, nanos))
-                .setCreatedTime(Utils.TimestampToTime(seconds, nanos)).setNetValue(value);
+                .setCreatedDate(Utils.timestampToDate(seconds, nanos))
+                .setCreatedTime(Utils.timestampToTime(seconds, nanos)).setNetValue(value);
 
         for (String proposedThreadId : settleProposal.getThreadIds()) {
             settleProposeBPM.addThreadIDs(proposedThreadId);
@@ -190,9 +190,9 @@ public final class HCSMessages {
         settlement.setPayerName(settleProposal.getPayerName());
         settlement.setRecipientName(settleProposal.getRecipientName());
         settlement.setThreadId(threadId);
-        settlement.setApplicationMessageId(Utils.TransactionIdToString(transactionId));
-        settlement.setCreatedDate(Utils.TimestampToDate(seconds, nanos));
-        settlement.setCreatedTime(Utils.TimestampToTime(seconds, nanos));
+        settlement.setApplicationMessageId(Utils.transactionIdToString(transactionId));
+        settlement.setCreatedDate(Utils.timestampToDate(seconds, nanos));
+        settlement.setCreatedTime(Utils.timestampToTime(seconds, nanos));
 
         settlement = settlementRepository.save(settlement);
 

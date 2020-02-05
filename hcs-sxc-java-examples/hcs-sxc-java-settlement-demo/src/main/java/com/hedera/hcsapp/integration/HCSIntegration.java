@@ -113,7 +113,7 @@ public class HCSIntegration {
                         (credit) -> {
                             if (credit.getStatus().equals(priorState)) {
                                 credit.setStatus(nextState);
-                                credit.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                                credit.setApplicationMessageId(Utils.applicationMessageIdToString(hcsResponse.getApplicationMessageId()));
                                 creditRepository.save(credit);
                             } else {
                                 log.error("Credit status should be " + priorState + ", found : " + credit.getStatus());
@@ -122,7 +122,7 @@ public class HCSIntegration {
                         () -> {
                             Credit credit = Utils.creditFromCreditBPM(creditBPM, threadId);
                             credit.setStatus(nextState);
-                            credit.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                            credit.setApplicationMessageId(Utils.applicationMessageIdToString(hcsResponse.getApplicationMessageId()));
                             creditRepository.save(credit);
                             log.info("Adding new credit to Database: " + threadId);
                         }
@@ -160,7 +160,7 @@ public class HCSIntegration {
                         (settlement) -> {
                             if (settlement.getStatus().equals(nextState + "_PENDING")) {
                                 settlement.setStatus(nextState);
-                                settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                                settlement.setApplicationMessageId(Utils.applicationMessageIdToString(hcsResponse.getApplicationMessageId()));
                                 settlementRepository.save(settlement);
                                 // update the credits too
                                 updateCreditStateForSettlementItems(threadId, nextState);
@@ -172,7 +172,7 @@ public class HCSIntegration {
                         () -> {
                             Settlement settlement = Utils.settlementFromSettleProposeBPM(settleProposeBPM, threadId);
                             settlement.setStatus(nextState);
-                            settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                            settlement.setApplicationMessageId(Utils.applicationMessageIdToString(hcsResponse.getApplicationMessageId()));
                             settlementRepository.save(settlement);
                             log.info("Adding new settlement to Database: " + threadId);
 
@@ -246,7 +246,7 @@ public class HCSIntegration {
                         (settlement) -> {
                             if ((settlement.getStatus().equals(nextState + "_PENDING")) || (settlement.getStatus().equals(priorState))) {
                                 settlement.setStatus(nextState);
-                                settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                                settlement.setApplicationMessageId(Utils.applicationMessageIdToString(hcsResponse.getApplicationMessageId()));
                                 settlement.setAdditionalNotes(settleInitBPM.getAdditionalNotes());
                                 settlement.setPaymentChannelName(settleInitBPM.getPaymentChannelName());
                                 settlementRepository.save(settlement);
@@ -322,7 +322,7 @@ public class HCSIntegration {
                             if ((settlement.getPayerName().endsWith(appData.getUserName())) || (settlement.getPaymentChannelName().equals(appData.getUserName()))) {
                                 if ((settlement.getStatus().equals(nextState + "_PENDING")) || (settlement.getStatus().equals(priorState))) {
                                     settlement.setStatus(nextState);
-                                    settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                                    settlement.setApplicationMessageId(Utils.applicationMessageIdToString(hcsResponse.getApplicationMessageId()));
                                     settlement.setAdditionalNotes(paymentInitBPM.getAdditionalNotes());
                                     settlement.setPayerAccountDetails(paymentInitBPM.getPayerAccountDetails());
                                     settlement.setRecipientAccountDetails(paymentInitBPM.getRecipientAccountDetails());
@@ -392,7 +392,7 @@ public class HCSIntegration {
                             if ((settlement.getPayerName().equals(appData.getUserName())) || (settlement.getPaymentChannelName().equals(appData.getUserName()))) {
                                 if ((settlement.getStatus().equals(nextState + "_PENDING")) || (settlement.getStatus().equals(priorState))) {
                                     settlement.setStatus(nextState);
-                                    settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                                    settlement.setApplicationMessageId(Utils.applicationMessageIdToString(hcsResponse.getApplicationMessageId()));
                                     settlement.setAdditionalNotes(paymentSentBPM.getAdditionalNotes());
                                     settlement.setPaymentReference(paymentSentBPM.getPaymentReference());
                                     
@@ -463,7 +463,7 @@ public class HCSIntegration {
                                 }
                                 if (doUpdate) {
                                     settlement.setStatus(nextState);
-                                    settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                                    settlement.setApplicationMessageId(Utils.applicationMessageIdToString(hcsResponse.getApplicationMessageId()));
                                     settlement.setAdditionalNotes(settlePaidBPM.getAdditionalNotes());
                                     settlement.setPaymentReference(settlePaidBPM.getPaymentReference());
                                     
@@ -525,7 +525,7 @@ public class HCSIntegration {
                                 // payer updates status to SETTLE_PAY_CONFIRMED
                                 if ((settlement.getStatus().equals(nextState + "_PENDING")) || (settlement.getStatus().equals(priorState))) {
                                     settlement.setStatus(nextState);
-                                    settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                                    settlement.setApplicationMessageId(Utils.applicationMessageIdToString(hcsResponse.getApplicationMessageId()));
                                     settlement.setAdditionalNotes(settleCompleteBPM.getAdditionalNotes());
                                     settlement.setPaymentReference(settleCompleteBPM.getPaymentReference());
                                     
@@ -539,7 +539,7 @@ public class HCSIntegration {
                             } else if (settlement.getPaymentChannelName().equals(appData.getUserName())) {
                                 if (settlement.getStatus().equals(States.SETTLE_PAY_ACK.name())) {
                                     settlement.setStatus(nextState);
-                                    settlement.setApplicationMessageId(Utils.TransactionIdToString(hcsResponse.getApplicationMessageId()));
+                                    settlement.setApplicationMessageId(Utils.applicationMessageIdToString(hcsResponse.getApplicationMessageId()));
                                     settlement.setAdditionalNotes(settleCompleteBPM.getAdditionalNotes());
                                     settlement.setPaymentReference(settleCompleteBPM.getPaymentReference());
                                     

@@ -66,13 +66,15 @@ public final class AppData {
         return Long.parseLong(getEnvValue(varName));
     }
 
-    private int getEnvValueInt(String varName) throws Exception {
-        return Integer.parseInt(getEnvValue(varName));
-    }
-
     public AppData() throws Exception {
-
         this.hcsCore = new HCSCore(this.appId);
+        init();
+    }
+    public AppData(String configFilePath, String environmentFilePath) throws Exception {
+        this.hcsCore = new HCSCore(this.appId, configFilePath, environmentFilePath);
+        init();
+    }
+    private void init() throws Exception {
         this.dotEnv = hcsCore.getEnvironment();
         // just check if set
         getEnvValue("OPERATOR_KEY");

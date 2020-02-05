@@ -1,6 +1,5 @@
 package com.hedera.hcs.sxc.callback;
 
-import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
 /*-
  * ‌
  * hcs-sxc-java
@@ -24,7 +23,6 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
-import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 import com.hedera.hcs.sxc.interfaces.HCSResponse;
 import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;

@@ -109,6 +109,19 @@
             <version>${hcs-sxc.version}</version>
         </dependency>
         -->
+        <!-- PLUGINS for testing -->
+        <dependency> 
+            <groupId>com.hedera</groupId>
+            <artifactId>hcs-sxc-java-plugins-persistence-in-memory</artifactId>
+            <version>${hcs-sxc.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency> 
+            <groupId>com.hedera</groupId>
+            <artifactId>hcs-sxc-java-plugins-persistence-in-memory</artifactId>
+            <version>${hcs-sxc.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

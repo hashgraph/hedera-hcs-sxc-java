@@ -229,17 +229,29 @@ public final class OutboundHCSMessage {
                     Any anyPack = Any.pack(kr1);
                     byte[] encryptedAnyPackedChunkBody = messageEncryptionPlugin.encrypt(this.messageEncryptionKey, anyPack.toByteArray());
 
-                    firstTransactionId = new TransactionId(this.operatorAccountId);
+                    
+                    TransactionId newTransactionId = new TransactionId(hcsCore.getOperatorAccountId());
+                    ApplicationMessageId newAppId = ApplicationMessageId.newBuilder()
+                                    .setAccountID(AccountID.newBuilder()
+                                            .setShardNum(newTransactionId.accountId.shard)
+                                            .setRealmNum(newTransactionId.accountId.realm)
+                                            .setAccountNum(newTransactionId.accountId.account)
+                                            .build()
+                                    )
+                                    .setValidStart(Timestamp.newBuilder()
+                                            .setSeconds(newTransactionId.validStart.getEpochSecond())
+                                            .setNanos(newTransactionId.validStart.getNano())
+                                            .build()
+                                    ).build();
+                    
                     ApplicationMessageChunk appChunk = ApplicationMessageChunk.newBuilder()
-                            .setApplicationMessageId(
-                                    parts.get(0).getApplicationMessageId()
-                            )
+                            .setApplicationMessageId(newAppId)
                             .setChunkIndex(1)
                             .setChunksCount(1)
                             .setMessageChunk(
                                     //fit an antire ApplicationMessage in the chunk and set body message to the encrypted stuff
                                     ApplicationMessage.newBuilder()
-                                        .setApplicationMessageId(parts.get(0).getApplicationMessageId())
+                                        .setApplicationMessageId(newAppId)
                                         //TODO: set signature 
                                         .setBusinessProcessMessage(ByteString.copyFrom(encryptedAnyPackedChunkBody))
                                         //TODO: set hash
@@ -249,14 +261,13 @@ public final class OutboundHCSMessage {
                                 
                                 
                    
-                        transactionId = new TransactionId(this.operatorAccountId);
                         ConsensusMessageSubmitTransaction txRotation = new ConsensusMessageSubmitTransaction()
                             .setMessage(appChunk.toByteArray())
                             .setTopicId(this.topics.get(topicIndex).getConsensusTopicId())
-                            .setTransactionId(transactionId);
+                            .setTransactionId(newTransactionId);
                         
                         // persist the transaction
-                        this.persistencePlugin.storeTransaction(transactionId, txRotation);
+                        this.persistencePlugin.storeTransaction(newTransactionId, txRotation);
                         TransactionId txIdKR1 =  txRotation.execute(client);
                         
                         TransactionReceipt receiptKR1 = txIdKR1.getReceipt(client, Duration.ofSeconds(30));

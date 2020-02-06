@@ -255,8 +255,9 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                 hcsCore.setTempKeyAgreement(null);
                                 byte[] newSecretKey = keyRotationPlugin.finalise(responderPublicKeyEncoded, keyAgreement);
                                   // store new SecretKey in Database
+                                hcsCore.updateSecretKey(newSecretKey);
                                 hcsCore.getMessagePersistence().storeSecretKey(newSecretKey);
-                              
+                                
                             }
                         } else {
                                 this.hcsCore.getMessagePersistence().storeApplicationMessage(messageEnvelopeOptional.get().getApplicationMessageId(), messageEnvelopeOptional.get());

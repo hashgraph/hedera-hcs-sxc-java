@@ -2,3 +2,5 @@ OPERATOR_KEY=
 OPERATOR_ID=0.0.2
 # APP Net
 APP_ID=0
+# Encryption private key (HEX)
+ENCRYPTION_KEY

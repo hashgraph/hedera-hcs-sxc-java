@@ -1,5 +1,6 @@
 package com.hedera.hcs.sxc.plugin.cryptography.keyrotation;
 
+import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -21,15 +22,13 @@ import org.apache.commons.lang3.tuple.Pair;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-public class KeyRotation {
+public class KeyRotation implements SxcKeyRotation{
 
     private KeyAgreement aliceKeyAgree;
     
     /**
      * Constructs an object for the key rotation initiator to keep and reuse 
      * the generated KeyAgreement. 
-     * Note that the key rotation responder uses a static method to interact with
-     * this class while the initiator needs to construct an object. 
      */ 
     public KeyRotation() {
     }
@@ -45,7 +44,7 @@ public class KeyRotation {
      * 
      * @return Alice's public key.
      */
-    public byte[]  aliceFirst() {
+    private byte[]  aliceFirst() {
         byte[] alicePubKeyEnc  = null;    
         try {
             KeyPairGenerator aliceKpairGen = KeyPairGenerator.getInstance("DH");
@@ -72,7 +71,7 @@ public class KeyRotation {
      * @param alicePubKeyEnc
      * @return Pair.of(bob's public key, shared secret)
      */
-    public static Pair<byte[],byte[]> bobGenFromAlice(byte[] alicePubKeyEnc) {
+    private  Pair<byte[],byte[]> bobGenFromAlice(byte[] alicePubKeyEnc) {
         byte[] bobPubKeyEnc = null;
         byte[] bobSecret  = null;
         try {
@@ -105,7 +104,7 @@ public class KeyRotation {
      * @param bobPubKeyEnc This is Bob's public key
      * @return the shared secret. 
      */
-    public byte[] aliceFinish(byte[] bobPubKeyEnc) {
+    private byte[] aliceFinish(byte[] bobPubKeyEnc) {
         if(this.aliceKeyAgree == null) throw new IllegalStateException("You must initialize the object using 'aliceFirst()'");
         try {
             KeyFactory aliceKeyFac = KeyFactory.getInstance("DH");
@@ -118,6 +117,24 @@ public class KeyRotation {
         }
         return aliceKeyAgree.generateSecret();
     }
-   
-   
+    
+    
+
+    @Override
+    public Pair<KeyAgreement, byte[]> initiate() throws Exception {
+        byte[] aliceFirst = aliceFirst();
+        return Pair.of(this.aliceKeyAgree, aliceFirst);
+    }
+
+    @Override
+    public Pair<byte[], byte[]> respond(byte[] initiatorPubKeyEnc) throws Exception {
+        return bobGenFromAlice(initiatorPubKeyEnc);
+    }
+
+    @Override
+    public byte[] finalise(byte[] responderPubKeyEnc, KeyAgreement keyAgreement) throws Exception {
+        this.aliceKeyAgree = keyAgreement;
+        return aliceFinish(responderPubKeyEnc);
+    }
+    
  }

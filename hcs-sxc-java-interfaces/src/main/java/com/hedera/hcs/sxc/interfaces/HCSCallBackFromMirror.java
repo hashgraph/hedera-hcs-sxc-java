@@ -9,5 +9,5 @@ public interface HCSCallBackFromMirror {
     public void addObserver(HCSCallBackToAppInterface listener);
     public void notifyObservers(byte[] message, ApplicationMessageId applicationMessageId);
     public void storeMirrorResponse(SxcConsensusMessage consensusMessage);
-    public void partialMessage(ApplicationMessageChunk messagePart) throws InvalidProtocolBufferException;
+    public void partialMessage(ApplicationMessageChunk messagePart); 
 }

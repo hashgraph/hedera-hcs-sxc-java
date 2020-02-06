@@ -83,7 +83,14 @@ public enum HCSCore { // singleton implementation
 
         this.operatorAccountId = this.environment.getOperatorAccountId();
         this.ed25519PrivateKey = this.environment.getOperatorKey();
-        this.messageEncryptionKey  = this.environment.getMessageEncryptionKey();
+        if(this.encryptMessages){
+            this.messageEncryptionKey  = this.environment.getMessageEncryptionKey();
+        }
+        if(this.rotateKeys && !this.encryptMessages){
+            System.out.println("config.ini has key rotation enabled, however encryption is disabled. Exiting...");
+            System.exit(0);
+        }
+        
         String appId = Long.toString(this.applicationId);
         // replace hibernate configuration {appid}
         yamlConfig.getCoreHibernate().forEach((key,value) -> this.hibernateConfig.put(key, value.replace("{appid}", appId))); 

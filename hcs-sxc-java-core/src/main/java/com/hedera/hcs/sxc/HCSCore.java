@@ -23,6 +23,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.crypto.KeyAgreement;
 
 public enum HCSCore { // singleton implementation
     
@@ -51,6 +52,7 @@ public enum HCSCore { // singleton implementation
     private byte[] messageEncryptionKey = new byte[0];
     private Environment environment = new Environment();
     private YAMLConfig yamlConfig;
+    private KeyAgreement tempKeyAgreement = null; // if set, user is KR initiator. 
 	
     /**
      * Constructor for HCS Core
@@ -83,11 +85,19 @@ public enum HCSCore { // singleton implementation
 
         this.operatorAccountId = this.environment.getOperatorAccountId();
         this.ed25519PrivateKey = this.environment.getOperatorKey();
-        this.messageEncryptionKey  = this.environment.getMessageEncryptionKey();
+        if(this.encryptMessages){
+            this.messageEncryptionKey  = this.environment.getMessageEncryptionKey();
+        }
+        if(this.rotateKeys && !this.encryptMessages){
+            System.out.println("config.ini has key rotation enabled, however encryption is disabled. Exiting...");
+            System.exit(0);
+        }
+        
         String appId = Long.toString(this.applicationId);
         // replace hibernate configuration {appid}
         yamlConfig.getCoreHibernate().forEach((key,value) -> this.hibernateConfig.put(key, value.replace("{appid}", appId))); 
         
+      
     }
 
     public HCSCore withAppId(long applicationId) {
@@ -196,4 +206,20 @@ public enum HCSCore { // singleton implementation
         }
         return consensusTopicIds;
     }
+
+    public KeyAgreement getTempKeyAgreement() {
+        return tempKeyAgreement;
+    }
+
+    public void setTempKeyAgreement(KeyAgreement tempKeyAgreement) {
+        this.tempKeyAgreement = tempKeyAgreement;
+    }
+
+    public void updateSecretKey(byte[] newSecretKey){
+        this.messageEncryptionKey = newSecretKey;
+    }
+    
+    
+    
+    
 }

@@ -6,6 +6,7 @@ import java.util.Optional;
 import lombok.extern.log4j.Log4j2;
 
 import com.google.common.util.concurrent.Uninterruptibles;
+import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.proto.Timestamp;
@@ -16,7 +17,10 @@ import com.hedera.hashgraph.sdk.consensus.ConsensusClient.Subscription;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackFromMirror;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
+import com.hedera.hcs.sxc.interfaces.MirrorSubscriptionInterface;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
+import com.hedera.hcs.sxc.proto.KeyRotationInitialise;
+import com.hedera.hcs.sxc.proto.KeyRotationRespond;
 
 /**
  * 
@@ -118,7 +122,7 @@ public final class MirrorTopicSubscriber extends Thread {
           ApplicationMessageChunk messagePart;
         try {
             messagePart = ApplicationMessageChunk.parseFrom(message);
-            log.info("Got message from mirror - calling back");
+          log.info("Got message from mirror - calling back");
             onHCSMessageCallback.partialMessage(messagePart);
         } catch (InvalidProtocolBufferException e) {
             log.error(e);

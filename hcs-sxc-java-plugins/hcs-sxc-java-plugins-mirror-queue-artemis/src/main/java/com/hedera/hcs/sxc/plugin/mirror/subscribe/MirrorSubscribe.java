@@ -31,6 +31,8 @@ import com.hedera.hcs.sxc.interfaces.HCSRelayMessage;
 import com.hedera.hcs.sxc.interfaces.MirrorSubscriptionInterface;
 import com.hedera.hcs.sxc.plugin.mirror.config.Config;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -122,8 +124,8 @@ public class MirrorSubscribe implements MirrorSubscriptionInterface {
                         } catch (JMSException ex) {
                             log.error(ex);
                         } catch (InvalidProtocolBufferException ex) {
-                            log.error(ex);
-                        }
+                            Logger.getLogger(MirrorSubscribe.class.getName()).log(Level.SEVERE, null, ex);
+                        } 
                     }
 
                   });

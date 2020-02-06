@@ -161,8 +161,8 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                 // create your own new key store it and respond
                                 Pair<byte[], byte[]> respond = keyRotationPlugin.respond(initiatorPublicKeyEncoded);
 
-                                byte[] newPublicKey =  respond.getRight();
-                                byte[] newSecretKey = respond.getLeft();  
+                                byte[] newPublicKey =  respond.getLeft();
+                                byte[] newSecretKey = respond.getRight();  
                                 byte[] oldSecretKey = hcsCore.getMessageEncryptionKey();
                                 hcsCore.updateSecretKey(newSecretKey);
                                 hcsCore.getMessagePersistence().storeSecretKey(newSecretKey);

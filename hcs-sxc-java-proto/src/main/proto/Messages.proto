@@ -24,7 +24,7 @@ message ApplicationMessageId {
 // a complete message containing data provided by an app to the core component
 message ApplicationMessage {
     ApplicationMessageId applicationMessageId = 1;
-    bytes businessProcessMessage = 2;
+    bytes businessProcessMessage = 2; // Can be KeyRotationInitialise etc or BMP potobuf message
     bytes businessProcessHash = 3;
     bytes businessProcessSignature = 4;
 }
@@ -35,4 +35,12 @@ message ApplicationMessageChunk {
     int32 chunksCount = 2; // The total number of parts to make up a complete message
     int32 chunkIndex = 3; // This message part index
     bytes messageChunk = 4; // The message part
+}
+
+message KeyRotationInitialise{
+    bytes initiatorPublicKeyEncoded = 1;
+}
+
+message KeyRotationRespond {
+    bytes responderPublicKeyEncoded = 1;
 }

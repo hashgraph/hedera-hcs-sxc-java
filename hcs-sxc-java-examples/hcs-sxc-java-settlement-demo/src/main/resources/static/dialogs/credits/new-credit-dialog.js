@@ -48,9 +48,10 @@ function openNewCreditDialog(recipient) {
                         'Content-Type': 'application/json'
                     },
                     body: postBody
-                }).then(function(response) {
+                }).then(async function(response) {
                     if (response.status===200){
                         showSnackBarMessage("Credit request sent");
+                        await renderCreditsPanel(recipient);
                     } else {
                         alert("Failed to send message to HH network");
                     }

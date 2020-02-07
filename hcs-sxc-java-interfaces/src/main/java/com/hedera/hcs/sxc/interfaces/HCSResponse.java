@@ -20,16 +20,16 @@ package com.hedera.hcs.sxc.interfaces;
  * ‍
  */
 
-import com.hedera.hcs.sxc.proto.ApplicationMessageId;
+import com.hedera.hcs.sxc.proto.ApplicationMessageID;
 
 public class HCSResponse {
-    private ApplicationMessageId applicationMessageId;
+    private ApplicationMessageID applicationMessageId;
     private byte[] message;
     
-    public ApplicationMessageId getApplicationMessageId() {
+    public ApplicationMessageID getApplicationMessageId() {
         return this.applicationMessageId;
     }
-    public void setApplicationMessageId(ApplicationMessageId applicationMessageId) {
+    public void setApplicationMessageID(ApplicationMessageID applicationMessageId) {
         this.applicationMessageId = applicationMessageId;
     }
     public byte[] getMessage() {

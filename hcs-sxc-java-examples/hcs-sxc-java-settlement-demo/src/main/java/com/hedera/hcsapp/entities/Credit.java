@@ -43,4 +43,5 @@ public final class Credit {
     private String status;
     private String createdDate;
     private String createdTime;
+    private Boolean automatic;
 }

@@ -21,7 +21,7 @@ HCSTransactionFee: 100000000
 
 mirrorNode:
   # Address of the mirror node's subscription end point
-  address: "mirror:6552"
+  address: "hcs.testnet.mirrornode.hedera.com:5600"
 
 # List of Hedera Nodes to send HCS messages to, if more than one is specified, the SDK will randomly choose a node with each transaction
 nodes:

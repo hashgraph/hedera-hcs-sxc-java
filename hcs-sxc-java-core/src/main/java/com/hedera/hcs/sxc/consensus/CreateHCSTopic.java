@@ -41,7 +41,7 @@ import com.hedera.hcs.sxc.HCSCore;
 public final class CreateHCSTopic {
     private Map<AccountId, String> nodeMap = new HashMap<AccountId, String>();
     private AccountId operatorAccountId = new AccountId(0, 0, 0); 
-    private Ed25519PrivateKey ed25519PrivateKey;
+    private Ed25519PrivateKey ed25519PrivateKey = null;
     ConsensusTopicCreateTransaction tx = new ConsensusTopicCreateTransaction();
     
     public CreateHCSTopic(HCSCore hcsCore) {
@@ -55,18 +55,29 @@ public final class CreateHCSTopic {
         this.nodeMap = nodeMap;
         return this;
     }
+    public Map<AccountId, String> getOverrideNodeMap() {
+        return this.nodeMap;
+    }
     public CreateHCSTopic overrideOperatorAccountId(AccountId operatorAccountId) {
         this.operatorAccountId = operatorAccountId;
         return this;
+    }
+    public AccountId getOverrideOperatorAccountId() {
+        return this.operatorAccountId;
     }
     public CreateHCSTopic overrideOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
         this.ed25519PrivateKey = ed25519PrivateKey;
         return this;
     }
+    public Ed25519PrivateKey getOverrideOperatorKey() {
+        return this.ed25519PrivateKey;
+    }
+
     public CreateHCSTopic setMaxTransactionFee(Long maxTansactionFee) {
         this.tx.setMaxTransactionFee(maxTansactionFee);
         return this;
     }
+
     public CreateHCSTopic setTopicMemo (String topicMemo) {
         this.tx.setTopicMemo(topicMemo);
         return this;

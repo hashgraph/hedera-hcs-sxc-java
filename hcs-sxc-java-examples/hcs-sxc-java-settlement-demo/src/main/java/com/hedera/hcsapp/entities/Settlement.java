@@ -48,4 +48,5 @@ public final class Settlement {
     private String payerAccountDetails;
     private String recipientAccountDetails;
     private String paymentReference;
+    private Boolean automatic;
 }

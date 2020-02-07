@@ -44,11 +44,8 @@ public class CryptographyTest {
     byte[] publicKeyBytes = null;
     String publicKeyKexEncoded = null;
     
-    public CryptographyTest() {
-    }
-
     @BeforeAll
-    public static void initClass(){
+    public static void testInitClass(){
         KeyRotation keyRotation = new KeyRotation();
         byte[] alicePublic = keyRotation.aliceFirst();
         Pair<byte[], byte[]> bobPubSecret = KeyRotation.bobGenFromAlice(alicePublic);
@@ -60,7 +57,7 @@ public class CryptographyTest {
     
     
     @Test
-    public void encryptAndDecrypt() throws Exception {
+    public void testEncryptAndDecrypt() throws Exception {
         byte[] encrypt = Cryptography.encrypt(sharedSecret, cleartext);
         String encryptHex = StringUtils.byteArrayToHexString(encrypt);
         byte[] encryptPrime = StringUtils.hexStringToByteArray(encryptHex);

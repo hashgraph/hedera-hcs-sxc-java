@@ -40,7 +40,7 @@ import com.hedera.hcsapp.restclasses.AuditThreadId;
 import com.hedera.hcsapp.restclasses.AuditThreadIds;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
-import com.hedera.hcs.sxc.proto.ApplicationMessageId;
+import com.hedera.hcs.sxc.proto.ApplicationMessageID;
 
 import lombok.extern.log4j.Log4j2;
 import proto.SettlementBPM;
@@ -138,7 +138,7 @@ public class AuditController {
         for (String applicationMessageId : applicationMessageIds) {
            SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessages.get(applicationMessageId).getBusinessProcessMessage());
 
-           if (settlementBPM.getThreadId().equals(threadId)) {
+           if (settlementBPM.getThreadID().equals(threadId)) {
                AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
                auditApplicationMessage.setApplicationMessageId(applicationMessageId);
                auditApplicationMessage.setMessage(settlementBPM.toString());
@@ -165,7 +165,7 @@ public class AuditController {
             try {
                 ApplicationMessageChunk chunk = ApplicationMessageChunk.parseFrom(mirrorResponse.getValue().message);
 
-                ApplicationMessageId applicationMessageIdProto = chunk.getApplicationMessageId();
+                ApplicationMessageID applicationMessageIdProto = chunk.getApplicationMessageId();
 
                 String appMessageId = applicationMessageIdProto.getAccountID().getShardNum()
                         + "." + applicationMessageIdProto.getAccountID().getRealmNum()

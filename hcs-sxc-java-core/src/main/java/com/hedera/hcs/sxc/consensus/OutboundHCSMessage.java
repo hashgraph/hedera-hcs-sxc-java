@@ -35,7 +35,6 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
-import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.config.Topic;
@@ -44,7 +43,7 @@ import com.hedera.hcs.sxc.plugins.Plugins;
 import com.hedera.hcs.sxc.proto.AccountID;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
-import com.hedera.hcs.sxc.proto.ApplicationMessageId;
+import com.hedera.hcs.sxc.proto.ApplicationMessageID;
 import com.hedera.hcs.sxc.proto.Timestamp;
 
 import java.util.Arrays;
@@ -81,14 +80,30 @@ public final class OutboundHCSMessage {
         this.persistence = (SxcMessagePersistence)persistenceClass.newInstance();
     }
 
+    public boolean getOverrideMessageSignature() {
+        return this.signMessages;
+    }
+    
     public OutboundHCSMessage overrideMessageSignature(boolean signMessages) {
         this.signMessages = signMessages;
         return this;
     }
 
+    public boolean getOverrideEncryptedMessages() {
+        return this.encryptMessages;
+    }
+
     public OutboundHCSMessage overrideEncryptedMessages(boolean encryptMessages) {
         this.encryptMessages = encryptMessages;
         return this;
+    }
+
+    public boolean getOverrideKeyRotation() {
+        return this.rotateKeys;
+    }
+ 
+    public int getOverrideKeyRotationFrequency() {
+        return this.rotationFrequency;
     }
 
     public OutboundHCSMessage overrideKeyRotation(boolean keyRotation, int frequency) {
@@ -97,9 +112,17 @@ public final class OutboundHCSMessage {
         return this;
     }
 
+    public Map<AccountId, String> getOverrideNodeMap() {
+        return this.nodeMap;
+    }
+
     public OutboundHCSMessage overrideNodeMap(Map<AccountId, String> nodeMap) {
         this.nodeMap = nodeMap;
         return this;
+    }
+
+    public AccountId getOverrideOperatorAccountId() {
+        return this.operatorAccountId;
     }
 
     public OutboundHCSMessage overrideOperatorAccountId(AccountId operatorAccountId) {
@@ -107,9 +130,17 @@ public final class OutboundHCSMessage {
         return this;
     }
 
+    public Ed25519PrivateKey getOverrideOperatorKey() {
+        return this.ed25519PrivateKey;
+    }
+
     public OutboundHCSMessage overrideOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
         this.ed25519PrivateKey = ed25519PrivateKey;
         return this;
+    }
+
+    public TransactionId getFirstTransactionId() {
+        return this.transactionId;
     }
 
     public OutboundHCSMessage withFirstTransactionId(TransactionId transactionId) {
@@ -158,7 +189,7 @@ public final class OutboundHCSMessage {
             TransactionId transactionId = firstTransactionId;
             int count = 1;
             for (ApplicationMessageChunk messageChunk : parts) {
-                log.info("Sending message part " + count + " of " + parts.size() + " to topic " + this.topics.get(topicIndex));
+                log.info("Sending message part " + count + " of " + parts.size() + " to topic " + this.topics.get(topicIndex).toString());
                 count++;
                 ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction()
                     .setMessage(messageChunk.toByteArray())
@@ -201,7 +232,7 @@ public final class OutboundHCSMessage {
 
     public static  List<ApplicationMessageChunk> chunk(TransactionId transactionId,  byte[] message) {
         
-        ApplicationMessageId transactionID = ApplicationMessageId.newBuilder()
+        ApplicationMessageID transactionID = ApplicationMessageID.newBuilder()
                 .setAccountID(AccountID.newBuilder()
                         .setShardNum(transactionId.accountId.shard)
                         .setRealmNum(transactionId.accountId.realm)

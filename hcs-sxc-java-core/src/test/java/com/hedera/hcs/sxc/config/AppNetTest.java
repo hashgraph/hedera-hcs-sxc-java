@@ -37,7 +37,7 @@ public class AppNetTest extends AbstractConfigTest {
     private  static AppNet appNet = new AppNet();
     
     @Test
-    public void gettersAndSetters() throws Exception {
+    public void testGettersAndSetters() throws Exception {
         
         appNet.setEncryptMessages(true);
         assertTrue(appNet.getEncryptMessages());

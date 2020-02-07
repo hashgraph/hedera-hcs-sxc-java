@@ -1,0 +1,61 @@
+version: '3.3'
+services:
+  Alice:
+    container_name: Alice
+    image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
+    restart: on-failure
+    environment:
+      APP_ID: 0
+      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6b
+      ROLES: "BUYER,SELLER"
+      PAYMENT_ACCOUNT_DETAILS: "10-11-12 80640665"
+      COLOR: 0a2c5a
+    ports:
+      - 8081:8081
+    volumes:
+      - ./:/config
+
+  Bob:
+    container_name: Bob
+    image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
+    restart: on-failure
+    environment:
+      APP_ID: 1
+      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6a
+      ROLES: "BUYER,SELLER"
+      PAYMENT_ACCOUNT_DETAILS: "13-01-32 79832564"
+      COLOR: 0d431f
+    ports:
+      - 8082:8082
+    volumes:
+      - ./:/config
+
+  Carlos:
+   container_name: Carlos
+   image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
+   restart: on-failure
+   environment:
+     APP_ID: 2
+     PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6c
+     ROLES: "BUYER,SELLER"
+     PAYMENT_ACCOUNT_DETAILS: "22-11-14 70925098"
+     COLOR: 275f4f
+   ports:
+     - 8083:8083
+   volumes:
+     - ./:/config
+
+  Diana:
+    container_name: Diana
+    image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
+    restart: on-failure
+    environment:
+      APP_ID: 3
+      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6d
+      ROLES: "PAYCHANNEL"
+      PAYMENT_ACCOUNT_DETAILS: "12-52-23 26789524"
+      COLOR: 3f370b
+    ports:
+      - 8084:8084
+    volumes:
+      - ./:/config

@@ -30,11 +30,8 @@ import com.hedera.hcs.sxc.cryptography.KeyRotation;
 
 public class KeyRotationTest {
     
-    public KeyRotationTest() {
-    }
-
     @Test
-    public void createCommonSecret() {
+    public void testCreateCommonSecret() {
         KeyRotation keyRotation = new KeyRotation();
         byte[] alicePublic = keyRotation.aliceFirst();
         Pair<byte[], byte[]> bobPubSecret = KeyRotation.bobGenFromAlice(alicePublic);

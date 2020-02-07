@@ -71,6 +71,7 @@ Looking through the java project, we have the following Maven components/artifac
 
 * hcs-sxc-java
     * hcs-sxc-java-core
+    * hcs-sxc-java-coverage
     * hcs-sxc-java-relay
     * hcs-sxc-java-interfaces
     * hcs-sxc-java-examples
@@ -86,6 +87,10 @@ Looking through the java project, we have the following Maven components/artifac
 ### hcs-sxc-java-core
 
 This component does the bulk of the work and is imported into a project (see example applications).
+
+### hcs-sxc-java-coverage
+
+Test coverage aggregator, no code here.
 
 ### hcs-sxc-java-relay
 

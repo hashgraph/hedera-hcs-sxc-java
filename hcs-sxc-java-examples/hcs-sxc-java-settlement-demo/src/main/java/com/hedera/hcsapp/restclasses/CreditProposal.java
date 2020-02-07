@@ -31,4 +31,5 @@ public final class CreditProposal {
     private long amount;
     private String currency;
     private String additionalNotes;
+    private boolean automatic;
 }

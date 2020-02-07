@@ -36,14 +36,14 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public final class DockerComposeReader {
 
-    public static DockerCompose parse() throws Exception {
+    public static DockerCompose parse(String dockerFileLocation) throws Exception {
         InputStream inputStream = null;
 
         log.info("Loading app net configuration from docker-compose.yml");
 
-        File configFile = new File("./config/docker-compose.yml");
+        File configFile = new File(dockerFileLocation);
         if (configFile.exists()) {
-            log.info("Found app net configuration in ./config/docker-compose.yml");
+            log.info("Found app net configuration in " + dockerFileLocation);
             inputStream = new FileInputStream(configFile.getCanonicalPath());
         }
         if (inputStream != null) {
@@ -52,7 +52,11 @@ public final class DockerComposeReader {
             Yaml yaml = new Yaml(new Constructor(DockerCompose.class),representer);
             return yaml.load(inputStream);
         } else {
-            throw new Exception("Docker compose file not found in ./config");
+            throw new Exception("Docker compose file not found in " + dockerFileLocation);
         }
+    }
+
+    public static DockerCompose parse() throws Exception {
+        return parse("./config/docker-compose.yml");
     }
 }

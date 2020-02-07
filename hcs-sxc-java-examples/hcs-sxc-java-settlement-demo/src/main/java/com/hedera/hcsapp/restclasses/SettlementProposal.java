@@ -33,4 +33,5 @@ public final class SettlementProposal {
     private List<String> threadIds;
     private long netValue;
     private String currency;
+    private boolean automatic;
 }

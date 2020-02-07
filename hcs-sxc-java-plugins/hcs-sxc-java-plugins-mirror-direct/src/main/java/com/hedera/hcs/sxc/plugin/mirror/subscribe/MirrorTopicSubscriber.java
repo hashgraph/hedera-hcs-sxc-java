@@ -1,5 +1,7 @@
 package com.hedera.hcs.sxc.plugin.mirror.subscribe;
 
+import java.nio.charset.StandardCharsets;
+
 /*-
  * ‌
  * hcs-sxc-java
@@ -33,6 +35,9 @@ import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
 import com.hedera.hashgraph.sdk.consensus.ConsensusClient;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessage;
 import com.hedera.hashgraph.sdk.consensus.ConsensusClient.Subscription;
+import com.hedera.hashgraph.sdk.mirror.MirrorClient;
+import com.hedera.hashgraph.sdk.mirror.MirrorConsensusTopicQuery;
+import com.hedera.hashgraph.sdk.mirror.MirrorConsensusTopicResponse;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackFromMirror;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
@@ -82,39 +87,42 @@ public final class MirrorTopicSubscriber extends Thread {
     }
     
     private void subscribe() {
-        try (ConsensusClient subscriber = new ConsensusClient(this.mirrorAddress+ ":" + this.mirrorPort)
-                .setErrorHandler(e -> {
-                    log.info("Attempting to reconnect");
-                    subscribe();
-                })
-        )
-        {
-            try {
-                
-                log.info("App Subscribing to topic number " + this.topicId.toString() + " on mirror node: " + this.mirrorAddress + ":" + this.mirrorPort);
-
-                if (this.subscribeFrom.isPresent()) {
-                    this.subscribeFrom = Optional.of(this.subscribeFrom.get().plusNanos(1));
-                } else {
-                    this.subscribeFrom = Optional.of(Instant.now());
-                }
-                
-                log.info("subscribing from " + this.subscribeFrom.get().getEpochSecond() + " seconds, " + this.subscribeFrom.get().getNano() + " nanos.");
-                Subscription subscription = subscriber.subscribe(this.topicId, this.subscribeFrom.get(), tm -> {
-                    log.info("Got mirror message, calling handler");
-                    this.subscribeFrom = Optional.of(tm.consensusTimestamp.plusNanos(1));
-                    onMirrorMessage(tm, this.onHCSMessageCallback);   
-                });
-                log.info("Adding shutdown hook to subscription");
-                Runtime.getRuntime().addShutdownHook(new SusbcriberCloseHook(subscription));
-                for (;;) {
-                  Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(30));
-                }
-            } catch (Exception e) {
-                log.error(e);
-                log.info("Sleeping 10s before attempting connection again");
-                Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(10));
+        final MirrorClient mirrorClient = new MirrorClient(this.mirrorAddress+ ":" + this.mirrorPort);
+        try {
+            MirrorConsensusTopicQuery mirrorConsensusTopicQuery = new MirrorConsensusTopicQuery()
+                    .setTopicId(topicId);
+    
+            log.info("App Subscribing to topic number " + this.topicId.toString() + " on mirror node: " + this.mirrorAddress + ":" + this.mirrorPort);
+    
+            if (this.subscribeFrom.isPresent()) {
+                this.subscribeFrom = Optional.of(this.subscribeFrom.get().plusNanos(1));
+            } else {
+                this.subscribeFrom = Optional.of(Instant.now());
             }
+            
+            log.info("subscribing from " + this.subscribeFrom.get().getEpochSecond() + " seconds, " + this.subscribeFrom.get().getNano() + " nanos.");
+    
+            mirrorConsensusTopicQuery.setStartTime(this.subscribeFrom.get());
+            
+            mirrorConsensusTopicQuery.subscribe(mirrorClient, resp -> {
+                log.info("Got mirror message, calling handler");
+                this.subscribeFrom = Optional.of(resp.consensusTimestamp.plusNanos(1));
+                onMirrorMessage(resp, this.onHCSMessageCallback, this.topicId);   
+            },(error) -> {
+                // On gRPC error, print the stack trace
+                log.error(error);
+                log.info("Sleeping 11s before attempting connection again");
+                Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(11));
+                log.info("Attempting to reconnect");
+                subscribe();
+            }
+            );
+//        log.info("Adding shutdown hook to subscription");
+//        Runtime.getRuntime().addShutdownHook(new SusbcriberCloseHook(subscription));
+//        for (;;) {
+//          Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(30));
+//        }
+        
         } catch (Exception e1) {
             log.error(e1);
             log.info("Sleeping 11s before attempting connection again");
@@ -122,19 +130,19 @@ public final class MirrorTopicSubscriber extends Thread {
         }
     }
     
-    void onMirrorMessage(ConsensusMessage messagesResponse, HCSCallBackFromMirror onHCSMessageCallback) {
+    void onMirrorMessage(MirrorConsensusTopicResponse resp, HCSCallBackFromMirror onHCSMessageCallback, ConsensusTopicId topicId) {
           log.info("Got message from mirror - persisting");
           ConsensusTopicResponse consensusTopicResponse = ConsensusTopicResponse.newBuilder()
-                  .setConsensusTimestamp(Timestamp.newBuilder().setSeconds(messagesResponse.consensusTimestamp.getEpochSecond()).setNanos(messagesResponse.consensusTimestamp.getNano()).build())
-                  .setMessage(ByteString.copyFrom(messagesResponse.message))
-                  .setRunningHash(ByteString.copyFrom(messagesResponse.runningHash))
-                  .setSequenceNumber(messagesResponse.sequenceNumber)
+                  .setConsensusTimestamp(Timestamp.newBuilder().setSeconds(resp.consensusTimestamp.getEpochSecond()).setNanos(resp.consensusTimestamp.getNano()).build())
+                  .setMessage(ByteString.copyFrom(resp.message))
+                  .setRunningHash(ByteString.copyFrom(resp.runningHash))
+                  .setSequenceNumber(resp.sequenceNumber)
                   .build();
           
-          SxcConsensusMessage consensusMessage = new SxcConsensusMessage(messagesResponse.topicId, consensusTopicResponse);
+          SxcConsensusMessage consensusMessage = new SxcConsensusMessage(topicId, consensusTopicResponse);
           onHCSMessageCallback.storeMirrorResponse(consensusMessage);
           
-          byte[] message = messagesResponse.message;
+          byte[] message = resp.message;
           ApplicationMessageChunk messagePart;
         try {
             messagePart = ApplicationMessageChunk.parseFrom(message);

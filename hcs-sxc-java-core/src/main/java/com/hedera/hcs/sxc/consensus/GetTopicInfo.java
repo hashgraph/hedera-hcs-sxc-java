@@ -50,13 +50,22 @@ public final class GetTopicInfo {
         this.nodeMap = nodeMap;
         return this;
     }
+    public Map<AccountId, String> getOverrideNodeMap() {
+        return this.nodeMap;
+    }
     public GetTopicInfo overrideOperatorAccountId(AccountId operatorAccountId) {
         this.operatorAccountId = operatorAccountId;
         return this;
     }
+    public AccountId getOverrideOperatorAccountId() {
+        return this.operatorAccountId;
+    }
     public GetTopicInfo overrideOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
         this.ed25519PrivateKey = ed25519PrivateKey;
         return this;
+    }
+    public Ed25519PrivateKey getOverrideOperatorKey() {
+        return this.ed25519PrivateKey;
     }
 
     public GetTopicInfo setMaxQueryPayment(long maxQueryPayment) {

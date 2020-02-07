@@ -28,10 +28,9 @@ import com.hedera.hcs.sxc.config.Environment;
 
 public class EnvironmentTest {
 
-    private static Environment environment;
-
     @Test
-    public void loadConfig() throws Exception {
+    public void testLoadConfig() throws Exception {
+        Environment environment;
         environment = new Environment("dotenv.test");
         assertAll(
                  () -> assertEquals("302e020100300506032b657004220420abb9499694bad1f081cb2a55a08989303cbc3322fae657db1044fdbf3b9eed65", environment.getOperatorKey().toString()),

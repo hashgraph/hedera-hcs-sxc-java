@@ -17,26 +17,25 @@
     <name>hcs-sxc-java-settlement-demo</name>
 
     <properties>
-        <spring-boot-starter-web.version>2.2.0.RELEASE</spring-boot-starter-web.version>
-        <spring-boot-starter-data-jpa.version>2.2.0.RELEASE</spring-boot-starter-data-jpa.version>
+        <javax.inject.version>1</javax.inject.version>
+        <jaxb-api.version>2.3.1</jaxb-api.version>
+        <org.hibernate.validator.version>6.1.0.Final</org.hibernate.validator.version>
+        <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
         <spring-messaging.version>5.2.0.RELEASE</spring-messaging.version>
         <spring-websocket.version>5.2.0.RELEASE</spring-websocket.version>
-        <spring-boot-maven-plugin.version>2.2.0.RELEASE</spring-boot-maven-plugin.version>
-        <javax.inject.version>1</javax.inject.version>
-        <org.hibernate.validator.version>6.1.0.Final</org.hibernate.validator.version>
-        <jaxb-api.version>2.3.1</jaxb-api.version>
+        <mockito.version>3.2.4</mockito.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>${spring-boot-starter-web.version}</version>
+            <version>${spring-boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>${spring-boot-starter-data-jpa.version}</version>
+            <version>${spring-boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -95,7 +94,6 @@
         <!--
        <dependency> <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-plugins-persistence-in-memory</artifactId>
-            <version>${hcs-sxc.version}</version>
         </dependency>
         -->
         <dependency>
@@ -109,6 +107,19 @@
             <version>${hcs-sxc.version}</version>
         </dependency>
         -->
+        <!-- PLUGINS and dependencies for testing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>        
+        <dependency> 
+            <groupId>com.hedera</groupId>
+            <artifactId>hcs-sxc-java-plugins-persistence-in-memory</artifactId>
+            <version>${hcs-sxc.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -124,7 +135,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot-maven-plugin.version}</version>
+                <version>${spring-boot.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -216,7 +227,7 @@
                     <plugin>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-maven-plugin</artifactId>
-                        <version>${spring-boot-maven-plugin.version}</version>
+                        <version>${spring-boot.version}</version>
                         <configuration>
                             <mainClass>com.hedera.hcsapp.Application</mainClass>
                         </configuration>

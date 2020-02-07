@@ -32,7 +32,7 @@ import com.hedera.hcs.sxc.relay.config.YAMLConfig;
 public class ConfigTest extends AbstractConfigTest {
 
     @Test
-    public void LoadConfig() throws Exception {
+    public void testLoadConfig() throws Exception {
         Config config = new Config("./src/test/resources/relay-config.yaml");
         YAMLConfig yamlConfig = config.getConfig();
         Queue queue = yamlConfig.getQueue();

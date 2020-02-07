@@ -35,16 +35,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class Util {
     @PersistenceContext
     private EntityManager entityManager;
-
- 
-    
     public void stashData(){
         entityManager.createNativeQuery("SCRIPT TO 'h2data/stash.sql'").getResultList();
     }
-    
     public void stashPopData(){
         entityManager.createNativeQuery("DROP ALL OBJECTS;RUNSCRIPT FROM 'h2data/stash.sql'").executeUpdate();
-        
     }
-    
 }

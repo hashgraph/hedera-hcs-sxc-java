@@ -88,6 +88,7 @@
             $settleNowDialog.querySelector("#settle-now-additional-notes").setAttribute("disabled","disabled");
             $settleNowDialog.querySelector("#settle-now-send").setAttribute("disabled","disabled");
             $settleNowDialog.querySelector(".warning").style.visibility='visible';
+            $settleNowDialog.querySelector("#settle-now-automatic").setAttribute("disabled","disabled");            
         }
 
         settleNowDialog.open();

@@ -114,12 +114,6 @@
             <version>${spring-boot.version}</version>
             <scope>test</scope>
         </dependency>        
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>test</scope>
-            <version>${h2.version}</version>
-        </dependency>
         <dependency> 
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-plugins-persistence-in-memory</artifactId>
@@ -233,7 +227,7 @@
                     <plugin>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-maven-plugin</artifactId>
-                        <version>${spring-boot-maven-plugin.version}</version>
+                        <version>${spring-boot.version}</version>
                         <configuration>
                             <mainClass>com.hedera.hcsapp.Application</mainClass>
                         </configuration>

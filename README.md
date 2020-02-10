@@ -4,7 +4,9 @@
 
 # HCS-SXC-Java
 
+
 The HCS SXC Java project (SDK eXtension Components) is a set of pre-built components that aim to provide additional functionality over and above the java SDK for HCS to make it easier and quicker to develop applications.
+
 
 These components use the Hedera Java SDK to communicate with Hedera's HCS service and add a number of features (Italicised still in development/planning) as follows:
 

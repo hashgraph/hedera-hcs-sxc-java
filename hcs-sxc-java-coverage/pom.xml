@@ -59,6 +59,11 @@
         <artifactId>hcs-sxc-java-plugins-persistence-in-memory</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>com.hedera</groupId>
+        <artifactId>hcs-sxc-java-plugins-cryptography</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 <!-- no need to test proto files
       <dependency>
         <groupId>com.hedera</groupId>

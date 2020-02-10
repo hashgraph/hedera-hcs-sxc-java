@@ -32,24 +32,25 @@ import java.security.KeyPair;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class CryptographyTest {
     
-    static byte[] secretKey;
-    String cleartext = "Hear my cries Hear 234sdf! �$%&*)_+ my call Lend me your ears See my fall See my error Know my faults Time halts See my loss ";
-    KeyPair generateRsaKeyPair = null;
-    byte[] privateKeyBytes = null;
-    String privateKeyHexEncoded = null;
-    byte[] publicKeyBytes = null;
-    String publicKeyKexEncoded = null;
+  
     
     public CryptographyTest() {
     }
 
-    @BeforeAll
-    public static void testInitClass(){
+   
+    @Test
+    public void testEncryptAndDecrypt() throws Exception {
+        byte[] secretKey=null;
+        String cleartext = "Hear my cries Hear 234sdf! �$%&*)_+ my call Lend me your ears See my fall See my error Know my faults Time halts See my loss ";
+        //KeyPair generateRsaKeyPair = null;
+        //byte[] privateKeyBytes = null;
+        //String privateKeyHexEncoded = null;
+        //byte[] publicKeyBytes = null;
+        //String publicKeyKexEncoded = null;
         try {
             KeyPair kp = Cryptography.generateRsaKeyPair();
             secretKey =  kp.getPrivate().getEncoded();
@@ -57,10 +58,6 @@ public class CryptographyTest {
         } catch (Exception ex) {
             Logger.getLogger(CryptographyTest.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-    
-    @Test
-    public void testEncryptAndDecrypt() throws Exception {
         byte[] encrypt = Cryptography.load().encrypt(secretKey, StringUtils.stringToByteArray(cleartext));
         String encryptHex = StringUtils.byteArrayToHexString(encrypt);
         byte[] encryptPrime = StringUtils.hexStringToByteArray(encryptHex);

@@ -194,7 +194,7 @@
              <artifactId>maven-surefire-plugin</artifactId>
              <version>${surefire.version}</version>
              <configuration>
-                 <argLine>${argLine} -Xms512m</argLine>
+                 <argLine>@{argLine} -Xms512m</argLine>
              </configuration>
          </plugin>
         
@@ -301,10 +301,12 @@
                 </dependency>
             </dependencies>
         </plugin>
+        <!--
         <plugin>
             <artifactId>maven-surefire-plugin</artifactId>
             <version>${surefire.version}</version>
         </plugin>
+        -->
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>

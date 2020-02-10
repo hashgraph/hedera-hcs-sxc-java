@@ -61,7 +61,7 @@ public enum HCSCore { // singleton implementation
     private Ed25519PrivateKey ed25519PrivateKey;
     private List<Topic> topics = new ArrayList<Topic>();
     private long maxTransactionFee = 0L;
-    private long applicationId = 0L;
+    private long applicationId = -1L;
     private static SxcMessagePersistence persistence;
     private boolean catchupHistory;
     private MessagePersistenceLevel messagePersistenceLevel;
@@ -91,15 +91,26 @@ public enum HCSCore { // singleton implementation
     private  HCSCore() throws  ExceptionInInitializerError {  
     }
     
-    private void init(long applicationId, String configFilePath, String environmentFilePath) {
-        this.applicationId  = applicationId;
-         try {    
+    private void init(long appId, String configFilePath, String environmentFilePath) {
+       
+        
+        try {    
             this.environment = new Environment(environmentFilePath);
             this.config = new Config(configFilePath);
             this.yamlConfig = config.getConfig();
         } catch (IOException ex) {
-            throw new ExceptionInInitializerError (ex);
+            ex.printStackTrace();
+            System.out.println("Can not load one of " + environmentFilePath + ", " + configFilePath);
+            System.exit(0);
         }
+        
+        if (this.applicationId == -1){
+            this.applicationId = this.environment.getAppId();
+        }
+        else { 
+            this.applicationId  = appId;
+        }
+        
         this.nodeMap = yamlConfig.getNodesMap();
         this.maxTransactionFee = yamlConfig.getHCSTransactionFee();
 
@@ -124,19 +135,19 @@ public enum HCSCore { // singleton implementation
             System.exit(0);
         }
         
-        String appId = Long.toString(this.applicationId);
+        
         // replace hibernate configuration {appid}
-        yamlConfig.getCoreHibernate().forEach((key,value) -> this.hibernateConfig.put(key, value.replace("{appid}", appId)));
+        yamlConfig.getCoreHibernate().forEach((key,value) -> this.hibernateConfig.put(key, value.replace("{appid}",  Long.toString(this.applicationId))));
     }
     
     
     public HCSCore singletonInstanceDefault(long appId){
-        if(this.applicationId!=-1) init(appId, "./config/config.yaml", "./config/.env");
+        if(this.applicationId==-1) init(appId, "./config/config.yaml", "./config/.env");
         return INSTANCE;
     }
 
     public HCSCore singletonInstanceWithAppIdEnvAndConfig (long appId, String configFilePath, String environmentFilePath) {
-        if(this.applicationId!=-1) init(appId,configFilePath, environmentFilePath);
+        if(this.applicationId==-1) init(appId,configFilePath, environmentFilePath);
         return INSTANCE;
     }
     

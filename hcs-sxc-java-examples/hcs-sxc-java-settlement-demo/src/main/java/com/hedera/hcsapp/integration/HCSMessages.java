@@ -111,7 +111,7 @@ public final class HCSMessages {
         
         credit = creditRepository.save(credit);
         new OutboundHCSMessage(appData.getHCSCore())
-              .overrideEncryptedMessages(false)
+              //.overrideEncryptedMessages(false)
               .overrideMessageSignature(false)
               .withFirstTransactionId(transactionId)
               .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
@@ -145,7 +145,7 @@ public final class HCSMessages {
         }
 
         new OutboundHCSMessage(appData.getHCSCore())
-              .overrideEncryptedMessages(false)
+              //.overrideEncryptedMessages(false)
               .overrideMessageSignature(false)
               .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
 
@@ -212,7 +212,9 @@ public final class HCSMessages {
             settlementItem = settlementItemRepository.save(settlementItem);
         }
 
-        new OutboundHCSMessage(appData.getHCSCore()).overrideEncryptedMessages(false).overrideMessageSignature(false)
+        new OutboundHCSMessage(appData.getHCSCore())
+                //.overrideEncryptedMessages(false)
+                .overrideMessageSignature(false)
                 .withFirstTransactionId(transactionId).sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
 
         log.info("Message sent successfully.");
@@ -565,7 +567,8 @@ public final class HCSMessages {
 
         Settlement newSettlement = settlementRepository.save(settlement);
 
-        new OutboundHCSMessage(appData.getHCSCore()).overrideEncryptedMessages(false)
+        new OutboundHCSMessage(appData.getHCSCore())
+                //.overrideEncryptedMessages(false)
                 .overrideMessageSignature(false).sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
 
         log.info("Message sent successfully.");

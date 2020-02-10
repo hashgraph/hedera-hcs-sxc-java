@@ -130,7 +130,7 @@ public enum HCSCore { // singleton implementation
     }
     
     
-    public HCSCore singletonInstanceDefault(int appId){
+    public HCSCore singletonInstanceDefault(long appId){
         if(this.applicationId!=-1) init(appId, "./config/config.yaml", "./config/.env");
         return INSTANCE;
     }

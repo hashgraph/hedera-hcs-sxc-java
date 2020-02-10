@@ -107,17 +107,13 @@
             <version>${hcs-sxc.version}</version>
         </dependency>
         -->
-<<<<<<< HEAD
-      
+
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-plugins-cryptography</artifactId>
             <version>0.0.3-SNAPSHOT</version>
         </dependency>
         
-
-       
-=======
         <!-- PLUGINS and dependencies for testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -131,7 +127,7 @@
             <version>${hcs-sxc.version}</version>
             <scope>test</scope>
         </dependency>
->>>>>>> a37e9d798e77ff9f6eb6899d22d0867ecf876a49
+
     </dependencies>
 
     <build>

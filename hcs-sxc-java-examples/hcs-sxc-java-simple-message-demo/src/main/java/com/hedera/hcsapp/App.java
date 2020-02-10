@@ -49,7 +49,7 @@ public final class App {
         
         // Simplest setup and send
         Config config = new Config();
-        HCSCore hcsCore = HCSCore.INSTANCE.getInstance().withAppId(appId);
+        HCSCore hcsCore = HCSCore.INSTANCE.singletonInstanceDefault((int)appId);
 
         System.out.println("****************************************");
         System.out.println("** Welcome to a simple HCS demo");

@@ -5,6 +5,7 @@ appNet:
   rotateKeyFrequency: 0
   topics:
     - topic: 0.0.999
+    submitKey:
   persistenceLevel: "FULL"
   catchupHistory: true
 

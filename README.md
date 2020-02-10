@@ -1,5 +1,5 @@
 [![CircleCI](https://circleci.com/gh/hashgraph/hedera-hcs-sxc-java.svg?style=svg&circle-token=4f151711fb43e44d3d469cc1fbeaa17de4ab0c23)](https://circleci.com/gh/hashgraph/hedera-hcs-sxc)
-[![codecov](https://img.shields.io/codecov/c/github/hashgraph/hedera-hcs-sxc-java/master)](https://codecov.io/gh/hashgraph/hedera-hcs-sxc)
+[![codecov](https://codecov.io/gh/hashgraph/hedera-hcs-sxc-java/branch/master/graph/badge.svg)](https://codecov.io/gh/hashgraph/hedera-hcs-sxc-java)
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
 
 # HCS-SXC-Java
@@ -71,6 +71,7 @@ Looking through the java project, we have the following Maven components/artifac
 
 * hcs-sxc-java
     * hcs-sxc-java-core
+    * hcs-sxc-java-coverage
     * hcs-sxc-java-relay
     * hcs-sxc-java-interfaces
     * hcs-sxc-java-examples
@@ -86,6 +87,10 @@ Looking through the java project, we have the following Maven components/artifac
 ### hcs-sxc-java-core
 
 This component does the bulk of the work and is imported into a project (see example applications).
+
+### hcs-sxc-java-coverage
+
+Test coverage aggregator, no code here.
 
 ### hcs-sxc-java-relay
 
@@ -492,9 +497,10 @@ These are merely sample lines of code, please refer to the example projects for 
 
     - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/apps.yaml
     - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/config.yaml
-    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/docker-compose.yml
-    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/queue-config.yaml
-    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/relay-config.yaml
+
+    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/docker-compose.yml (only if you want to try simple demo through relay and queue)
+    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/queue-config.yaml (only if you want to try simple demo through relay and queue)
+    - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/relay-config.yaml (only if you want to try simple demo through relay and queue)
 
 #### Compile docker images
 
@@ -533,14 +539,40 @@ This is a simple messaging demo between two participants. All messages sent from
 To run the demo, first create a new HCS topic using the CreateTopic class in the examples and edit the `config.yaml` file to reflect the new topic id. This is to ensure that when you run the demo, you don't receive messages from someone else who you may be sharing a topic id with - although that could be fun.
 Also check other details such as the mirror node, hedera network, etc... are correct.
 
-You will also need to ensure the same topic id is reflected in `relay-config.yaml`
+#### without relay and queue
 
-Also create a `.env` file with the following information
+This is the simplest way to get the demo running.
+
+ensure that the following files are present and configured properly, `apps.yaml` should just be a copy of `apps.yaml.sample`, no change required. `config.yaml` should be a copy of `config.yaml.sample` with the `topic` property set to your topic id.
+
+  - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/apps.yaml
+  - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/config.yaml
+  - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/.env (copy of .env.sample with your own account and private key)
+
+Open up to three terminal windows and in each type:
+
+  - terminal 1: linux/mac: `./runapp.sh 0`, windows: `runapp.cmd 0`
+  - terminal 2: linux/mac: `./runapp.sh 1`, windows: `runapp.cmd 1`
+  - terminal 3: linux/mac: `./runapp.sh 2`, windows: `runapp.cmd 2`
+
+All terminals should now be waiting for input, enter text in one terminal and press [return], after a few seconds, the message should be reflected in all three terminals.
 
 ```
-OPERATOR_KEY=
-OPERATOR_ID=0.0.xxxx
+****************************************
+** Welcome to a simple HCS demo
+** I am app: Player 1
+****************************************
 ```
+
+#### with relay and queue
+
+This setup is slightly more complex and showcases the use of a relay to catch notifications from mirror which are then forwarded to a queue (Active MQ) for consumption by clients.
+
+In addition to the files above (without relay and queue), ensure the following files are present and properly configured
+
+  - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/docker-compose.yml (no changes required here, just copy sample)
+  - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/queue-config.yaml (no changes required here, just copy sample)
+  - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/relay-config.yaml (update the topic id)
 
 This demo uses the queue and relay components. For the apps to connect to the queue, an entry in your hosts file needs to be added as follows:
 
@@ -548,7 +580,13 @@ This demo uses the queue and relay components. For the apps to connect to the qu
 127.0.0.1       hcs-sxc-java-queue
 ```
 
-Compile the project (see above) and open three console terminals and switch to the folder/directory containing the `hcs-sxc-java-simple-message-demo` example on your computer.
+Compile the project 
+
+`mvnw clean install -Pqueue` This will invoke the `queue` profile which switches dependencies to include the queue instead of mirror for subscriptions.
+
+(see above) and open three console terminals and switch to the folder/directory containing the `hcs-sxc-java-simple-message-demo` example on your computer.
+
+Open up to three terminal windows and in each type:
 
 In the first, run the docker images for the queue and relay.
 

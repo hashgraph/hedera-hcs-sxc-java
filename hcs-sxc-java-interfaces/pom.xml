@@ -20,8 +20,16 @@
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-proto</artifactId>
-            <version>${hcs-sxc-proto.version}</version>
+            <version>${hcs-sxc.version}</version>
         </dependency>
     </dependencies>
-
+    
+<!--    <build>
+      <plugins>
+        <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+        </plugin>
+      </plugins>
+    </build>-->
 </project>

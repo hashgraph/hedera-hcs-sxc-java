@@ -1,5 +1,25 @@
 package com.hedera.hcs.sxc;
 
+/*-
+ * ‌
+ * hcs-sxc-java
+ * ​
+ * Copyright (C) 2019 - 2020 Hedera Hashgraph, LLC
+ * ​
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ‍
+ */
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,9 +49,7 @@ public enum HCSCore { // singleton implementation
     
     INSTANCE();
     
-    public HCSCore getInstance(){
-        return INSTANCE;
-    }
+    
 
     private boolean signMessages = false;
     private boolean encryptMessages = false;
@@ -53,19 +71,32 @@ public enum HCSCore { // singleton implementation
     private Environment environment = new Environment();
     private YAMLConfig yamlConfig;
     private KeyAgreement tempKeyAgreement = null; // if set, user is KR initiator. 
-	
+    private Config config;
+    
     /**
      * Constructor for HCS Core
      * @param applicationId - unique value per app instance using the component, if the app generates this value and stops/starts,
      * it must reuse the same applicationId to ensure consistent message delivery
      * @throws java.io.FileNotFoundException
      */
-    private  HCSCore() throws  ExceptionInInitializerError {
-        
-        try {
-        Config config = new Config();
-            yamlConfig = config.getConfig();
-
+    /**
+     * Constructor for HCS Core
+     * @param applicationId - unique value per app instance using the component, if the app generates this value and stops/starts,
+     * @param configFilePath - path to the configuration files
+     * it must reuse the same applicationId to ensure consistent message delivery
+     * FOR TESTING PURPOSES ONLY
+     */
+    
+    
+    private  HCSCore() throws  ExceptionInInitializerError {  
+    }
+    
+    private void init(long applicationId, String configFilePath, String environmentFilePath) {
+        this.applicationId  = applicationId;
+         try {    
+            this.environment = new Environment(environmentFilePath);
+            this.config = new Config(configFilePath);
+            this.yamlConfig = config.getConfig();
         } catch (IOException ex) {
             throw new ExceptionInInitializerError (ex);
         }
@@ -95,19 +126,18 @@ public enum HCSCore { // singleton implementation
         
         String appId = Long.toString(this.applicationId);
         // replace hibernate configuration {appid}
-        yamlConfig.getCoreHibernate().forEach((key,value) -> this.hibernateConfig.put(key, value.replace("{appid}", appId))); 
-        
-      
+        yamlConfig.getCoreHibernate().forEach((key,value) -> this.hibernateConfig.put(key, value.replace("{appid}", appId)));
+    }
+    
+    
+    public HCSCore singletonInstanceDefault(int appId){
+        if(this.applicationId!=-1) init(appId, "./config/config.yaml", "./config/.env");
+        return INSTANCE;
     }
 
-    public HCSCore withAppId(long applicationId) {
-        if (this.applicationId == 0L){
-        this.applicationId = applicationId;
-        String appId = Long.toString(this.applicationId);
-        // replace hibernate configuration {appid}
-        yamlConfig.getCoreHibernate().forEach((key,value) -> this.hibernateConfig.put(key, value.replace("{appid}", appId))); 
-    }
-        return this;
+    public HCSCore singletonInstanceWithAppIdEnvAndConfig (long appId, String configFilePath, String environmentFilePath) {
+        if(this.applicationId!=-1) init(appId,configFilePath, environmentFilePath);
+        return INSTANCE;
     }
     
     

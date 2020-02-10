@@ -1,5 +1,24 @@
 package com.hedera.hcs.sxc.callback;
 
+/*-
+ * ‌
+ * hcs-sxc-java
+ * ​
+ * Copyright (C) 2019 - 2020 Hedera Hashgraph, LLC
+ * ​
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ‍
+ */
 import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -22,9 +41,12 @@ import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
 import com.hedera.hcs.sxc.plugins.Plugins;
 import com.hedera.hcs.sxc.proto.AccountID;
 import com.hedera.hcs.sxc.utils.ByteUtil;
+
+import lombok.extern.log4j.Log4j2;
+
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
-import com.hedera.hcs.sxc.proto.ApplicationMessageId;
+import com.hedera.hcs.sxc.proto.ApplicationMessageID;
 import com.hedera.hcs.sxc.proto.KeyRotationInitialise;
 import com.hedera.hcs.sxc.proto.KeyRotationRespond;
 import com.hedera.hcs.sxc.proto.Timestamp;
@@ -45,6 +67,7 @@ import org.apache.commons.lang3.tuple.Pair;
  * Implements callback registration and notification capabilities to support apps
  *
  */
+@Log4j2
 public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
 
     private final List<HCSCallBackToAppInterface> observers = new ArrayList<>();
@@ -88,13 +111,14 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
         MirrorSubscriptionInterface mirrorSubscription = ((MirrorSubscriptionInterface)callbackClass.newInstance());
 
         if (this.hcsCore.getCatchupHistory()) {
+            log.info("catching up with mirror history");
             Optional<Instant> lastConsensusTimestamp = Optional.of(this.hcsCore.getMessagePersistence().getLastConsensusTimestamp());
             mirrorSubscription.init(this, this.hcsCore.getApplicationId(), lastConsensusTimestamp, this.hcsCore.getMirrorAddress(), this.hcsCore.getConsensusTopicIds());
         } else {
-            mirrorSubscription.init(this, this.hcsCore.getApplicationId(), Optional.empty(), this.hcsCore.getMirrorAddress(), this.hcsCore.getConsensusTopicIds());
+            log.info("NOT catching up with mirror history");
+            mirrorSubscription.init(this, this.hcsCore.getApplicationId(), Optional.of(Instant.now()), this.hcsCore.getMirrorAddress(), this.hcsCore.getConsensusTopicIds());
         }
     }
-    
     /**
      * Adds an observer to the list of observers
      * @param listener
@@ -103,22 +127,17 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
     public void addObserver(HCSCallBackToAppInterface listener) {
        observers.add(listener);
     }
-    
     /**
      * Notifies all observers with the supplied message
      * @param message
      * @param applicationMessageId
      */
-    @Override
-    public void notifyObservers(byte[] message, ApplicationMessageId applicationMessageId) {
+    public void notifyObservers(byte[] message, ApplicationMessageID applicationMessageId) {
         HCSResponse hcsResponse = new HCSResponse();
-        hcsResponse.setApplicationMessageId(applicationMessageId);
-        
+        hcsResponse.setApplicationMessageID(applicationMessageId);
         hcsResponse.setMessage(message);
         observers.forEach(listener -> listener.onMessage(hcsResponse));
     }
-    
-    @Override
     public void storeMirrorResponse(SxcConsensusMessage consensusMessage) {
         hcsCore.getMessagePersistence().storeMirrorResponse(consensusMessage);
     }
@@ -179,7 +198,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
 
                                 
                                 TransactionId transactionId = new TransactionId(hcsCore.getOperatorAccountId());
-                                ApplicationMessageId newAppId = ApplicationMessageId.newBuilder()
+                                ApplicationMessageID newAppId = ApplicationMessageID.newBuilder()
                                     .setAccountID(AccountID.newBuilder()
                                             .setShardNum(transactionId.accountId.shard)
                                             .setRealmNum(transactionId.accountId.realm)
@@ -305,7 +324,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
      */
     static Optional<ApplicationMessage> pushUntilCompleteMessage(ApplicationMessageChunk messageChunk, SxcMessagePersistence persistence) throws InvalidProtocolBufferException {
 
-        ApplicationMessageId applicationMessageId = messageChunk.getApplicationMessageId();
+        ApplicationMessageID applicationMessageId = messageChunk.getApplicationMessageId();
         //look up db to find parts received already
         List<ApplicationMessageChunk> chunkList = persistence.getParts(applicationMessageId);
         if (chunkList==null){

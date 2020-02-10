@@ -14,7 +14,7 @@ public class KeyRotationTest {
     }
 
     @Test
-    public void createCommonSecret() throws Exception {
+    public void testCreateCommonSecret() throws Exception {
         KeyRotation keyRotation = new KeyRotation();
         Pair<KeyAgreement, byte[]> initiate = keyRotation.initiate();
         KeyAgreement keyAgreement = initiate.getLeft();

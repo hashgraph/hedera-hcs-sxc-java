@@ -10,7 +10,7 @@
 
   <artifactId>hcs-sxc-java-plugins-persistence-hibernate</artifactId>
 
-  <name>hcs-sxc-java-plugins-persistence-in-hibernate</name>
+  <name>hcs-sxc-java-plugins-persistence-hibernate</name>
 
     <dependencies>
         <dependency>
@@ -26,14 +26,22 @@
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-proto</artifactId>
-            <version>${hcs-sxc-proto.version}</version>
+            <version>${hcs-sxc.version}</version>
         </dependency>
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-interfaces</artifactId>
-            <version>${hcs-sxc-interfaces.version}</version>
+            <version>${hcs-sxc.version}</version>
         </dependency>
     </dependencies>
+<!--    <build>
+      <plugins>
+        <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+        </plugin>
+      </plugins>
+    </build>-->
 
     <profiles>
         <profile>
@@ -65,7 +73,7 @@
                 <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>1.4.200</version>
+                <version>${h2.version}</version>
                 </dependency>
             </dependencies>
         </profile>

@@ -1,4 +1,7 @@
    function openSettleNowDialog(otherUserId){
+	   
+	   const delay = ms => new Promise(res => setTimeout(res, ms));
+	   
         /* Functions for settlement dialog in credit tab */
         settleNowDialog  = new mdc.dialog.MDCDialog(document.getElementById('settle-now-dialog'));
         event.preventDefault();
@@ -47,9 +50,7 @@
 
         clickFunction = function(){
             additionalNotes = $settleNowDialog.querySelector("#settle-now-additional-notes").value;
-            //alert(thisUserPays + " " + otherUserPays);
             settleNowDialog.close();
-
             preventInput(otherUserId);
 
             var automate = (document.getElementById('settle-now-automatic').checked);
@@ -72,13 +73,15 @@
                     'Content-Type': 'application/json'
                 },
                 body: postBody
-            }).then(function(response) {
+            }).then(async function(response) {
                 if (response.status===200){
                     showSnackBarMessage("Settlement request sent");
+                    location.hash='settlements';
+                    await renderSettlementsPanel(otherUserId);
                 } else {
                     alert("Failed to send message to HH network");
                 }
-                //restoreInput(otherUserId);
+                restoreInput(otherUserId);
             }).catch(function(res){
                 alert(res);
                 restoreInput(otherUserId);

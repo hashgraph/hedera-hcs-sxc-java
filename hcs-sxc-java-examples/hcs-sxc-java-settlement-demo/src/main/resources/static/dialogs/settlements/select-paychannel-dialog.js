@@ -48,11 +48,12 @@ function openSelectPaychannelDialog(threadId, userName) {
                 'Content-Type': 'application/json'
             },
             body: postBody
-        }).then(function(response) {
-            return response.json();
-        }).then(function(data) {
-            showSnackBarMessage("New channel proposal sent");
-
+    	}).then(async function(response) {
+    		if (response.status===200){
+    			showSnackBarMessage("New channel proposal sent");
+    			await renderSettlementsPanel(userName);
+    			return response.json();
+    		}
         }).catch(function(res){
             alert(res);
         });

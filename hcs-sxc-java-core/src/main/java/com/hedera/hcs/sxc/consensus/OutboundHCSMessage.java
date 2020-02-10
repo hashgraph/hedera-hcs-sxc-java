@@ -253,7 +253,7 @@ public final class OutboundHCSMessage {
 
                 transactionId = new TransactionId(this.operatorAccountId);
 
-                log.info("Mesage receipt status is {} "
+                log.info("Message receipt status is {} "
                         + "sequence no is {}"
                         ,receipt.status
                         ,receipt.getConsensusTopicSequenceNumber()
@@ -326,7 +326,7 @@ public final class OutboundHCSMessage {
                         
                         TransactionReceipt receiptKR1 = txIdKR1.getReceipt(client, Duration.ofSeconds(30));
                        
-                        log.info("Mesage receipt for KR1 status is {} "
+                        log.info("Message receipt for KR1 status is {} "
                                 + "sequence no is {}"
                                 ,receiptKR1.status
                                 ,receiptKR1.getConsensusTopicSequenceNumber()

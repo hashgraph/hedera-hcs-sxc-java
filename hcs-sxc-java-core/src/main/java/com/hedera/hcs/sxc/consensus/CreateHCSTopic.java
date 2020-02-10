@@ -1,5 +1,25 @@
 package com.hedera.hcs.sxc.consensus;
 
+/*-
+ * ‌
+ * hcs-sxc-java
+ * ​
+ * Copyright (C) 2019 - 2020 Hedera Hashgraph, LLC
+ * ​
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ‍
+ */
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.Duration;
@@ -21,7 +41,7 @@ import com.hedera.hcs.sxc.HCSCore;
 public final class CreateHCSTopic {
     private Map<AccountId, String> nodeMap = new HashMap<AccountId, String>();
     private AccountId operatorAccountId = new AccountId(0, 0, 0); 
-    private Ed25519PrivateKey ed25519PrivateKey;
+    private Ed25519PrivateKey ed25519PrivateKey = null;
     ConsensusTopicCreateTransaction tx = new ConsensusTopicCreateTransaction();
     
     public CreateHCSTopic(HCSCore hcsCore) {
@@ -35,18 +55,29 @@ public final class CreateHCSTopic {
         this.nodeMap = nodeMap;
         return this;
     }
+    public Map<AccountId, String> getOverrideNodeMap() {
+        return this.nodeMap;
+    }
     public CreateHCSTopic overrideOperatorAccountId(AccountId operatorAccountId) {
         this.operatorAccountId = operatorAccountId;
         return this;
+    }
+    public AccountId getOverrideOperatorAccountId() {
+        return this.operatorAccountId;
     }
     public CreateHCSTopic overrideOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
         this.ed25519PrivateKey = ed25519PrivateKey;
         return this;
     }
+    public Ed25519PrivateKey getOverrideOperatorKey() {
+        return this.ed25519PrivateKey;
+    }
+
     public CreateHCSTopic setMaxTransactionFee(Long maxTansactionFee) {
         this.tx.setMaxTransactionFee(maxTansactionFee);
         return this;
     }
+
     public CreateHCSTopic setTopicMemo (String topicMemo) {
         this.tx.setTopicMemo(topicMemo);
         return this;

@@ -3,11 +3,13 @@
         settleNowDialog  = new mdc.dialog.MDCDialog(document.getElementById('settle-now-dialog'));
         event.preventDefault();
         styleTextFields();
+        styleSwitches();
         $settleNowDialog = document.getElementById('settle-now-dialog');
 
         $settleNowDialog.querySelector("#settle-now-additional-notes").removeAttribute("disabled");
         $settleNowDialog.querySelector("#settle-now-send").removeAttribute("disabled");
         $settleNowDialog.querySelector(".warning").style.visibility='hidden';
+
         /*
          * Calculate the net amount.
          */
@@ -46,11 +48,10 @@
             //alert(thisUserPays + " " + otherUserPays);
             settleNowDialog.close();
 
-            el = document.getElementById(otherUserId);
-            el.style.opacity=0.4;
-            el.style.pointerEvents =  'none';
-            el.querySelector(".mdc-linear-progress").classList.remove('mdc-linear-progress--closed');
+            preventInput(otherUserId);
 
+            var automate = (document.getElementById('new-credit-automatic').checked);
+            
             postBody = `{
                           "payerName"       : "${payerName}"
                         , "recipientName"   : "${recipientName}"  
@@ -58,8 +59,8 @@
                         , "currency"        : "USD"
                         , "threadIds"       : ${JSON.stringify(threadIds)}
                         , "additionalNotes" : "${additionalNotes}"
+                        , "automatic"       : ${automate}
                         }`;
-
 
             showSnackBarMessage("sending new settlement request to HH Network ...");
             fetch('settlements', {
@@ -75,11 +76,11 @@
                 } else {
                     alert("Failed to send message to HH network");
                 }
+                //restoreInput(otherUserId);
             }).catch(function(res){
                 alert(res);
+                restoreInput(otherUserId);
             });
-
-
         };
         if (payerName === thisuserName) {
             $settleNowDialog.querySelector("#settle-now-send").onclick =  clickFunction;
@@ -87,6 +88,7 @@
             $settleNowDialog.querySelector("#settle-now-additional-notes").setAttribute("disabled","disabled");
             $settleNowDialog.querySelector("#settle-now-send").setAttribute("disabled","disabled");
             $settleNowDialog.querySelector(".warning").style.visibility='visible';
+            $settleNowDialog.querySelector("#settle-now-automatic").setAttribute("disabled","disabled");            
         }
 
         settleNowDialog.open();

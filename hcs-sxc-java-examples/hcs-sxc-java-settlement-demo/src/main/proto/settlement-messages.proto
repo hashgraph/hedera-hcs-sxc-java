@@ -13,8 +13,8 @@ message AccountID {
     int64 accountNum = 3; // A nonnegative account number unique within its realm
 }
 
-// Represents an ApplicationMessageId
-//message ApplicationMessageId {
+// Represents an ApplicationMessageID
+//message ApplicationMessageID {
 //    Timestamp transactionValidStart = 1; 
 //    AccountID accountID = 2; //The Account ID that paid for this transaction
 //} 
@@ -66,7 +66,7 @@ message CreditBPM{
     string additionalNotes = 5;
     
     // The ID of the transaction that carried this message through HCS    
-    string applicationMessageId = 6;
+    string applicationMessageID = 6;
     
     // The date the credit was created
     string createdDate = 7;
@@ -83,7 +83,7 @@ message CreditAckBPM{
     CreditBPM credit = 1;
 
     // Reference to the TransactionID of the `credit` message being acknowledged
-//    ApplicationMessageId creditMessageId = 2;
+//    ApplicationMessageID creditMessageID = 2;
 
 }
 
@@ -109,11 +109,11 @@ message SettleProposeBPM {
     // Optional supplementary notes or text
     string additionalNotes = 3;
 
-    // Reference to each threadId of the `creditAck` message included in the proposed settlement
-    repeated string threadIds = 4;
+    // Reference to each threadID of the `creditAck` message included in the proposed settlement
+    repeated string threadIDs = 4;
 
-    // Reference to each ApplicationMessageId of the `creditAck` messages included in the proposed settlement
-//    repeated ApplicationMessageId creditAckMessageId = 5;
+    // Reference to each ApplicationMessageID of the `creditAck` messages included in the proposed settlement
+//    repeated ApplicationMessageID creditAckMessageID = 5;
 
     // Total amount owed from payer to recipient
     // `netValue` must be greater than zero
@@ -133,8 +133,8 @@ message SettleProposeAckBPM {
     // SettlePropose message being acknowledged
     SettleProposeBPM settlePropose = 1;
 
-    // Reference to the ApplicationMessageId of the `settlePropose` message being acknowledged
-//    ApplicationMessageId settleProposeMessageId = 2;
+    // Reference to the ApplicationMessageID of the `settlePropose` message being acknowledged
+//    ApplicationMessageID settleProposeMessageID = 2;
 }
 
 // Represents intent to begin settlement through a third party payment channel
@@ -156,8 +156,8 @@ message SettleInitBPM {
     // Total amount that the payment channel will transfer from the bank account of the payer to the bank account of the recipient
     Money netValue = 5;
 
-    // Reference to the ApplicationMessageId of the `settleProposeAck` message within which settlement was agreed
-//    ApplicationMessageId settleProposeAckMessageId = 6;
+    // Reference to the ApplicationMessageID of the `settleProposeAck` message within which settlement was agreed
+//    ApplicationMessageID settleProposeAckMessageID = 6;
 }
 
 // Represents acknowledgement of the intent to settle through a third party payment channel
@@ -167,8 +167,8 @@ message SettleInitAckBPM {
     // SettleInit message being acknowledged
     SettleInitBPM settleInit = 1;
 
-    // Reference to the ApplicationMessageId of the `settleInit` message being acknowledged
-//    ApplicationMessageId settleInitMessageId = 2;
+    // Reference to the ApplicationMessageID of the `settleInit` message being acknowledged
+//    ApplicationMessageID settleInitMessageID = 2;
 }
 
 // Represents a payment mandate instructing a payment channel to transfer the specified amount
@@ -204,8 +204,8 @@ message PaymentInitAckBPM {
     // PaymentInit message being acknowledged
     PaymentInitBPM paymentInit = 1;
 
-    // Reference to the ApplicationMessageId of the `paymentInit` message being acknowledged
-//    ApplicationMessageId paymentInitMessageId = 2;
+    // Reference to the ApplicationMessageID of the `paymentInit` message being acknowledged
+//    ApplicationMessageID paymentInitMessageID = 2;
 }
 
 // Represents confirmation that a settlement payment has been completed by the payment channel
@@ -230,8 +230,8 @@ message PaymentSentBPM {
     // Total amount that the payment channel transferred from the bank account of the payer to the bank account of the recipient
     Money netValue = 6;
 
-    // Reference to the ApplicationMessageId of the `paymentInitAck` also sent by the payment channel
-//    ApplicationMessageId paymentInitMessageAckId = 7;
+    // Reference to the ApplicationMessageID of the `paymentInitAck` also sent by the payment channel
+//    ApplicationMessageID paymentInitMessageAckID = 7;
 
     // Optional Date and time that the funds were transferred from the payer's bank account
     Timestamp transferStart = 8;
@@ -251,8 +251,8 @@ message PaymentSentAckBPM {
     // PaymentSent message being acknowledged
     PaymentSentBPM paymentSent = 1;
 
-    // Reference to the ApplicationMessageId of the `paymentSent` also sent by the payment channel
-//    ApplicationMessageId paymentInitMessageAckId = 2;
+    // Reference to the ApplicationMessageID of the `paymentSent` also sent by the payment channel
+//    ApplicationMessageID paymentInitMessageAckID = 2;
 }
 
 // Represents communication of the completed settlement payment to the recipient
@@ -271,8 +271,8 @@ message SettlePaidBPM {
     // Total amount that the payment channel will transfer from the bank account of the payer to the bank account of the recipient
     Money netValue = 4;
 
-    // Reference to the ApplicationMessageId of the `settleProposeAck` message that has now been paid
-//    ApplicationMessageId settleProposeAckMessageId = 6;
+    // Reference to the ApplicationMessageID of the `settleProposeAck` message that has now been paid
+//    ApplicationMessageID settleProposeAckMessageID = 6;
 
     // Optional [external] Payment Reference
     string paymentReference = 7;
@@ -286,8 +286,8 @@ message SettlePaidAckBPM {
     // SettlePaid message being acknowledged
     SettlePaidBPM settlePaid = 1;
 
-    // Reference to the ApplicationMessageId of the `settlePaid` message being acknowledged
-//    ApplicationMessageId settlePaidMessageId = 2;
+    // Reference to the ApplicationMessageID of the `settlePaid` message being acknowledged
+//    ApplicationMessageID settlePaidMessageID = 2;
 }
 
 // Represents confirmation that the settlement amount has been transferred to the receipient's account
@@ -307,8 +307,8 @@ message SettleCompleteBPM {
     // Total amount that has been paid into the recipient's bank account
     Money netValue = 4;
 
-    // Reference to the ApplicationMessageId of the `settleProposeAck` message that has now been paid
-//    ApplicationMessageId settleProposeAckMessageId = 6;
+    // Reference to the ApplicationMessageID of the `settleProposeAck` message that has now been paid
+//    ApplicationMessageID settleProposeAckMessageID = 6;
 
     // Optional [external] Payment Reference
     string paymentReference = 7;
@@ -321,8 +321,8 @@ message SettleCompleteAckBPM {
     // SettleComplete message being acknowledged
     SettleCompleteBPM settlePaid = 1;
 
-    // Reference to the ApplicationMessageId of the `settlePaid` message being acknowledged
-//    ApplicationMessageId settleCompleteMessageId = 2;
+    // Reference to the ApplicationMessageID of the `settlePaid` message being acknowledged
+//    ApplicationMessageID settleCompleteMessageID = 2;
 }
 
 // Message to signal a deletion of all data from local persistent storage, this is purely for demonstration purposes.
@@ -344,11 +344,11 @@ message AdminStashPopDatabaseBPM {
 // Represents a Settlement-specific Business Process Message
 // The message within will be encapsulated within an ApplicationMessage
 // See: https://github.com/hashgraph/hedera-hcs-sxc/blob/master/hcs-sxc-proto/src/main/proto/Messages.proto
-// Note that ApplicationMessageId values (in messages above) will contain ApplicationMessage applicationMessageIds
+// Note that ApplicationMessageID values (in messages above) will contain ApplicationMessage applicationMessageIDs
 message SettlementBPM {
 
     // The context or business-process instance ID with which this message is associated
-    string threadId = 1;
+    string threadID = 1;
 
     // The specific settlement message
     oneof data {
@@ -370,5 +370,7 @@ message SettlementBPM {
         AdminStashDatabaseBPM adminStashDatabaseBPM = 17;
         AdminStashPopDatabaseBPM adminStashPopDatabaseBPM = 18;
     }
+    // automatic processing
+    bool automatic = 19;
 }
 

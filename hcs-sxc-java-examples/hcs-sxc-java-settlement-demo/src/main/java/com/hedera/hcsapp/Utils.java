@@ -1,5 +1,25 @@
 package com.hedera.hcsapp;
 
+/*-
+ * ‌
+ * hcs-sxc-java
+ * ​
+ * Copyright (C) 2019 - 2020 Hedera Hashgraph, LLC
+ * ​
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ‍
+ */
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -16,7 +36,7 @@ import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.entities.Settlement;
 import com.hedera.hcsapp.restclasses.SettlementRest;
 import com.hedera.hcs.sxc.proto.AccountID;
-import com.hedera.hcs.sxc.proto.ApplicationMessageId;
+import com.hedera.hcs.sxc.proto.ApplicationMessageID;
 import com.hedera.hcs.sxc.proto.Timestamp;
 
 import proto.CreditBPM;
@@ -26,28 +46,28 @@ import proto.SettleProposeBPM;
 public final class Utils {
     private static Random random = new Random();
 
-    public static String TimestampToDate(long seconds, int nanos) {
+    public static String timestampToDate(long seconds, int nanos) {
         LocalDateTime dateTime = LocalDateTime.ofEpochSecond(seconds, nanos, ZoneOffset.UTC);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM", Locale.getDefault());
         String formattedDate = dateTime.format(formatter);
         return formattedDate;
     }
     
-    public static String TimestampToTime(long seconds, int nanos) {
+    public static String timestampToTime(long seconds, int nanos) {
         LocalDateTime dateTime = LocalDateTime.ofEpochSecond(seconds, nanos, ZoneOffset.UTC);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm", Locale.getDefault());
         String formattedDate = dateTime.format(formatter);
         return formattedDate;
     }
     
-    public static String TransactionIdToString(ApplicationMessageId transactionId) {
+    public static String applicationMessageIdToString(ApplicationMessageID transactionId) {
         String txId = "0.0." + transactionId.getAccountID().getAccountNum()
                 + "-" + transactionId.getValidStart().getSeconds()
                 + "-" + transactionId.getValidStart().getNanos();
         return txId;
     }
     
-    public static String TransactionIdToString(TransactionId transactionId) {
+    public static String transactionIdToString(TransactionId transactionId) {
         String txId = "0.0." + transactionId.accountId.account
                 + "-" + transactionId.validStart.getEpochSecond()
                 + "-" + transactionId.validStart.getNano();
@@ -61,7 +81,7 @@ public final class Utils {
         credit.setPayerName(creditBPM.getPayerName());
         credit.setRecipientName(creditBPM.getRecipientName());
         credit.setReference(creditBPM.getServiceRef());
-        credit.setApplicationMessageId(creditBPM.getApplicationMessageId());
+        credit.setApplicationMessageId(creditBPM.getApplicationMessageID());
         credit.setCreatedDate(creditBPM.getCreatedDate());
         credit.setCreatedTime(creditBPM.getCreatedTime());
         credit.setAmount(creditBPM.getValue().getUnits());
@@ -82,7 +102,7 @@ public final class Utils {
                 .setPayerName(credit.getPayerName())
                 .setRecipientName(credit.getRecipientName())
                 .setServiceRef(credit.getReference())
-                .setApplicationMessageId(credit.getApplicationMessageId())
+                .setApplicationMessageID(credit.getApplicationMessageId())
                 .setCreatedDate(credit.getCreatedDate())
                 .setCreatedTime(credit.getCreatedTime())
                 .setValue(value)
@@ -105,7 +125,7 @@ public final class Utils {
         
         return settlement;
     }
-    public static ApplicationMessageId applicationMessageIdFromString(String appMessageId) {
+    public static ApplicationMessageID applicationMessageIdFromString(String appMessageId) {
         String[] messageIdParts = appMessageId.split("-");
         String[] account = messageIdParts[0].split("\\.");
         
@@ -120,7 +140,7 @@ public final class Utils {
                 .setNanos(Integer.parseInt(messageIdParts[2]))
                 .build();
         
-        ApplicationMessageId applicationMessageId = ApplicationMessageId.newBuilder()
+        ApplicationMessageID applicationMessageId = ApplicationMessageID.newBuilder()
                 .setAccountID(accountId)
                 .setValidStart(timestamp)
                 .build();

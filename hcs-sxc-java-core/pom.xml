@@ -20,19 +20,34 @@
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-proto</artifactId>
-            <version>${hcs-sxc-proto.version}</version>
+            <version>${hcs-sxc.version}</version>
         </dependency>
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-interfaces</artifactId>
-            <version>${hcs-sxc-interfaces.version}</version>
+            <version>${hcs-sxc.version}</version>
         </dependency>
+
         <!-- PLUGINS for testing -->
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-plugins-persistence-in-memory</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
+            <version>${hcs-sxc.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hedera</groupId>
+            <artifactId>hcs-sxc-java-plugins-mirror-direct</artifactId>
+            <version>${hcs-sxc.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
+<!--    <build>
+      <plugins>
+        <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+        </plugin>
+      </plugins>
+    </build>-->
 </project>

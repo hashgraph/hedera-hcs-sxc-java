@@ -1,5 +1,25 @@
 package com.hedera.hcs.sxc.consensus;
 
+/*-
+ * ‌
+ * hcs-sxc-java
+ * ​
+ * Copyright (C) 2019 - 2020 Hedera Hashgraph, LLC
+ * ​
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ‍
+ */
+
 import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
 
@@ -28,7 +48,7 @@ import com.hedera.hcs.sxc.plugins.Plugins;
 import com.hedera.hcs.sxc.proto.AccountID;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
-import com.hedera.hcs.sxc.proto.ApplicationMessageId;
+import com.hedera.hcs.sxc.proto.ApplicationMessageID;
 import com.hedera.hcs.sxc.proto.KeyRotationInitialise;
 import com.hedera.hcs.sxc.proto.Timestamp;
 
@@ -88,16 +108,31 @@ public final class OutboundHCSMessage {
         }
     }
 
+    
+    public boolean getOverrideMessageSignature() {
+        return this.signMessages;
+    }
+    
     public OutboundHCSMessage overrideMessageSignature(boolean signMessages) {
         this.signMessages = signMessages;
         return this;
     }
 
+    public boolean getOverrideEncryptedMessages() {
+        return this.encryptMessages;
+    }
  
-    
     public OutboundHCSMessage overrideEncryptedMessages(boolean encryptMessages) {
         this.encryptMessages = encryptMessages;
         return this;
+    }
+
+    public boolean getOverrideKeyRotation() {
+        return this.rotateKeys;
+    }
+ 
+    public int getOverrideKeyRotationFrequency() {
+        return this.rotationFrequency;
     }
 
     public OutboundHCSMessage overrideKeyRotation(boolean keyRotation, int frequency) {
@@ -106,9 +141,17 @@ public final class OutboundHCSMessage {
         return this;
     }
 
+    public Map<AccountId, String> getOverrideNodeMap() {
+        return this.nodeMap;
+    }
+
     public OutboundHCSMessage overrideNodeMap(Map<AccountId, String> nodeMap) {
         this.nodeMap = nodeMap;
         return this;
+    }
+
+    public AccountId getOverrideOperatorAccountId() {
+        return this.operatorAccountId;
     }
 
     public OutboundHCSMessage overrideOperatorAccountId(AccountId operatorAccountId) {
@@ -116,10 +159,19 @@ public final class OutboundHCSMessage {
         return this;
     }
 
+    public Ed25519PrivateKey getOverrideOperatorKey() {
+        return this.ed25519PrivateKey;
+    }
+
     public OutboundHCSMessage overrideOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
         this.ed25519PrivateKey = ed25519PrivateKey;
         return this;
     }
+    
+    public TransactionId getFirstTransactionId() {
+        return this.transactionId;
+    }
+
     
     public OutboundHCSMessage overrideMessageEncryptionKey (byte[] messageEncryptionKey){
         this.overrideMessageEncryptionKey = messageEncryptionKey;
@@ -179,14 +231,14 @@ public final class OutboundHCSMessage {
             TransactionId transactionId = firstTransactionId;
             int count = 1;
             for (ApplicationMessageChunk messageChunk : parts) {
-                log.info("Sending message part " + count + " of " + parts.size() + " to topic " + this.topics.get(topicIndex));
+                log.info("Sending message part " + count + " of " + parts.size() + " to topic " + this.topics.get(topicIndex).toString());
                 count++;
                 ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction()
                     .setMessage(messageChunk.toByteArray())
                     .setTopicId(this.topics.get(topicIndex).getConsensusTopicId())
                     .setTransactionId(transactionId);
                 
-                if ((this.topics.get(topicIndex).getSubmitKey() != null) && (this.topics.get(topicIndex).getSubmitKey().isEmpty())) {
+                if ((this.topics.get(topicIndex).getSubmitKey() != null) && (! this.topics.get(topicIndex).getSubmitKey().isEmpty())) {
                     // sign if we have a submit key
                     tx.build(client).sign(Ed25519PrivateKey.fromString(this.topics.get(topicIndex).getSubmitKey()));
                 }
@@ -231,7 +283,7 @@ public final class OutboundHCSMessage {
 
                     
                     TransactionId newTransactionId = new TransactionId(hcsCore.getOperatorAccountId());
-                    ApplicationMessageId newAppId = ApplicationMessageId.newBuilder()
+                    ApplicationMessageID newAppId = ApplicationMessageID.newBuilder()
                                     .setAccountID(AccountID.newBuilder()
                                             .setShardNum(newTransactionId.accountId.shard)
                                             .setRealmNum(newTransactionId.accountId.realm)
@@ -296,7 +348,7 @@ public final class OutboundHCSMessage {
 
     public static  List<ApplicationMessageChunk> chunk(TransactionId transactionId,  byte[] message) {
 
-        ApplicationMessageId transactionID = ApplicationMessageId.newBuilder()
+        ApplicationMessageID transactionID = ApplicationMessageID.newBuilder()
                 .setAccountID(AccountID.newBuilder()
                         .setShardNum(transactionId.accountId.shard)
                         .setRealmNum(transactionId.accountId.realm)

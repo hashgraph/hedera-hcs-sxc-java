@@ -20,12 +20,13 @@
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-core</artifactId>
-            <version>${hcs-sxc-core.version}</version>
+            <version>${hcs-sxc.version}</version>
         </dependency>
         <!--  PLUGINS -->
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-plugins-persistence-in-memory</artifactId>
+<<<<<<< HEAD
             <version>0.0.3-SNAPSHOT</version>
         </dependency>
         
@@ -33,6 +34,9 @@
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-plugins-mirror-queue-artemis</artifactId>
             <version>0.0.3-SNAPSHOT</version>
+=======
+            <version>${hcs-sxc.version}</version>
+>>>>>>> a37e9d798e77ff9f6eb6899d22d0867ecf876a49
         </dependency>
         
 	<dependency>
@@ -44,85 +48,88 @@
        
     </dependencies>
     <build>
-        <sourceDirectory>src</sourceDirectory>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>${maven-dependency-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>${maven-jar-plugin.version}</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>com.hedera.hcsapp.App</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-        </plugins>
+            <sourceDirectory>src</sourceDirectory>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <configuration>
+                        <artifactSet>
+                            <excludes>
+                                <exclude>junit:junit</exclude>
+                                <exclude>*:xml-apis</exclude>
+                                <exclude>org.apache.maven:lib:tests</exclude>
+                            </excludes>
+                        </artifactSet>
+                        <filters>
+                            <filter>
+                                <artifact>*:*</artifact>
+                                <excludes>
+                                    <exclude>META-INF/*.SF</exclude>
+                                    <exclude>META-INF/*.DSA</exclude>
+                                    <exclude>META-INF/*.RSA</exclude>
+                                </excludes>
+                            </filter>
+                        </filters>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>shade</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${project.basedir}</outputDirectory>
+                                <shadedArtifactAttached>true</shadedArtifactAttached>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <addClasspath>true</addClasspath>
+                                <mainClass>com.hedera.hcsapp.App</mainClass>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                </plugin>
+            </plugins>
     </build>
 
     <profiles>
-        <!-- profile which adds the possibility to build docker images Call
-            "mvn clean install -Pdocker" to invoke this additional plugin in the maven
-            build -->
         <profile>
-            <id>docker</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.google.cloud.tools</groupId>
-                        <artifactId>jib-maven-plugin</artifactId>
-                        <version>${jib.version}</version>
-                        <configuration>
-                            <from>
-                                <image>adoptopenjdk/openjdk10:jdk-10.0.2.13-alpine</image>
-                            </from>
-                            <to>
-                                <image>hederahashgraph/hcs-sxc-java-simple-message-demo:latest</image>
-                                <tags>
-                                    <tag>${project.version}</tag>
-                                </tags>
-                            </to>
-                            <extraDirectories>
-                                <paths>
-                                    <path>src/main/resources</path>
-                                    <path>../../hcs-sxc-plugins/hcs-sxc-java-plugins-persistence-in-memory/target</path>
-                                </paths>
-                            </extraDirectories>
-                            <mainClass>com.hedera.simple-message-demo.App</mainClass>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <phase>install</phase>
-                                <goals>
-                                    <goal>dockerBuild</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
+            <id>direct</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.hedera</groupId>
+                    <artifactId>hcs-sxc-java-plugins-mirror-direct</artifactId>
+                    <version>${hcs-sxc.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>queue</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.hedera</groupId>
+                    <artifactId>hcs-sxc-java-plugins-mirror-queue-artemis</artifactId>
+                    <version>0.0.3-SNAPSHOT</version>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 </project>

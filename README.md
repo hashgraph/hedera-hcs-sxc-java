@@ -381,9 +381,12 @@ OPERATOR_KEY=
 OPERATOR_ID=0.0.xxxx
 # APP Net
 APP_ID=0
+# Message encryption key (HEX)
+ENCRYPTION_KEY=308204be02...
 ```
 
-The `OPERATOR_KEY` is the private key of the account identified by `OPERATOR_ID`.
+The `OPERATOR_KEY` is the HH private key of the account identified by `OPERATOR_ID`.
+The `ENCRYPTION_KEY` is used only if message encryption is enabled in in `config.yaml`
 
 *Note: When running in your java IDE or standalone in a command line, the host's environment variables take precedence over those in the `.env` file.*
 

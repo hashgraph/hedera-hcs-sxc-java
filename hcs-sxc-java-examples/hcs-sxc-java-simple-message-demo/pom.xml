@@ -46,6 +46,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
+                    <version>${maven-shade-plugin.version}</version>
                     <configuration>
                         <artifactSet>
                             <excludes>
@@ -81,6 +82,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven-jar-plugin.version}</version>
                     <configuration>
                         <archive>
                             <manifest>
@@ -92,6 +94,7 @@
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
+                    <version>${jacoco.version}</version>
                     <artifactId>jacoco-maven-plugin</artifactId>
                 </plugin>
             </plugins>

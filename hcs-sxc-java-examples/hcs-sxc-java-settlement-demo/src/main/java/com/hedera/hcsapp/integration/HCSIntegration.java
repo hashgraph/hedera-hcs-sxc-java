@@ -88,8 +88,6 @@ public class HCSIntegration {
         // create a callback object to receive the message
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(this.appData.getHCSCore());
         onHCSMessageCallback.addObserver(hcsMessage -> {
-            
-            
             processHCSMessage(hcsMessage);
         });
     }

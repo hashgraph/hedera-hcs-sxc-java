@@ -26,17 +26,7 @@
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-plugins-persistence-in-memory</artifactId>
-<<<<<<< HEAD
-            <version>0.0.3-SNAPSHOT</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>com.hedera</groupId>
-            <artifactId>hcs-sxc-java-plugins-mirror-queue-artemis</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
-=======
             <version>${hcs-sxc.version}</version>
->>>>>>> a37e9d798e77ff9f6eb6899d22d0867ecf876a49
         </dependency>
         
 	<dependency>

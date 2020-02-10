@@ -262,7 +262,9 @@ public final class OutboundHCSMessage {
             
             // after sending all parts check if key rotation is due
             if (rotateKeys) {
-                if (!this.encryptMessages) throw new Exception("Trying to initiate key rotation but encryption is disabled");
+                if (!this.encryptMessages) {
+                    throw new Exception("Trying to initiate key rotation but encryption is disabled");   
+                }
                    
                 int messageCount = -1; //TODO - keep track of messages pair-wise, not just here. ( per topic )
                 if (messageCount < rotationFrequency) { // TODO - Fires everytime

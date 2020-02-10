@@ -1,25 +1,3 @@
-<<<<<<< HEAD
-package com.hedera.hcsapp;
-
-import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
-import com.hedera.hcs.sxc.HCSCore;
-import com.hedera.hcs.sxc.consensus.CreateHCSTopic;
-
-import lombok.extern.log4j.Log4j2;
-
-@Log4j2
-public class CreateTopic {
-
-    public static void main(String[] args) throws Exception {
-        HCSCore hcsCore = HCSCore.INSTANCE.getInstance();
-        // create topics on HCS
-        ConsensusTopicId topicId = new CreateHCSTopic(hcsCore)
-                .execute();
-        log.info(topicId.toString());
-    }
-
-}
-=======
 package com.hedera.hcsapp;
 
 /*-
@@ -52,12 +30,10 @@ import lombok.extern.log4j.Log4j2;
 public class CreateTopic {
 
     public static void main(String[] args) throws Exception {
-        HCSCore hcsCore = new HCSCore(0L);
+        HCSCore hcsCore = HCSCore.INSTANCE.singletonInstanceDefault(0L);
         // create topics on HCS
         ConsensusTopicId topicId = new CreateHCSTopic(hcsCore)
                 .execute();
         log.info(topicId.toString());
     }
-
 }
->>>>>>> a37e9d798e77ff9f6eb6899d22d0867ecf876a49

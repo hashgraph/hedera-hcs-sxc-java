@@ -35,7 +35,7 @@
       <module>hcs-sxc-java-core</module>
       <module>hcs-sxc-java-relay</module>
       <module>hcs-sxc-java-interfaces</module>
-      <!--<module>hcs-sxc-java-examples</module>-->
+      <module>hcs-sxc-java-examples</module>
       <module>hcs-sxc-java-proto</module>
       <module>hcs-sxc-java-plugins</module>
       <!--<module>hcs-sxc-java-coverage</module>-->

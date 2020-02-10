@@ -372,28 +372,8 @@ public class HCSIntegration {
                             String payref = String.format("PAYREF{%05d}",random);
                             
                             try {
-<<<<<<< HEAD
-        
-                                if ( ! settlement.getStatus().contentEquals(newState.name())) {
-                                    settlement.setStatus(newState.name() + "_PENDING");
-                                } else {
-                                    log.error("Settlement state is already " + newState.name());
-                                }
-        
-                                settlementRepository.save(settlement);
-        
-                                OutboundHCSMessage o =  new OutboundHCSMessage(appData.getHCSCore());
-                                        o.overrideEncryptedMessages(true);
-                                        o.overrideMessageSignature(false);
-                                        o.sendMessage(appData.getTopicIndex(), newSettlementBPM.toByteArray());
-        
-                                log.info("Message sent successfully.");
-                                notify("settlements", settlement.getPayerName(), settlement.getRecipientName(),threadId);
-        
-=======
                                 hcsMessages.settlePaymentSent(appData, threadId, settlementBPM.getAutomatic(), payref);
                                 notify("settlements", settlement.getPayerName(), settlement.getRecipientName(), threadId);
->>>>>>> a37e9d798e77ff9f6eb6899d22d0867ecf876a49
                             } catch (Exception e) {
                                 log.error(e);
                             }

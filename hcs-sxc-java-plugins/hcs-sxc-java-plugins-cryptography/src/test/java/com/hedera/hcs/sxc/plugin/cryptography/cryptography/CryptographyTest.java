@@ -49,7 +49,7 @@ public class CryptographyTest {
     }
 
     @BeforeAll
-    public static void initClass(){
+    public static void testInitClass(){
         try {
             KeyPair kp = Cryptography.generateRsaKeyPair();
             secretKey =  kp.getPrivate().getEncoded();
@@ -60,7 +60,7 @@ public class CryptographyTest {
     }
     
     @Test
-    public void encryptAndDecrypt() throws Exception {
+    public void testEncryptAndDecrypt() throws Exception {
         byte[] encrypt = Cryptography.load().encrypt(secretKey, StringUtils.stringToByteArray(cleartext));
         String encryptHex = StringUtils.byteArrayToHexString(encrypt);
         byte[] encryptPrime = StringUtils.hexStringToByteArray(encryptHex);

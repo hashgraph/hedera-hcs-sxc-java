@@ -38,7 +38,7 @@
       <module>hcs-sxc-java-examples</module>
       <module>hcs-sxc-java-proto</module>
       <module>hcs-sxc-java-plugins</module>
-      <!--<module>hcs-sxc-java-coverage</module>-->
+      <module>hcs-sxc-java-coverage</module>
     </modules>
 
     <organization>
@@ -186,7 +186,9 @@
   <build>
     <pluginManagement>
        <plugins>
-         <!--
+        
+           
+    
          <plugin>
              <groupId>org.apache.maven.plugins</groupId>
              <artifactId>maven-surefire-plugin</artifactId>
@@ -195,6 +197,7 @@
                  <argLine>${argLine} -Xms512m</argLine>
              </configuration>
          </plugin>
+        
          <plugin>
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
@@ -214,7 +217,10 @@
                 </execution>
             </executions>
         </plugin>
-        -->
+        
+       
+        
+        
       <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>

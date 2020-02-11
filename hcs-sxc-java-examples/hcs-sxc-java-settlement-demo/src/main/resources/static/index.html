@@ -37,7 +37,34 @@
                                 includeHTML();
                             }
                         };
-                        xhttp.open("GET", file, true);
+                        xhttp.open("GET", file + "?v="+ Date.now(), true);
+                        xhttp.send();
+                        return;
+                    }
+                }
+            }
+            
+            function includeJS() {
+                var z, i, elmnt, file, xhttp;
+                z = document.getElementsByTagName("*");
+                for (i = 0; i < z.length; i++) {
+                    elmnt = z[i];
+                    file = elmnt.getAttribute("hh-include-js");
+                  if (file) {
+                    xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState === 4) {
+                            if (this.status === 200) {
+                                elmnt.innerHTML = this.responseText;
+                            }
+                            if (this.status === 404) {
+                                elmnt.innerHTML = "Page not found.";
+                            }
+                            elmnt.removeAttribute("hh-include-js");
+                                includeJS();
+                            }
+                        };
+                        xhttp.open("GET", file + "?v="+ Date.now(), true);
                         xhttp.send();
                         return;
                     }
@@ -466,39 +493,39 @@
         </div>
         
         <div hh-include-html="dialogs/credits/new-credit-dialog.html"></div> 
-        <script src="dialogs/credits/new-credit-dialog.js"></script>
+        <script hh-include-js="dialogs/credits/new-credit-dialog.js"></script>
         
         <div hh-include-html="dialogs/credits/confirm-credit-dialog.html"></div> 
-        <script src="dialogs/credits/confirm-credit-dialog.js"></script>
+        <script hh-include-js="dialogs/credits/confirm-credit-dialog.js"></script>
         
         <div hh-include-html="dialogs/credits/settle-now-dialog.html"></div> 
-        <script src="dialogs/credits/settle-now-dialog.js"></script>
+        <script hh-include-js="dialogs/credits/settle-now-dialog.js"></script>
         
         <div hh-include-html="dialogs/settlements/confirm-settlement-dialog.html"></div> 
-        <script src="dialogs/settlements/confirm-settlement-dialog.js"></script>
+        <script hh-include-js="dialogs/settlements/confirm-settlement-dialog.js"></script>
         
         
         <div hh-include-html="dialogs/settlements/select-paychannel-dialog.html"></div> 
-        <script src="dialogs/settlements/select-paychannel-dialog.js"></script>
+        <script hh-include-js="dialogs/settlements/select-paychannel-dialog.js"></script>
         
         
         <div hh-include-html="dialogs/settlements/accept-paychannel-dialog.html"></div> 
-        <script src="dialogs/settlements/accept-paychannel-dialog.js"></script>
+        <script hh-include-js="dialogs/settlements/accept-paychannel-dialog.js"></script>
         
         <div hh-include-html="dialogs/settlements/initialise-payment-dialog.html"></div> 
-        <script src="dialogs/settlements/initialise-payment-dialog.js"></script>
+        <script hh-include-js="dialogs/settlements/initialise-payment-dialog.js"></script>
         
         <div hh-include-html="dialogs/settlements/confirm-payment-dialog.html"></div> 
-        <script src="dialogs/settlements/confirm-payment-dialog.js"></script>
+        <script hh-include-js="dialogs/settlements/confirm-payment-dialog.js"></script>
         
         <div hh-include-html="dialogs/settlements/payment-made-dialog.html"></div> 
-        <script src="dialogs/settlements/payment-made-dialog.js"></script>
+        <script hh-include-js="dialogs/settlements/payment-made-dialog.js"></script>
         
         <div hh-include-html="dialogs/settlements/confirm-settlement-receipt-dialog.html"></div> 
-        <script src="dialogs/settlements/confirm-settlement-receipt-dialog.js"></script>
+        <script hh-include-js="dialogs/settlements/confirm-settlement-receipt-dialog.js"></script>
         
         <div hh-include-html="dialogs/settlements/settlement-completed-dialog.html"></div> 
-        <script src="dialogs/settlements/settlement-completed-dialog.js"></script>
+        <script hh-include-js="dialogs/settlements/settlement-completed-dialog.js"></script>
         
         <!-- pay sent was here -->
       
@@ -1048,6 +1075,7 @@
             });
             
             includeHTML();
+            includeJS();
             styleButtons();
             styleTextFields();
             styleTextFieldIcons();

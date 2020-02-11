@@ -81,7 +81,7 @@ public class AdminController {
                 .build();
         try {
             new OutboundHCSMessage(appData.getHCSCore())
-                .overrideEncryptedMessages(false)
+                //.overrideEncryptedMessages(false)
                 .overrideMessageSignature(false)
                 .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
         } catch (Exception e) {
@@ -106,7 +106,7 @@ public class AdminController {
                 .build();
         try {
             new OutboundHCSMessage(appData.getHCSCore())
-                .overrideEncryptedMessages(false)
+                //.overrideEncryptedMessages(false)
                 .overrideMessageSignature(false)
                 .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
         } catch (Exception e) {
@@ -129,7 +129,7 @@ public class AdminController {
                 .build();
         try {
             new OutboundHCSMessage(appData.getHCSCore())
-                .overrideEncryptedMessages(false)
+                //.overrideEncryptedMessages(false)
                 .overrideMessageSignature(false)
                 .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
         } catch (Exception e) {

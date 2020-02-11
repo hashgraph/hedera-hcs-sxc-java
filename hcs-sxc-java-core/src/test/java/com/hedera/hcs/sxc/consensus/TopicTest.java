@@ -39,7 +39,8 @@ public class TopicTest {
         Ed25519PrivateKey ed25519PrivateKey = Ed25519PrivateKey.generate();
         Ed25519PrivateKey adminKey = Ed25519PrivateKey.generate();
         Ed25519PrivateKey submitKey = Ed25519PrivateKey.generate();
-        HCSCore hcsCore = new HCSCore(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+        HCSCore hcsCore = HCSCore.INSTANCE
+                .singletonInstanceWithAppIdEnvAndConfig(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
 
         CreateHCSTopic createHCSTopic = new CreateHCSTopic(hcsCore);
 
@@ -78,7 +79,8 @@ public class TopicTest {
         Ed25519PrivateKey ed25519PrivateKey = Ed25519PrivateKey.generate();
         Ed25519PrivateKey adminKey = Ed25519PrivateKey.generate();
         Ed25519PrivateKey submitKey = Ed25519PrivateKey.generate();
-        HCSCore hcsCore = new HCSCore(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+         HCSCore hcsCore = HCSCore.INSTANCE
+                .singletonInstanceWithAppIdEnvAndConfig(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
 
         UpdateHCSTopic updateHCSTopic = new UpdateHCSTopic(hcsCore);
 
@@ -123,7 +125,8 @@ public class TopicTest {
     @Test
     public void testDeleteTopic() throws Exception {
         Ed25519PrivateKey ed25519PrivateKey = Ed25519PrivateKey.generate();
-        HCSCore hcsCore = new HCSCore(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+         HCSCore hcsCore = HCSCore.INSTANCE
+                .singletonInstanceWithAppIdEnvAndConfig(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
 
         DeleteHCSTopic deleteHCSTopic = new DeleteHCSTopic(hcsCore);
 
@@ -156,7 +159,8 @@ public class TopicTest {
     @Test
     public void testGetInfoTopic() throws Exception {
         Ed25519PrivateKey ed25519PrivateKey = Ed25519PrivateKey.generate();
-        HCSCore hcsCore = new HCSCore(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+         HCSCore hcsCore = HCSCore.INSTANCE
+                .singletonInstanceWithAppIdEnvAndConfig(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
 
         GetTopicInfo getTopicInfo = new GetTopicInfo(hcsCore);
 

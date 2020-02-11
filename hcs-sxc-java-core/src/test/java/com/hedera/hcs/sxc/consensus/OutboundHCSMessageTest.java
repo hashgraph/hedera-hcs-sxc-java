@@ -56,8 +56,10 @@ public class OutboundHCSMessageTest {
     
     @Test
     public void testOutBoundMessageBuilder() throws Exception {
-        HCSCore hcsCore = new HCSCore(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
-        
+         HCSCore hcsCore = HCSCore.INSTANCE
+                .singletonInstanceWithAppIdEnvAndConfig
+                 (0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+
         Ed25519PrivateKey ed25519PrivateKey = Ed25519PrivateKey.generate();
         TransactionId transactionId = TransactionId.withValidStart(AccountId.fromString("0.0.10"), Instant.now());
         

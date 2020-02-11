@@ -32,9 +32,10 @@ import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hcs.sxc.plugin.persistence.entities.HCSApplicationMessage;
 import com.hedera.hcs.sxc.plugin.persistence.entities.HCSTransaction;
 import com.hedera.hcs.sxc.plugin.persistence.entities.MirrorResponse;
-import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
+import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
+import com.hedera.hcs.sxc.plugin.persistence.entities.KeyStore;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 import com.hedera.hcs.sxc.proto.ApplicationMessageID;
@@ -56,15 +57,15 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 @Log4j2
-public class PersistMessages
-implements SxcMessagePersistence{
+public class Persist
+implements SxcPersistence{
 
     private final Long SCALAR = 1_000_000_000L;
     private Map<ApplicationMessageID, List<ApplicationMessageChunk>> partialMessages;
     private MessagePersistenceLevel persistenceLevel = null;
     private Map<String, String> hibernateProperties = new HashMap<String, String>();
 
-    public PersistMessages() throws Exception {
+    public Persist() throws Exception {
         partialMessages = new HashMap<>();
     }
 
@@ -453,5 +454,50 @@ implements SxcMessagePersistence{
         session.createQuery("delete HCSTransaction").executeUpdate();
         session.createQuery("delete HCSApplicationMessage").executeUpdate();
         session.getTransaction().commit();
+    }
+
+    @Override
+    public void storeSecretKey(byte[] secretKey) {
+        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        List<KeyStore> resultList = session.createQuery("select k from KeyStore k").getResultList();
+        if (resultList.size() == 1){
+            KeyStore ks = resultList.get(0);
+            ks.setId(0);
+            ks.setSecretKey(secretKey);
+            session.update(ks);
+        } else {
+            KeyStore ks = new KeyStore();
+            ks.setId(0);
+            ks.setSecretKey(secretKey);
+            session.save(ks);
+        }
+        
+        
+    }
+
+    @Override
+    public byte[] getSecretKey() {
+        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        KeyStore ks = session.find(KeyStore.class, 0);
+        return ks.getSecretKey();
+    }   
+
+    @Override
+    public void storePublicKey(byte[] publicKey) {
+        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        KeyStore ks = session.find(KeyStore.class, 0);
+        ks.setPublicKey(publicKey);
+        session.save(ks);
+        
+    }
+
+    @Override
+    public byte[] getPublicKey() {
+        
+        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+       
+        
+        KeyStore ks = session.find(KeyStore.class, 0);
+        return ks.getPublicKey();
     }
 }

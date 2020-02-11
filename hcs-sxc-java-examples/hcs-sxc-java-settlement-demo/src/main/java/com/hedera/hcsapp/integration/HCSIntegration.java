@@ -33,7 +33,7 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
 import com.hedera.hcs.sxc.interfaces.HCSResponse;
-import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
+import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.Utils;
@@ -95,7 +95,6 @@ public class HCSIntegration {
     public void processHCSMessage(HCSResponse hcsResponse) {
         try {
             ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(hcsResponse.getMessage());
-
             SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessage.getBusinessProcessMessage().toByteArray());
             // (CREDIT_PENDING , r ,threadId ,credit) => (CREDIT_AWAIT_ACK ,r ,threadId , credit[threadId].txId=r.MessageId)
             String threadId = settlementBPM.getThreadID();
@@ -632,7 +631,7 @@ public class HCSIntegration {
     }
     
     private void deleteData() {
-        SxcMessagePersistence persistence = this.appData.getHCSCore().getMessagePersistence();
+        SxcPersistence persistence = this.appData.getHCSCore().getMessagePersistence();
 
         persistence.clear();
         

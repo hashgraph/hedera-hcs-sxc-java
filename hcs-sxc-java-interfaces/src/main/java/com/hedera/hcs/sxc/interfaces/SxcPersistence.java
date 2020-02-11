@@ -32,8 +32,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
-
-public interface SxcMessagePersistence {
+public interface SxcPersistence {
     // Hibernate properties
     public void setHibernateProperties(Map<String, String> hibernateProperties);
     
@@ -57,6 +56,13 @@ public interface SxcMessagePersistence {
     public void storeApplicationMessage(ApplicationMessageID applicationMessageId, ApplicationMessage applicationMessage);
     public Map<String, ApplicationMessage> getApplicationMessages();
     public ApplicationMessage getApplicationMessage(String applicationMessageId) throws InvalidProtocolBufferException;
+    
+    // secret key  and keySpec holder for key rotation
+    public void storeSecretKey(byte[] secretKey);
+    public byte[] getSecretKey();
+   
+    public void storePublicKey(byte[] secretKey);
+    public byte[] getPublicKey();
     
     // consensus timestamp
     public Instant getLastConsensusTimestamp();

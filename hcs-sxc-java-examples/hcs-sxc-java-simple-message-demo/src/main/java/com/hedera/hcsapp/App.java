@@ -49,7 +49,7 @@ public final class App {
         
         // Simplest setup and send
         Config config = new Config();
-        HCSCore hcsCore = new HCSCore(appId);
+        HCSCore hcsCore = HCSCore.INSTANCE.singletonInstanceDefault(appId);
 
         System.out.println("****************************************");
         System.out.println("** Welcome to a simple HCS demo");
@@ -81,7 +81,7 @@ public final class App {
             } else {
                 try {
                     new OutboundHCSMessage(hcsCore)
-                        .overrideEncryptedMessages(false)
+                        //.overrideEncryptedMessages(false)
                         .overrideMessageSignature(false)
                         .sendMessage(topicIndex, userInput.getBytes());
     

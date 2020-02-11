@@ -20,6 +20,7 @@ package com.hedera.hcs.sxc.consensus;
  * ‍
  */
 
+import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
 
 import java.time.Duration;
@@ -38,34 +39,46 @@ import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.config.Topic;
-import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
+import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
+import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
+import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcs.sxc.plugins.Plugins;
 import com.hedera.hcs.sxc.proto.AccountID;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 import com.hedera.hcs.sxc.proto.ApplicationMessageID;
+import com.hedera.hcs.sxc.proto.KeyRotationInitialise;
 import com.hedera.hcs.sxc.proto.Timestamp;
 
 import java.util.Arrays;
+import java.util.NoSuchElementException;
+import javax.crypto.KeyAgreement;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.tuple.Pair;
 
 @Log4j2
 public final class OutboundHCSMessage {
 
     private boolean signMessages = false;
     private boolean encryptMessages = false;
+    private byte[] overrideMessageEncryptionKey = null; 
     private boolean rotateKeys = false;
     private int rotationFrequency = 0;
-    private Map<AccountId, String> nodeMap = new HashMap<AccountId, String>();
+    private byte[] messageEncryptionKey = null;
+    private Map<AccountId, String> nodeMap = new HashMap<>();
     private AccountId operatorAccountId = new AccountId(0, 0, 0);
     private Ed25519PrivateKey ed25519PrivateKey;
-    private List<Topic> topics = new ArrayList<Topic>();
     private long hcsTransactionFee = 0L;
+    private List<Topic> topics;
     private TransactionId transactionId = null;
-    private SxcMessagePersistence persistence;
+    private SxcPersistence persistencePlugin;
+    private SxcMessageEncryption messageEncryptionPlugin;
+    private SxcKeyRotation keyRotationPlugin;
+    private HCSCore hcsCore;
 
     public OutboundHCSMessage(HCSCore hcsCore) throws Exception {
+        this.hcsCore = hcsCore;
         this.signMessages = hcsCore.getSignMessages();
         this.encryptMessages = hcsCore.getEncryptMessages();
         this.rotateKeys = hcsCore.getRotateKeys();
@@ -76,10 +89,23 @@ public final class OutboundHCSMessage {
         this.hcsTransactionFee = hcsCore.getMaxTransactionFee();
 
         // load persistence implementation at runtime
-        Class<?> persistenceClass = Plugins.find("com.hedera.hcs.sxc.plugin.persistence.*", "com.hedera.hcs.sxc.interfaces.SxcMessagePersistence", true);
-        this.persistence = (SxcMessagePersistence)persistenceClass.newInstance();
+        Class<?> persistenceClass = Plugins.find("com.hedera.hcs.sxc.plugin.persistence.*", "com.hedera.hcs.sxc.interfaces.SxcPersistence", true);
+        this.persistencePlugin = (SxcPersistence)persistenceClass.newInstance();
+        
+        
+        if(this.encryptMessages){
+            Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
+            this.messageEncryptionPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
+        }
+        
+        if(this.rotateKeys){
+            
+            Class<?> messageKeyRotationClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcKeyRotation", true);
+            this.keyRotationPlugin = (SxcKeyRotation)messageKeyRotationClass.newInstance();
+        }
     }
 
+    
     public boolean getOverrideMessageSignature() {
         return this.signMessages;
     }
@@ -92,7 +118,7 @@ public final class OutboundHCSMessage {
     public boolean getOverrideEncryptedMessages() {
         return this.encryptMessages;
     }
-
+ 
     public OutboundHCSMessage overrideEncryptedMessages(boolean encryptMessages) {
         this.encryptMessages = encryptMessages;
         return this;
@@ -138,11 +164,17 @@ public final class OutboundHCSMessage {
         this.ed25519PrivateKey = ed25519PrivateKey;
         return this;
     }
-
+    
     public TransactionId getFirstTransactionId() {
         return this.transactionId;
     }
 
+    
+    public OutboundHCSMessage overrideMessageEncryptionKey (byte[] messageEncryptionKey){
+        this.overrideMessageEncryptionKey = messageEncryptionKey;
+        return this;
+    }
+    
     public OutboundHCSMessage withFirstTransactionId(TransactionId transactionId) {
         this.transactionId = transactionId;
         return this;
@@ -156,6 +188,7 @@ public final class OutboundHCSMessage {
      * @throws HederaNetworkException
      * @throws IllegalArgumentException
      * @throws Exception
+     * @return TransactionId
      */
     public TransactionId sendMessage(int topicIndex, byte[] message) throws Exception {
 
@@ -163,18 +196,24 @@ public final class OutboundHCSMessage {
 
         }
         if (encryptMessages) {
-
-        }
-        if (rotateKeys) {
-            int messageCount = 0; //TODO - keep track of messages app-wide, not just here. ( per topic )
-            if (messageCount > rotationFrequency) {
+            if (this.overrideMessageEncryptionKey != null) {
+                this.messageEncryptionKey = this.overrideMessageEncryptionKey;
+                message = messageEncryptionPlugin.encrypt(this.messageEncryptionKey, message);
+     
+            } else if (hcsCore.getMessageEncryptionKey() != null){ // get it from .env
+                this.messageEncryptionKey = hcsCore.getMessageEncryptionKey();
+                message = messageEncryptionPlugin.encrypt(this.messageEncryptionKey, message);
+            } else {
+                throw new NoSuchElementException("Encryption set to true, but key not found, neither in .env nor provided by builder");
             }
         }
+
+   
 
         // generate TXId for main and first message it not already set by caller
         TransactionId firstTransactionId = (this.transactionId == null) ? new TransactionId(this.operatorAccountId) : this.transactionId;
 
-        //break up
+        //break up  (and the whole encrypted messages
         List<ApplicationMessageChunk> parts = chunk(firstTransactionId, message);
         // send each part to the network
 
@@ -195,43 +234,119 @@ public final class OutboundHCSMessage {
                     .setMessage(messageChunk.toByteArray())
                     .setTopicId(this.topics.get(topicIndex).getConsensusTopicId())
                     .setTransactionId(transactionId);
-
+                
                 if ((this.topics.get(topicIndex).getSubmitKey() != null) && (! this.topics.get(topicIndex).getSubmitKey().isEmpty())) {
                     // sign if we have a submit key
                     tx.build(client).sign(Ed25519PrivateKey.fromString(this.topics.get(topicIndex).getSubmitKey()));
                 }
 
                 // persist the transaction
-                this.persistence.storeTransaction(transactionId, tx);
+                this.persistencePlugin.storeTransaction(transactionId, tx);
 
                 log.info("Executing transaction");
                 TransactionId txId = tx.execute(client);
-
+                
                 TransactionReceipt receipt = txId.getReceipt(client, Duration.ofSeconds(30));
 
                 transactionId = new TransactionId(this.operatorAccountId);
 
-                log.info("status is {} "
+                log.info("Message receipt status is {} "
                         + "sequence no is {}"
                         ,receipt.status
                         ,receipt.getConsensusTopicSequenceNumber()
                 );
+            } // end-for
+            
+            // after sending all parts check if key rotation is due
+            if (rotateKeys) {
+                if (!this.encryptMessages) {
+                    throw new Exception("Trying to initiate key rotation but encryption is disabled");   
+                }
+                   
+                int messageCount = -1; //TODO - keep track of messages pair-wise, not just here. ( per topic )
+                if (messageCount < rotationFrequency) { // TODO - Fires everytime
+                        
+                    //1) Send initiate  Message so that his onHCSMessage can pick it up
+                    //2) If onHCSMessage receives KR1 then update key and KR2
+                    //3) If onHCSMessage receives KR2 then update key using stored KeyAgreement
+                    
+                    Pair<KeyAgreement, byte[]> initiate = keyRotationPlugin.initiate();
+                    //store the KeyAgreement to HCSCore to refetch when finalising
+                    hcsCore.setTempKeyAgreement(initiate.getLeft());
+                    //prepare yielded PK and send to network
+                    KeyRotationInitialise kr1 = KeyRotationInitialise.newBuilder()
+                            .setInitiatorPublicKeyEncoded(ByteString.copyFrom(initiate.getRight()))
+                            .build();
+                    Any anyPack = Any.pack(kr1);
+                    byte[] encryptedAnyPackedChunkBody = messageEncryptionPlugin.encrypt(this.messageEncryptionKey, anyPack.toByteArray());
 
-            }
+                    
+                    TransactionId newTransactionId = new TransactionId(hcsCore.getOperatorAccountId());
+                    ApplicationMessageID newAppId = ApplicationMessageID.newBuilder()
+                                    .setAccountID(AccountID.newBuilder()
+                                            .setShardNum(newTransactionId.accountId.shard)
+                                            .setRealmNum(newTransactionId.accountId.realm)
+                                            .setAccountNum(newTransactionId.accountId.account)
+                                            .build()
+                                    )
+                                    .setValidStart(Timestamp.newBuilder()
+                                            .setSeconds(newTransactionId.validStart.getEpochSecond())
+                                            .setNanos(newTransactionId.validStart.getNano())
+                                            .build()
+                                    ).build();
+                    
+                    ApplicationMessageChunk appChunk = ApplicationMessageChunk.newBuilder()
+                            .setApplicationMessageId(newAppId)
+                            .setChunkIndex(1)
+                            .setChunksCount(1)
+                            .setMessageChunk(
+                                    //fit an antire ApplicationMessage in the chunk and set body message to the encrypted stuff
+                                    ApplicationMessage.newBuilder()
+                                        .setApplicationMessageId(newAppId)
+                                        //TODO: set signature 
+                                        .setBusinessProcessMessage(ByteString.copyFrom(encryptedAnyPackedChunkBody))
+                                        //TODO: set hash
+                                        .build()
+                                        .toByteString()
+                        ).build();
+                                
+                                
+                   
+                        ConsensusMessageSubmitTransaction txRotation = new ConsensusMessageSubmitTransaction()
+                            .setMessage(appChunk.toByteArray())
+                            .setTopicId(this.topics.get(topicIndex).getConsensusTopicId())
+                            .setTransactionId(newTransactionId);
+                        
+                        // persist the transaction
+                        this.persistencePlugin.storeTransaction(newTransactionId, txRotation);
+                        TransactionId txIdKR1 =  txRotation.execute(client);
+                        
+                        TransactionReceipt receiptKR1 = txIdKR1.getReceipt(client, Duration.ofSeconds(30));
+                       
+                        log.info("Message receipt for KR1 status is {} "
+                                + "sequence no is {}"
+                                ,receiptKR1.status
+                                ,receiptKR1.getConsensusTopicSequenceNumber()
+                        );
+                    }
+                }
+            
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (TimeoutException e) {
             // do nothing
         } catch (Exception e) {
             log.error(e);
-            throw e;
+            e.printStackTrace();
+        } finally {
+            
         }
 
         return firstTransactionId;
     }
 
     public static  List<ApplicationMessageChunk> chunk(TransactionId transactionId,  byte[] message) {
-        
+
         ApplicationMessageID transactionID = ApplicationMessageID.newBuilder()
                 .setAccountID(AccountID.newBuilder()
                         .setShardNum(transactionId.accountId.shard)

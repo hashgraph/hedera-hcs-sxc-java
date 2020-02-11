@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
 
 # HCS-SXC-Java
-
+   
 The HCS SXC Java project (SDK eXtension Components) is a set of pre-built components that aim to provide additional functionality over and above the java SDK for HCS to make it easier and quicker to develop applications.
 
 These components use the Hedera Java SDK to communicate with Hedera's HCS service and add a number of features (Italicised still in development/planning) as follows:
@@ -79,6 +79,7 @@ Looking through the java project, we have the following Maven components/artifac
         * hcs-sxc-java-settlement-demo
     * hcs-sxc-java-proto
     * hcs-sxc-java-plugins
+        * hcs-sxc-java-plugins-cryptography
         * hcs-sxc-java-plugins-persistence-in-memory
         * hcs-sxc-java-plugins-persistence-hibernate
         * hcs-sxc-java-plugins-mirror-direct
@@ -103,7 +104,7 @@ A set of standard interfaces or structures for the various components to communi
 * HCSCallBackFromMirror - so that an app can register with the `hcs-sxc-java-core` for callbacks
 * HCSCallBackToAppInterface - so that the `hcs-sxc-java-core` can call back to an app
 * MirrorSubscriptionInterface - so that plugins can be made to subscribe to mirror notifications
-* SxcMessagePersistence - so that plugins can be used to persist data
+* SxcPersistence - so that plugins can be used to persist data
 
 Defined in the `hcs-sxc-java-Interfaces` project, these are data structures that are shared between components.
 
@@ -117,10 +118,15 @@ Defined in the `hcs-sxc-java-Interfaces` project, these are data structures that
 This project contains a series of plugins to be used in conjunction with the hcs sxc core component, at the time of writing, the following plug-ins are available.
 The choice of a plug-in architecture is to enable additional plugins to be developed without needing to change the projects that may later depend on them and so to offer extensibility with a choice of options.
 
+* hcs-sxc-java-plugins-cryptography - plugin to encrypt messages and manage key rotation
 * hcs-sxc-java-plugins-mirror-direct - plugin to enable the `hcs-sxc-java-core` to subscribe to mirror notifications directly
 * hcs-sxc-java-plugins-mirror-queue-artemis - plugin to enable the `hcs-sxc-java-core` to subscribe to mirror notifications via an Artemis Message Queue (which receives messages via the `hcs-sxc-java-relay` component)
 * hcs-sxc-java-plugins-persistence-hibernate - plug in to provide data persistence in a database through hibernate
 * hcs-sxc-java-plugins-persistence-in-memory - plug in to provide data persistence in memory
+
+#### hcs-sxc-java-plugins-cryptography
+
+Manages message encryption and decryption while also optionally dealing with key rotation.
 
 #### hcs-sxc-java-plugins-mirror-direct
 
@@ -159,7 +165,7 @@ coreHibernate:
 The list of configuration entries is variable, you may add or remove entries as necessary for your particular database.
 Also, if `{appid}` is found in any of the values, it will be swapped at run time for the id of the instance of the application being run.
 
-Further, to ensure the appropriate database vendors' dependencies are available when compiling, the `hcs-sxc-java-plugins-persistence-hibernate` project makes use of profiles in its `pom.xml`.
+Further, to ensure the appropriate database vendors' dependencies are available when compiling, the `hcs-sxc-java-plugins-persistence-hibernate` project makes use of profiles in its `pom.xml`. 
 
 For example:
 
@@ -264,7 +270,7 @@ for in database
 
 *Note 1: Version numbers may change over time.*
 
-*Note 2: Class loading should happen from the class path if the correct jar is found, it may therefore not be absolutely necessary to declare dependencies here since loading of a class matching the appropriate interface (`MirrorSubscriptionInterface` or `SxcMessagePersistence`) will happen dynamically when the application starts.*
+*Note 2: Class loading should happen from the class path if the correct jar is found, it may therefore not be absolutely necessary to declare dependencies here since loading of a class matching the appropriate interface (`MirrorSubscriptionInterface` or `SxcPersistence`) will happen dynamically when the application starts.*
 
 ## Configuration files
 
@@ -381,9 +387,12 @@ OPERATOR_KEY=
 OPERATOR_ID=0.0.xxxx
 # APP Net
 APP_ID=0
+# Message encryption key (HEX)
+ENCRYPTION_KEY=308204be02...
 ```
 
-The `OPERATOR_KEY` is the private key of the account identified by `OPERATOR_ID`.
+The `OPERATOR_KEY` is the HH private key of the account identified by `OPERATOR_ID`.
+The `ENCRYPTION_KEY` is used only if message encryption is enabled in in `config.yaml`
 
 *Note: When running in your java IDE or standalone in a command line, the host's environment variables take precedence over those in the `.env` file.*
 
@@ -674,21 +683,23 @@ Whenever a participant performs and action in the UI, this results in a HCS tran
 To run the examples outside of docker and override `.env` variables run:
 
 ```
-mvnw exec:java -Dexec.mainClass="com.hedera.hcsapp.Application"  -Pfatjar  -DAPP_ID=1 -DOPERATOR_ID=0.0.xxxx -DOPERATOR_KEY=302e0208...94329fb
+mvnw exec:java -Dexec.mainClass="com.hedera.hcsapp.Application"  -Pfatjar  -DAPP_ID=1 -DOPERATOR_ID=0.0.1010 -DOPERATOR_KEY=302e0208...94329fb
 ```
 If you want to run multiple clients from the command line simultaneously then make sure the server ports are not occupied.
 
-Note that the  `./config/docker-compose.yaml` file is consulted even when running from then command line. If you specify the `-DAPP_ID` argument then the port mapping is selected from the `yaml` file.
-
+Note that the  `docker-compose.yaml` file is consulted even when running from then command line. If you specify the `-DAPP_ID`  argument then the port mapping is selected from the `yaml` file. 
 You can override the port by setting:
 
-```
--Dserver.port=8081
-```
+
+```-Dserver.port=8081```
+
+
 
 The demo provides helper functions to delete save and restore the local demo database however, these have undefined behavior when `hcs-sxc-plugins-persistence-in-memory` is chosen.
 
+
 You can also specify these `-D` input values in your IDE so that you can run several instances of the application in the IDE, this can help when debugging. To enable the debugger use the `-Djpda.listen=maven` flag.
+
 
 ## Contributing
 

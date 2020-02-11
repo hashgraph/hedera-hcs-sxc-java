@@ -22,6 +22,7 @@ package com.hedera.hcs.sxc.config;
 
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
+import com.hedera.hcs.sxc.utils.StringUtils;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.log4j.Log4j2;
@@ -87,7 +88,13 @@ public final class Environment {
         return Integer.parseInt(getEnvValue("APP_ID"));
     }
 
+    
+    public byte[] getMessageEncryptionKey() {
+        return StringUtils.hexStringToByteArray(getEnvValue("ENCRYPTION_KEY"));
+    }
+    
     public Dotenv getDotEnv() {
         return this.dotEnv;
     }
+
 }

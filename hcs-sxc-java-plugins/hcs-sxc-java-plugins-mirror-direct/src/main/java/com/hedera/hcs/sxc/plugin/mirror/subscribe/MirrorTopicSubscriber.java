@@ -1,6 +1,6 @@
 package com.hedera.hcs.sxc.plugin.mirror.subscribe;
 
-import java.nio.charset.StandardCharsets;
+
 
 /*-
  * ‌
@@ -32,9 +32,6 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.proto.Timestamp;
 import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
-import com.hedera.hashgraph.sdk.consensus.ConsensusClient;
-import com.hedera.hashgraph.sdk.consensus.ConsensusMessage;
-import com.hedera.hashgraph.sdk.consensus.ConsensusClient.Subscription;
 import com.hedera.hashgraph.sdk.mirror.MirrorClient;
 import com.hedera.hashgraph.sdk.mirror.MirrorConsensusTopicQuery;
 import com.hedera.hashgraph.sdk.mirror.MirrorConsensusTopicResponse;
@@ -57,22 +54,6 @@ public final class MirrorTopicSubscriber extends Thread {
     private ConsensusTopicId topicId;
     private Optional<Instant> subscribeFrom;
     private HCSCallBackFromMirror onHCSMessageCallback;
-    
-    public class SusbcriberCloseHook extends Thread {
-        private Subscription subscription;
-        public SusbcriberCloseHook(Subscription subscription) {
-           this.subscription = subscription;
-        }
-        @Override
-        public void run() {
-            try {
-                log.info("SusbcriberCloseHook - closing");
-                this.subscription.unsubscribe();
-            } catch (Exception e) {
-                log.error(e);
-            }
-        }
-    }
     
     public MirrorTopicSubscriber(String mirrorAddress, int mirrorPort, ConsensusTopicId topicId, Optional<Instant> subscribeFrom, HCSCallBackFromMirror onHCSMessageCallback) {
         this.mirrorAddress = mirrorAddress;
@@ -117,11 +98,6 @@ public final class MirrorTopicSubscriber extends Thread {
                 subscribe();
             }
             );
-//        log.info("Adding shutdown hook to subscription");
-//        Runtime.getRuntime().addShutdownHook(new SusbcriberCloseHook(subscription));
-//        for (;;) {
-//          Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(30));
-//        }
         
         } catch (Exception e1) {
             log.error(e1);
@@ -146,7 +122,7 @@ public final class MirrorTopicSubscriber extends Thread {
           ApplicationMessageChunk messagePart;
         try {
             messagePart = ApplicationMessageChunk.parseFrom(message);
-            log.info("Got message from mirror - calling back");
+          log.info("Got message from mirror - calling back");
             onHCSMessageCallback.partialMessage(messagePart);
         } catch (InvalidProtocolBufferException e) {
             log.error(e);

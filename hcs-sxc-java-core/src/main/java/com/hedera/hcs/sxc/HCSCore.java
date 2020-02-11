@@ -38,10 +38,11 @@ import com.hedera.hcs.sxc.config.YAMLConfig;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import lombok.extern.log4j.Log4j2;
 
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
 import javax.crypto.KeyAgreement;
-
+@Log4j2
 public enum HCSCore { // singleton implementation
     
     INSTANCE();
@@ -87,15 +88,14 @@ public enum HCSCore { // singleton implementation
     }
     
     private void init(long appId, String configFilePath, String environmentFilePath) {
-       
         
         try {    
             this.environment = new Environment(environmentFilePath);
             this.config = new Config(configFilePath);
             this.yamlConfig = config.getConfig();
         } catch (IOException ex) {
-            ex.printStackTrace();
-            System.out.println("Can not load one of " + environmentFilePath + ", " + configFilePath);
+            log.error(ex);
+            log.error("Can not load one of " + environmentFilePath + ", " + configFilePath);
             System.exit(0);
         }
         
@@ -126,10 +126,9 @@ public enum HCSCore { // singleton implementation
             this.messageEncryptionKey  = this.environment.getMessageEncryptionKey();
         }
         if(this.rotateKeys && !this.encryptMessages){
-            System.out.println("config.ini has key rotation enabled, however encryption is disabled. Exiting...");
+            log.error("config.ini has key rotation enabled, however encryption is disabled. Exiting...");
             System.exit(0);
         }
-        
         
         // replace hibernate configuration {appid}
         yamlConfig.getCoreHibernate().forEach((key,value) -> this.hibernateConfig.put(key, value.replace("{appid}",  Long.toString(this.applicationId))));
@@ -137,12 +136,12 @@ public enum HCSCore { // singleton implementation
     
     
     public HCSCore singletonInstanceDefault(long appId){
-        if(this.applicationId==-1) init(appId, "./config/config.yaml", "./config/.env");
+        if(this.applicationId == -1) init(appId, "./config/config.yaml", "./config/.env");
         return INSTANCE;
     }
 
     public HCSCore singletonInstanceWithAppIdEnvAndConfig (long appId, String configFilePath, String environmentFilePath) {
-        if(this.applicationId==-1) init(appId,configFilePath, environmentFilePath);
+        if(this.applicationId == -1) init(appId,configFilePath, environmentFilePath);
         return INSTANCE;
     }
     

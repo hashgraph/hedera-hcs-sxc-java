@@ -32,13 +32,13 @@
     </licenses>
 
     <modules>
-      <module>hcs-sxc-java-core</module>
-      <module>hcs-sxc-java-relay</module>
-      <module>hcs-sxc-java-interfaces</module>
-      <module>hcs-sxc-java-examples</module>
-      <module>hcs-sxc-java-proto</module>
-      <module>hcs-sxc-java-plugins</module>
-      <module>hcs-sxc-java-coverage</module>
+        <module>hcs-sxc-java-core</module>
+        <module>hcs-sxc-java-relay</module>
+        <module>hcs-sxc-java-interfaces</module>
+        <module>hcs-sxc-java-examples</module>
+        <module>hcs-sxc-java-proto</module>
+        <module>hcs-sxc-java-plugins</module>
+        <module>hcs-sxc-java-coverage</module>
     </modules>
 
     <organization>
@@ -51,6 +51,8 @@
         <maven.compiler.source>10</maven.compiler.source>
         <maven.compiler.target>10</maven.compiler.target>
         <java.version>10</java.version>
+        <!-- for jacoco -->
+        <argLine>-Xms512m</argLine>
 
         <!-- dependencies -->
         <artemis-jms-client-all.version>2.10.1</artemis-jms-client-all.version>
@@ -84,7 +86,7 @@
         <lombok.version>1.18.10</lombok.version>
 
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-        <maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>        
+        <maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
         <maven-shade-plugin.version>3.2.0</maven-shade-plugin.version>
 
         <os-maven-plugin.version>1.6.1</os-maven-plugin.version>
@@ -105,9 +107,9 @@
 
     <dependencies>
         <dependency>
-          <groupId>io.grpc</groupId>
-          <artifactId>grpc-netty-shaded</artifactId>
-          <version>${grpc-netty.version}</version>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty-shaded</artifactId>
+            <version>${grpc-netty.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.classgraph</groupId>
@@ -117,65 +119,59 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-          <version>${log4j.version}</version>
+            <version>${log4j.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>compile</scope>
-          <version>${lombok.version}</version>
+            <version>${lombok.version}</version>
         </dependency>
 
-      <dependency>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava</artifactId>
-          <version>${guava.version}</version>
-      </dependency>
-      <dependency>
-          <groupId>org.hamcrest</groupId>
-          <artifactId>hamcrest-core</artifactId>
-          <version>${hamcrest-core.version}</version>
-          <scope>test</scope>
-      </dependency>
-      <dependency>
-          <groupId>commons-codec</groupId>
-          <artifactId>commons-codec</artifactId>
-          <version>${commons.version}</version>
-      </dependency>
-      <dependency>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-databind</artifactId>
-          <version>${jackson-databind.version}</version>
-      </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>${hamcrest-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>${commons.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson-databind.version}</version>
+        </dependency>
 
-      <dependency>
-          <groupId>org.apache.commons</groupId>
-          <artifactId>commons-lang3</artifactId>
-          <version>${commons-lang3.version}</version>
-      </dependency>
-      <dependency>
-          <groupId>org.junit.jupiter</groupId>
-          <artifactId>junit-jupiter</artifactId>
-          <version>${junit-jupiter.version}</version>
-          <scope>test</scope>
-      </dependency>
-      <dependency>
-          <groupId>com.google.protobuf</groupId>
-          <artifactId>protobuf-java</artifactId>
-          <version>${protobuf-java.version}</version>
-      </dependency>
-      <dependency>
-          <groupId>com.hedera.hashgraph</groupId>
-          <artifactId>sdk</artifactId>
-          <version>${hedera-sdk.version}</version>
-      </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>${protobuf-java.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hedera.hashgraph</groupId>
+            <artifactId>sdk</artifactId>
+            <version>${hedera-sdk.version}</version>
+        </dependency>
 
-      <dependency>
-          <groupId>io.github.cdimascio</groupId>
-          <artifactId>java-dotenv</artifactId>
-          <version>${java-dotenv.version}</version>
-      </dependency>
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>java-dotenv</artifactId>
+            <version>${java-dotenv.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
@@ -183,136 +179,135 @@
         </dependency>
 
     </dependencies>
-  <build>
-    <pluginManagement>
-       <plugins>
-        
-           
-    <!--
-         <plugin>
-             <groupId>org.apache.maven.plugins</groupId>
-             <artifactId>maven-surefire-plugin</artifactId>
-             <version>${surefire.version}</version>
-             <configuration>
-                 <argLine>${argLine} -Xms512m</argLine>
-             </configuration>
-         </plugin>
-       --> 
-         <plugin>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-            <version>${jacoco.version}</version>
-            <executions>
-                <execution>
-                    <goals>
-                        <goal>prepare-agent</goal>
-                    </goals>
-                </execution>
-                <execution>
-                    <id>report</id>
-                    <phase>test</phase>
-                    <goals>
-                        <goal>report</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
-        
-       
-        
-        
-      <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>build-helper-maven-plugin</artifactId>
-          <version>${build-helper-maven-plugin.version}</version>
-          <executions>
-              <execution>
-                  <phase>generate-sources</phase>
-                  <goals>
-                      <goal>add-source</goal>
-                  </goals>
-                  <configuration>
-                      <sources>
-                        <source>src/main/java</source>
-                      </sources>
-                  </configuration>
-              </execution>
-              <execution>
-                  <id>add-test-source</id>
-                  <phase>generate-test-sources</phase>
-                  <goals>
-                      <goal>add-test-source</goal>
-                  </goals>
-                  <configuration>
-                      <sources>
-                        <source>src/test/java</source>
-                      </sources>
-                  </configuration>
-              </execution>
-          </executions>
-      </plugin>
-      <plugin>
-        <!-- To update license headers: ./mvnw license:update-file-header -N -->
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>license-maven-plugin</artifactId>
-          <version>${license-maven-plugin.version}</version>
-          <configuration>
-              <canUpdateCopyright>true</canUpdateCopyright>
-              <excludes>
-                  <exclude>**/target/**/*</exclude>
-                  <exclude>**/.mvn/**/*</exclude>
-              </excludes>
-              <includes>
-                <include>**/*.java</include>
-                <include>**/*.proto</include>
-              </includes>
-              <licenseName>apache_v2</licenseName>
-              <roots>
-                  <root>.</root>
-              </roots>
-              <!-- These contain unprintable characters to suppress
-                  showing the delimiters -->
-              <processEndTag>‍</processEndTag>
-              <processStartTag>‌</processStartTag>
-              <sectionDelimiter>​</sectionDelimiter>
-          </configuration>
-          <executions>
-                <execution>
-                    <id>first</id>
-                    <goals>
-                        <goal>update-file-header</goal>
-                    </goals>
-                    <phase>process-sources</phase>
-                </execution>
-            </executions>
-        </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <version>${maven-compiler-plugin.version}</version>
-            <configuration>
-                <release>${java.version}</release>
-            </configuration>
-            <dependencies>
-                <dependency>
-                    <groupId>org.ow2.asm</groupId>
-                    <artifactId>asm</artifactId>
-                    <version>${asm.version}</version> <!-- Use newer version of ASM -->
-                </dependency>
-            </dependencies>
-        </plugin>
-        <!--
-        <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>${surefire.version}</version>
-        </plugin>
-        -->
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <version>${failsafe.version}</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${surefire.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${build-helper-maven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>add-source</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>src/main/java</source>
+                                </sources>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>add-test-source</id>
+                            <phase>generate-test-sources</phase>
+                            <goals>
+                                <goal>add-test-source</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>src/test/java</source>
+                                </sources>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <!-- To update license headers: ./mvnw license:update-file-header 
+                        -N -->
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>${license-maven-plugin.version}</version>
+                    <configuration>
+                        <canUpdateCopyright>true</canUpdateCopyright>
+                        <excludes>
+                            <exclude>**/target/**/*</exclude>
+                            <exclude>**/.mvn/**/*</exclude>
+                        </excludes>
+                        <includes>
+                            <include>**/*.java</include>
+                            <include>**/*.proto</include>
+                        </includes>
+                        <licenseName>apache_v2</licenseName>
+                        <roots>
+                            <root>.</root>
+                        </roots>
+                        <!-- These contain unprintable characters to suppress 
+                            showing the delimiters -->
+                        <processEndTag>‍</processEndTag>
+                        <processStartTag>‌</processStartTag>
+                        <sectionDelimiter>​</sectionDelimiter>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>first</id>
+                            <goals>
+                                <goal>update-file-header</goal>
+                            </goals>
+                            <phase>process-sources</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                        <release>${java.version}</release>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.ow2.asm</groupId>
+                            <artifactId>asm</artifactId>
+                            <version>${asm.version}</version> <!-- Use newer version of ASM -->
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${failsafe.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    <profiles>
+        <profile>
+            <id>ci</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${jacoco.version}</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+    </profiles>
 </project>

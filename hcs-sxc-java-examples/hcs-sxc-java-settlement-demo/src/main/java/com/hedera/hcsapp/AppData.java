@@ -71,7 +71,8 @@ public final class AppData {
         hcsCore = HCSCore.INSTANCE.singletonInstanceDefault(appId);
         init("./config/config.yaml", "./config/.env", "./config/docker-compose.yml");
     }
-    public AppData(String configFilePath, String environmentFilePath, String dockerFilePath) throws Exception {
+    public AppData(long appId, String configFilePath, String environmentFilePath, String dockerFilePath) throws Exception {
+        this.appId = appId;
         this.hcsCore =  HCSCore.INSTANCE.singletonInstanceWithAppIdEnvAndConfig(this.appId, configFilePath, environmentFilePath);
         init(configFilePath, environmentFilePath, dockerFilePath);
     }

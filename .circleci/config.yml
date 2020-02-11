@@ -20,7 +20,7 @@ jobs:
 #HCS SXC
       - run:
           name: Running maven (validate, compile, test, package)
-          command: mvn package
+          command: mvn package -Pci
       # - save_cache:
       #     key: maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
       #     paths:

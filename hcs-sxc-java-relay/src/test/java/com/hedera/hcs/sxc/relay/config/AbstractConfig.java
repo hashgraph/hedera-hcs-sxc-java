@@ -1,5 +1,8 @@
 package com.hedera.hcs.sxc.relay.config;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /*-
  * ‌
  * hcs-sxc-java
@@ -20,12 +23,10 @@ package com.hedera.hcs.sxc.relay.config;
  * ‍
  */
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 
-public class AbstractConfigTest {
+public class AbstractConfig {
     protected final void assertTopicId(long shardNum, long realmNum, long topicNum, ConsensusTopicId topicId) {
         assertAll(
                 () -> assertEquals (shardNum, topicId.shard)

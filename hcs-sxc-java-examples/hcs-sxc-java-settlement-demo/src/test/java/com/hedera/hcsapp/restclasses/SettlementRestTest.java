@@ -1,16 +1,24 @@
 package com.hedera.hcsapp.restclasses;
 
-import static org.junit.Assert.assertEquals;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.States;
@@ -23,13 +31,19 @@ import com.hedera.hcsapp.repository.SettlementItemRepository;
 import com.hedera.hcsapp.restclasses.SettlementRestTest;
 
 @ExtendWith(SpringExtension.class)
+//@TestInstance(Lifecycle.PER_CLASS)
 public class SettlementRestTest {    
     
     @MockBean
-    private static SettlementItemRepository settlementItemRepository;
+    private SettlementItemRepository settlementItemRepository;
     
     @MockBean
-    private static CreditRepository creditRepository;
+    private CreditRepository creditRepository;
+    
+    @BeforeEach
+    public void setup(){
+        MockitoAnnotations.initMocks(this); //without this you will get NPE
+    }
     
     @Test
     public void testSettlementRest() throws Exception {
@@ -46,7 +60,13 @@ public class SettlementRestTest {
         credit.get().setReference("creditreference");
         credit.get().setStatus("creditstatus");
         credit.get().setThreadId("creditthreadId");
-        
+
+        if (creditRepository == null) {
+            System.out.println("Credit repository is null");
+            System.exit(0);
+        } else {
+            System.out.println("Credit repository is NOT null");
+        }
         Mockito.when(creditRepository.findById("creditthreadId"))
             .thenReturn(credit);
         
@@ -62,7 +82,7 @@ public class SettlementRestTest {
         Mockito.when(settlementItemRepository.findAllSettlementItems("threadid"))
             .thenReturn(settlementItems);
 
-        AppData appData = new AppData("./src/test/resources/config.yaml", "./src/test/resources/dotenv.sample", "./src/test/resources/docker-compose.yml");
+        AppData appData = new AppData(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.sample", "./src/test/resources/docker-compose.yml");
         
         Settlement settlement = new Settlement();
         settlement.setAdditionalNotes("additionalNotes");

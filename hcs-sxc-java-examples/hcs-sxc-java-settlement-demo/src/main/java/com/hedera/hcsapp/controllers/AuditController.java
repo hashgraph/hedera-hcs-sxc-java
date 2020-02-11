@@ -151,7 +151,7 @@ public class AuditController {
 
                 AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
                 auditApplicationMessage.setApplicationMessageId(applicationMessageId);
-                auditApplicationMessage.setMessage("Business Proccess Message ENCRYPTED");
+                auditApplicationMessage.setMessage("Business Process Message ENCRYPTED");
                 auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
 
             }

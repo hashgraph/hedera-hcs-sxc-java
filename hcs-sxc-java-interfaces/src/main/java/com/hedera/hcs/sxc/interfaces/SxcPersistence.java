@@ -31,10 +31,8 @@ import com.hedera.hcs.sxc.proto.ApplicationMessageID;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import javax.crypto.KeyAgreement;
 
-
-public interface SxcMessagePersistence {
+public interface SxcPersistence {
     // Hibernate properties
     public void setHibernateProperties(Map<String, String> hibernateProperties);
     

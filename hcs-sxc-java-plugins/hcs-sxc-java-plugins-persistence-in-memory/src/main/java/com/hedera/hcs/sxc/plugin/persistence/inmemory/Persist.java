@@ -35,11 +35,10 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.crypto.KeyAgreement;
 
 @Log4j2
-public class PersistMessages 
-        implements com.hedera.hcs.sxc.interfaces.SxcMessagePersistence{
+public class Persist 
+        implements com.hedera.hcs.sxc.interfaces.SxcPersistence{
     
     private Map<ApplicationMessageID, List<ApplicationMessageChunk>> partialMessages;
     private Map<String, ConsensusMessageSubmitTransaction> transactions;
@@ -48,7 +47,7 @@ public class PersistMessages
     
     private MessagePersistenceLevel persistenceLevel = MessagePersistenceLevel.FULL;
     
-    public PersistMessages() throws IOException{
+    public Persist() throws IOException{
         partialMessages = new HashMap<>();
         transactions = new HashMap<>();
         mirrorTopicMessages = new HashMap<>();

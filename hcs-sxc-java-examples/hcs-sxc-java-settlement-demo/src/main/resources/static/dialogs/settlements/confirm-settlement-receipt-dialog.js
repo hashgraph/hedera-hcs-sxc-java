@@ -21,11 +21,12 @@ function openAcceptSettlePaymentMade (threadId, otherUserId){
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 }
-            }).then(function(response) {
-                return response.json();
-            }).then(function(data) {
-                showSnackBarMessage("confirmation sent");
-
+	    	}).then(async function(response) {
+	    		if (response.status===200){
+	    			showSnackBarMessage("Confirmation sent");
+	    			await renderSettlementsPanel(otherUserId);
+	    			return response.json();
+	    		}
             }).catch(function(res){
                 alert(res);
             });

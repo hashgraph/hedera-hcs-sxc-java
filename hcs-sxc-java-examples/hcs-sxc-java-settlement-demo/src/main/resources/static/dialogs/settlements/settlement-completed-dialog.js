@@ -28,11 +28,12 @@ function openSettlementCompletedDialog(threadId, userName) {
                 'Content-Type': 'application/json'
             },
             body: postBody
-        }).then(function(response) {
-            return response.json();
-        }).then(function(data) {
-            showSnackBarMessage("Settlement paid Sent");
-
+    	}).then(async function(response) {
+    		if (response.status===200){
+                showSnackBarMessage("Settlement paid Sent");
+    			await renderSettlementsPanel(userName);
+    			return response.json();
+    		}
         }).catch(function(res){
             alert(res);
         });

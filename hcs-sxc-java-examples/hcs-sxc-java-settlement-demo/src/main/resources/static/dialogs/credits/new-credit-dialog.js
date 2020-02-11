@@ -5,8 +5,9 @@ function openNewCreditDialog(recipient) {
     newCreditDialog  = new mdc.dialog.MDCDialog(document.getElementById('new-credit-dialog'));
     event.preventDefault();
     styleTextFields();
-    styleSwitches();
     $newCreditDialog = document.getElementById('new-credit-dialog');
+    $newCreditDialog.querySelector('#new-credit-automatic').checked = false;
+    styleSwitches();
     /*Clear styles and values to reuse fields*/
     $newCreditDialog.querySelectorAll(".mdc-text-field input").forEach(function(e){
         e.parentElement.classList.remove('mdc-text-field--invalid');

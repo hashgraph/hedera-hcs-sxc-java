@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
-import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
+import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.entities.Credit;
@@ -129,7 +129,7 @@ public class AuditController {
 
         AuditApplicationMessages auditApplicationMessages = new AuditApplicationMessages();
         HCSCore hcsCore = appData.getHCSCore();
-        SxcMessagePersistence persistence = hcsCore.getMessagePersistence();
+        SxcPersistence persistence = hcsCore.getMessagePersistence();
 
         Map<String, ApplicationMessage> applicationMessages = persistence.getApplicationMessages();
 
@@ -167,7 +167,7 @@ public class AuditController {
 
         AuditHCSMessages auditHCSMessages = new AuditHCSMessages();
         HCSCore hcsCore = appData.getHCSCore();
-        SxcMessagePersistence persistence = hcsCore.getMessagePersistence();
+        SxcPersistence persistence = hcsCore.getMessagePersistence();
 
         Map<String, SxcConsensusMessage> mirrorResponses = persistence.getMirrorResponses();
 

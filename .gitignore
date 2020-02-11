@@ -81,9 +81,6 @@ hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/apps.yaml
 hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/docker-compose.yml
 hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/lastConsensusTime.txt
 hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/docker-compose.yml
-<<<<<<< HEAD
 hcs-sxc-java-basics
-=======
 hcs-sxc-java-coverage/target
->>>>>>> a37e9d798e77ff9f6eb6899d22d0867ecf876a49
 /hcs-sxc-java-plugins/hcs-sxc-java-plugins-cryptography/nbproject/

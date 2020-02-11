@@ -103,7 +103,7 @@ A set of standard interfaces or structures for the various components to communi
 * HCSCallBackFromMirror - so that an app can register with the `hcs-sxc-java-core` for callbacks
 * HCSCallBackToAppInterface - so that the `hcs-sxc-java-core` can call back to an app
 * MirrorSubscriptionInterface - so that plugins can be made to subscribe to mirror notifications
-* SxcMessagePersistence - so that plugins can be used to persist data
+* SxcPersistence - so that plugins can be used to persist data
 
 Defined in the `hcs-sxc-java-Interfaces` project, these are data structures that are shared between components.
 
@@ -264,7 +264,7 @@ for in database
 
 *Note 1: Version numbers may change over time.*
 
-*Note 2: Class loading should happen from the class path if the correct jar is found, it may therefore not be absolutely necessary to declare dependencies here since loading of a class matching the appropriate interface (`MirrorSubscriptionInterface` or `SxcMessagePersistence`) will happen dynamically when the application starts.*
+*Note 2: Class loading should happen from the class path if the correct jar is found, it may therefore not be absolutely necessary to declare dependencies here since loading of a class matching the appropriate interface (`MirrorSubscriptionInterface` or `SxcPersistence`) will happen dynamically when the application starts.*
 
 ## Configuration files
 

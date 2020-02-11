@@ -94,7 +94,6 @@
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
-                    <version>${jacoco.version}</version>
                     <artifactId>jacoco-maven-plugin</artifactId>
                 </plugin>
             </plugins>

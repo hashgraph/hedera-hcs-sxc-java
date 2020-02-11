@@ -24,8 +24,8 @@ import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 import com.hedera.hcs.sxc.interfaces.HCSResponse;
-import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
-import com.hedera.hcs.sxc.plugin.persistence.inmemory.PersistMessages;
+import com.hedera.hcs.sxc.interfaces.SxcPersistence;
+import com.hedera.hcs.sxc.plugin.persistence.inmemory.Persist;
 import com.hedera.hcs.sxc.proto.AccountID;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
@@ -93,7 +93,7 @@ public class OnHCSMessageCallbackTest {
         byte[] message = "Single Chunk Message".getBytes();
         List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),message);
         assertTrue(chunks.size() == 1);
-        SxcMessagePersistence persistence = new PersistMessages(); 
+        SxcPersistence persistence = new Persist(); 
         Optional<ApplicationMessage> messageOptional
                 = OnHCSMessageCallback.pushUntilCompleteMessage(chunks.get(0), persistence);
         assertTrue(messageOptional.isPresent());
@@ -109,7 +109,7 @@ public class OnHCSMessageCallbackTest {
         assertTrue(chunks.size() == 2);
         
         Optional<ApplicationMessage> messageOptional = null;
-        SxcMessagePersistence persistence = new PersistMessages(); 
+        SxcPersistence persistence = new Persist(); 
         for (ApplicationMessageChunk messagePart : chunks){
             messageOptional = OnHCSMessageCallback.pushUntilCompleteMessage(messagePart, persistence);;
         }

@@ -20,7 +20,6 @@ package com.hedera.hcs.sxc;
  * ‍
  */
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,21 +35,17 @@ import com.hedera.hcs.sxc.config.Environment;
 import com.hedera.hcs.sxc.config.MirrorNode;
 import com.hedera.hcs.sxc.config.Topic;
 import com.hedera.hcs.sxc.config.YAMLConfig;
-import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
+import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.crypto.KeyAgreement;
 
 public enum HCSCore { // singleton implementation
     
     INSTANCE();
     
-    
-
     private boolean signMessages = false;
     private boolean encryptMessages = false;
     private boolean rotateKeys = false;
@@ -62,7 +57,7 @@ public enum HCSCore { // singleton implementation
     private List<Topic> topics = new ArrayList<Topic>();
     private long maxTransactionFee = 0L;
     private long applicationId = -1L;
-    private static SxcMessagePersistence persistence;
+    private static SxcPersistence persistence;
     private boolean catchupHistory;
     private MessagePersistenceLevel messagePersistenceLevel;
     private String mirrorAddress;
@@ -224,12 +219,12 @@ public enum HCSCore { // singleton implementation
     public boolean getCatchupHistory() {
         return this.catchupHistory;
     }
-    public void setMessagePersistence(SxcMessagePersistence persistence) {
+    public void setMessagePersistence(SxcPersistence persistence) {
         HCSCore.persistence = persistence;
         HCSCore.persistence.setPersistenceLevel(this.messagePersistenceLevel);
     }
 
-    public SxcMessagePersistence getMessagePersistence() {
+    public SxcPersistence getMessagePersistence() {
         return HCSCore.persistence;
     }
     

@@ -1,6 +1,6 @@
 package com.hedera.hcs.sxc.plugin.mirror.subscribe;
 
-import java.nio.charset.StandardCharsets;
+
 
 /*-
  * ‌
@@ -28,14 +28,10 @@ import java.util.Optional;
 import lombok.extern.log4j.Log4j2;
 
 import com.google.common.util.concurrent.Uninterruptibles;
-import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.proto.Timestamp;
 import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
-import com.hedera.hashgraph.sdk.consensus.ConsensusClient;
-import com.hedera.hashgraph.sdk.consensus.ConsensusMessage;
-import com.hedera.hashgraph.sdk.consensus.ConsensusClient.Subscription;
 import com.hedera.hashgraph.sdk.mirror.MirrorClient;
 import com.hedera.hashgraph.sdk.mirror.MirrorConsensusTopicQuery;
 import com.hedera.hashgraph.sdk.mirror.MirrorConsensusTopicResponse;
@@ -43,8 +39,6 @@ import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackFromMirror;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
-import com.hedera.hcs.sxc.proto.KeyRotationInitialise;
-import com.hedera.hcs.sxc.proto.KeyRotationRespond;
 
 /**
  * 
@@ -60,22 +54,6 @@ public final class MirrorTopicSubscriber extends Thread {
     private ConsensusTopicId topicId;
     private Optional<Instant> subscribeFrom;
     private HCSCallBackFromMirror onHCSMessageCallback;
-    
-    public class SusbcriberCloseHook extends Thread {
-        private Subscription subscription;
-        public SusbcriberCloseHook(Subscription subscription) {
-           this.subscription = subscription;
-        }
-        @Override
-        public void run() {
-            try {
-                log.info("SusbcriberCloseHook - closing");
-                this.subscription.unsubscribe();
-            } catch (Exception e) {
-                log.error(e);
-            }
-        }
-    }
     
     public MirrorTopicSubscriber(String mirrorAddress, int mirrorPort, ConsensusTopicId topicId, Optional<Instant> subscribeFrom, HCSCallBackFromMirror onHCSMessageCallback) {
         this.mirrorAddress = mirrorAddress;
@@ -120,11 +98,6 @@ public final class MirrorTopicSubscriber extends Thread {
                 subscribe();
             }
             );
-//        log.info("Adding shutdown hook to subscription");
-//        Runtime.getRuntime().addShutdownHook(new SusbcriberCloseHook(subscription));
-//        for (;;) {
-//          Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(30));
-//        }
         
         } catch (Exception e1) {
             log.error(e1);

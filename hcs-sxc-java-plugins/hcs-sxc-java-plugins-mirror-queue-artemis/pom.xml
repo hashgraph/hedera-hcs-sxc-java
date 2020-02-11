@@ -29,7 +29,7 @@
           <version>${artemis-jms-client-all.version}</version>
       </dependency>
     </dependencies>
-   <build>
+    <build>
       <plugins>
         <plugin>
             <groupId>org.jacoco</groupId>
@@ -37,6 +37,5 @@
         </plugin>
       </plugins>
     </build>
-
 </project>
 

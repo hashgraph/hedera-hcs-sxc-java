@@ -32,18 +32,16 @@ import java.util.concurrent.TimeoutException;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.HederaNetworkException;
-import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
-import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.config.Topic;
 import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
 import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
-import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
+import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcs.sxc.plugins.Plugins;
 import com.hedera.hcs.sxc.proto.AccountID;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
@@ -71,11 +69,10 @@ public final class OutboundHCSMessage {
     private Map<AccountId, String> nodeMap = new HashMap<>();
     private AccountId operatorAccountId = new AccountId(0, 0, 0);
     private Ed25519PrivateKey ed25519PrivateKey;
-    private List<ConsensusTopicId> topicIds = new ArrayList<>();
     private long hcsTransactionFee = 0L;
     private List<Topic> topics;
     private TransactionId transactionId = null;
-    private SxcMessagePersistence persistencePlugin;
+    private SxcPersistence persistencePlugin;
     private SxcMessageEncryption messageEncryptionPlugin;
     private SxcKeyRotation keyRotationPlugin;
     private HCSCore hcsCore;
@@ -92,8 +89,8 @@ public final class OutboundHCSMessage {
         this.hcsTransactionFee = hcsCore.getMaxTransactionFee();
 
         // load persistence implementation at runtime
-        Class<?> persistenceClass = Plugins.find("com.hedera.hcs.sxc.plugin.persistence.*", "com.hedera.hcs.sxc.interfaces.SxcMessagePersistence", true);
-        this.persistencePlugin = (SxcMessagePersistence)persistenceClass.newInstance();
+        Class<?> persistenceClass = Plugins.find("com.hedera.hcs.sxc.plugin.persistence.*", "com.hedera.hcs.sxc.interfaces.SxcPersistence", true);
+        this.persistencePlugin = (SxcPersistence)persistenceClass.newInstance();
         
         
         if(this.encryptMessages){

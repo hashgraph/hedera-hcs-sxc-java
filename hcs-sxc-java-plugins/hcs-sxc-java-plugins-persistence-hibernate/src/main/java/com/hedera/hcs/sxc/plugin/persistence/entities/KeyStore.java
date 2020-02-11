@@ -12,6 +12,10 @@ import lombok.Data;
 @Data
 @Table(name = "KeyStore")
 public class KeyStore implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     @Id
     private int id;
     @Lob

@@ -34,7 +34,7 @@ import com.hedera.hcs.sxc.config.Topic;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackFromMirror;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackToAppInterface;
 import com.hedera.hcs.sxc.interfaces.HCSResponse;
-import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
+import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcs.sxc.interfaces.MirrorSubscriptionInterface;
 import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
 import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
@@ -102,8 +102,8 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
         
         
         // load persistence implementation at runtime
-        Class<?> persistenceClass = Plugins.find("com.hedera.hcs.sxc.plugin.persistence.*", "com.hedera.hcs.sxc.interfaces.SxcMessagePersistence", true);
-        this.hcsCore.setMessagePersistence((SxcMessagePersistence)persistenceClass.newInstance());
+        Class<?> persistenceClass = Plugins.find("com.hedera.hcs.sxc.plugin.persistence.*", "com.hedera.hcs.sxc.interfaces.SxcPersistence", true);
+        this.hcsCore.setMessagePersistence((SxcPersistence)persistenceClass.newInstance());
         this.hcsCore.getMessagePersistence().setHibernateProperties(this.hcsCore.getHibernateConfig());
 
         // load mirror callback implementation at runtime
@@ -322,7 +322,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
      * nothing otherwise.
      * @throws InvalidProtocolBufferException
      */
-    static Optional<ApplicationMessage> pushUntilCompleteMessage(ApplicationMessageChunk messageChunk, SxcMessagePersistence persistence) throws InvalidProtocolBufferException {
+    static Optional<ApplicationMessage> pushUntilCompleteMessage(ApplicationMessageChunk messageChunk, SxcPersistence persistence) throws InvalidProtocolBufferException {
 
         ApplicationMessageID applicationMessageId = messageChunk.getApplicationMessageId();
         //look up db to find parts received already

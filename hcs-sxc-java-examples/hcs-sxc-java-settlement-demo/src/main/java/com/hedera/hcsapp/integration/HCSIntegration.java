@@ -33,7 +33,7 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
 import com.hedera.hcs.sxc.interfaces.HCSResponse;
-import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
+import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.Utils;
@@ -631,7 +631,7 @@ public class HCSIntegration {
     }
     
     private void deleteData() {
-        SxcMessagePersistence persistence = this.appData.getHCSCore().getMessagePersistence();
+        SxcPersistence persistence = this.appData.getHCSCore().getMessagePersistence();
 
         persistence.clear();
         

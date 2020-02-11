@@ -9,7 +9,7 @@ import com.hedera.hcsapp.AppData;
 public class AuditHCSMessageTest {
     @Test
     public void testAuditHCSMessage() throws Exception {
-        AppData appData = new AppData("./src/test/resources/config.yaml", "./src/test/resources/dotenv.sample", "./src/test/resources/docker-compose.yml");
+        AppData appData = new AppData(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.sample", "./src/test/resources/docker-compose.yml");
 
         AuditHCSMessage auditHCSMessage = new AuditHCSMessage(appData);
         assertEquals(appData.getHCSCore().getTopics().get(appData.getTopicIndex()).getTopic(), auditHCSMessage.getTopicId());

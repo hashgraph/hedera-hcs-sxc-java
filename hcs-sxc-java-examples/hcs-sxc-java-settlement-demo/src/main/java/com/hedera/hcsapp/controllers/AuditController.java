@@ -19,13 +19,12 @@ package com.hedera.hcsapp.controllers;
  * limitations under the License.
  * ‍
  */
-
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
-import com.hedera.hcs.sxc.interfaces.SxcMessagePersistence;
+import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.entities.Credit;
@@ -86,26 +85,26 @@ public class AuditController {
         Map<String, AuditThreadId> threads = new HashMap<>();
 
         for (Credit credit : creditRepository.findAll()) {
-            threads.put(credit.getThreadId(), new AuditThreadId (
-                    credit.getThreadId()
-                    , "Credit"
-                    , States.valueOf(credit.getStatus()).getDisplayForCredit()
-                    , appData.getHCSCore().getTopics().get(appData.getTopicIndex()).getTopic()
-                    , credit.getCreatedDate()
-                    , credit.getCreatedTime()
-                )
+            threads.put(credit.getThreadId(), new AuditThreadId(
+                    credit.getThreadId(),
+                     "Credit",
+                     States.valueOf(credit.getStatus()).getDisplayForCredit(),
+                     appData.getHCSCore().getTopics().get(appData.getTopicIndex()).getTopic(),
+                     credit.getCreatedDate(),
+                     credit.getCreatedTime()
+            )
             );
         }
 
         for (Settlement settlement : settlementRepository.findAll()) {
-            threads.put(settlement.getThreadId(), new AuditThreadId (
-                    settlement.getThreadId()
-                    , "Settlement"
-                    , States.valueOf(settlement.getStatus()).getDisplayForSettlement()
-                    , appData.getHCSCore().getTopics().get(appData.getTopicIndex()).getTopic()
-                    , settlement.getCreatedDate()
-                    , settlement.getCreatedTime()
-                )
+            threads.put(settlement.getThreadId(), new AuditThreadId(
+                    settlement.getThreadId(),
+                     "Settlement",
+                     States.valueOf(settlement.getStatus()).getDisplayForSettlement(),
+                     appData.getHCSCore().getTopics().get(appData.getTopicIndex()).getTopic(),
+                     settlement.getCreatedDate(),
+                     settlement.getCreatedTime()
+            )
             );
         }
 
@@ -113,12 +112,12 @@ public class AuditController {
 
         // sort the list
         threads.entrySet()
-            .stream()
-            .sorted(Map.Entry.<String, AuditThreadId>comparingByKey(Comparator.reverseOrder()))
-            .forEach( (auditThreadId) -> {
-                auditThreadIds.getThreadIds().add(auditThreadId.getValue());
-            }
-        );
+                .stream()
+                .sorted(Map.Entry.<String, AuditThreadId>comparingByKey(Comparator.reverseOrder()))
+                .forEach((auditThreadId) -> {
+                    auditThreadIds.getThreadIds().add(auditThreadId.getValue());
+                }
+                );
 
         return new ResponseEntity<>(auditThreadIds, headers, HttpStatus.OK);
     }
@@ -130,20 +129,32 @@ public class AuditController {
 
         AuditApplicationMessages auditApplicationMessages = new AuditApplicationMessages();
         HCSCore hcsCore = appData.getHCSCore();
-        SxcMessagePersistence persistence = hcsCore.getMessagePersistence();
+        SxcPersistence persistence = hcsCore.getMessagePersistence();
 
         Map<String, ApplicationMessage> applicationMessages = persistence.getApplicationMessages();
 
         SortedSet<String> applicationMessageIds = new TreeSet<>(applicationMessages.keySet());
         for (String applicationMessageId : applicationMessageIds) {
-           SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessages.get(applicationMessageId).getBusinessProcessMessage());
+            //SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessages.get(applicationMessageId).getBusinessProcessMessage());
 
-           if (settlementBPM.getThreadID().equals(threadId)) {
-               AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
-               auditApplicationMessage.setApplicationMessageId(applicationMessageId);
-               auditApplicationMessage.setMessage(settlementBPM.toString());
-               auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
-           }
+            if (!appData.getHCSCore().getEncryptMessages()) {
+
+                SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessages.get(applicationMessageId).getBusinessProcessMessage());
+                if (settlementBPM.getThreadID().equals(threadId)) {
+                    AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
+                    auditApplicationMessage.setApplicationMessageId(applicationMessageId);
+                    auditApplicationMessage.setMessage(settlementBPM.toString());
+                    auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
+                }
+                
+            } else {
+
+                AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
+                auditApplicationMessage.setApplicationMessageId(applicationMessageId);
+                auditApplicationMessage.setMessage("Business Process Message ENCRYPTED");
+                auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
+
+            }
         }
 
         return new ResponseEntity<>(auditApplicationMessages, headers, HttpStatus.OK);
@@ -156,7 +167,7 @@ public class AuditController {
 
         AuditHCSMessages auditHCSMessages = new AuditHCSMessages();
         HCSCore hcsCore = appData.getHCSCore();
-        SxcMessagePersistence persistence = hcsCore.getMessagePersistence();
+        SxcPersistence persistence = hcsCore.getMessagePersistence();
 
         Map<String, SxcConsensusMessage> mirrorResponses = persistence.getMirrorResponses();
 

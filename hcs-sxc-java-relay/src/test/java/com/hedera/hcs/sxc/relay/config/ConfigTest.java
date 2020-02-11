@@ -29,7 +29,7 @@ import com.hedera.hcs.sxc.relay.config.Config;
 import com.hedera.hcs.sxc.relay.config.Queue;
 import com.hedera.hcs.sxc.relay.config.YAMLConfig;
 
-public class ConfigTest extends AbstractConfigTest {
+public class ConfigTest extends AbstractConfig {
 
     @Test
     public void testLoadConfig() throws Exception {

@@ -143,7 +143,7 @@ public class MirrorSubscribe implements MirrorSubscriptionInterface {
                             log.error(ex);
                         } catch (InvalidProtocolBufferException ex) {
                             log.error(ex);
-                        }
+                        } 
                     }
 
                   });
@@ -174,4 +174,3 @@ public class MirrorSubscribe implements MirrorSubscriptionInterface {
         thread.start();
     }
 }
-

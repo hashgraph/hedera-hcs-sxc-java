@@ -37,8 +37,8 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-public class PersistMessages 
-        implements com.hedera.hcs.sxc.interfaces.SxcMessagePersistence{
+public class Persist 
+        implements com.hedera.hcs.sxc.interfaces.SxcPersistence{
     
     private Map<ApplicationMessageID, List<ApplicationMessageChunk>> partialMessages;
     private Map<String, ConsensusMessageSubmitTransaction> transactions;
@@ -47,7 +47,7 @@ public class PersistMessages
     
     private MessagePersistenceLevel persistenceLevel = MessagePersistenceLevel.FULL;
     
-    public PersistMessages() throws IOException{
+    public Persist() throws IOException{
         partialMessages = new HashMap<>();
         transactions = new HashMap<>();
         mirrorTopicMessages = new HashMap<>();
@@ -200,4 +200,26 @@ public class PersistMessages
     public void setHibernateProperties(Map<String, String> hibernateProperties) {
         
     }
+
+    @Override
+    public void storeSecretKey(byte[] secretKey) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public byte[] getSecretKey() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void storePublicKey(byte[] secretKey) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public byte[] getPublicKey() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+   
 }

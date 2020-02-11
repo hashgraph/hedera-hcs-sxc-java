@@ -23,7 +23,6 @@ package com.hedera.hcs.sxc.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
 
 public final class AppNet {

@@ -1,4 +1,5 @@
-package com.hedera.hcs.sxc.cryptography;
+package com.hedera.hcs.sxc.plugin.cryptography.cryptography;
+
 
 /*-
  * ‌
@@ -20,8 +21,7 @@ package com.hedera.hcs.sxc.cryptography;
  * ‍
  */
 
-import com.hedera.hcs.sxc.cryptography.Cryptography;
-import com.hedera.hcs.sxc.cryptography.KeyRotation;
+
 import com.hedera.hcs.sxc.utils.StringUtils;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -30,41 +30,41 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.security.KeyPair;
 import java.util.Arrays;
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.BeforeAll;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.jupiter.api.Test;
 
 public class CryptographyTest {
     
-    static byte[] sharedSecret;
-    String cleartext = "Hear my cries Hear 234sdf! �$%&*)_+ my call Lend me your ears See my fall See my error Know my faults Time halts See my loss ";
-    KeyPair generateRsaKeyPair = null;
-    byte[] privateKeyBytes = null;
-    String privateKeyHexEncoded = null;
-    byte[] publicKeyBytes = null;
-    String publicKeyKexEncoded = null;
+  
     
-    @BeforeAll
-    public static void testInitClass(){
-        KeyRotation keyRotation = new KeyRotation();
-        byte[] alicePublic = keyRotation.aliceFirst();
-        Pair<byte[], byte[]> bobPubSecret = KeyRotation.bobGenFromAlice(alicePublic);
-        byte[] aliceSharedSecret = keyRotation.aliceFinish(bobPubSecret.getLeft());
-        byte[] bobSharedSecret = bobPubSecret.getRight();
-        assertTrue(Arrays.equals(aliceSharedSecret, bobSharedSecret));
-        sharedSecret = aliceSharedSecret;
+    public CryptographyTest() {
     }
-    
-    
+
+   
     @Test
     public void testEncryptAndDecrypt() throws Exception {
-        byte[] encrypt = Cryptography.encrypt(sharedSecret, cleartext);
+        byte[] secretKey=null;
+        String cleartext = "Hear my cries Hear 234sdf! �$%&*)_+ my call Lend me your ears See my fall See my error Know my faults Time halts See my loss ";
+        //KeyPair generateRsaKeyPair = null;
+        //byte[] privateKeyBytes = null;
+        //String privateKeyHexEncoded = null;
+        //byte[] publicKeyBytes = null;
+        //String publicKeyKexEncoded = null;
+        try {
+            KeyPair kp = Cryptography.generateRsaKeyPair();
+            secretKey =  kp.getPrivate().getEncoded();
+            //System.out.println(StringUtils.byteArrayToHexString(secretKey));
+        } catch (Exception ex) {
+            Logger.getLogger(CryptographyTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        byte[] encrypt = Cryptography.load().encrypt(secretKey, StringUtils.stringToByteArray(cleartext));
         String encryptHex = StringUtils.byteArrayToHexString(encrypt);
         byte[] encryptPrime = StringUtils.hexStringToByteArray(encryptHex);
         assertArrayEquals(encrypt, encryptPrime);
-        byte[] decrypt = Cryptography.decrypt(sharedSecret, encrypt);
+        byte[] decrypt = Cryptography.load().decrypt(secretKey, encrypt);
         assertTrue(Arrays.equals(StringUtils.stringToByteArray(cleartext), decrypt)); 
         assertEquals(cleartext, StringUtils.byteArrayToString(decrypt));
-        assertEquals(cleartext, Cryptography.decryptToClearText(sharedSecret, encrypt));
+        assertEquals(cleartext, Cryptography.load().decryptToClearText(secretKey, encrypt));
     }
 }

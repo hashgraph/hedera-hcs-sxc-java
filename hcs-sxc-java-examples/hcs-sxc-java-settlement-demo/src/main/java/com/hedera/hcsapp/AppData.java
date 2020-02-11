@@ -40,11 +40,11 @@ public final class AppData {
     private int topicIndex = 0; // refers to the first topic ID in the config.yaml
     private String publicKey = "";
     private String userName = "";
-    private long appId = 0;
+    private long appId = -1; // -1 means load from environment
     List<AppClient> appClients = new ArrayList<>();
     private int webPort = 8080;
     private Dotenv dotEnv;
-
+    
     private String getEnvValue(String varName) throws Exception {
         String value = "";
         log.info("Looking for " + varName + " in environment variables");
@@ -55,6 +55,7 @@ public final class AppData {
             log.error(varName + " environment variable is not set");
             log.error(varName + " environment variable not found in ./config/.env");
             log.error(varName + " environment variable not found in command line parameters");
+            System.exit(0);
         } else {
             value = this.dotEnv.get(varName);
             log.info(varName + " found in environment variables");
@@ -67,11 +68,12 @@ public final class AppData {
     }
 
     public AppData() throws Exception {
-        this.hcsCore = new HCSCore(this.appId);
+        hcsCore = HCSCore.INSTANCE.singletonInstanceDefault(appId);
         init("./config/config.yaml", "./config/.env", "./config/docker-compose.yml");
     }
-    public AppData(String configFilePath, String environmentFilePath, String dockerFilePath) throws Exception {
-        this.hcsCore = new HCSCore(this.appId, configFilePath, environmentFilePath);
+    public AppData(long appId, String configFilePath, String environmentFilePath, String dockerFilePath) throws Exception {
+        this.appId = appId;
+        this.hcsCore =  HCSCore.INSTANCE.singletonInstanceWithAppIdEnvAndConfig(this.appId, configFilePath, environmentFilePath);
         init(configFilePath, environmentFilePath, dockerFilePath);
     }
     private void init(String configFilePath, String environmentFilePath, String dockerFilePath) throws Exception {
@@ -79,12 +81,12 @@ public final class AppData {
         // just check if set
         getEnvValue("OPERATOR_KEY");
         this.appId = getEnvValueLong("APP_ID");
-        if (this.appId != 0) {
-            this.hcsCore = new HCSCore(this.appId, configFilePath, environmentFilePath);
-        }
+        //if (this.appId != -1) {
+        //    this.hcsCore = HCSCore.INSTANCE.singletonInstanceWithAppIdEnvAndConfig(this.appId, configFilePath, environmentFilePath);
+        //}
         DockerCompose dockerCompose = DockerComposeReader.parse(dockerFilePath);
-
-        if (System.getProperty("server.port") != null) {
+  
+        if ( System.getProperty("server.port") != null ) { 
             this.webPort = Integer.parseInt(System.getProperty("server.port"));
             log.info("PORT=" + this.webPort + " found in command line parameter server.port");
         } else {
@@ -95,8 +97,8 @@ public final class AppData {
         this.publicKey = dockerCompose.getPublicKeyForId(this.appId);
         this.userName = dockerCompose.getNameForId(this.appId);
         this.topicIndex = 0;
-
-        if (publicKey.equalsIgnoreCase("not found") || publicKey.equalsIgnoreCase("not found")) {
+        
+        if (publicKey.equalsIgnoreCase("not found") || publicKey.equalsIgnoreCase("not found")){
             log.error("The chosen APP_ID must be present in the docker-compose config file. Exiting ...");
             System.exit(0);
         }
@@ -144,7 +146,7 @@ public final class AppData {
     public List<AppClient> getAppClients() {
         return this.appClients;
     }
-
+    
     public int getWebPort() {
         return this.webPort;
     }

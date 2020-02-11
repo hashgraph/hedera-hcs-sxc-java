@@ -36,3 +36,11 @@ message ApplicationMessageChunk {
     int32 chunkIndex = 3; // This message part index
     bytes messageChunk = 4; // The message part
 }
+
+message KeyRotationInitialise{
+    bytes initiatorPublicKeyEncoded = 1;
+}
+
+message KeyRotationRespond {
+    bytes responderPublicKeyEncoded = 1;
+}

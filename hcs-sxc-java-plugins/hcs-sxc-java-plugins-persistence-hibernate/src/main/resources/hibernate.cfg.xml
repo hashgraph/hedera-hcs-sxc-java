@@ -6,5 +6,6 @@
         <mapping class="com.hedera.hcs.sxc.plugin.persistence.entities.HCSApplicationMessage" />
         <mapping class="com.hedera.hcs.sxc.plugin.persistence.entities.HCSTransaction" />
         <mapping class="com.hedera.hcs.sxc.plugin.persistence.entities.MirrorResponse" />
+        <mapping class="com.hedera.hcs.sxc.plugin.persistence.entities.KeyStore" />
     </session-factory>
 </hibernate-configuration>

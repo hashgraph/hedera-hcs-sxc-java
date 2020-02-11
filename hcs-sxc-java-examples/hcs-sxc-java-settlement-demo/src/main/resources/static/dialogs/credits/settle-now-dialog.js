@@ -1,7 +1,5 @@
    function openSettleNowDialog(otherUserId){
 	   
-	   const delay = ms => new Promise(res => setTimeout(res, ms));
-	   
         /* Functions for settlement dialog in credit tab */
         settleNowDialog  = new mdc.dialog.MDCDialog(document.getElementById('settle-now-dialog'));
         event.preventDefault();

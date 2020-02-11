@@ -2,7 +2,7 @@ appNet:
   # Should messages be signed
   signMessages: false
   # Should messages be encrypted
-  encryptMessages: false
+  encryptMessages: true
   # Should messages be rotated
   rotateKeys: false
   # How often (messages) should keys be rotated

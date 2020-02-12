@@ -52,11 +52,11 @@ public final class MirrorMessageHandler {
         try {
             Config config = new Config();
 
-            log.info("Got message from mirror node");
-            log.info(messagesResponse.toString());
+            log.debug("Got message from mirror node");
+            log.debug(messagesResponse.toString());
 
             addMessage(config, messagesResponse, topicId);
-            log.info("Message added to queue");
+            log.debug("Message added to queue");
         } catch (Exception ex) {
             log.error(ex);
         }
@@ -68,7 +68,7 @@ public final class MirrorMessageHandler {
         InitialContext initialContext = null;
 
         try {
-            log.info("Sending message to queue");
+            log.debug("Sending message to queue");
             Queue queueConfig = config.getConfig().getQueue();
             Hashtable<String, Object> props = new Hashtable<>();
             props.put(Context.INITIAL_CONTEXT_FACTORY, queueConfig.getInitialContextFactory());
@@ -90,7 +90,7 @@ public final class MirrorMessageHandler {
                     scanning = false;
                 } catch (Exception ie) {
                     String tcpConnectionFactory = config.getConfig().getQueue().getTcpConnectionFactory();
-                    log.info("Is Artemis up? Setup your host file so that the host identified in'"+tcpConnectionFactory+"' points to 127.0.0.1 if running outside of docker");
+                    log.debug("Is Artemis up? Setup your host file so that the host identified in'"+tcpConnectionFactory+"' points to 127.0.0.1 if running outside of docker");
                     TimeUnit.SECONDS.sleep(6000);
                 }
 
@@ -117,17 +117,17 @@ public final class MirrorMessageHandler {
                 br.write(seconds + "-" + nanos);
             }
 
-            log.info("Sent message to queue");
+            log.debug("Sent message to queue");
 
         } catch (Exception e) {
             log.error(e);
         } finally {
             if (connection != null) {
-                log.info("addMessage - Closing JMS connection");
+                log.debug("addMessage - Closing JMS connection");
                 connection.close();
             }
             if (initialContext != null) {
-                log.info("addMessage- Closing JMS initial context");
+                log.debug("addMessage- Closing JMS initial context");
                 initialContext.close();
             }
         }

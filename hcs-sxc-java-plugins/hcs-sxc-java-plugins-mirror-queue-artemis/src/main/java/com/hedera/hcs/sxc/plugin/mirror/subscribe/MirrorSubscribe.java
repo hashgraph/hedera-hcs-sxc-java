@@ -60,7 +60,7 @@ public class MirrorSubscribe implements MirrorSubscriptionInterface {
     @Override
     public void init(HCSCallBackFromMirror onHCSMessageCallback, long applicationId, Optional<Instant> lastConsensusTimestamp, String mirrorAddress, List<ConsensusTopicId> topicIds) throws Exception {
         Config  config = new Config();
-        log.info("hcs-sxc-java-plugins-mirror-queue-artemis init");
+        log.debug("hcs-sxc-java-plugins-mirror-queue-artemis init");
         String contextFactory = config.getConfig().getQueue().getInitialContextFactory();
         String tcpConnectionFactory = config.getConfig().getQueue().getTcpConnectionFactory();
         Runnable runnable;
@@ -88,11 +88,11 @@ public class MirrorSubscribe implements MirrorSubscriptionInterface {
                     try {
                         connection = cf.createConnection();
                         retry = false;
-                        log.info("Connected to message queue");
+                        log.debug("Connected to message queue");
                     }
                     catch (JMSException ex) {
                         log.error(ex);
-                        log.info("Unable to connect to message queue - sleeping 5s");
+                        log.debug("Unable to connect to message queue - sleeping 5s");
                         TimeUnit.SECONDS.sleep(5);
                     }
                 }
@@ -111,12 +111,12 @@ public class MirrorSubscribe implements MirrorSubscriptionInterface {
                         try {
                             // notify subscribed observer from App.java
                             if (messageFromJMS instanceof ActiveMQTextMessage) {
-                                log.info("Got message from queue - notifying");
+                                log.debug("Got message from queue - notifying");
                                 onHCSMessageCallback.notifyObservers(((ActiveMQTextMessage)messageFromJMS).getText().getBytes(), null);
                                 messageFromJMS.acknowledge();
-                                log.info("Got message from queue - acknowledged");
+                                log.debug("Got message from queue - acknowledged");
                             } else if (messageFromJMS instanceof ActiveMQObjectMessage) {
-                                log.info("Got message from queue - persisting");
+                                log.debug("Got message from queue - persisting");
                                 HCSRelayMessage rlm = (HCSRelayMessage)((ActiveMQObjectMessage) messageFromJMS).getObject();
                                 
                                 ConsensusTopicResponse consensusTopicResponse = ConsensusTopicResponse.newBuilder()
@@ -136,7 +136,7 @@ public class MirrorSubscribe implements MirrorSubscriptionInterface {
                                 onHCSMessageCallback.partialMessage(messagePart);
                                 messageFromJMS.acknowledge();
 
-                                log.info("Got message from queue - acknowledged");
+                                log.debug("Got message from queue - acknowledged");
                             }
                             
                         } catch (JMSException ex) {

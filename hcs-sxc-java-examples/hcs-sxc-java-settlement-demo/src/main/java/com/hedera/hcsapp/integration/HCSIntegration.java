@@ -99,7 +99,7 @@ public class HCSIntegration {
             // (CREDIT_PENDING , r ,threadId ,credit) => (CREDIT_AWAIT_ACK ,r ,threadId , credit[threadId].txId=r.MessageId)
             String threadId = settlementBPM.getThreadID();
             if (settlementBPM.hasCredit()) {
-                log.info("settlementBPM.hasCredit()");
+                log.debug("settlementBPM.hasCredit()");
                 String priorState = States.CREDIT_PROPOSED_PENDING.name();
                 String nextState = States.CREDIT_PROPOSED.name();
 
@@ -123,7 +123,7 @@ public class HCSIntegration {
                             credit.setStatus(nextState);
                             credit.setApplicationMessageId(Utils.applicationMessageIdToString(hcsResponse.getApplicationMessageId()));
                             creditRepository.save(credit);
-                            log.info("Adding new credit to Database: " + threadId);
+                            log.debug("Adding new credit to Database: " + threadId);
                         }
                 );
 
@@ -145,10 +145,10 @@ public class HCSIntegration {
                     }
                 }
             } else if (settlementBPM.hasCreditAck()) {
-                log.info("settlementBPM.hasCreditAck()");
+                log.debug("settlementBPM.hasCreditAck()");
                 updateCredit(threadId, States.CREDIT_PROPOSED, States.CREDIT_AGREED);
             } else if (settlementBPM.hasSettlePropose()) {
-                log.info("settlementBPM.hasSettlePropose()");
+                log.debug("settlementBPM.hasSettlePropose()");
                 String nextState = States.SETTLE_PROPOSED.name();
 
                 SettleProposeBPM settleProposeBPM = settlementBPM.getSettlePropose();
@@ -173,7 +173,7 @@ public class HCSIntegration {
                             settlement.setStatus(nextState);
                             settlement.setApplicationMessageId(Utils.applicationMessageIdToString(hcsResponse.getApplicationMessageId()));
                             settlementRepository.save(settlement);
-                            log.info("Adding new settlement to Database: " + threadId);
+                            log.debug("Adding new settlement to Database: " + threadId);
 
                             for (String settleThreadId : settleProposeBPM.getThreadIDsList()) {
                                 SettlementItem settlementItem = new SettlementItem();
@@ -204,7 +204,7 @@ public class HCSIntegration {
                 }
                 
             } else if (settlementBPM.hasSettleProposeAck()) {
-                log.info("settlementBPM.hasSettleProposeAck()");
+                log.debug("settlementBPM.hasSettleProposeAck()");
                 updateSettlement(threadId, States.SETTLE_PROPOSED, States.SETTLE_AGREED);
                 String payerName = settlementBPM.getSettleProposeAck().getSettlePropose().getPayerName();
                 String recipientName = settlementBPM.getSettleProposeAck().getSettlePropose().getRecipientName();
@@ -233,7 +233,7 @@ public class HCSIntegration {
                 });
                 }
             } else if (settlementBPM.hasSettleInit()) { // proposes a pay channel
-                log.info("settlementBPM.hasSettleInit()");
+                log.debug("settlementBPM.hasSettleInit()");
                 String priorState = States.SETTLE_AGREED.name();
                 String nextState = States.SETTLE_PAY_CHANNEL_PROPOSED.name();
                 String payerName = settlementBPM.getSettleInit().getPayerName();
@@ -273,7 +273,7 @@ public class HCSIntegration {
                 });
                 }
             } else if (settlementBPM.hasSettleInitAck()) { // agrees pay channel
-                log.info("settlementBPM.hasSettleInitAck()");
+                log.debug("settlementBPM.hasSettleInitAck()");
                 updateSettlement(threadId, States.SETTLE_PAY_CHANNEL_PROPOSED, States.SETTLE_PAY_CHANNEL_AGREED);
                 String payerName = settlementBPM.getSettleInitAck().getSettleInit().getPayerName();
                 String recipientName = settlementBPM.getSettleInitAck().getSettleInit().getRecipientName();
@@ -304,7 +304,7 @@ public class HCSIntegration {
                 });
                 }
             } else if (settlementBPM.hasPaymentInit()) {
-                log.info("settlementBPM.hasPaymentInit()");
+                log.debug("settlementBPM.hasPaymentInit()");
                 
                 String priorState = States.SETTLE_PAY_CHANNEL_AGREED.name();
                 String nextState = States.SETTLE_PAY_PROPOSED.name();
@@ -352,7 +352,7 @@ public class HCSIntegration {
                 });
                 }
             } else if (settlementBPM.hasPaymentInitAck()) {
-                log.info("settlementBPM.hasPaymentInitAck()");
+                log.debug("settlementBPM.hasPaymentInitAck()");
                 // Pay channel initiates payment (bank transfer between parties) and sends payment made message if
                 // self is responsible for payment
 
@@ -379,7 +379,7 @@ public class HCSIntegration {
                     }
                 );
             } else if (settlementBPM.hasPaymentSent()) {
-                log.info("settlementBPM.hasPaymentSent()");
+                log.debug("settlementBPM.hasPaymentSent()");
                 String priorState = States.SETTLE_PAY_AGREED.name();
                 String nextState = States.SETTLE_PAY_MADE.name();
 
@@ -418,7 +418,7 @@ public class HCSIntegration {
                 );
 
             } else if (settlementBPM.hasPaymentSentAck()) {
-                log.info("settlementBPM.hasPaymentSentAck()");
+                log.debug("settlementBPM.hasPaymentSentAck()");
                 
                 settlementRepository.findById(threadId).ifPresent(
                     (settlement) -> {
@@ -441,7 +441,7 @@ public class HCSIntegration {
                 );
                 
             } else if (settlementBPM.hasSettlePayment()) {
-                log.info("settlementBPM.hasSettlePayment()");
+                log.debug("settlementBPM.hasSettlePayment()");
                 String priorState = States.SETTLE_PAY_ACK.name();
                 String nextState = States.SETTLE_RCPT_REQUESTED.name();
 
@@ -487,7 +487,7 @@ public class HCSIntegration {
                         }
                 );
             } else if (settlementBPM.hasSettlePaymentAck()) {
-                log.info("settlementBPM.hasSettlePaymentAck()");
+                log.debug("settlementBPM.hasSettlePaymentAck()");
                 settlementRepository.findById(threadId).ifPresent(
                         (settlement) -> {
                             // only update state if payer or recipient
@@ -512,7 +512,7 @@ public class HCSIntegration {
                         }
                     );
             } else if (settlementBPM.hasSettleComplete()) {
-                log.info("settlementBPM.hasSettleComplete()");
+                log.debug("settlementBPM.hasSettleComplete()");
                 String priorState = States.SETTLE_RCPT_CONFIRMED.name();
                 String nextState = States.SETTLE_PAY_CONFIRMED.name();
 
@@ -560,7 +560,7 @@ public class HCSIntegration {
                         }
                 );
             } else if (settlementBPM.hasSettleCompleteAck()) {
-                log.info("settlementBPM.hasSettleCompleteAck()");
+                log.debug("settlementBPM.hasSettleCompleteAck()");
                 settlementRepository.findById(threadId).ifPresent(
                     (settlement) -> {
                         if (settlement.getPayerName().equals(appData.getUserName())) {
@@ -571,16 +571,16 @@ public class HCSIntegration {
                     }
                 );
             } else if (settlementBPM.hasAdminDelete()) {
-                log.info("settlementBPM.hasAdminDelete()");
+                log.debug("settlementBPM.hasAdminDelete()");
                 deleteData();
                 notify("admin", "admin", "admin", "admin");
             }  else if (settlementBPM.hasAdminStashDatabaseBPM()) {
-                log.info("settlementBPM.hasAdminStashDatabaseBPM()");
+                log.debug("settlementBPM.hasAdminStashDatabaseBPM()");
                 stashData();
              
                 notify("admin", "admin", "admin", "admin");
             } else if (settlementBPM.hasAdminStashPopDatabaseBPM()) {
-                log.info("settlementBPM.hasAdminStashPopDatabaseBPM()");
+                log.debug("settlementBPM.hasAdminStashPopDatabaseBPM()");
                 stashPopData();
          
                 notify("admin", "admin", "admin", "admin");

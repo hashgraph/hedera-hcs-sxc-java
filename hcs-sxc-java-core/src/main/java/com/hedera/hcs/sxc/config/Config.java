@@ -47,7 +47,7 @@ public final class Config {
 
         File configFile = new File(configFilePath);
         if (configFile.exists()) {
-            log.info("Loading config.yaml from " + configFilePath);
+            log.debug("Loading config.yaml from " + configFilePath);
             InputStream inputStream = new FileInputStream(configFile.getCanonicalPath());
             yamlConfig = yaml.load(inputStream);
         } else {

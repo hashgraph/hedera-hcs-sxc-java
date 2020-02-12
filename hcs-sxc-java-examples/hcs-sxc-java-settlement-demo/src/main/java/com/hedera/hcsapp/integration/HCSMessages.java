@@ -56,7 +56,7 @@ public final class HCSMessages {
     private SettlementItemRepository settlementItemRepository;
     
     public CreditRest creditNew(AppData appData, CreditProposal creditCreate) throws Exception {
-        log.info("creditNew");
+        log.debug("creditNew");
         Instant now = Instant.now();
         Long seconds = now.getEpochSecond();
         int nanos = now.getNano();
@@ -116,12 +116,12 @@ public final class HCSMessages {
               .withFirstTransactionId(transactionId)
               .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
 
-        log.info("Message sent successfully.");
+        log.debug("Message sent successfully.");
 
         return new CreditRest(credit, appData);
     }
     public CreditRest creditAck(AppData appData, String threadId, boolean automatic) throws Exception {
-        log.info("creditAck");
+        log.debug("creditAck");
         Credit credit = creditRepository.findById(threadId).get();
 
         CreditBPM creditBPM = Utils.creditBPMFromCredit(credit);
@@ -149,14 +149,14 @@ public final class HCSMessages {
               .overrideMessageSignature(false)
               .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
 
-        log.info("Message sent successfully.");
+        log.debug("Message sent successfully.");
 
         return new CreditRest(credit, appData);
         
     }
     
     public SettlementRest settlementNew(AppData appData, SettlementProposal settleProposal) throws Exception {
-        log.info("settlementNew");
+        log.debug("settlementNew");
         Instant now = Instant.now();
         Long seconds = now.getEpochSecond();
         int nanos = now.getNano();
@@ -217,14 +217,14 @@ public final class HCSMessages {
                 .overrideMessageSignature(false)
                 .withFirstTransactionId(transactionId).sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
 
-        log.info("Message sent successfully.");
+        log.debug("Message sent successfully.");
 
         return new SettlementRest(settlement, appData, settlementItemRepository,
                 creditRepository);
     }
     
     public SettlementRest settlementAck(AppData appData, String threadId, boolean automatic) throws Exception {
-        log.info("settlementAck");
+        log.debug("settlementAck");
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
         if (settlement.isPresent()) {
@@ -259,7 +259,7 @@ public final class HCSMessages {
     }
     
     public SettlementRest settlementInit(AppData appData, String threadId, boolean automatic, String additionalNotes, String paymentChannelName) throws Exception {
-        log.info("settlementInit");
+        log.debug("settlementInit");
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
         if (settlement.isPresent()) {
@@ -283,7 +283,7 @@ public final class HCSMessages {
     }
     
     public SettlementRest settleProposeChannelAck(AppData appData, String threadId, boolean automatic) throws Exception {
-        log.info("settleProposeChannelAck");
+        log.debug("settleProposeChannelAck");
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
         if (settlement.isPresent()) {
@@ -314,7 +314,7 @@ public final class HCSMessages {
     }
     
     public SettlementRest settlePaymentInit (AppData appData, String threadId, boolean automatic, String payerAccountDetails, String recipientAccountDetails, String additionalNotes) throws Exception {
-        log.info("settlePaymentInit");
+        log.debug("settlePaymentInit");
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
     
         if (settlement.isPresent()) {
@@ -345,7 +345,7 @@ public final class HCSMessages {
     }
     
     public SettlementRest settlePaymentInitAck(AppData appData, String threadId, boolean automatic) throws Exception {
-        log.info("settlePaymentInitAck");
+        log.debug("settlePaymentInitAck");
         
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
@@ -378,7 +378,7 @@ public final class HCSMessages {
     }
     
     public SettlementRest settlePaymentSent(AppData appData, String threadId, boolean automatic, String payref) throws Exception {
-        log.info("settlePaymentSent");
+        log.debug("settlePaymentSent");
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
         if (settlement.isPresent()) {
@@ -410,7 +410,7 @@ public final class HCSMessages {
     }
     
     public SettlementRest settlePaymentSentAck(AppData appData, String threadId, boolean automatic, PaymentSentBPM paymentSentBPM) throws Exception {
-        log.info("settlePaymentSentAck");
+        log.debug("settlePaymentSentAck");
 
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
@@ -434,7 +434,7 @@ public final class HCSMessages {
     }
 
     public SettlementRest settlePaymentPaid(AppData appData, String threadId, boolean automatic, String additionalNotes) throws Exception {
-        log.info("settlePaymentPaid");
+        log.debug("settlePaymentPaid");
         
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
@@ -464,7 +464,7 @@ public final class HCSMessages {
     }
     
     public SettlementRest settlePaymentPaidAck(AppData appData, String threadId, boolean automatic) throws Exception {
-        log.info("settlePaymentPaidAck");
+        log.debug("settlePaymentPaidAck");
         
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
@@ -497,7 +497,7 @@ public final class HCSMessages {
     }
     
     public SettlementRest settlePaymentComplete(AppData appData, String threadId, boolean automatic, String additionalNotes) throws Exception {
-        log.info("settlePaymentComplete");
+        log.debug("settlePaymentComplete");
         
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
@@ -527,7 +527,7 @@ public final class HCSMessages {
     }
 
     public SettlementRest settlePaymentCompleteAck(AppData appData, String threadId, boolean automatic, SettleCompleteBPM settleCompleteBPM) throws Exception {
-        log.info("settlePaymentCompleteAck");
+        log.debug("settlePaymentCompleteAck");
         
         Optional<Settlement> settlement = settlementRepository.findById(threadId);
 
@@ -571,7 +571,7 @@ public final class HCSMessages {
                 //.overrideEncryptedMessages(false)
                 .overrideMessageSignature(false).sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
 
-        log.info("Message sent successfully.");
+        log.debug("Message sent successfully.");
 
         SettlementRest settlementResponse = new SettlementRest(newSettlement, appData, settlementItemRepository, creditRepository);
         return settlementResponse;

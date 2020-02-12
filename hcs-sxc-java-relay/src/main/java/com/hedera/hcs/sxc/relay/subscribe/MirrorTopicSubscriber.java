@@ -57,7 +57,7 @@ public final class MirrorTopicSubscriber extends Thread {
         @Override
         public void run() {
             try {
-                log.info("SusbcriberCloseHook - closing");
+                log.debug("SusbcriberCloseHook - closing");
                 this.subscription.unsubscribe();
             } catch (Exception e) {
                 log.error(e);
@@ -80,7 +80,7 @@ public final class MirrorTopicSubscriber extends Thread {
     private void subscribe() {
         try (ConsensusClient subscriber = new ConsensusClient(this.mirrorAddress+ ":" + this.mirrorPort)
                 .setErrorHandler(e -> {
-                    log.info("Attempting to reconnect");
+                    log.debug("Attempting to reconnect");
                     subscribe();
                 })
                 
@@ -105,26 +105,26 @@ public final class MirrorTopicSubscriber extends Thread {
                         this.lastConsensusTimestamp = Optional.of(Instant.now());
                     }
                     
-                    log.info("Relay Subscribing to topic number " + this.topicId.toString() + " on mirror node: " + this.mirrorAddress + ":" + this.mirrorPort);
+                    log.debug("Relay Subscribing to topic number " + this.topicId.toString() + " on mirror node: " + this.mirrorAddress + ":" + this.mirrorPort);
 
                     Subscription subscription = subscriber.subscribe(this.topicId, lastConsensusTimestamp.get(), tm -> {
-                        log.info("Got mirror message, calling handler");
+                        log.debug("Got mirror message, calling handler");
                         lastConsensusTimestamp = Optional.of(tm.consensusTimestamp.plusNanos(1));
                         MirrorMessageHandler.onMirrorMessage(tm, this.topicId);
                     });
                     Runtime.getRuntime().addShutdownHook(new SusbcriberCloseHook(subscription));
                     for (;;) {
-                        log.info("Sleeping 30s");
+                        log.debug("Sleeping 30s");
                         Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(30));
                     }
                 } catch (Exception e) {
                     log.error(e);
-                    log.info("Sleeping 10s before attempting connection again");
+                    log.debug("Sleeping 10s before attempting connection again");
                     Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(10));
                 }
         } catch (Exception e1) {
             log.error(e1);
-            log.info("Sleeping 11s before attempting connection again");
+            log.debug("Sleeping 11s before attempting connection again");
             Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(11));
         }
 

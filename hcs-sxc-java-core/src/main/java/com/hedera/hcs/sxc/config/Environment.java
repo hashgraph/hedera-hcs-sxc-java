@@ -41,7 +41,7 @@ public final class Environment {
     public Environment(String fileName) {
         try {
             this.dotEnv = Dotenv.configure().filename(fileName).load();
-            log.info("Found .env file in " + fileName);
+            log.debug("Found .env file in " + fileName);
         } catch (Exception e) {
             log.warn("No " + fileName + " found.");
         }

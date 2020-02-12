@@ -67,7 +67,7 @@ public class Persist
     @Override
     public void storeMirrorResponse(SxcConsensusMessage consensusMessage) {
         mirrorTopicMessages.put(consensusMessage.consensusTimestamp.toString(), consensusMessage);
-        log.info("storeMirrorResponse " + consensusMessage.consensusTimestamp.toString() + "-" + consensusMessage);
+        log.debug("storeMirrorResponse " + consensusMessage.consensusTimestamp.toString() + "-" + consensusMessage);
     }
     
     @Override 
@@ -104,7 +104,7 @@ public class Persist
                 + "-" + transactionId.validStart.getNano();
         
         transactions.put(txId, submitMessageTransaction);
-        log.info("storeTransaction " + txId + "-" + submitMessageTransaction);
+        log.debug("storeTransaction " + txId + "-" + submitMessageTransaction);
     }
     
     @Override 
@@ -131,7 +131,7 @@ public class Persist
                 + "-" + applicationMessageId.getValidStart().getNanos();
 
         applicationMessages.put(appMessageId, applicationMessage);
-        log.info("storeApplicationMessage " + appMessageId + "-" + applicationMessage);
+        log.debug("storeApplicationMessage " + appMessageId + "-" + applicationMessage);
     }
 
     @Override

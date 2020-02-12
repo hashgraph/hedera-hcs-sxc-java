@@ -36,7 +36,7 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
 
     @Override
     public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
-        log.info("New websocket session established : " + session.getSessionId());
+        log.debug("New websocket session established : " + session.getSessionId());
     }
 
     @Override
@@ -47,7 +47,7 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
     @Override
     public void handleFrame(StompHeaders headers, Object payload) {
         NotificationMessage msg = (NotificationMessage) payload;
-//      log.info("Received : " + msg.getPayer() + ", " + msg.getRecipient() + ", " + msg.getThreadId());
-      log.info("Received : " + msg.getRecipient());
+//      log.debug("Received : " + msg.getPayer() + ", " + msg.getRecipient() + ", " + msg.getThreadId());
+      log.debug("Received : " + msg.getRecipient());
     }    
 }

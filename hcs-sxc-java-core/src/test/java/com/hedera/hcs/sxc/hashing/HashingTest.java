@@ -38,7 +38,7 @@ public class HashingTest {
 
     @Test
     public void testSha() {
-        log.info("sha");
+        log.debug("sha");
         byte[] expResult = StringUtils.hexStringToByteArray(hexOfHashOfPlainText);
         byte[] result = Hashing.sha(plaintext);
         assertArrayEquals(expResult, result);

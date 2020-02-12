@@ -228,7 +228,7 @@ public final class OutboundHCSMessage {
             TransactionId transactionId = firstTransactionId;
             int count = 1;
             for (ApplicationMessageChunk messageChunk : parts) {
-                log.info("Sending message part " + count + " of " + parts.size() + " to topic " + this.topics.get(topicIndex).toString());
+                log.debug("Sending message part " + count + " of " + parts.size() + " to topic " + this.topics.get(topicIndex).toString());
                 count++;
                 ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction()
                     .setMessage(messageChunk.toByteArray())
@@ -243,14 +243,14 @@ public final class OutboundHCSMessage {
                 // persist the transaction
                 this.persistencePlugin.storeTransaction(transactionId, tx);
 
-                log.info("Executing transaction");
+                log.debug("Executing transaction");
                 TransactionId txId = tx.execute(client);
                 
                 TransactionReceipt receipt = txId.getReceipt(client, Duration.ofSeconds(30));
 
                 transactionId = new TransactionId(this.operatorAccountId);
 
-                log.info("Message receipt status is {} "
+                log.debug("Message receipt status is {} "
                         + "sequence no is {}"
                         ,receipt.status
                         ,receipt.getConsensusTopicSequenceNumber()
@@ -323,7 +323,7 @@ public final class OutboundHCSMessage {
                         
                         TransactionReceipt receiptKR1 = txIdKR1.getReceipt(client, Duration.ofSeconds(30));
                        
-                        log.info("Message receipt for KR1 status is {} "
+                        log.debug("Message receipt for KR1 status is {} "
                                 + "sequence no is {}"
                                 ,receiptKR1.status
                                 ,receiptKR1.getConsensusTopicSequenceNumber()

@@ -108,11 +108,11 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
         MirrorSubscriptionInterface mirrorSubscription = ((MirrorSubscriptionInterface)callbackClass.newInstance());
 
         if (this.hcsCore.getCatchupHistory()) {
-            log.info("catching up with mirror history");
+            log.debug("catching up with mirror history");
             Optional<Instant> lastConsensusTimestamp = Optional.of(this.hcsCore.getMessagePersistence().getLastConsensusTimestamp());
             mirrorSubscription.init(this, this.hcsCore.getApplicationId(), lastConsensusTimestamp, this.hcsCore.getMirrorAddress(), this.hcsCore.getConsensusTopicIds());
         } else {
-            log.info("NOT catching up with mirror history");
+            log.debug("NOT catching up with mirror history");
             mirrorSubscription.init(this, this.hcsCore.getApplicationId(), Optional.of(Instant.now()), this.hcsCore.getMirrorAddress(), this.hcsCore.getConsensusTopicIds());
         }
     }

@@ -111,9 +111,9 @@ implements SxcPersistence{
             // commit transaction
             dbTransaction.commit();
     
-            log.info("storeMirrorResponse " + mirrorTopicMessageResponse.toString());
+            log.debug("storeMirrorResponse " + mirrorTopicMessageResponse.toString());
         } else {
-            log.info("Skipping duplicate mirror response entry");
+            log.debug("Skipping duplicate mirror response entry");
         }
     }
 
@@ -213,7 +213,7 @@ implements SxcPersistence{
         //            // commit transaction
         //            dbTransaction.commit();
         //
-        //            log.info("storeTransaction " + txId + "-" + submitMessageTransaction);
+        //            log.debug("storeTransaction " + txId + "-" + submitMessageTransaction);
         //        } catch (Exception e) {
         //            if (dbTransaction != null) {
         //                dbTransaction.rollback();
@@ -348,9 +348,9 @@ implements SxcPersistence{
             session.save(hcsApplicationMessage);
             dbTransaction.commit();
     
-            log.info("storeApplicationMessage " + appMessageId + "-" + applicationMessage);
+            log.debug("storeApplicationMessage " + appMessageId + "-" + applicationMessage);
         } else {
-            log.info("Application message already in database");
+            log.debug("Application message already in database");
         }
     }
 
@@ -439,7 +439,7 @@ implements SxcPersistence{
             int nanos = (int) (maxTimestamp % SCALAR);
             lastConsensusTimestamp = Instant.ofEpochSecond(seconds, nanos);
         }
-        log.info("Last consensus timestamp from database is : " + lastConsensusTimestamp.getEpochSecond() + " seconds, " + lastConsensusTimestamp.getNano() + " nanos.");
+        log.debug("Last consensus timestamp from database is : " + lastConsensusTimestamp.getEpochSecond() + " seconds, " + lastConsensusTimestamp.getNano() + " nanos.");
 
         return lastConsensusTimestamp;
     }

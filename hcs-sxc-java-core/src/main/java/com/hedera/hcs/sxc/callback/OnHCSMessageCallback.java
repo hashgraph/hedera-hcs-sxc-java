@@ -57,8 +57,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.crypto.KeyAgreement;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -99,7 +97,6 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
             Class<?> messageKeyRotationClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcKeyRotation", true);
             this.keyRotationPlugin = (SxcKeyRotation)messageKeyRotationClass.newInstance();
         }
-        
         
         // load persistence implementation at runtime
         Class<?> persistenceClass = Plugins.find("com.hedera.hcs.sxc.plugin.persistence.*", "com.hedera.hcs.sxc.interfaces.SxcPersistence", true);
@@ -156,8 +153,6 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                 if (isMessageForMe == false) return; 
                 
                 ApplicationMessage appMessage = messageEnvelopeOptional.get();
-                
-                
 
                 if(this.encryptMessages){
                    
@@ -250,9 +245,9 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                     TransactionReceipt receiptKR2 = txIdKR2.getReceipt(client, Duration.ofSeconds(30));
 
                                 } catch (HederaStatusException ex) {
-                                        Logger.getLogger(OnHCSMessageCallback.class.getName()).log(Level.SEVERE, null, ex);
+                                        log.error(ex);
                                 } catch (HederaNetworkException ex) {
-                                        Logger.getLogger(OnHCSMessageCallback.class.getName()).log(Level.SEVERE, null, ex);
+                                    log.error(ex);
                                 }
                                     
                             } // test checking if initiator
@@ -308,7 +303,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
             }
       
         } catch (InvalidProtocolBufferException ex) {
-            Logger.getLogger(OnHCSMessageCallback.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex);
         }     
     }
     

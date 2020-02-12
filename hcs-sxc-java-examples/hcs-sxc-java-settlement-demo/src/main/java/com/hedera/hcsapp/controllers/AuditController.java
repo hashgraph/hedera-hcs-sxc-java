@@ -24,7 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
+import com.hedera.hcs.sxc.config.Topic;
+import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
+import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
+import com.hedera.hcs.sxc.plugins.Plugins;
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.States;
 import com.hedera.hcsapp.entities.Credit;
@@ -48,6 +52,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -70,11 +75,35 @@ public class AuditController {
     @Autowired
     SettlementRepository settlementRepository;
 
-    private static AppData appData;
-
+    private AppData appData;
+    //private HCSCore hCSCore;
+    private boolean signMessages;
+    private boolean encryptMessages;
+    private boolean rotateKeys;
+    private List<Topic> topics;
+    private SxcMessageEncryption messageEncryptionPlugin;
+    private SxcKeyRotation keyRotationPlugin;
     public AuditController() throws Exception {
-
         appData = new AppData();
+         HCSCore hcsCore = appData.getHCSCore();
+     
+          
+        this.signMessages = hcsCore.getSignMessages();
+        this.encryptMessages = hcsCore.getEncryptMessages();
+        this.rotateKeys = hcsCore.getRotateKeys();
+        this.topics = hcsCore.getTopics();
+        
+        if(this.signMessages){
+            
+        }
+        if (this.encryptMessages){
+            Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
+            this.messageEncryptionPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
+        }
+         if(this.rotateKeys){
+            Class<?> messageKeyRotationClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcKeyRotation", true);
+            this.keyRotationPlugin = (SxcKeyRotation)messageKeyRotationClass.newInstance();
+        }
     }
 
     @GetMapping(value = "/audit", produces = "application/json")
@@ -137,24 +166,17 @@ public class AuditController {
         for (String applicationMessageId : applicationMessageIds) {
             //SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessages.get(applicationMessageId).getBusinessProcessMessage());
 
-            if (!appData.getHCSCore().getEncryptMessages()) {
 
-                SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessages.get(applicationMessageId).getBusinessProcessMessage());
-                if (settlementBPM.getThreadID().equals(threadId)) {
-                    AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
-                    auditApplicationMessage.setApplicationMessageId(applicationMessageId);
-                    auditApplicationMessage.setMessage(settlementBPM.toString());
-                    auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
-                }
-                
-            } else {
 
+            SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessages.get(applicationMessageId).getBusinessProcessMessage());
+            if (settlementBPM.getThreadID().equals(threadId)) {
                 AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
                 auditApplicationMessage.setApplicationMessageId(applicationMessageId);
-                auditApplicationMessage.setMessage("Business Process Message ENCRYPTED");
+                auditApplicationMessage.setMessage(settlementBPM.toString());
                 auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
-
             }
+                
+         
         }
 
         return new ResponseEntity<>(auditApplicationMessages, headers, HttpStatus.OK);
@@ -193,7 +215,7 @@ public class AuditController {
                     auditHCSMessage.setSequenceNumber(mirrorResponse.getValue().sequenceNumber);
 
                     auditHCSMessage.setPart(chunk.getChunkIndex() + " of " + chunk.getChunksCount());
-
+                        
                     auditHCSMessage.setMessage(ApplicationMessage.parseFrom(chunk.getMessageChunk()).toString());
 
                     auditHCSMessages.getAuditHCSMessages().add(auditHCSMessage);

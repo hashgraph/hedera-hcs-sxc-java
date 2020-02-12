@@ -274,7 +274,6 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                 
                             }
                         } else {
-                                this.hcsCore.getMessagePersistence().storeApplicationMessage(messageEnvelopeOptional.get().getApplicationMessageId(), messageEnvelopeOptional.get());
                                 ApplicationMessage decryptedAppmessage = ApplicationMessage.newBuilder()
                                     .setApplicationMessageId(appMessage.getApplicationMessageId())
                                     .setBusinessProcessHash(appMessage.getBusinessProcessHash())
@@ -284,6 +283,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                     .setBusinessProcessSignature(appMessage.getBusinessProcessSignature())
                                     .build();
                                 appMessage = decryptedAppmessage;
+                                this.hcsCore.getMessagePersistence().storeApplicationMessage(appMessage.getApplicationMessageId(), appMessage);
 
                         }
                         //skip storing

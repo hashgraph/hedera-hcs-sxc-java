@@ -177,11 +177,11 @@ public class AuditController {
                 }
                 
             } else {
-
-                AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
-                auditApplicationMessage.setApplicationMessageId(applicationMessageId);
-                auditApplicationMessage.setMessage("Business Process Message ENCRYPTED");
-                auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
+                    
+                    AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
+                    auditApplicationMessage.setApplicationMessageId(applicationMessageId);
+                    auditApplicationMessage.setMessage("Business Process Message ENCRYPTED");
+                    auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
 
             }
         }
@@ -222,7 +222,7 @@ public class AuditController {
                     auditHCSMessage.setSequenceNumber(mirrorResponse.getValue().sequenceNumber);
 
                     auditHCSMessage.setPart(chunk.getChunkIndex() + " of " + chunk.getChunksCount());
-
+                        
                     auditHCSMessage.setMessage(ApplicationMessage.parseFrom(chunk.getMessageChunk()).toString());
 
                     auditHCSMessages.getAuditHCSMessages().add(auditHCSMessage);

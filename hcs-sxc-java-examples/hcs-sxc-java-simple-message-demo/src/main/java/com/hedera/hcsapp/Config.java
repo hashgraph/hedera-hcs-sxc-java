@@ -47,7 +47,7 @@ public final class Config {
 
         File configFile = new File(configFilePath);
         if (configFile.exists()) {
-            log.info("Loading apps.yaml from " + configFilePath);
+            log.debug("Loading apps.yaml from " + configFilePath);
             // config file exists outside of jar, use it
             InputStream inputStream = new FileInputStream(configFile.getCanonicalPath());
             yamlConfig = yaml.load(inputStream);

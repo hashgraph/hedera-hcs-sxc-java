@@ -73,7 +73,7 @@ public final class MirrorTopicSubscriber extends Thread {
             MirrorConsensusTopicQuery mirrorConsensusTopicQuery = new MirrorConsensusTopicQuery()
                     .setTopicId(topicId);
     
-            log.info("App Subscribing to topic number " + this.topicId.toString() + " on mirror node: " + this.mirrorAddress + ":" + this.mirrorPort);
+            log.debug("App Subscribing to topic number " + this.topicId.toString() + " on mirror node: " + this.mirrorAddress + ":" + this.mirrorPort);
     
             if (this.subscribeFrom.isPresent()) {
                 this.subscribeFrom = Optional.of(this.subscribeFrom.get().plusNanos(1));
@@ -81,33 +81,33 @@ public final class MirrorTopicSubscriber extends Thread {
                 this.subscribeFrom = Optional.of(Instant.now());
             }
             
-            log.info("subscribing from " + this.subscribeFrom.get().getEpochSecond() + " seconds, " + this.subscribeFrom.get().getNano() + " nanos.");
+            log.debug("subscribing from " + this.subscribeFrom.get().getEpochSecond() + " seconds, " + this.subscribeFrom.get().getNano() + " nanos.");
     
             mirrorConsensusTopicQuery.setStartTime(this.subscribeFrom.get());
             
             mirrorConsensusTopicQuery.subscribe(mirrorClient, resp -> {
-                log.info("Got mirror message, calling handler");
+                log.debug("Got mirror message, calling handler");
                 this.subscribeFrom = Optional.of(resp.consensusTimestamp.plusNanos(1));
                 onMirrorMessage(resp, this.onHCSMessageCallback, this.topicId);   
             },(error) -> {
                 // On gRPC error, print the stack trace
                 log.error(error);
-                log.info("Sleeping 11s before attempting connection again");
+                log.debug("Sleeping 11s before attempting connection again");
                 Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(11));
-                log.info("Attempting to reconnect");
+                log.debug("Attempting to reconnect");
                 subscribe();
             }
             );
         
         } catch (Exception e1) {
             log.error(e1);
-            log.info("Sleeping 11s before attempting connection again");
+            log.debug("Sleeping 11s before attempting connection again");
             Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(11));
         }
     }
     
     void onMirrorMessage(MirrorConsensusTopicResponse resp, HCSCallBackFromMirror onHCSMessageCallback, ConsensusTopicId topicId) {
-          log.info("Got message from mirror - persisting");
+          log.debug("Got message from mirror - persisting");
           ConsensusTopicResponse consensusTopicResponse = ConsensusTopicResponse.newBuilder()
                   .setConsensusTimestamp(Timestamp.newBuilder().setSeconds(resp.consensusTimestamp.getEpochSecond()).setNanos(resp.consensusTimestamp.getNano()).build())
                   .setMessage(ByteString.copyFrom(resp.message))
@@ -122,13 +122,13 @@ public final class MirrorTopicSubscriber extends Thread {
           ApplicationMessageChunk messagePart;
         try {
             messagePart = ApplicationMessageChunk.parseFrom(message);
-          log.info("Got message from mirror - calling back");
+          log.debug("Got message from mirror - calling back");
             onHCSMessageCallback.partialMessage(messagePart);
         } catch (InvalidProtocolBufferException e) {
             log.error(e);
         }
 
-        log.info("Got message from mirror - acknowledged");
+        log.debug("Got message from mirror - acknowledged");
       
     }
 }

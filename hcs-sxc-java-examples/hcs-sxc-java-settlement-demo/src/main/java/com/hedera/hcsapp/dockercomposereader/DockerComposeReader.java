@@ -39,11 +39,11 @@ public final class DockerComposeReader {
     public static DockerCompose parse(String dockerFileLocation) throws Exception {
         InputStream inputStream = null;
 
-        log.info("Loading app net configuration from docker-compose.yml");
+        log.debug("Loading app net configuration from docker-compose.yml");
 
         File configFile = new File(dockerFileLocation);
         if (configFile.exists()) {
-            log.info("Found app net configuration in " + dockerFileLocation);
+            log.debug("Found app net configuration in " + dockerFileLocation);
             inputStream = new FileInputStream(configFile.getCanonicalPath());
         }
         if (inputStream != null) {

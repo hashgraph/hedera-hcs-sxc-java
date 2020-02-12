@@ -47,10 +47,10 @@ public final class AppData {
     
     private String getEnvValue(String varName) throws Exception {
         String value = "";
-        log.info("Looking for " + varName + " in environment variables");
+        log.debug("Looking for " + varName + " in environment variables");
         if (System.getProperty(varName) != null) {
             value = System.getProperty(varName);
-            log.info(varName + " found in command line parameters");
+            log.debug(varName + " found in command line parameters");
         } else if ((this.dotEnv.get(varName) == null) || (this.dotEnv.get(varName).isEmpty())) {
             log.error(varName + " environment variable is not set");
             log.error(varName + " environment variable not found in ./config/.env");
@@ -58,7 +58,7 @@ public final class AppData {
             System.exit(0);
         } else {
             value = this.dotEnv.get(varName);
-            log.info(varName + " found in environment variables");
+            log.debug(varName + " found in environment variables");
         }
         return value;
     }
@@ -88,10 +88,10 @@ public final class AppData {
   
         if ( System.getProperty("server.port") != null ) { 
             this.webPort = Integer.parseInt(System.getProperty("server.port"));
-            log.info("PORT=" + this.webPort + " found in command line parameter server.port");
+            log.debug("PORT=" + this.webPort + " found in command line parameter server.port");
         } else {
             this.webPort = dockerCompose.getPortForId(this.appId);
-            log.info("PORT=" + this.webPort + " found in docker compose");
+            log.debug("PORT=" + this.webPort + " found in docker compose");
         }
 
         this.publicKey = dockerCompose.getPublicKeyForId(this.appId);

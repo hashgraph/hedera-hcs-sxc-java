@@ -51,12 +51,12 @@ public final class Launch {
             throw new Exception("hcs-sxc-java-relay: mirrorAddress format is incorrect, should be address:port");
         }
 
-        log.info("Relay topics to subscribe to from mirror and queue");
+        log.debug("Relay topics to subscribe to from mirror and queue");
         boolean blockingSetupJmsTopic = blockingCreateJmsTopic(config);
-        log.info("Queue in relay is set up:" + blockingSetupJmsTopic);
+        log.debug("Queue in relay is set up:" + blockingSetupJmsTopic);
         if (blockingSetupJmsTopic) {
             for (ConsensusTopicId topic : config.getConfig().getTopicIds()) {
-                log.info("Processing topic num: " + topic.topic);
+                log.debug("Processing topic num: " + topic.topic);
                 // subscribe to topic with mirror node
                 MirrorTopicSubscriber subscriber = new MirrorTopicSubscriber(
                         mirrorDetails[0]
@@ -107,7 +107,7 @@ public final class Launch {
 
             ConnectionFactory cf = (ConnectionFactory) initialContext.lookup("TCPConnectionFactory");
 
-            log.info("Waiting for MQ Artemis to start ...");
+            log.debug("Waiting for MQ Artemis to start ...");
 
             boolean scanning = true;
             do {
@@ -116,8 +116,8 @@ public final class Launch {
                     scanning = false;
                 } catch (Exception ie) {
                     String tcpConnectionFactory = queueConfig.getTcpConnectionFactory();
-                    log.info("Is Artemis up? Setup your host file so that the host identified in'"+tcpConnectionFactory+"' points to 127.0.0.1 if running outside of docker");
-                    log.info("Sleeping 6s before retry");
+                    log.debug("Is Artemis up? Setup your host file so that the host identified in'"+tcpConnectionFactory+"' points to 127.0.0.1 if running outside of docker");
+                    log.debug("Sleeping 6s before retry");
                     TimeUnit.SECONDS.sleep(6);
                 }
 
@@ -137,11 +137,11 @@ public final class Launch {
             log.error(e);
         } finally {
             if (connection != null) {
-                log.info("blockingCreateJmsTopic - Closing JMS connection");
+                log.debug("blockingCreateJmsTopic - Closing JMS connection");
                 connection.close();
             }
             if (initialContext != null) {
-                log.info("blockingCreateJmsTopic- Closing JMS initial context");
+                log.debug("blockingCreateJmsTopic- Closing JMS initial context");
                 initialContext.close();
             }
         }

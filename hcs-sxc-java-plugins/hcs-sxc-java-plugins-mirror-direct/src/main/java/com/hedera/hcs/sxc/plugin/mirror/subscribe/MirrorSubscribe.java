@@ -35,7 +35,7 @@ public class MirrorSubscribe implements MirrorSubscriptionInterface {
 
     @Override
     public void init(HCSCallBackFromMirror onHCSMessageCallback, long applicationId, Optional<Instant> lastConsensusTimestamp, String mirrorAddress, List<ConsensusTopicId> topicIds) throws Exception {
-        log.info("hcs-sxc-java-plugins-mirror-direct init");
+        log.debug("hcs-sxc-java-plugins-mirror-direct init");
         // subscribe
         
         String[] mirrorDetails = mirrorAddress.split(":");
@@ -43,9 +43,9 @@ public class MirrorSubscribe implements MirrorSubscriptionInterface {
             throw new Exception("mirrorAddress format is incorrect, should be address:port");
         }
 
-        log.info("Subscribing to mirror node");
+        log.debug("Subscribing to mirror node");
         for (ConsensusTopicId topic : topicIds) {
-            log.info("Processing topic num: " + topic.toString());
+            log.debug("Processing topic num: " + topic.toString());
             // subscribe to topic with mirror node
             MirrorTopicSubscriber subscriber = new MirrorTopicSubscriber(mirrorDetails[0], Integer.parseInt(mirrorDetails[1]), topic, lastConsensusTimestamp, onHCSMessageCallback);
             Thread subscriberThread = new Thread(subscriber);

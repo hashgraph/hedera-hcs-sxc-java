@@ -24,23 +24,20 @@ package com.hedera.hcs.sxc.plugin.cryptography.cryptography;
 
 import com.hedera.hcs.sxc.utils.StringUtils;
 
+import lombok.extern.log4j.Log4j2;
+
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.security.KeyPair;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.junit.jupiter.api.Test;
 
+@Log4j2
 public class CryptographyTest {
-    
-  
-    
     public CryptographyTest() {
     }
-
    
     @Test
     public void testEncryptAndDecrypt() throws Exception {
@@ -56,7 +53,7 @@ public class CryptographyTest {
             secretKey =  kp.getPrivate().getEncoded();
             //System.out.println(StringUtils.byteArrayToHexString(secretKey));
         } catch (Exception ex) {
-            Logger.getLogger(CryptographyTest.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex);
         }
         byte[] encrypt = Cryptography.load().encrypt(secretKey, StringUtils.stringToByteArray(cleartext));
         String encryptHex = StringUtils.byteArrayToHexString(encrypt);

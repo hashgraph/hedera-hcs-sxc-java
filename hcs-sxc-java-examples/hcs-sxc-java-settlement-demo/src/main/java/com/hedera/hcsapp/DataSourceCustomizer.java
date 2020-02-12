@@ -20,8 +20,6 @@ package com.hedera.hcsapp;
  * ‍
  */
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sql.DataSource;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -29,6 +27,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 @Configuration
 public class DataSourceCustomizer {
     @Bean(name = "dataSourceOverride")
@@ -42,7 +43,7 @@ public class DataSourceCustomizer {
                     .url("jdbc:h2:./h2data/demo-db-appid-"+appData.getAppId()+"-"+appData.getUserName())
                     .build();
         } catch (Exception ex) {
-            Logger.getLogger(DataSourceCustomizer.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex);
         }
         return ds;
     }

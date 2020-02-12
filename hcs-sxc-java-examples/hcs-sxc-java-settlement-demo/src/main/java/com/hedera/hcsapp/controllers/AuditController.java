@@ -166,24 +166,17 @@ public class AuditController {
         for (String applicationMessageId : applicationMessageIds) {
             //SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessages.get(applicationMessageId).getBusinessProcessMessage());
 
-            if (!appData.getHCSCore().getEncryptMessages()) {
 
-                SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessages.get(applicationMessageId).getBusinessProcessMessage());
-                if (settlementBPM.getThreadID().equals(threadId)) {
-                    AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
-                    auditApplicationMessage.setApplicationMessageId(applicationMessageId);
-                    auditApplicationMessage.setMessage(settlementBPM.toString());
-                    auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
-                }
-                
-            } else {
-                    
-                    AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
-                    auditApplicationMessage.setApplicationMessageId(applicationMessageId);
-                    auditApplicationMessage.setMessage("Business Process Message ENCRYPTED");
-                    auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
 
+            SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessages.get(applicationMessageId).getBusinessProcessMessage());
+            if (settlementBPM.getThreadID().equals(threadId)) {
+                AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
+                auditApplicationMessage.setApplicationMessageId(applicationMessageId);
+                auditApplicationMessage.setMessage(settlementBPM.toString());
+                auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
             }
+                
+         
         }
 
         return new ResponseEntity<>(auditApplicationMessages, headers, HttpStatus.OK);

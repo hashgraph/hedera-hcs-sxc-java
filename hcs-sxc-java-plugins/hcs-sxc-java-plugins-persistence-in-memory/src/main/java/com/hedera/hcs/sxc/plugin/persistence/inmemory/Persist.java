@@ -24,6 +24,7 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
+import com.hedera.hcs.sxc.interfaces.SXCApplicationMessageInterface;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 import com.hedera.hcs.sxc.proto.ApplicationMessageID;
@@ -123,7 +124,12 @@ public class Persist
     }
 
     @Override
-    public void storeApplicationMessage(ApplicationMessageID applicationMessageId, ApplicationMessage applicationMessage) {
+    public void storeApplicationMessage(ApplicationMessage applicationMessage, 
+                Instant lastChronoPartConsensusTimestamp,
+                byte[] lastChronoPartRunningHash,
+                long lastChronoPartSequenceNum        
+    ) {
+        ApplicationMessageID applicationMessageId = applicationMessage.getApplicationMessageId();
         String appMessageId = applicationMessageId.getAccountID().getShardNum()
                 + "." + applicationMessageId.getAccountID().getRealmNum()
                 + "." + applicationMessageId.getAccountID().getAccountNum()
@@ -220,6 +226,18 @@ public class Persist
     public byte[] getPublicKey() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+
+    @Override
+    public List<? extends SXCApplicationMessageInterface> getSCXApplicationMessages() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public SXCApplicationMessageInterface getApplicationMessageEntity(String applicationMessageId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 
    
 }

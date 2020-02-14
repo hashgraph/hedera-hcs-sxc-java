@@ -36,6 +36,7 @@ import com.hedera.hcs.sxc.interfaces.HCSCallBackToAppInterface;
 import com.hedera.hcs.sxc.interfaces.HCSResponse;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcs.sxc.interfaces.MirrorSubscriptionInterface;
+import com.hedera.hcs.sxc.interfaces.SXCApplicationMessageInterface;
 import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
 import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
 import com.hedera.hcs.sxc.plugins.Plugins;
@@ -140,7 +141,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
     }
     
     @Override
-    public void partialMessage(ApplicationMessageChunk messagePart) {
+    public void partialMessage(ApplicationMessageChunk messagePart, SxcConsensusMessage sxcConsensusMesssage) {
                 
         try {
             Optional<ApplicationMessage> messageEnvelopeOptional =
@@ -283,7 +284,12 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                     .setBusinessProcessSignature(appMessage.getBusinessProcessSignature())
                                     .build();
                                 appMessage = decryptedAppmessage;
-                                this.hcsCore.getMessagePersistence().storeApplicationMessage(appMessage.getApplicationMessageId(), appMessage);
+                                this.hcsCore.getMessagePersistence().storeApplicationMessage(
+                                        appMessage,
+                                        sxcConsensusMesssage.consensusTimestamp,
+                                        sxcConsensusMesssage.runningHash,
+                                        sxcConsensusMesssage.sequenceNumber
+                                );
 
                         }
                         //skip storing
@@ -294,7 +300,12 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                     }  
                     
                 } else { // not encrypted
-                    this.hcsCore.getMessagePersistence().storeApplicationMessage(messageEnvelopeOptional.get().getApplicationMessageId(), messageEnvelopeOptional.get());
+                    this.hcsCore.getMessagePersistence().storeApplicationMessage(
+                            messageEnvelopeOptional.get(),
+                            sxcConsensusMesssage.consensusTimestamp,
+                            sxcConsensusMesssage.runningHash,
+                            sxcConsensusMesssage.sequenceNumber
+                    );
                     notifyObservers( appMessage.toByteArray(), appMessage.getApplicationMessageId());
                 }
                 

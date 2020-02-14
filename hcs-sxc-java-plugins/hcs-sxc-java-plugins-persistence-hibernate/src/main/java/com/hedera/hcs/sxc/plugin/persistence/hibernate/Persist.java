@@ -35,6 +35,7 @@ import com.hedera.hcs.sxc.plugin.persistence.entities.MirrorResponse;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
+import com.hedera.hcs.sxc.interfaces.SXCApplicationMessageInterface;
 import com.hedera.hcs.sxc.plugin.persistence.entities.KeyStore;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
@@ -106,7 +107,7 @@ implements SxcPersistence{
             Transaction dbTransaction = null;
             // start a transaction
             dbTransaction = session.beginTransaction();
-            // save the student objects
+            
             session.save(mirrorResponse);
             // commit transaction
             dbTransaction.commit();
@@ -324,7 +325,14 @@ implements SxcPersistence{
     }
 
     @Override
-    public void storeApplicationMessage(ApplicationMessageID applicationMessageId, ApplicationMessage applicationMessage) {
+    public void storeApplicationMessage(
+            ApplicationMessage applicationMessage,
+            Instant lastChronoPartConsensusTimestamp,
+            byte[] lastChronoPartRunningHash,
+            long lastChronoPartSequenceNum
+    
+    ) {
+        ApplicationMessageID applicationMessageId = applicationMessage.getApplicationMessageId();
         String appMessageId = applicationMessageId.getAccountID().getShardNum()
                 + "." + applicationMessageId.getAccountID().getRealmNum()
                 + "." + applicationMessageId.getAccountID().getAccountNum()
@@ -342,7 +350,9 @@ implements SxcPersistence{
 
             hcsApplicationMessage.setApplicationMessageId(appMessageId);
             hcsApplicationMessage.setApplicationMessage(applicationMessage.toByteArray());
-    
+            hcsApplicationMessage.setLastChronoPartConsensusTimestamp(lastChronoPartConsensusTimestamp);
+            hcsApplicationMessage.setLastChronoPartRunningHash(lastChronoPartRunningHash);
+            hcsApplicationMessage.setLastChronoPartSequenceNum(lastChronoPartSequenceNum);
             Transaction dbTransaction = null;
             dbTransaction = session.beginTransaction();
             session.save(hcsApplicationMessage);
@@ -353,6 +363,8 @@ implements SxcPersistence{
             log.debug("Application message already in database");
         }
     }
+    
+   
 
     @Override
     public ApplicationMessage getApplicationMessage(String applicationMessageId) {
@@ -370,6 +382,19 @@ implements SxcPersistence{
             log.error(e);
         }
         return null;
+    }
+    
+    @Override
+    public SXCApplicationMessageInterface getApplicationMessageEntity(String applicationMessageId) {
+        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        HCSApplicationMessage applicationMessage = session.createQuery("from HCSApplicationMessage m where m.applicationMessageId = :applicationMessageId", HCSApplicationMessage.class)
+                .setParameter("applicationMessageId", applicationMessageId)
+                .getResultList()
+                .stream().findFirst().orElse(null);
+        if (applicationMessage == null) {
+            return null;
+        }
+        return applicationMessage;
     }
 
 
@@ -391,7 +416,18 @@ implements SxcPersistence{
 
         return responseList;
     }
+    
+    
+    @Override
+    public List<? extends SXCApplicationMessageInterface> getSCXApplicationMessages() {
+         
+        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        List<HCSApplicationMessage> applicationMessages = session.createQuery("from HCSApplicationMessage", HCSApplicationMessage.class)
+                .list();
+        return applicationMessages;
+    }
 
+    
     @Override
     public void putParts(ApplicationMessageID applicationMessageId, List<ApplicationMessageChunk> l) {
         // always keep data to allow for reassembly of messages,
@@ -500,4 +536,9 @@ implements SxcPersistence{
         KeyStore ks = session.find(KeyStore.class, 0);
         return ks.getPublicKey();
     }
+
+
+   
+
+  
 }

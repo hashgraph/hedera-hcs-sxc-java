@@ -52,10 +52,21 @@ public interface SxcPersistence {
     public ConsensusMessageSubmitTransaction getSubmittedTransaction(String transactionId);
     public Map<String, ConsensusMessageSubmitTransaction> getSubmittedTransactions();
     
-    // application message persistence
-    public void storeApplicationMessage(ApplicationMessageID applicationMessageId, ApplicationMessage applicationMessage);
-    public Map<String, ApplicationMessage> getApplicationMessages();
-    public ApplicationMessage getApplicationMessage(String applicationMessageId) throws InvalidProtocolBufferException;
+   // application message persistence
+  
+   public void storeApplicationMessage(
+        ApplicationMessage applicationMessage,
+        Instant lastChronoPartConsensusTimestamp,
+        byte[] lastChronoPartRunningHash,
+        long lastChronoPartSequenceNum
+   );
+   
+   public Map<String, ApplicationMessage> getApplicationMessages();
+   public List<? extends SXCApplicationMessageInterface> getSCXApplicationMessages(); 
+    
+   public SXCApplicationMessageInterface getApplicationMessageEntity(String applicationMessageId);
+   public ApplicationMessage getApplicationMessage(String applicationMessageId) throws InvalidProtocolBufferException;
+   
     
     // secret key  and keySpec holder for key rotation
     public void storeSecretKey(byte[] secretKey);
@@ -63,7 +74,7 @@ public interface SxcPersistence {
    
     public void storePublicKey(byte[] secretKey);
     public byte[] getPublicKey();
-    
+       
     // consensus timestamp
     public Instant getLastConsensusTimestamp();
     
@@ -73,3 +84,4 @@ public interface SxcPersistence {
     // clear all data
     public void clear();
   }
+    

@@ -11,12 +11,6 @@ message AccountID {
     int64 accountNum = 3; //A nonnegative account number unique within its realm
 }
 
-message TopicID {
-    int64 shardNum = 1; //The shard number (nonnegative)
-    int64 realmNum = 2; //The realm number (nonnegative)
-    int64 topicNum = 3; //A nonnegative topic number unique within its realm
-}
-
 message Timestamp {
     int64 seconds = 1; // Number of complete seconds since the start of the epoch
     int32 nanos = 2; // Number of nanoseconds since the start of the last second
@@ -27,18 +21,12 @@ message ApplicationMessageID {
     AccountID accountID = 2; //The Account ID that paid for this transaction
 }
 
-
-
 // a complete message containing data provided by an app to the core component
 message ApplicationMessage {
     ApplicationMessageID applicationMessageId = 1;
     bytes businessProcessMessage = 2;  // the payload
     bytes businessProcessHash = 3;
     bytes businessProcessSignature = 4;
-    Timestamp consensusTimestamp = 5; // consensus time stamp of last chunk received
-    bytes runningHash = 6;// running hash of last chunk
-    TopicID topicId = 7;
-    int64 sequenceNumber = 8;
 }
 
 // parts of a complete message

@@ -123,7 +123,7 @@ public final class MirrorTopicSubscriber extends Thread {
         try {
             messagePart = ApplicationMessageChunk.parseFrom(message);
           log.debug("Got message from mirror - calling back");
-            onHCSMessageCallback.partialMessage(messagePart);
+            onHCSMessageCallback.partialMessage(messagePart, consensusMessage);
         } catch (InvalidProtocolBufferException e) {
             log.error(e);
         }

@@ -25,9 +25,11 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.config.Topic;
+import com.hedera.hcs.sxc.interfaces.SXCApplicationMessageInterface;
 import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
 import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
+import com.hedera.hcs.sxc.plugin.persistence.entities.HCSApplicationMessage;
 import com.hedera.hcs.sxc.plugins.Plugins;
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.States;
@@ -160,25 +162,26 @@ public class AuditController {
         HCSCore hcsCore = appData.getHCSCore();
         SxcPersistence persistence = hcsCore.getMessagePersistence();
 
-        Map<String, ApplicationMessage> applicationMessages = persistence.getApplicationMessages();
-
-        SortedSet<String> applicationMessageIds = new TreeSet<>(applicationMessages.keySet());
-        for (String applicationMessageId : applicationMessageIds) {
-            //SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessages.get(applicationMessageId).getBusinessProcessMessage());
-
-
-
-            SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessages.get(applicationMessageId).getBusinessProcessMessage());
+        //Map<String, ApplicationMessage> applicationMessages = persistence.getApplicationMessages();
+        
+        
+        
+        List<? extends SXCApplicationMessageInterface> scxApplicationMessages = persistence.getSCXApplicationMessages();
+        for (SXCApplicationMessageInterface m : scxApplicationMessages){
+            //ApplicationMessage  = ApplicationMessage.parseFrom(m.getBusinessProcessMessage());
+            SettlementBPM settlementBPM = SettlementBPM.parseFrom(  
+                ApplicationMessage.parseFrom(m.getBusinessProcessMessage())
+                .getBusinessProcessMessage()
+            );
             if (settlementBPM.getThreadID().equals(threadId)) {
                 AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
-                auditApplicationMessage.setApplicationMessageId(applicationMessageId);
+                auditApplicationMessage.setApplicationMessageId(m.getApplicationMessageId());
                 auditApplicationMessage.setMessage(settlementBPM.toString());
                 auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
             }
-                
-         
-        }
+        };
 
+    
         return new ResponseEntity<>(auditApplicationMessages, headers, HttpStatus.OK);
     }
 

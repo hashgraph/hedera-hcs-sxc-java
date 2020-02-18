@@ -28,5 +28,5 @@ public interface HCSCallBackFromMirror {
     public void addObserver(HCSCallBackToAppInterface listener);
     public void notifyObservers(byte[] message, ApplicationMessageID applicationMessageId);
     public void storeMirrorResponse(SxcConsensusMessage consensusMessage);
-    public void partialMessage(ApplicationMessageChunk messagePart); 
+    public void partialMessage(ApplicationMessageChunk messagePart, SxcConsensusMessage sxcConsensusMessage); 
 }

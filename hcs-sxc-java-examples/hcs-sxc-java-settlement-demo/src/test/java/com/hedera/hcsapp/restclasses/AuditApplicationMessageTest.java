@@ -14,9 +14,11 @@ public class AuditApplicationMessageTest {
         AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
         auditApplicationMessage.setApplicationMessageId("applicationMessageId");
         auditApplicationMessage.setMessage("message");
+        auditApplicationMessage.setLastChronoPartConsensusTimestamp("lastChronoPartConsensusTimestamp");
         
         assertEquals("applicationMessageId", auditApplicationMessage.getApplicationMessageId());
         assertEquals("message", auditApplicationMessage.getMessage());
+        assertEquals("lastChronoPartConsensusTimestamp", auditApplicationMessage.getLastChronoPartConsensusTimestamp());
         assertEquals(appData.getHCSCore().getTopics().get(appData.getTopicIndex()).getTopic(), auditApplicationMessage.getTopicId());
         
     }

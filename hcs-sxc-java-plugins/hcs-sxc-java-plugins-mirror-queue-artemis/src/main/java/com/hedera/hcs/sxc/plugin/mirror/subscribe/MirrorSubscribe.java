@@ -133,7 +133,7 @@ public class MirrorSubscribe implements MirrorSubscriptionInterface {
                                 byte[] message = rlm.getMessage();
                                 ApplicationMessageChunk messagePart = ApplicationMessageChunk.parseFrom(message);
 
-                                onHCSMessageCallback.partialMessage(messagePart);
+                                onHCSMessageCallback.partialMessage(messagePart, consensusMessage);
                                 messageFromJMS.acknowledge();
 
                                 log.debug("Got message from queue - acknowledged");

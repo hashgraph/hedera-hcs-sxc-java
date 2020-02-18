@@ -465,12 +465,15 @@
                     <div class="panel">
                         <details>
                             <summary>
-                                <div  style="display:flex; flex-direction: column; margin-left: 64px;">
+                                <div  style="display:flex; flex-direction: column; margin-left: 16px;margin-right: 32px">
                                     <div style="display: flex; ">
-                                        <div style="padding: 16px"><b>Application Message ID:</b></div>
-                                        <div style="padding: 16px" id="audit-thread-message-id">0.0.1010-1575314109-166076700</div>
-                                        <div style="padding: 16px"><b>TX ID:</b></div>
-                                        <div style="padding: 16px" id="audit-thread-message-id">0.0.1010-1575314109-166076700</div>
+                                        <div style="padding: 16px"><b>Topic / SeqNo:</b></div>
+                                        <div style="padding: 16px" id="audit-topic-id">0.0.1010</div> 
+                                        <div style="padding: 16px 0px">/</div>
+                                        <div style="padding: 16px; flex-grow: 1" id="audit-seqno">55</div>  
+                                        
+                                        <div style="padding: 16px"><b>Consensus Time</b></div>
+                                        <div style="padding: 16px" id="audit-thread-tx-details">0.0.1010-1575314109-166076700</div>
                                     
                                     </div>
                                     <div style="padding: 16px; padding-top:8px" id="audit-thread-message-text">threadId: \"1575314119-166076700\"\ncredit ...</div>
@@ -918,7 +921,10 @@
                     let responseJSON = await  response.json();
                     responseJSON = responseJSON.auditHCSMessages;
                     clonedTemplate = document.getElementById("audit-thread-template").content.cloneNode(true);
-                    clonedTemplate.querySelector("#audit-thread-message-id").innerHTML=auditApplicationMessages[z].applicationMessageId;
+                    //clonedTemplate.querySelector("#audit-thread-message-id").innerHTML=auditApplicationMessages[z].applicationMessageId;
+                    clonedTemplate.querySelector("#audit-topic-id").innerHTML=auditApplicationMessages[z].topicId;
+                    clonedTemplate.querySelector("#audit-seqno").innerHTML=auditApplicationMessages[z].lastChronoPartSequenceNum;
+                    clonedTemplate.querySelector("#audit-thread-tx-details").innerHTML=auditApplicationMessages[z].lastChronoPartConsensusTimestamp;
                     clonedTemplate.querySelector("#audit-thread-message-text").innerHTML=syntaxHighlight(auditApplicationMessages[z].message);//.substring(0,180)+"...";
                     clonedTemplate.querySelector("#audit-thread-message-parts-json").innerHTML=syntaxHighlight(responseJSON);
                     main.appendChild(clonedTemplate);
@@ -1132,6 +1138,7 @@
                
                 json = json.replace(/([^ -~-\n]+)/g, "Ħ");
                 json = json.replace(/\\n/g, '\n\t\t');
+                json = json.replace(/(^threadID:."\d+-\d+")/g, '');
                 json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                 return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)|\b(credit|creditAck|settlePropose|settleProposeAck|settleInit|settleInitAck|paymentInit|paymentInitAck|paymentSent|paymentSentAck|settlePayment|settlePaymentAck|settleComplete|settleCompleteAck)\b/g, function (match) {
                     var cls = 'number';
@@ -1145,8 +1152,7 @@
                         cls = 'boolean';
                     } else if (/null/.test(match)) {
                         cls = 'null';
-                    }
-                    else if (/credit|creditAck|settlePropose|settleProposeAck|settleInit|settleInitAck|paymentInit|paymentInitAck|paymentSent|paymentSentAck|settlePayment|settlePaymentAck|settleComplete|settleCompleteAck/.test(match)) {
+                    } else if (/credit|creditAck|settlePropose|settleProposeAck|settleInit|settleInitAck|paymentInit|paymentInitAck|paymentSent|paymentSentAck|settlePayment|settlePaymentAck|settleComplete|settleCompleteAck/.test(match)) {
                         cls = 'mdc-chip';
                     }
                     return '<span class="' + cls + '">' + match + '</span>';
@@ -1162,7 +1168,7 @@
                 el.style.opacity=1;
                 el.style.pointerEvents =  'auto';
                 el.querySelector(".mdc-linear-progress").classList.add('mdc-linear-progress--closed');
-            }
+            }2
             
             function preventInput(recipient) {
                 el = document.getElementById(recipient);

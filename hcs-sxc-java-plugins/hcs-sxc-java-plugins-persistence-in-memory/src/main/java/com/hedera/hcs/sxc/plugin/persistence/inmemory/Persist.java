@@ -24,6 +24,7 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
+import com.hedera.hcs.sxc.interfaces.SXCApplicationMessageInterface;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 import com.hedera.hcs.sxc.proto.ApplicationMessageID;
@@ -31,19 +32,71 @@ import com.hedera.hcs.sxc.proto.ApplicationMessageID;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Log4j2
 public class Persist 
         implements com.hedera.hcs.sxc.interfaces.SxcPersistence{
     
+    
+
+    public class HCSApplicationMessage implements  SXCApplicationMessageInterface, Serializable{
+
+            private String applicationMessageId;
+            private byte[] applicationMessage;
+
+            private Instant lastChronoPartConsensusTimestamp;
+            private long lastChronoPartShardNum;
+            private long lastChronoPartRealmNum;
+            private long lastChronoPartRealmTopicNum;
+            private long lastChronoPartSequenceNum;
+            private String lastChronoPartRunningHashHEX;
+
+            @Override
+            public String getApplicationMessageId(){
+                return this.applicationMessageId;
+            }
+
+            @Override
+            public byte[] getBusinessProcessMessage(){
+                return this.applicationMessage;
+            }
+
+            @Override
+            public Instant getLastChronoPartConsensusTimestamp () {
+                return this.lastChronoPartConsensusTimestamp;
+            }
+
+            @Override
+            public long getLastChronoPartShardNum () {
+                return this.lastChronoPartShardNum;
+            }
+            @Override
+            public long getLastChronoPartRealmNum(){
+                return this.lastChronoPartRealmNum;
+            }
+            @Override
+            public long getLastChronoPartSequenceNum(){
+                return this.lastChronoPartSequenceNum;
+            }
+            @Override
+            public String getLastChronoPartRunningHashHEX(){
+                return this.lastChronoPartRunningHashHEX;
+            }
+
+    }
+    
+    
     private Map<ApplicationMessageID, List<ApplicationMessageChunk>> partialMessages;
     private Map<String, ConsensusMessageSubmitTransaction> transactions;
     private Map<String, SxcConsensusMessage> mirrorTopicMessages;
     private Map<String, ApplicationMessage> applicationMessages;
+    private Map<String, HCSApplicationMessage> hcsApplicationMessages;
     
     private MessagePersistenceLevel persistenceLevel = MessagePersistenceLevel.FULL;
     
@@ -52,6 +105,7 @@ public class Persist
         transactions = new HashMap<>();
         mirrorTopicMessages = new HashMap<>();
         applicationMessages = new HashMap<>();
+        hcsApplicationMessages = new HashMap<>();
     }
     
     public void setPersistenceLevel(MessagePersistenceLevel persistenceLevel) {
@@ -123,14 +177,30 @@ public class Persist
     }
 
     @Override
-    public void storeApplicationMessage(ApplicationMessageID applicationMessageId, ApplicationMessage applicationMessage) {
+    public void storeApplicationMessage(ApplicationMessage applicationMessage, 
+                Instant lastChronoPartConsensusTimestamp,
+                String lastChronoPartRunningHashHEX,
+                long lastChronoPartSequenceNum        
+    ) {
+        ApplicationMessageID applicationMessageId = applicationMessage.getApplicationMessageId();
         String appMessageId = applicationMessageId.getAccountID().getShardNum()
                 + "." + applicationMessageId.getAccountID().getRealmNum()
                 + "." + applicationMessageId.getAccountID().getAccountNum()
                 + "-" + applicationMessageId.getValidStart().getSeconds()
                 + "-" + applicationMessageId.getValidStart().getNanos();
+       
 
         applicationMessages.put(appMessageId, applicationMessage);
+        
+        HCSApplicationMessage hcsApplicationMessage = new HCSApplicationMessage();
+        hcsApplicationMessage.applicationMessageId = appMessageId;
+        hcsApplicationMessage.applicationMessage = applicationMessage.toByteArray();
+        hcsApplicationMessage.lastChronoPartConsensusTimestamp = lastChronoPartConsensusTimestamp;
+        hcsApplicationMessage.lastChronoPartRunningHashHEX= lastChronoPartRunningHashHEX;
+        hcsApplicationMessage.lastChronoPartSequenceNum = lastChronoPartSequenceNum;
+        
+        hcsApplicationMessages.put(appMessageId, hcsApplicationMessage);
+        
         log.debug("storeApplicationMessage " + appMessageId + "-" + applicationMessage);
     }
 
@@ -221,5 +291,15 @@ public class Persist
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+
+    @Override
+    public List<? extends SXCApplicationMessageInterface> getSCXApplicationMessages() {
+        return this.hcsApplicationMessages.values().stream().collect(Collectors.toList());
+    }
+
+    @Override
+    public SXCApplicationMessageInterface getApplicationMessageEntity(String applicationMessageId) {
+        return this.hcsApplicationMessages.get(applicationMessageId);
+    }
    
 }

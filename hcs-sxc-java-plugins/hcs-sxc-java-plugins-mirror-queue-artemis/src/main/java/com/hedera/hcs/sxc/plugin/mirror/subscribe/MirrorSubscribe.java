@@ -58,7 +58,7 @@ import lombok.extern.log4j.Log4j2;
 public class MirrorSubscribe implements MirrorSubscriptionInterface {
 
     @Override
-    public void init(HCSCallBackFromMirror onHCSMessageCallback, long applicationId, Optional<Instant> lastConsensusTimestamp, String mirrorAddress, List<ConsensusTopicId> topicIds) throws Exception {
+    public void init(HCSCallBackFromMirror onHCSMessageCallback, String applicationId, Optional<Instant> lastConsensusTimestamp, String mirrorAddress, List<ConsensusTopicId> topicIds) throws Exception {
         Config  config = new Config();
         log.debug("hcs-sxc-java-plugins-mirror-queue-artemis init");
         String contextFactory = config.getConfig().getQueue().getInitialContextFactory();

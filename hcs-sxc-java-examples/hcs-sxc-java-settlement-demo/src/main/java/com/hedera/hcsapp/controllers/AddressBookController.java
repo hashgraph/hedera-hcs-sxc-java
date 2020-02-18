@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hedera.hcsapp.AppData;
+import com.hedera.hcsapp.Statics;
 import com.hedera.hcsapp.dockercomposereader.DockerCompose;
 import com.hedera.hcsapp.dockercomposereader.DockerComposeReader;
 import com.hedera.hcsapp.dockercomposereader.DockerService;
@@ -46,20 +47,16 @@ import lombok.extern.log4j.Log4j2;
 @RestController
 public class AddressBookController {
 
-    private static AppData appData;
-    
     public AddressBookController() throws Exception {
-        appData = new AppData();
     }
 
     @Autowired
     AddressBookRepository addressBookRepository;
 
     @GetMapping(value = "/addressbook/buyerseller", produces = "application/json")
-    public List<AddressBook> addressbookBuyerSeller() throws FileNotFoundException, IOException {
-//        AppData appData = new AppData();
+    public List<AddressBook> addressbookBuyerSeller() throws Exception {
         log.debug("/addressbook/buyerorseller");
-        return addressBookRepository.findAllWithRoleButMe(appData.getUserName(),"BUYER,SELLER");
+        return addressBookRepository.findAllWithRoleButMe(Statics.getAppData().getUserName(),"BUYER,SELLER");
     }
 
     @GetMapping(value = "/addressbook/appusers", produces = "application/json")
@@ -82,46 +79,34 @@ public class AddressBookController {
                 String paymentAccountDetails = service.getEnvironment().get("PAYMENT_ACCOUNT_DETAILS");
                 String color = service.getEnvironment().get("COLOR");
                 long port = Long.parseLong(service.getPort());
-                long appId = Long.parseLong(service.getEnvironment().get("APP_ID"));
+                String appId = service.getEnvironment().get("APP_ID");
                 
                 restResponse.add(new AddressBookRest(name, publicKey, roles, paymentAccountDetails, port, color, appId));
             }
             
         }
-        
-//        List<AddressBook> addressBookList = new ArrayList<AddressBook>();
-//
-//        addressBookList = addressBookRepository.findAllUsers();
-//        
-//        for (AddressBook addressBook : addressBookList) {
-//            restResponse.add(new AddressBookRest(addressBook, index));
-//            index += 1;
-//        }
-//
         return new ResponseEntity<>(restResponse, headers, HttpStatus.OK);
     }
 
     @GetMapping(value = "/addressbook/paychannel", produces = "application/json")
-    public List<AddressBook> addressbookPaychannel() throws FileNotFoundException, IOException {
+    public List<AddressBook> addressbookPaychannel() throws Exception {
         log.debug("/addressbook/paychannel");
-        return addressBookRepository.findAllWithRoleButMe(appData.getUserName(),"PAYCHANNEL");
+        return addressBookRepository.findAllWithRoleButMe(Statics.getAppData().getUserName(),"PAYCHANNEL");
     }
     
     @GetMapping(value = "/addressbook-everything", produces = "application/json")
     public List<AddressBook> addressbookEverything() throws FileNotFoundException, IOException {
-//        AppData appData = new AppData();
         return addressBookRepository.findAllUsers();
     }
     
     @GetMapping(value = "/addressbook", produces = "application/json")
-    public List<AddressBook> addressbookAll() throws FileNotFoundException, IOException {
-//        AppData appData = new AppData();
+    public List<AddressBook> addressbookAll() throws Exception {
         log.debug("/addressbook");
-        return addressBookRepository.findAllUsersButMe(appData.getUserName());
+        return addressBookRepository.findAllUsersButMe(Statics.getAppData().getUserName());
     }
     @GetMapping(value = "/addressbook/me", produces = "application/json")
-    public AddressBook addressbookMe() throws FileNotFoundException, IOException {
+    public AddressBook addressbookMe() throws Exception {
         log.debug("/addressbook");
-        return addressBookRepository.findById(appData.getUserName()).get();
+        return addressBookRepository.findById(Statics.getAppData().getUserName()).get();
     }
 }

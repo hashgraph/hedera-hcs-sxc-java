@@ -40,8 +40,6 @@ public class Application {
     public static void main(String[] args) throws Exception {
 
         SpringApplication app = new SpringApplication(Application.class);
-        //app.setDefaultProperties(Collections
-        //  .singletonMap("server.port", appData.getWebPort()));
         app.run(args);
     }
     
@@ -49,13 +47,11 @@ public class Application {
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
         return args -> {
 
-            AppData appData = new AppData();
-           
             // delete the address book
             addressBookRepository.deleteAll();
             
             // populate the address book
-            for (AppClient appClient : appData.getAppClients()) {   
+            for (AppClient appClient : Statics.getAppData().getAppClients()) {   
                 AddressBook addressBook = new AddressBook();
                 addressBook.setName(appClient.getClientName());
                 addressBook.setPublicKey(appClient.getClientKey());

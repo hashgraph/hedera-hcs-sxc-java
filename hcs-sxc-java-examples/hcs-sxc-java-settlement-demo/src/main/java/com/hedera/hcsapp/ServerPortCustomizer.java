@@ -34,8 +34,7 @@ public class ServerPortCustomizer
     @Override
     public void customize(ConfigurableWebServerFactory factory) {
         try {
-            AppData appData = new AppData();
-            factory.setPort(appData.getWebPort());
+            factory.setPort(Statics.getAppData().getWebPort());
         } catch (Exception e) {
             log.error(e);
         }

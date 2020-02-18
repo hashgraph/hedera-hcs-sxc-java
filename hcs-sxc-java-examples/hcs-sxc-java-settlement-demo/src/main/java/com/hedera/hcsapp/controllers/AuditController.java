@@ -29,8 +29,8 @@ import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
 import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcs.sxc.plugins.Plugins;
-import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.States;
+import com.hedera.hcsapp.Statics;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.entities.Settlement;
 import com.hedera.hcsapp.repository.CreditRepository;
@@ -75,8 +75,6 @@ public class AuditController {
     @Autowired
     SettlementRepository settlementRepository;
 
-    private AppData appData;
-    //private HCSCore hCSCore;
     private boolean signMessages;
     private boolean encryptMessages;
     private boolean rotateKeys;
@@ -84,14 +82,10 @@ public class AuditController {
     private SxcMessageEncryption messageEncryptionPlugin;
     private SxcKeyRotation keyRotationPlugin;
     public AuditController() throws Exception {
-        appData = new AppData();
-         HCSCore hcsCore = appData.getHCSCore();
-     
-          
-        this.signMessages = hcsCore.getSignMessages();
-        this.encryptMessages = hcsCore.getEncryptMessages();
-        this.rotateKeys = hcsCore.getRotateKeys();
-        this.topics = hcsCore.getTopics();
+        this.signMessages = Statics.getAppData().getHCSCore().getSignMessages();
+        this.encryptMessages = Statics.getAppData().getHCSCore().getEncryptMessages();
+        this.rotateKeys = Statics.getAppData().getHCSCore().getRotateKeys();
+        this.topics = Statics.getAppData().getHCSCore().getTopics();
         
         if(this.signMessages){
             
@@ -107,7 +101,7 @@ public class AuditController {
     }
 
     @GetMapping(value = "/audit", produces = "application/json")
-    public ResponseEntity<AuditThreadIds> threadIds() throws FileNotFoundException, IOException {
+    public ResponseEntity<AuditThreadIds> threadIds() throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
 
@@ -118,7 +112,7 @@ public class AuditController {
                     credit.getThreadId(),
                      "Credit",
                      States.valueOf(credit.getStatus()).getDisplayForCredit(),
-                     appData.getHCSCore().getTopics().get(appData.getTopicIndex()).getTopic(),
+                     Statics.getAppData().getHCSCore().getTopics().get(Statics.getAppData().getTopicIndex()).getTopic(),
                      credit.getCreatedDate(),
                      credit.getCreatedTime()
             )
@@ -130,7 +124,7 @@ public class AuditController {
                     settlement.getThreadId(),
                      "Settlement",
                      States.valueOf(settlement.getStatus()).getDisplayForSettlement(),
-                     appData.getHCSCore().getTopics().get(appData.getTopicIndex()).getTopic(),
+                     Statics.getAppData().getHCSCore().getTopics().get(Statics.getAppData().getTopicIndex()).getTopic(),
                      settlement.getCreatedDate(),
                      settlement.getCreatedTime()
             )
@@ -152,43 +146,36 @@ public class AuditController {
     }
 
     @GetMapping(value = "/audit/{threadId}", produces = "application/json")
-    public ResponseEntity<AuditApplicationMessages> applicationMessages(@PathVariable String threadId) throws InvalidProtocolBufferException {
+    public ResponseEntity<AuditApplicationMessages> applicationMessages(@PathVariable String threadId) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
 
         AuditApplicationMessages auditApplicationMessages = new AuditApplicationMessages();
-        HCSCore hcsCore = appData.getHCSCore();
+        HCSCore hcsCore = Statics.getAppData().getHCSCore();
         SxcPersistence persistence = hcsCore.getMessagePersistence();
 
         Map<String, ApplicationMessage> applicationMessages = persistence.getApplicationMessages();
 
         SortedSet<String> applicationMessageIds = new TreeSet<>(applicationMessages.keySet());
         for (String applicationMessageId : applicationMessageIds) {
-            //SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessages.get(applicationMessageId).getBusinessProcessMessage());
-
-
-
             SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessages.get(applicationMessageId).getBusinessProcessMessage());
             if (settlementBPM.getThreadID().equals(threadId)) {
-                AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
+                AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(Statics.getAppData());
                 auditApplicationMessage.setApplicationMessageId(applicationMessageId);
                 auditApplicationMessage.setMessage(settlementBPM.toString());
                 auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
             }
-                
-         
         }
-
         return new ResponseEntity<>(auditApplicationMessages, headers, HttpStatus.OK);
     }
 
     @GetMapping(value = "/audit/{threadId}/{applicationMessageId}", produces = "application/json")
-    public ResponseEntity<AuditHCSMessages> applicationMessages(@PathVariable String threadId, @PathVariable String applicationMessageId) {
+    public ResponseEntity<AuditHCSMessages> applicationMessages(@PathVariable String threadId, @PathVariable String applicationMessageId) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
 
         AuditHCSMessages auditHCSMessages = new AuditHCSMessages();
-        HCSCore hcsCore = appData.getHCSCore();
+        HCSCore hcsCore = Statics.getAppData().getHCSCore();
         SxcPersistence persistence = hcsCore.getMessagePersistence();
 
         Map<String, SxcConsensusMessage> mirrorResponses = persistence.getMirrorResponses();
@@ -207,7 +194,7 @@ public class AuditController {
                         + "-" + applicationMessageIdProto.getValidStart().getNanos();
 
                 if (appMessageId.contentEquals(applicationMessageId)) {
-                    AuditHCSMessage auditHCSMessage = new AuditHCSMessage(appData);
+                    AuditHCSMessage auditHCSMessage = new AuditHCSMessage(Statics.getAppData());
                     auditHCSMessage.setConsensusTimeStampSeconds(mirrorResponse.getValue().consensusTimestamp.getEpochSecond());
                     auditHCSMessage.setConsensusTimeStampNanos(mirrorResponse.getValue().consensusTimestamp.getNano());
                     byte[] runningHash = mirrorResponse.getValue().runningHash;

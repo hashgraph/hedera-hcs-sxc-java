@@ -1155,6 +1155,9 @@
                     } else if (/credit|creditAck|settlePropose|settleProposeAck|settleInit|settleInitAck|paymentInit|paymentInitAck|paymentSent|paymentSentAck|settlePayment|settlePaymentAck|settleComplete|settleCompleteAck/.test(match)) {
                         cls = 'mdc-chip';
                     }
+                    else if (/credit|creditAck|settlePropose|settleProposeAck|settleInit|settleInitAck|paymentInit|paymentInitAck|paymentSent|paymentSentAck|settlePayment|settlePaymentAck|settleComplete|settleCompleteAck/.test(match)) {
+                        cls = 'mdc-chip';
+                    }
                     return '<span class="' + cls + '">' + match + '</span>';
                 });
             }

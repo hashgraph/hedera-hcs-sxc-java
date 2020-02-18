@@ -1,6 +1,7 @@
 package com.hedera.hcsapp.restclasses;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +12,7 @@ import com.hedera.hcsapp.entities.Credit;
 public class CreditRestTest {
     @Test
     public void testCreditRest() throws Exception {
-        AppData appData = new AppData("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.sample", "./src/test/resources/docker-compose.yml");
+        AppData appData = new AppData("./src/test/resources/config.yaml", "./src/test/resources/dotenv.sample", "./src/test/resources/docker-compose.yml");
 
         Credit credit = new Credit();
         credit.setAdditionalNotes("additionalNotes");
@@ -26,6 +27,8 @@ public class CreditRestTest {
         credit.setReference("reference");
         credit.setStatus(States.CREDIT_PROPOSED_PENDING.name());
         credit.setThreadId("threadId");
+        credit.setAutomatic(true);
+        assertTrue(credit.getAutomatic());
         
         CreditRest creditRest = new CreditRest(credit, appData);
         

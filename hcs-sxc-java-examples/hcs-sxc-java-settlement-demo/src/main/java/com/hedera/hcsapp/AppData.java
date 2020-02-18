@@ -99,7 +99,7 @@ public final class AppData {
         loadEnv("./config/.env");
         init("./config/config.yaml", "./config/docker-compose.yml", "./config/.env");
     }
-    public AppData(String appId, String configFilePath, String environmentFilePath, String dockerFilePath) throws Exception {
+    public AppData(String configFilePath, String environmentFilePath, String dockerFilePath) throws Exception {
         loadEnv(environmentFilePath);
         init(configFilePath, dockerFilePath, environmentFilePath);
     }

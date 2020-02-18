@@ -9,7 +9,7 @@ import com.hedera.hcsapp.AppData;
 public class AuditHCSMessagesTest {
     @Test
     public void testAuditApplicationMessages() throws Exception {
-        AppData appData = new AppData("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.sample", "./src/test/resources/docker-compose.yml");
+        AppData appData = new AppData("./src/test/resources/config.yaml", "./src/test/resources/dotenv.sample", "./src/test/resources/docker-compose.yml");
 
         AuditHCSMessage auditHCSMessage = new AuditHCSMessage(appData);
         auditHCSMessage.setConsensusTimeStampNanos(10);

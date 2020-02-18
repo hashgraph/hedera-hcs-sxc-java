@@ -46,25 +46,25 @@ public final class GetTopicInfo {
         this.operatorAccountId = hcsCore.getOperatorAccountId();
         this.ed25519PrivateKey = hcsCore.getEd25519PrivateKey();
     }    
-    public GetTopicInfo overrideNodeMap(Map<AccountId, String> nodeMap) {
+    public GetTopicInfo withNodeMap(Map<AccountId, String> nodeMap) {
         this.nodeMap = nodeMap;
         return this;
     }
-    public Map<AccountId, String> getOverrideNodeMap() {
+    public Map<AccountId, String> getNodeMap() {
         return this.nodeMap;
     }
-    public GetTopicInfo overrideOperatorAccountId(AccountId operatorAccountId) {
+    public GetTopicInfo withOperatorAccountId(AccountId operatorAccountId) {
         this.operatorAccountId = operatorAccountId;
         return this;
     }
-    public AccountId getOverrideOperatorAccountId() {
+    public AccountId getOperatorAccountId() {
         return this.operatorAccountId;
     }
-    public GetTopicInfo overrideOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
+    public GetTopicInfo withOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
         this.ed25519PrivateKey = ed25519PrivateKey;
         return this;
     }
-    public Ed25519PrivateKey getOverrideOperatorKey() {
+    public Ed25519PrivateKey getOperatorKey() {
         return this.ed25519PrivateKey;
     }
 

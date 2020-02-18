@@ -163,7 +163,7 @@ public class AuditController {
                 .getBusinessProcessMessage()
             );
             if (settlementBPM.getThreadID().equals(threadId)) {
-                AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
+                AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(Statics.getAppData());
                 auditApplicationMessage.setApplicationMessageId(m.getApplicationMessageId());
                 auditApplicationMessage.setLastChronoPartConsensusTimestamp(m.getLastChronoPartConsensusTimestamp().toString());
                 auditApplicationMessage.setLastChronoPartSequenceNum(m.getLastChronoPartSequenceNum());

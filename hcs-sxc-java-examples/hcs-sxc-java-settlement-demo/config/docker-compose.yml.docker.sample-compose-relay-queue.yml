@@ -44,7 +44,7 @@ services:
     image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
     restart: on-failure
     environment:
-      APP_ID: 0
+      APP_ID: "Alice"
       PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6b
       ROLES: "BUYER,SELLER"
       PAYMENT_ACCOUNT_DETAILS: "10-11-12 80640665"
@@ -64,7 +64,7 @@ services:
     image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
     restart: on-failure
     environment:
-      APP_ID: 1
+      APP_ID: "Bob"
       PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6a
       ROLES: "BUYER,SELLER"
       PAYMENT_ACCOUNT_DETAILS: "13-01-32 79832564"
@@ -84,7 +84,7 @@ services:
     image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
     restart: on-failure
     environment:
-      APP_ID: 2
+      APP_ID: "Carlos"
       PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6c
       ROLES: "BUYER,SELLER"
       PAYMENT_ACCOUNT_DETAILS: "22-11-14 70925098"
@@ -104,7 +104,7 @@ services:
     image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
     restart: on-failure
     environment:
-      APP_ID: 3
+      APP_ID: "Diana"
       PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6d
       ROLES: "PAYCHANNEL"
       PAYMENT_ACCOUNT_DETAILS: "12-52-23 26789524"
@@ -124,7 +124,7 @@ services:
     image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
     restart: on-failure
     environment:
-      APP_ID: 4
+      APP_ID: "Erica"
       PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6e
       ROLES: "BUYER,SELLER"
       PAYMENT_ACCOUNT_DETAILS: "09-34-21 46324354"
@@ -144,7 +144,7 @@ services:
     image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
     restart: on-failure
     environment:
-      APP_ID: 5
+      APP_ID: "Farouk"
       PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6f
       ROLES: "ARBITER,AUDITOR"
       PAYMENT_ACCOUNT_DETAILS: "10-69-43 86535765"
@@ -164,7 +164,7 @@ services:
     image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
     restart: on-failure
     environment:
-      APP_ID: 6
+      APP_ID: "Grace"
       PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab7a
       ROLES: "DEMO"
       PAYMENT_ACCOUNT_DETAILS: "10-32-52 55424452"
@@ -184,7 +184,7 @@ services:
     image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
     restart: on-failure
     environment:
-      APP_ID: 7
+      APP_ID: "Harry"
       PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab7b
       ROLES: "PAYCHANNEL"
       PAYMENT_ACCOUNT_DETAILS: "10-21-33 98321542"

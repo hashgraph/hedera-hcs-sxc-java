@@ -22,9 +22,11 @@ package com.hedera.hcsapp.restclasses;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.States;
+import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.entities.Settlement;
 import com.hedera.hcsapp.entities.SettlementItem;
 import com.hedera.hcsapp.repository.CreditRepository;
@@ -74,12 +76,10 @@ public final class SettlementRest {
         List<SettlementItem> settlementItemsFromDB = settlementItemRepository.findAllSettlementItems(settlement.getThreadId());
         for (SettlementItem settlementItem : settlementItemsFromDB) {
             this.threadIds.add(settlementItem.getId().getSettledThreadId());
-            creditRepository.findById(settlementItem.getId().getSettledThreadId()).ifPresent(
-                    (credit) -> {
-                        credits.add(new CreditRest(credit, appData));
-                    }
-            );
-
+            Optional<Credit> credit = creditRepository.findById(settlementItem.getId().getSettledThreadId());
+            if (credit.isPresent()) {
+                credits.add(new CreditRest(credit.get(), appData));
+            }
         }
     }
 }

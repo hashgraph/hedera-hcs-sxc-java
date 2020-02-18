@@ -386,7 +386,7 @@ In addition to the `config.yaml` file, a `.env` file may be provided (or environ
 OPERATOR_KEY=
 OPERATOR_ID=0.0.xxxx
 # APP Net
-APP_ID=0
+APP_ID="Alice"
 # Message encryption key (HEX)
 ENCRYPTION_KEY=308204be02...
 ```
@@ -466,9 +466,8 @@ These are merely sample lines of code, please refer to the example projects for 
 
 ```java
     public HCSIntegration() throws Exception {
-        this.appData = new AppData();
         // create a callback object to receive the message
-        OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(appData.getHCSCore());
+        OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(Statics.getAppData().getHCSCore());
         onHCSMessageCallback.addObserver(hcsMessage -> {
             processHCSMessage(hcsMessage);
         });
@@ -646,7 +645,7 @@ Also create a `.env` file with the following information
 OPERATOR_KEY=
 OPERATOR_ID=0.0.xxxx
 # APP Net
-APP_ID=0
+APP_ID="Alice"
 ```
 
 This demo does not use the queue and relay components, although it's possible to enable them by modifying the `pom.xml` file of the `hcs-sxc-java-settlement-demo` project to include them, they will also need to run as docker containers.
@@ -683,23 +682,18 @@ Whenever a participant performs and action in the UI, this results in a HCS tran
 To run the examples outside of docker and override `.env` variables run:
 
 ```
-mvnw exec:java -Dexec.mainClass="com.hedera.hcsapp.Application"  -Pfatjar  -DAPP_ID=1 -DOPERATOR_ID=0.0.1010 -DOPERATOR_KEY=302e0208...94329fb
+mvnw exec:java -Dexec.mainClass="com.hedera.hcsapp.Application"  -Pfatjar  -DAPP_ID="Alice" -DOPERATOR_ID=0.0.1010 -DOPERATOR_KEY=302e0208...94329fb
 ```
 If you want to run multiple clients from the command line simultaneously then make sure the server ports are not occupied.
 
 Note that the  `docker-compose.yaml` file is consulted even when running from then command line. If you specify the `-DAPP_ID`  argument then the port mapping is selected from the `yaml` file. 
 You can override the port by setting:
 
-
 ```-Dserver.port=8081```
-
-
 
 The demo provides helper functions to delete save and restore the local demo database however, these have undefined behavior when `hcs-sxc-plugins-persistence-in-memory` is chosen.
 
-
 You can also specify these `-D` input values in your IDE so that you can run several instances of the application in the IDE, this can help when debugging. To enable the debugger use the `-Djpda.listen=maven` flag.
-
 
 ## Contributing
 

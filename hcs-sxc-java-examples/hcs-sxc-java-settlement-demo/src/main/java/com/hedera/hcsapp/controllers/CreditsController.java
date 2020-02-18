@@ -23,6 +23,7 @@ package com.hedera.hcsapp.controllers;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hedera.hcsapp.AppData;
+import com.hedera.hcsapp.Statics;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.integration.HCSMessages;
 import com.hedera.hcsapp.repository.AddressBookRepository;
@@ -56,11 +57,7 @@ public class CreditsController {
     @Autowired
     AddressBookRepository addressBookRepository;
 
-    private static AppData appData;
-
     public CreditsController() throws Exception {
-
-        appData = new AppData();
     }
 
     @GetMapping(value = "/credits/{user}", produces = "application/json")
@@ -68,18 +65,17 @@ public class CreditsController {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
 
-        AppData appData = new AppData();
         List<Credit> creditList = new ArrayList<Credit>();
         List<CreditRest> restResponse = new ArrayList<CreditRest>();
 
         if (user == null) {
             creditList = (List<Credit>) creditRepository.findAllDesc();
         } else {
-            creditList = creditRepository.findAllCreditsForUsers(appData.getUserName(), user);
+            creditList = creditRepository.findAllCreditsForUsers(Statics.getAppData().getUserName(), user);
         }
         
         for (Credit credit : creditList) {
-            restResponse.add(new CreditRest(credit, appData));
+            restResponse.add(new CreditRest(credit, Statics.getAppData()));
         }
 
         return new ResponseEntity<>(restResponse, headers, HttpStatus.OK);
@@ -91,7 +87,7 @@ public class CreditsController {
         headers.add("Content-Type", "application/json");
 
         try {
-            CreditRest creditRest = hcsMessages.creditAck(appData, threadId, false);
+            CreditRest creditRest = hcsMessages.creditAck(Statics.getAppData(), threadId, false);
             return new ResponseEntity<>(creditRest, headers, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e);
@@ -104,7 +100,7 @@ public class CreditsController {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
         try {
-            CreditRest creditRest = hcsMessages.creditNew(appData, creditCreate);
+            CreditRest creditRest = hcsMessages.creditNew(Statics.getAppData(), creditCreate);
             return new ResponseEntity<>(creditRest, headers, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e);

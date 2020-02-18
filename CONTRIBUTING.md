@@ -152,6 +152,10 @@ commit automatically with `-s` command line option:
 $ git commit -s -m 'Update README'
 ```
 
+You may also follow these instructions so that signing is fully automated (https://github.com/prometheus/prometheus/wiki/DCO-signing).
+
+*Note that files created need to be set to executable (chmod +x on linux).*
+
 ### PR Lifecycle
 
 Now that you've got your [forked](#forking) branch and [signed off](#sign-off) any commits, you can proceed to submit it.

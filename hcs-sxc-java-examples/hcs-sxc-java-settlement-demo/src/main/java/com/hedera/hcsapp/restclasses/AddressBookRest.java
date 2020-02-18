@@ -36,6 +36,6 @@ public final class AddressBookRest {
     private final String paymentAccountDetails;    
     private final long port;
     private final String color;
-    private final long appId;
+    private final String appId;
     
 }

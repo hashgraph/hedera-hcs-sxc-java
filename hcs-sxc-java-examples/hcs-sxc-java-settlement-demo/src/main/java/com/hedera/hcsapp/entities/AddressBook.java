@@ -36,6 +36,6 @@ public class AddressBook {
     private String roles;
     private String paymentAccountDetails;
     private String color;
-    private int appId;
+    private String appId;
     private int port;
 }

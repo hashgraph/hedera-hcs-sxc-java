@@ -15,5 +15,8 @@ public class AuditThreadIdTest {
         assertEquals("topicId", auditThreadId.getTopicId());
         assertEquals("createdDate", auditThreadId.getCreatedDate());
         assertEquals("createdTime", auditThreadId.getCreatedTime());
+        
+        int equals = auditThreadId.compareTo(auditThreadId);
+        assertEquals(0, equals);
     }
 }

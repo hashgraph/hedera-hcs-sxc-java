@@ -52,25 +52,25 @@ public final class UpdateHCSTopic {
         this.tx.setMaxTransactionFee(hcsCore.getMaxTransactionFee());
     }
     
-    public UpdateHCSTopic overrideNodeMap(Map<AccountId, String> nodeMap) {
+    public UpdateHCSTopic withNodeMap(Map<AccountId, String> nodeMap) {
         this.nodeMap = nodeMap;
         return this;
     }
-    public Map<AccountId, String> getOverrideNodeMap() {
+    public Map<AccountId, String> getNodeMap() {
         return this.nodeMap;
     }
-    public UpdateHCSTopic overrideOperatorAccountId(AccountId operatorAccountId) {
+    public UpdateHCSTopic withOperatorAccountId(AccountId operatorAccountId) {
         this.operatorAccountId = operatorAccountId;
         return this;
     }
-    public AccountId getOverrideOperatorAccountId() {
+    public AccountId getOperatorAccountId() {
         return this.operatorAccountId;
     }
-    public UpdateHCSTopic overrideOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
+    public UpdateHCSTopic withOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
         this.ed25519PrivateKey = ed25519PrivateKey;
         return this;
     }
-    public Ed25519PrivateKey getOverrideOperatorKey() {
+    public Ed25519PrivateKey getOperatorKey() {
         return this.ed25519PrivateKey;
     }
     public UpdateHCSTopic setMaxTransactionFee(Long maxTansactionFee) {

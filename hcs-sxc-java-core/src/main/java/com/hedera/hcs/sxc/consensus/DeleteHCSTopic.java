@@ -50,25 +50,25 @@ public final class DeleteHCSTopic {
         this.tx.setMaxTransactionFee(hcsCore.getMaxTransactionFee());
     }
     
-    public DeleteHCSTopic overrideNodeMap(Map<AccountId, String> nodeMap) {
+    public DeleteHCSTopic withNodeMap(Map<AccountId, String> nodeMap) {
         this.nodeMap = nodeMap;
         return this;
     }
-    public Map<AccountId, String> getOverrideNodeMap() {
+    public Map<AccountId, String> getNodeMap() {
         return this.nodeMap;
     }
-    public DeleteHCSTopic overrideOperatorAccountId(AccountId operatorAccountId) {
+    public DeleteHCSTopic withOperatorAccountId(AccountId operatorAccountId) {
         this.operatorAccountId = operatorAccountId;
         return this;
     }
-    public AccountId getOverrideOperatorAccountId() {
+    public AccountId getOperatorAccountId() {
         return this.operatorAccountId;
     }
-    public DeleteHCSTopic overrideOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
+    public DeleteHCSTopic withOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
         this.ed25519PrivateKey = ed25519PrivateKey;
         return this;
     }
-    public Ed25519PrivateKey getOverrideOperatorKey() {
+    public Ed25519PrivateKey getOperatorKey() {
         return this.ed25519PrivateKey;
     }
     public DeleteHCSTopic setMaxTransactionFee(Long maxTansactionFee) {

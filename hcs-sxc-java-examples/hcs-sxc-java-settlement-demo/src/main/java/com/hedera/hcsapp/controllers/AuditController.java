@@ -9,9 +9,9 @@ package com.hedera.hcsapp.controllers;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,6 +25,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.config.Topic;
+import com.hedera.hcs.sxc.interfaces.SXCApplicationMessageInterface;
 import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
 import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
@@ -86,9 +87,9 @@ public class AuditController {
         this.encryptMessages = Statics.getAppData().getHCSCore().getEncryptMessages();
         this.rotateKeys = Statics.getAppData().getHCSCore().getRotateKeys();
         this.topics = Statics.getAppData().getHCSCore().getTopics();
-        
+
         if(this.signMessages){
-            
+
         }
         if (this.encryptMessages){
             Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
@@ -154,18 +155,24 @@ public class AuditController {
         HCSCore hcsCore = Statics.getAppData().getHCSCore();
         SxcPersistence persistence = hcsCore.getMessagePersistence();
 
-        Map<String, ApplicationMessage> applicationMessages = persistence.getApplicationMessages();
-
-        SortedSet<String> applicationMessageIds = new TreeSet<>(applicationMessages.keySet());
-        for (String applicationMessageId : applicationMessageIds) {
-            SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessages.get(applicationMessageId).getBusinessProcessMessage());
+        List<? extends SXCApplicationMessageInterface> scxApplicationMessages = persistence.getSCXApplicationMessages();
+        for (SXCApplicationMessageInterface m : scxApplicationMessages){
+            //ApplicationMessage  = ApplicationMessage.parseFrom(m.getBusinessProcessMessage());
+            SettlementBPM settlementBPM = SettlementBPM.parseFrom(
+                ApplicationMessage.parseFrom(m.getBusinessProcessMessage())
+                .getBusinessProcessMessage()
+            );
             if (settlementBPM.getThreadID().equals(threadId)) {
-                AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(Statics.getAppData());
-                auditApplicationMessage.setApplicationMessageId(applicationMessageId);
+                AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(appData);
+                auditApplicationMessage.setApplicationMessageId(m.getApplicationMessageId());
+                auditApplicationMessage.setLastChronoPartConsensusTimestamp(m.getLastChronoPartConsensusTimestamp().toString());
+                auditApplicationMessage.setLastChronoPartSequenceNum(m.getLastChronoPartSequenceNum());
+
                 auditApplicationMessage.setMessage(settlementBPM.toString());
                 auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
             }
-        }
+        };
+
         return new ResponseEntity<>(auditApplicationMessages, headers, HttpStatus.OK);
     }
 
@@ -202,7 +209,7 @@ public class AuditController {
                     auditHCSMessage.setSequenceNumber(mirrorResponse.getValue().sequenceNumber);
 
                     auditHCSMessage.setPart(chunk.getChunkIndex() + " of " + chunk.getChunksCount());
-                        
+
                     auditHCSMessage.setMessage(ApplicationMessage.parseFrom(chunk.getMessageChunk()).toString());
 
                     auditHCSMessages.getAuditHCSMessages().add(auditHCSMessage);

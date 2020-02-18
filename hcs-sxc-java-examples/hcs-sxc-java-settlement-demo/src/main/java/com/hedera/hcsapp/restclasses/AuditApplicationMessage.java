@@ -29,6 +29,9 @@ public class AuditApplicationMessage {
     private String applicationMessageId;
     private String message;
     private String topicId;
+    private String lastChronoPartConsensusTimestamp;
+    private long lastChronoPartSequenceNum;
+    private long lastChronoPartTopicNum;
     
     public AuditApplicationMessage(AppData appData) {
         this.topicId = appData.getHCSCore().getTopics().get(appData.getTopicIndex()).getTopic();

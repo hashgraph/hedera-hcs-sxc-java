@@ -567,7 +567,7 @@
                 thisRoles = whoami.roles;
                 thisAppId = whoami.appId;
                 thisPK = whoami.publicKey;
-                thisPort = allAddresses[thisAppId].port;
+                thisPort = getAddressById(thisAppId)[0].port;
                 document.documentElement.style.setProperty('--mdc-theme-primary', "#"+whoami.color);
                 
                 document.getElementById("this-user").innerHTML=whoami.name +"<span style='color:#aaa; font-size:12px;'> ("+whoami.roles+")</span>";
@@ -641,6 +641,11 @@
             function hasRole(userName, roleName){
                 return allAddresses.filter(f => f.name === userName)[0].roles.includes(roleName);
             }
+            function getAddressById(id) {
+            	return allAddresses.filter(
+           	      function(allAddresses){ return allAddresses.name == id }
+           	    );
+            }            
             
        </script>
       

@@ -61,12 +61,6 @@ public class SettlementRestTest {
         credit.get().setStatus("creditstatus");
         credit.get().setThreadId("creditthreadId");
 
-        if (creditRepository == null) {
-            System.out.println("Credit repository is null");
-            System.exit(0);
-        } else {
-            System.out.println("Credit repository is NOT null");
-        }
         Mockito.when(creditRepository.findById("creditthreadId"))
             .thenReturn(credit);
         
@@ -82,7 +76,7 @@ public class SettlementRestTest {
         Mockito.when(settlementItemRepository.findAllSettlementItems("threadid"))
             .thenReturn(settlementItems);
 
-        AppData appData = new AppData(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.sample", "./src/test/resources/docker-compose.yml");
+        AppData appData = new AppData("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.sample", "./src/test/resources/docker-compose.yml");
         
         Settlement settlement = new Settlement();
         settlement.setAdditionalNotes("additionalNotes");

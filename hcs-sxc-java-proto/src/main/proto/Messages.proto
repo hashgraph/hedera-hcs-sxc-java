@@ -24,7 +24,7 @@ message ApplicationMessageID {
 // a complete message containing data provided by an app to the core component
 message ApplicationMessage {
     ApplicationMessageID applicationMessageId = 1;
-    bytes businessProcessMessage = 2;
+    bytes businessProcessMessage = 2;  // the payload
     bytes businessProcessHash = 3;
     bytes businessProcessSignature = 4;
 }

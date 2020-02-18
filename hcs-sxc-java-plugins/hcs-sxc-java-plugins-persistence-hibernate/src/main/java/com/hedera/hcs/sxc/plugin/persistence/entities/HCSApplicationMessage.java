@@ -20,6 +20,13 @@ package com.hedera.hcs.sxc.plugin.persistence.entities;
  * ‍
  */
 
+import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
+import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
+import com.hedera.hcs.sxc.interfaces.SXCApplicationMessageInterface;
+import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.time.Instant;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
@@ -30,10 +37,52 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name = "ApplicationMessages")
-public class HCSApplicationMessage {
+public class HCSApplicationMessage implements  SXCApplicationMessageInterface, Serializable{
     @Id
     private String applicationMessageId;
     @Lob
     private byte[] applicationMessage;
+    
+    private Instant lastChronoPartConsensusTimestamp;
+    private long lastChronoPartShardNum;
+    private long lastChronoPartRealmNum;
+    private long lastChronoPartRealmTopicNum;
+    private long lastChronoPartSequenceNum;
+    private String lastChronoPartRunningHashHEX;
+    
+    @Override
+    public String getApplicationMessageId(){
+        return this.applicationMessageId;
+    }
+    
+    @Override
+    public byte[] getBusinessProcessMessage(){
+        return this.applicationMessage;
+    }
+    
+    @Override
+    public Instant getLastChronoPartConsensusTimestamp () {
+        return this.lastChronoPartConsensusTimestamp;
+    }
+    
+    @Override
+    public long getLastChronoPartShardNum () {
+        return this.lastChronoPartShardNum;
+    }
+    @Override
+    public long getLastChronoPartRealmNum(){
+        return this.lastChronoPartRealmNum;
+    }
+    @Override
+    public long getLastChronoPartSequenceNum(){
+        return this.lastChronoPartSequenceNum;
+    }
+    @Override
+    public String getLastChronoPartRunningHashHEX(){
+        return this.lastChronoPartRunningHashHEX;
+    }
+    
+    
+    
     
 }

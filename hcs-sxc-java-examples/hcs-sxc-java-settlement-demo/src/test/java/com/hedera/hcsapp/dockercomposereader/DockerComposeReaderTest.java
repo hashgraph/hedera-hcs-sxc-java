@@ -9,8 +9,7 @@ public class DockerComposeReaderTest {
     @Test
     public void testDockerComposeReader() throws Exception {
         DockerComposeReader reader = new DockerComposeReader();
-        DockerCompose dockerCompose = reader.parse();
-        dockerCompose = DockerComposeReader.parse("./src/test/resources/docker-compose.yml");
+        DockerCompose dockerCompose = reader.parse("./src/test/resources/docker-compose.yml");
         
         assertEquals("3.3", dockerCompose.getVersion());
         assertEquals("Alice", dockerCompose.getNameForId("Alice"));

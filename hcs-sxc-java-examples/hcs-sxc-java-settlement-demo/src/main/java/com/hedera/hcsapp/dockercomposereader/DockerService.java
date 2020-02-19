@@ -40,9 +40,9 @@ final public class DockerService {
     public void setEnvironment(Map<String, String> environment) {
         this.environment = environment;
     }
-    public List<String> getPorts() {
-        return this.ports;
-    }
+//    public List<String> getPorts() {
+//        return this.ports;
+//    }
     public void setPorts(List<String> ports) {
         this.ports = ports;
     }  

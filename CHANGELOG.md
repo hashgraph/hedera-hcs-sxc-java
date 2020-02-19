@@ -2,6 +2,10 @@
 
 Besides bug fixes, some features may have changed with this release which need your attention, these will be listed here.
 
+## Feburary 18th 2020
+
+* App Ids are now optional strings, requires an update to docker-compose.
+
 ## February 4th 2020
 
 * Cryptography plug in for encryption/decryption

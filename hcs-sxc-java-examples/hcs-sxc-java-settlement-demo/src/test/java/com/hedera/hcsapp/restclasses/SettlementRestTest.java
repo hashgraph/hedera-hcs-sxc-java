@@ -2,6 +2,7 @@ package com.hedera.hcsapp.restclasses;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,31 +59,25 @@ public class SettlementRestTest {
         credit.get().setPayerName("creditpayerName");
         credit.get().setRecipientName("creditrecipientName");
         credit.get().setReference("creditreference");
-        credit.get().setStatus("creditstatus");
-        credit.get().setThreadId("creditthreadId");
+        credit.get().setStatus(States.CREDIT_AGREED.name());
+        credit.get().setThreadId("creditThreadId");
 
-        if (creditRepository == null) {
-            System.out.println("Credit repository is null");
-            System.exit(0);
-        } else {
-            System.out.println("Credit repository is NOT null");
-        }
-        Mockito.when(creditRepository.findById("creditthreadId"))
+        Mockito.when(creditRepository.findById("creditThreadId"))
             .thenReturn(credit);
         
         SettlementItemId settlementItemId = new SettlementItemId();
-        settlementItemId.setSettledThreadId("creditthreadId");
-        settlementItemId.setThreadId("threadid");
+        settlementItemId.setSettledThreadId("creditThreadId");
+        settlementItemId.setThreadId("threadId");
         
         SettlementItem settlementItem = new SettlementItem();
         settlementItem.setId(settlementItemId);
         List<SettlementItem> settlementItems = new ArrayList<SettlementItem>();
         settlementItems.add(settlementItem);
         
-        Mockito.when(settlementItemRepository.findAllSettlementItems("threadid"))
+        Mockito.when(settlementItemRepository.findAllSettlementItems("threadId"))
             .thenReturn(settlementItems);
 
-        AppData appData = new AppData(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.sample", "./src/test/resources/docker-compose.yml");
+        AppData appData = new AppData("./src/test/resources/config.yaml", "./src/test/resources/dotenv.sample", "./src/test/resources/docker-compose.yml");
         
         Settlement settlement = new Settlement();
         settlement.setAdditionalNotes("additionalNotes");
@@ -100,6 +95,9 @@ public class SettlementRestTest {
         settlement.setRecipientName("recipientName");
         settlement.setStatus(States.CREDIT_AGREED.name());
         settlement.setThreadId("threadId");
+        settlement.setAutomatic(true);
+        
+        assertTrue(settlement.getAutomatic());
         
         SettlementRest settlementRest = new SettlementRest(settlement, appData, settlementItemRepository, creditRepository);
 

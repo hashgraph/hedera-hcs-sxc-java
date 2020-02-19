@@ -24,7 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.hedera.hashgraph.sdk.account.AccountId;
+import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcs.sxc.HCSCore;
+import com.hedera.hcs.sxc.utils.StringUtils;
 import com.hedera.hcsapp.appconfig.AppClient;
 import com.hedera.hcsapp.dockercomposereader.DockerCompose;
 import com.hedera.hcsapp.dockercomposereader.DockerComposeReader;
@@ -39,8 +42,11 @@ public final class AppData {
     private HCSCore hcsCore;
     private int topicIndex = 0; // refers to the first topic ID in the config.yaml
     private String publicKey = "";
+    private Ed25519PrivateKey operatorKey;
+    private AccountId operatorId = new AccountId(0,0,0);
+    private byte[] messageEncryptionKey = new byte[0];
     private String userName = "";
-    private long appId = -1; // -1 means load from environment
+    private String appId = "";
     List<AppClient> appClients = new ArrayList<>();
     private int webPort = 8080;
     private Dotenv dotEnv;
@@ -51,7 +57,7 @@ public final class AppData {
         if (System.getProperty(varName) != null) {
             value = System.getProperty(varName);
             log.debug(varName + " found in command line parameters");
-        } else if ((this.dotEnv.get(varName) == null) || (this.dotEnv.get(varName).isEmpty())) {
+        } else if ((this.dotEnv == null) || (this.dotEnv.get(varName) == null) || (this.dotEnv.get(varName).isEmpty())) {
             log.error(varName + " environment variable is not set");
             log.error(varName + " environment variable not found in ./config/.env");
             log.error(varName + " environment variable not found in command line parameters");
@@ -63,27 +69,41 @@ public final class AppData {
         return value;
     }
 
-    private long getEnvValueLong(String varName) throws Exception {
-        return Long.parseLong(getEnvValue(varName));
+    private String getOptionalEnvValue(String varName) throws Exception {
+        String value = "";
+        log.debug("Looking for " + varName + " in environment variables");
+        if (System.getProperty(varName) != null) {
+            value = System.getProperty(varName);
+            log.debug(varName + " found in command line parameters");
+        } else if ((this.dotEnv == null) || (this.dotEnv.get(varName) == null)) {
+            value = "";
+        } else {
+            value = this.dotEnv.get(varName);
+            log.debug(varName + " found in environment variables");
+        }
+        return value;
+    }
+
+    private void loadEnv(String envPath) throws Exception {
+        this.dotEnv = Dotenv.configure().filename(envPath).ignoreIfMissing().load();
+        this.appId = getOptionalEnvValue("APP_ID");
+        String encryptionKey = getOptionalEnvValue("ENCRYPTION_KEY");
+        if (encryptionKey.isEmpty()) {
+            this.messageEncryptionKey = new byte[0];
+        } else {
+            this.messageEncryptionKey = StringUtils.hexStringToByteArray(encryptionKey);
+        }
     }
 
     public AppData() throws Exception {
-        hcsCore = HCSCore.INSTANCE.singletonInstanceDefault(appId);
-        init("./config/config.yaml", "./config/.env", "./config/docker-compose.yml");
+        loadEnv("./config/.env");
+        init("./config/config.yaml", "./config/docker-compose.yml", "./config/.env");
     }
-    public AppData(long appId, String configFilePath, String environmentFilePath, String dockerFilePath) throws Exception {
-        this.appId = appId;
-        this.hcsCore =  HCSCore.INSTANCE.singletonInstanceWithAppIdEnvAndConfig(this.appId, configFilePath, environmentFilePath);
-        init(configFilePath, environmentFilePath, dockerFilePath);
+    public AppData(String configFilePath, String environmentFilePath, String dockerFilePath) throws Exception {
+        loadEnv(environmentFilePath);
+        init(configFilePath, dockerFilePath, environmentFilePath);
     }
-    private void init(String configFilePath, String environmentFilePath, String dockerFilePath) throws Exception {
-        this.dotEnv = hcsCore.getEnvironment();
-        // just check if set
-        getEnvValue("OPERATOR_KEY");
-        this.appId = getEnvValueLong("APP_ID");
-        //if (this.appId != -1) {
-        //    this.hcsCore = HCSCore.INSTANCE.singletonInstanceWithAppIdEnvAndConfig(this.appId, configFilePath, environmentFilePath);
-        //}
+    private void init(String configFilePath, String dockerFilePath, String environmentFilePath) throws Exception {
         DockerCompose dockerCompose = DockerComposeReader.parse(dockerFilePath);
   
         if ( System.getProperty("server.port") != null ) { 
@@ -113,21 +133,22 @@ public final class AppData {
                     appClient.setPaymentAccountDetails(dockerService.getEnvironment().get("PAYMENT_ACCOUNT_DETAILS"));
                     appClient.setRoles(dockerService.getEnvironment().get("ROLES"));
                     appClient.setColor(dockerService.getEnvironment().get("COLOR"));
-                    appClient.setAppId(Integer.parseInt(dockerService.getEnvironment().get("APP_ID")));
+                    appClient.setAppId(dockerService.getEnvironment().get("APP_ID"));
                     appClient.setWebPort(dockerService.getPortAsInteger());
 
                     this.appClients.add(appClient);
                 }
             }
         }
-
+        this.hcsCore =  HCSCore.INSTANCE.singletonInstance(this.appId, configFilePath, environmentFilePath)
+                .withMessageEncryptionKey(this.messageEncryptionKey);
     }
 
     public HCSCore getHCSCore() {
         return this.hcsCore;
     }
 
-    public long getAppId() {
+    public String getAppId() {
         return this.appId;
     }
 
@@ -149,5 +170,12 @@ public final class AppData {
     
     public int getWebPort() {
         return this.webPort;
+    }
+    
+    public Ed25519PrivateKey getOperatorKey() {
+        return this.operatorKey;
+    }
+    public AccountId getOperatorId() {
+        return this.operatorId;
     }
 }

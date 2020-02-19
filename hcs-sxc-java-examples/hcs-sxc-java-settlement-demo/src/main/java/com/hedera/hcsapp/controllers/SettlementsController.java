@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hedera.hcsapp.AppData;
+import com.hedera.hcsapp.Statics;
 import com.hedera.hcsapp.Utils;
 import com.hedera.hcsapp.entities.Settlement;
 import com.hedera.hcsapp.integration.HCSMessages;
@@ -65,23 +66,21 @@ public class SettlementsController {
     @Autowired
     CreditRepository creditRepository;
 
-    private static AppData appData;
     HttpHeaders headers = new HttpHeaders();
 
     public SettlementsController() throws Exception {
-        appData = new AppData();
         headers.add("Content-Type", "application/json");
     }
 
     @GetMapping(value = "/settlements/{user}", produces = "application/json")
     public ResponseEntity<List<SettlementRest>> settlementsForUser(@PathVariable String user)
-            throws FileNotFoundException, IOException {
+            throws Exception {
         log.debug("/settlements/" + user);
 
         List<SettlementRest> settlementsList = new ArrayList<SettlementRest>();
-        List<Settlement> settlements = settlementRepository.findAllSettlementsForUsers(appData.getUserName(), user);
+        List<Settlement> settlements = settlementRepository.findAllSettlementsForUsers(Statics.getAppData().getUserName(), user);
         for (Settlement settlementfromDB : settlements) {
-            SettlementRest settlementResponse = new SettlementRest(settlementfromDB, appData, settlementItemRepository,
+            SettlementRest settlementResponse = new SettlementRest(settlementfromDB, Statics.getAppData(), settlementItemRepository,
                     creditRepository);
             settlementsList.add(settlementResponse);
         }
@@ -93,7 +92,7 @@ public class SettlementsController {
     public ResponseEntity<SettlementRest> settlementNew(@RequestBody SettlementProposal settleProposal)
             throws Exception {
         try {
-            SettlementRest settlementResponse = hcsMessages.settlementNew(appData, settleProposal);
+            SettlementRest settlementResponse = hcsMessages.settlementNew(Statics.getAppData(), settleProposal);
             return new ResponseEntity<>(settlementResponse, headers, HttpStatus.OK);
         } catch (Exception e) {
             log.error(e);
@@ -105,7 +104,7 @@ public class SettlementsController {
     public ResponseEntity<SettlementRest> settleProposeAck(@PathVariable String threadId) throws Exception {
 
         try {
-            SettlementRest settlementRest = hcsMessages.settlementAck(appData, threadId, false);
+            SettlementRest settlementRest = hcsMessages.settlementAck(Statics.getAppData(), threadId, false);
             return new ResponseEntity<>(settlementRest, headers, HttpStatus.OK);
         } catch (Exception e) {
             return Utils.serverError();
@@ -121,7 +120,7 @@ public class SettlementsController {
 
         String threadId = settlementChannelProposal.getThreadId();
         try {
-            SettlementRest settlementRest = hcsMessages.settlementInit(appData, threadId, false, additionalNotes, paymentChannelName);
+            SettlementRest settlementRest = hcsMessages.settlementInit(Statics.getAppData(), threadId, false, additionalNotes, paymentChannelName);
             return new ResponseEntity<>(settlementRest, headers, HttpStatus.OK);
         } catch (Exception e) {
             return Utils.serverError();
@@ -131,7 +130,7 @@ public class SettlementsController {
     @PostMapping(value = "/settlements/proposechannel/ack/{threadId}", produces = "application/json")
     public ResponseEntity<SettlementRest> settleProposeChannelAck(@PathVariable String threadId) throws Exception {
         try {
-            SettlementRest settlementRest = hcsMessages.settleProposeChannelAck(appData, threadId, false);
+            SettlementRest settlementRest = hcsMessages.settleProposeChannelAck(Statics.getAppData(), threadId, false);
             return new ResponseEntity<>(settlementRest, headers, HttpStatus.OK);
         } catch (Exception e) {
             return Utils.serverError();
@@ -148,7 +147,7 @@ public class SettlementsController {
         String additionalNotes = settlementPaymentInit.getAdditionalNotes();
         
         try {
-            SettlementRest settlementRest = hcsMessages.settlePaymentInit(appData, threadId, false, payerAccountDetails, recipientAccountDetails, additionalNotes);
+            SettlementRest settlementRest = hcsMessages.settlePaymentInit(Statics.getAppData(), threadId, false, payerAccountDetails, recipientAccountDetails, additionalNotes);
             return new ResponseEntity<>(settlementRest, headers, HttpStatus.OK);
         } catch (Exception e) {
             return Utils.serverError();
@@ -159,7 +158,7 @@ public class SettlementsController {
     public ResponseEntity<SettlementRest> settlePaymentInitAck(@PathVariable String threadId) throws Exception {
 
         try {
-            SettlementRest settlementRest = hcsMessages.settlePaymentInitAck(appData, threadId, false);
+            SettlementRest settlementRest = hcsMessages.settlePaymentInitAck(Statics.getAppData(), threadId, false);
             return new ResponseEntity<>(settlementRest, headers, HttpStatus.OK);
         } catch (Exception e) {
             return Utils.serverError();
@@ -172,7 +171,7 @@ public class SettlementsController {
         String threadId = settlementPaid.getThreadId();
         String additionalNotes = settlementPaid.getAdditionalNotes();
         try {
-            SettlementRest settlementRest = hcsMessages.settlePaymentPaid(appData, threadId, false, additionalNotes);
+            SettlementRest settlementRest = hcsMessages.settlePaymentPaid(Statics.getAppData(), threadId, false, additionalNotes);
             return new ResponseEntity<>(settlementRest, headers, HttpStatus.OK);
         } catch (Exception e) {
             return Utils.serverError();
@@ -183,7 +182,7 @@ public class SettlementsController {
     public ResponseEntity<SettlementRest> paidAck(@PathVariable String threadId) throws Exception {
 
         try {
-            SettlementRest settlementRest = hcsMessages.settlePaymentPaidAck(appData, threadId, false);
+            SettlementRest settlementRest = hcsMessages.settlePaymentPaidAck(Statics.getAppData(), threadId, false);
             return new ResponseEntity<>(settlementRest, headers, HttpStatus.OK);
         } catch (Exception e) {
             return Utils.serverError();
@@ -196,7 +195,7 @@ public class SettlementsController {
         String threadId = settlementPaid.getThreadId();
         String additionalNotes = settlementPaid.getAdditionalNotes();
         try {
-            SettlementRest settlementRest = hcsMessages.settlePaymentComplete(appData, threadId, false, additionalNotes);
+            SettlementRest settlementRest = hcsMessages.settlePaymentComplete(Statics.getAppData(), threadId, false, additionalNotes);
             return new ResponseEntity<>(settlementRest, headers, HttpStatus.OK);
         } catch (Exception e) {
             return Utils.serverError();

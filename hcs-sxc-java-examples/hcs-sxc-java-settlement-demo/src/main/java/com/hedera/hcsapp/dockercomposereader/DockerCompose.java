@@ -38,13 +38,13 @@ public final class DockerCompose {
     public void setServices(Map<String, DockerService> services) {
         this.services = services;
     }
-    public String getNameForId(long appId) {
+    public String getNameForId(String appId) {
         String name = "not found";
         for (Map.Entry<String, DockerService> service : this.services.entrySet()) {
             DockerService dockerService = service.getValue();
             if (dockerService.getEnvironment() != null) {
                 if (dockerService.getEnvironment().containsKey("APP_ID")) {
-                    if (dockerService.getEnvironment().get("APP_ID").contentEquals(String.valueOf(appId))) {
+                    if (dockerService.getEnvironment().get("APP_ID").contentEquals(appId)) {
                         return dockerService.getContainer_name();
                     }
                 }
@@ -52,13 +52,13 @@ public final class DockerCompose {
         }
         return name;
     }
-    public String getPublicKeyForId(long appId) {
+    public String getPublicKeyForId(String appId) {
         String key = "not found";
         for (Map.Entry<String, DockerService> service : this.services.entrySet()) {
             DockerService dockerService = service.getValue();
             if (dockerService.getEnvironment() != null) {
                 if (dockerService.getEnvironment().containsKey("PUBKEY")) {
-                    if (dockerService.getEnvironment().get("APP_ID").contentEquals(String.valueOf(appId))) {
+                    if (dockerService.getEnvironment().get("APP_ID").contentEquals(appId)) {
                         return dockerService.getEnvironment().get("PUBKEY");
                     }
                 }
@@ -66,19 +66,16 @@ public final class DockerCompose {
         }
         return key;
     }
-    public int getPortForId(long appId) {
+    public int getPortForId(String appId) {
         int port = 0;
         for (Map.Entry<String, DockerService> service : this.services.entrySet()) {
             DockerService dockerService = service.getValue();
             if (dockerService.getEnvironment() != null) {
-                if (dockerService.getEnvironment().get("APP_ID").contentEquals(String.valueOf(appId))) {
+                if (dockerService.getEnvironment().get("APP_ID").contentEquals(appId)) {
                     port = dockerService.getPortAsInteger();
                 }
             }
         }
         return port;
-    }
-    public int getPortForId(String appId) {
-        return getPortForId(Long.parseLong(appId));
     }
 }

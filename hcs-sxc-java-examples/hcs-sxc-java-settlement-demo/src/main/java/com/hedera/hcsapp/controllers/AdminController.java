@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 import com.hedera.hcsapp.AppData;
+import com.hedera.hcsapp.Statics;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.repository.AddressBookRepository;
 import com.hedera.hcsapp.repository.CreditRepository;
@@ -61,11 +62,7 @@ public class AdminController {
     @Autowired
     AddressBookRepository addressBookRepository;
 
-    private static AppData appData;
-
-    public AdminController() throws Exception {
-
-        appData = new AppData();
+    public AdminController() {
     }
 
     @Transactional
@@ -80,10 +77,10 @@ public class AdminController {
                 .setAdminDelete(adminDeleteBPM)
                 .build();
         try {
-            new OutboundHCSMessage(appData.getHCSCore())
+            new OutboundHCSMessage(Statics.getAppData().getHCSCore())
                 //.overrideEncryptedMessages(false)
                 .overrideMessageSignature(false)
-                .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
+                .sendMessage(Statics.getAppData().getTopicIndex(), settlementBPM.toByteArray());
         } catch (Exception e) {
             log.error(e);
             throw e;
@@ -105,10 +102,10 @@ public class AdminController {
                 .setAdminStashDatabaseBPM(adminStashDatabaseBPM)
                 .build();
         try {
-            new OutboundHCSMessage(appData.getHCSCore())
+            new OutboundHCSMessage(Statics.getAppData().getHCSCore())
                 //.overrideEncryptedMessages(false)
                 .overrideMessageSignature(false)
-                .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
+                .sendMessage(Statics.getAppData().getTopicIndex(), settlementBPM.toByteArray());
         } catch (Exception e) {
             log.error(e);
             throw e;
@@ -128,10 +125,10 @@ public class AdminController {
                 .setAdminStashPopDatabaseBPM(adminStashPopDatabaseBPM)
                 .build();
         try {
-            new OutboundHCSMessage(appData.getHCSCore())
+            new OutboundHCSMessage(Statics.getAppData().getHCSCore())
                 //.overrideEncryptedMessages(false)
                 .overrideMessageSignature(false)
-                .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
+                .sendMessage(Statics.getAppData().getTopicIndex(), settlementBPM.toByteArray());
         } catch (Exception e) {
             log.error(e);
             throw e;

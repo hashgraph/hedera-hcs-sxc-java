@@ -31,7 +31,6 @@ import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcs.sxc.config.AppNet;
 import com.hedera.hcs.sxc.config.Config;
-import com.hedera.hcs.sxc.config.Environment;
 import com.hedera.hcs.sxc.config.MirrorNode;
 import com.hedera.hcs.sxc.config.Topic;
 import com.hedera.hcs.sxc.config.YAMLConfig;
@@ -54,20 +53,21 @@ public enum HCSCore { // singleton implementation
    
     private Map<AccountId, String> nodeMap = new HashMap<>();
     private AccountId operatorAccountId = new AccountId(0, 0, 0); 
-    private Ed25519PrivateKey ed25519PrivateKey;
+    private Ed25519PrivateKey operatorKey;
     private List<Topic> topics = new ArrayList<Topic>();
     private long maxTransactionFee = 0L;
-    private long applicationId = -1L;
+    private String applicationId = "";
     private static SxcPersistence persistence;
     private boolean catchupHistory;
     private MessagePersistenceLevel messagePersistenceLevel;
     private String mirrorAddress;
     private Map<String, String> hibernateConfig = new HashMap<>();
     private byte[] messageEncryptionKey = new byte[0];
-    private Environment environment = new Environment();
     private YAMLConfig yamlConfig;
     private KeyAgreement tempKeyAgreement = null; // if set, user is KR initiator. 
     private Config config;
+    private boolean initialised = false;
+    private Dotenv dotEnv;
     
     /**
      * Constructor for HCS Core
@@ -87,24 +87,28 @@ public enum HCSCore { // singleton implementation
     private  HCSCore() throws  ExceptionInInitializerError {  
     }
     
-    private void init(long appId, String configFilePath, String environmentFilePath) {
+    private void init(String appId, String configFilePath, String environmentFilePath) throws Exception {
+        this.dotEnv = Dotenv.configure().filename(environmentFilePath).ignoreIfMissing().load();
+        // optionally get operator key and account id from environment variables
+        String envValue = getOptionalEnvValue("OPERATOR_KEY");
+        if ( ! envValue.isEmpty()) {
+            this.operatorKey = Ed25519PrivateKey.fromString(envValue);
+        }
+        envValue = getOptionalEnvValue("OPERATOR_ID");
+        if ( ! envValue.isEmpty()) {
+            this.operatorAccountId = AccountId.fromString(envValue);
+        }
         
         try {    
-            this.environment = new Environment(environmentFilePath);
             this.config = new Config(configFilePath);
             this.yamlConfig = config.getConfig();
         } catch (IOException ex) {
             log.error(ex);
-            log.error("Can not load one of " + environmentFilePath + ", " + configFilePath);
+            log.error("Can not load " + configFilePath);
             System.exit(0);
         }
         
-        if (this.applicationId == -1){
-            this.applicationId = this.environment.getAppId();
-        }
-        else { 
-            this.applicationId  = appId;
-        }
+        this.applicationId = appId;
         
         this.nodeMap = yamlConfig.getNodesMap();
         this.maxTransactionFee = yamlConfig.getHCSTransactionFee();
@@ -120,64 +124,85 @@ public enum HCSCore { // singleton implementation
         this.catchupHistory = appnet.getCatchupHistory();
         this.messagePersistenceLevel = appnet.getPersistenceLevel();
 
-        this.operatorAccountId = this.environment.getOperatorAccountId();
-        this.ed25519PrivateKey = this.environment.getOperatorKey();
-        if(this.encryptMessages){
-            this.messageEncryptionKey  = this.environment.getMessageEncryptionKey();
-        }
         if(this.rotateKeys && !this.encryptMessages){
             log.error("config.ini has key rotation enabled, however encryption is disabled. Exiting...");
             System.exit(0);
         }
         
         // replace hibernate configuration {appid}
-        yamlConfig.getCoreHibernate().forEach((key,value) -> this.hibernateConfig.put(key, value.replace("{appid}",  Long.toString(this.applicationId))));
+        yamlConfig.getCoreHibernate().forEach((key,value) -> this.hibernateConfig.put(key, value.replace("{appid}",  this.applicationId)));
+
+        this.initialised = true;
     }
     
+    private String getOptionalEnvValue(String varName) throws Exception {
+        String value = "";
+        log.debug("Looking for " + varName + " in environment variables");
+        if (System.getProperty(varName) != null) {
+            value = System.getProperty(varName);
+            log.debug(varName + " found in command line parameters");
+        } else if ((this.dotEnv == null) || (this.dotEnv.get(varName) == null)) {
+            value = "";
+        } else {
+            value = this.dotEnv.get(varName);
+            log.debug(varName + " found in environment variables");
+        }
+        return value;
+    }
     
-    public HCSCore singletonInstanceDefault(long appId){
-        if(this.applicationId == -1) init(appId, "./config/config.yaml", "./config/.env");
+    public HCSCore singletonInstance() throws Exception{
+        if( ! this.initialised) {
+            init("", "./config/config.yaml", "./config/.env");
+        }
         return INSTANCE;
     }
 
-    public HCSCore singletonInstanceWithAppIdEnvAndConfig (long appId, String configFilePath, String environmentFilePath) {
-        if(this.applicationId == -1) init(appId,configFilePath, environmentFilePath);
+    public HCSCore singletonInstance(String appId) throws Exception{
+        if( ! this.initialised) {
+            init(appId, "./config/config.yaml", "./config/.env");
+        }
+        return INSTANCE;
+    }
+
+    public HCSCore singletonInstance(String appId, String configFilePath, String environmentFilePath) throws Exception {
+        if( ! this.initialised) {
+            init(appId,configFilePath, environmentFilePath);
+        }
         return INSTANCE;
     }
     
-    
     public HCSCore withMessageSignature(boolean signMessages) {
         this.signMessages = signMessages;
-        return this;
+        return INSTANCE;
     }
     public HCSCore withEncryptedMessages(boolean encryptMessages) {
         this.encryptMessages = encryptMessages;
-        return this;
+        return INSTANCE;
     }
     public HCSCore withMessageEncryptionKey(byte[] messageEncryptionKey) {
         this.messageEncryptionKey = messageEncryptionKey;
-        return this;
+        return INSTANCE;
     }
     public HCSCore withKeyRotation(boolean keyRotation, int frequency) {
         this.rotateKeys = keyRotation;
         this.rotationFrequency = frequency;
-        return this;
+        return INSTANCE;
     }
     public HCSCore withNodeMap(Map<AccountId, String> nodeMap) {
         this.nodeMap = nodeMap;
-        return this;
+        return INSTANCE;
     }
     public HCSCore withOperatorAccountId(AccountId operatorAccountId) {
         this.operatorAccountId = operatorAccountId;
-        return this;
+        return INSTANCE;
     }
     public HCSCore withOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
-        this.ed25519PrivateKey = ed25519PrivateKey;
-        return this;
+        this.operatorKey = ed25519PrivateKey;
+        return INSTANCE;
     }
     public HCSCore withTopicList(List<Topic> topics) {
         this.topics = topics;
-        return this;
+        return INSTANCE;
     }
     public boolean getSignMessages() {
         return this.signMessages;
@@ -201,7 +226,7 @@ public enum HCSCore { // singleton implementation
         return this.operatorAccountId;
     } 
     public Ed25519PrivateKey getEd25519PrivateKey() {
-        return this.ed25519PrivateKey;
+        return this.operatorKey;
     } 
     public List<Topic> getTopics() {
         return this.topics;
@@ -209,7 +234,7 @@ public enum HCSCore { // singleton implementation
     public long getMaxTransactionFee() {
         return this.maxTransactionFee;
     }
-    public long getApplicationId() {
+    public String getApplicationId() {
         return this.applicationId;
     }
     public String getMirrorAddress() {
@@ -231,9 +256,6 @@ public enum HCSCore { // singleton implementation
         return this.hibernateConfig;
     }
     
-    public Dotenv getEnvironment() {
-        return this.environment.getDotEnv();
-    }
     public List<ConsensusTopicId> getConsensusTopicIds() {
         List<ConsensusTopicId> consensusTopicIds = new ArrayList<ConsensusTopicId>();
         for (Topic topic : this.topics) {
@@ -253,8 +275,4 @@ public enum HCSCore { // singleton implementation
     public void updateSecretKey(byte[] newSecretKey){
         this.messageEncryptionKey = newSecretKey;
     }
-    
-    
-    
-    
 }

@@ -38,9 +38,8 @@ public class DataSourceCustomizer {
     public DataSource masterDataSource() {
         DataSource ds = null;
         try {
-            AppData appData = new AppData();
              ds = DataSourceBuilder.create()
-                    .url("jdbc:h2:./h2data/demo-db-appid-"+appData.getAppId()+"-"+appData.getUserName())
+                    .url("jdbc:h2:./h2data/demo-db-appid-"+Statics.getAppData().getAppId()+"-"+Statics.getAppData().getUserName())
                     .build();
         } catch (Exception ex) {
             log.error(ex);

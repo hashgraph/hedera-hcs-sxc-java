@@ -47,12 +47,12 @@ public class OnHCSMessageCallbackTest {
     @Test
     public void testInstantiation() throws Exception {
          HCSCore hcsCore = HCSCore.INSTANCE
-            .singletonInstanceWithAppIdEnvAndConfig(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+            .singletonInstance("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
 
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsCore);
         
         hcsCore = HCSCore.INSTANCE
-           .singletonInstanceWithAppIdEnvAndConfig(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+           .singletonInstance("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
 
         onHCSMessageCallback = new OnHCSMessageCallback(hcsCore);
         
@@ -62,8 +62,7 @@ public class OnHCSMessageCallbackTest {
     @Test
     public void testAddObserverAndNotify() throws Exception {
          HCSCore hcsCore = HCSCore.INSTANCE
-                .singletonInstanceWithAppIdEnvAndConfig(0, "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
-
+                .singletonInstance("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
         
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsCore);
         onHCSMessageCallback.addObserver(hcsMessage -> {

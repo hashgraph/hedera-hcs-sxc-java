@@ -1,4 +1,4 @@
-package com.hedera.hcsapp;
+package com.hedera.hcsapp.appconfig;
 
 import static org.junit.jupiter.api.Assertions.*;
 

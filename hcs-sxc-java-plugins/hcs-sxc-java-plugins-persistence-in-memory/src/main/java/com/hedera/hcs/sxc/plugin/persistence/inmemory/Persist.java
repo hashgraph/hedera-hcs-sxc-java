@@ -43,17 +43,15 @@ import java.util.stream.Collectors;
 public class Persist 
         implements com.hedera.hcs.sxc.interfaces.SxcPersistence{
     
-    
-
     public class HCSApplicationMessage implements  SXCApplicationMessageInterface, Serializable{
 
             private String applicationMessageId;
             private byte[] applicationMessage;
 
             private Instant lastChronoPartConsensusTimestamp;
-            private long lastChronoPartShardNum;
-            private long lastChronoPartRealmNum;
-            private long lastChronoPartRealmTopicNum;
+//            private long lastChronoPartShardNum;
+//            private long lastChronoPartRealmNum;
+//            private long lastChronoPartRealmTopicNum;
             private long lastChronoPartSequenceNum;
             private String lastChronoPartRunningHashHEX;
 
@@ -63,7 +61,7 @@ public class Persist
             }
 
             @Override
-            public byte[] getBusinessProcessMessage(){
+            public byte[] getApplicationMessage(){
                 return this.applicationMessage;
             }
 
@@ -72,14 +70,14 @@ public class Persist
                 return this.lastChronoPartConsensusTimestamp;
             }
 
-            @Override
-            public long getLastChronoPartShardNum () {
-                return this.lastChronoPartShardNum;
-            }
-            @Override
-            public long getLastChronoPartRealmNum(){
-                return this.lastChronoPartRealmNum;
-            }
+//            @Override
+//            public long getLastChronoPartShardNum () {
+//                return this.lastChronoPartShardNum;
+//            }
+//            @Override
+//            public long getLastChronoPartRealmNum(){
+//                return this.lastChronoPartRealmNum;
+//            }
             @Override
             public long getLastChronoPartSequenceNum(){
                 return this.lastChronoPartSequenceNum;
@@ -88,7 +86,6 @@ public class Persist
             public String getLastChronoPartRunningHashHEX(){
                 return this.lastChronoPartRunningHashHEX;
             }
-
     }
     
     
@@ -293,7 +290,7 @@ public class Persist
 
 
     @Override
-    public List<? extends SXCApplicationMessageInterface> getSCXApplicationMessages() {
+    public List<? extends SXCApplicationMessageInterface> getSXCApplicationMessages() {
         return this.hcsApplicationMessages.values().stream().collect(Collectors.toList());
     }
 

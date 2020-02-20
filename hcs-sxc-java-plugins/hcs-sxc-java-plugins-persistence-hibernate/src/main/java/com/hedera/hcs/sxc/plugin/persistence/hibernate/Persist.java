@@ -86,7 +86,7 @@ implements SxcPersistence{
     @Override
     public void storeMirrorResponse(SxcConsensusMessage mirrorTopicMessageResponse) {
 
-        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
 
         MirrorResponse mirrorResponse = session.createQuery("from MirrorResponse mr where mr.timestamp = :timestamp", MirrorResponse.class)
                 .setParameter("timestamp", mirrorTopicMessageResponse.consensusTimestamp.toString())
@@ -110,18 +110,20 @@ implements SxcPersistence{
             
             session.save(mirrorResponse);
             // commit transaction
+            session.flush();
             dbTransaction.commit();
     
             log.debug("storeMirrorResponse " + mirrorTopicMessageResponse.toString());
         } else {
             log.debug("Skipping duplicate mirror response entry");
         }
+        session.close();
     }
 
     @Override
     public SxcConsensusMessage getMirrorResponse(String timestamp) {
 
-        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         MirrorResponse mirrorResponse = session.createQuery("from MirrorResponse mr where mr.timestamp = :timestamp", MirrorResponse.class)
                 .setParameter("timestamp", timestamp)
                 .getResultList()
@@ -138,7 +140,7 @@ implements SxcPersistence{
                 .build();
         
         SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage(mirrorResponse.getTopicId(), consensusTopicResponse);
-
+        session.close();
         return sxcConsensusMessage;
     }
 
@@ -146,7 +148,7 @@ implements SxcPersistence{
     public Map<String, SxcConsensusMessage> getMirrorResponses() {
         Map<String, SxcConsensusMessage> responseList = new HashMap<>();
 
-        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         List < MirrorResponse > mirrorResponses = session.createQuery("from MirrorResponse mr order by mr.timestamp desc", MirrorResponse.class).list();
         mirrorResponses.forEach(mirrorResponse -> {
             ConsensusTopicResponse consensusTopicResponse = ConsensusTopicResponse.newBuilder()
@@ -160,7 +162,7 @@ implements SxcPersistence{
 
             responseList.put(mirrorResponse.getTimestamp(), consensusMessage);
         });
-
+        session.close();
         return responseList;
     }
 
@@ -168,8 +170,8 @@ implements SxcPersistence{
     public Map<String, SxcConsensusMessage> getMirrorResponses(String fromTimestamp, String toTimestamp) {
         Map<String, SxcConsensusMessage> responseList = new HashMap<>();
 
-        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
-        List < MirrorResponse > mirrorResponses = session.createQuery("from MirrorResponse mr where mr.timestamp >= :fromTimestamp and mr.timestamp <= :toTimeStamp order by mr.timestamp desc", MirrorResponse.class)
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        List < MirrorResponse > mirrorResponses = session.createQuery("from MirrorResponse mr where mr.timestamp >= :fromTimestamp and mr.timestamp <= :toTimestamp order by mr.timestamp desc", MirrorResponse.class)
                 .setParameter("fromTimestamp", fromTimestamp)
                 .setParameter("toTimestamp", toTimestamp)
                 .getResultList();
@@ -187,7 +189,7 @@ implements SxcPersistence{
             
             responseList.put(mirrorResponse.getTimestamp(), sxcConsensusMessage);
         });
-
+        session.close();
         return responseList;
     }
 
@@ -226,12 +228,13 @@ implements SxcPersistence{
     @Override
     public ConsensusMessageSubmitTransaction getSubmittedTransaction(String transactionId) {
 
-        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         HCSTransaction hcsTransaction = session.createQuery("from HCSTransaction t where t.transactionId = :transactionId", HCSTransaction.class)
                 .setParameter("transactionId", transactionId)
                 .getResultList()
                 .stream().findFirst().orElse(null);
         if (hcsTransaction == null) {
+            session.close();
             return null;
         }
 
@@ -263,20 +266,21 @@ implements SxcPersistence{
           Duration validDuration = Duration.ofSeconds(body.getTransactionValidDuration().getSeconds());
 
           tx.setTransactionValidDuration(validDuration);
-
+          session.close();
           return tx;
         } catch (InvalidProtocolBufferException e) {
             log.error(e);
+            session.close();
             return null;
         }
-
+        //session.close();
     }
 
     @Override
     public Map<String, ConsensusMessageSubmitTransaction> getSubmittedTransactions() {
         Map<String, ConsensusMessageSubmitTransaction> responseList = new HashMap<>();
 
-        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         List<HCSTransaction> hcsTransactions = session.createQuery("from HCSTransaction t order by t.transactionId desc", HCSTransaction.class)
                 .list();
 
@@ -315,6 +319,7 @@ implements SxcPersistence{
             }
         });
 
+        session.close();
         return responseList;
 
     }
@@ -339,7 +344,7 @@ implements SxcPersistence{
                 + "-" + applicationMessageId.getValidStart().getSeconds()
                 + "-" + applicationMessageId.getValidStart().getNanos();
 
-        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         HCSApplicationMessage hcsApplicationMessage = session.createQuery("from HCSApplicationMessage m where m.applicationMessageId = :applicationMessageId", HCSApplicationMessage.class)
                 .setParameter("applicationMessageId", appMessageId)
                 .getResultList()
@@ -356,44 +361,51 @@ implements SxcPersistence{
             Transaction dbTransaction = null;
             dbTransaction = session.beginTransaction();
             session.save(hcsApplicationMessage);
+            session.flush();
             dbTransaction.commit();
     
             log.debug("storeApplicationMessage " + appMessageId + "-" + applicationMessage);
         } else {
             log.debug("Application message already in database");
         }
+        session.close();
     }
     
    
 
     @Override
     public ApplicationMessage getApplicationMessage(String applicationMessageId) {
-        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         try {
             HCSApplicationMessage applicationMessage = session.createQuery("from HCSApplicationMessage m where m.applicationMessageId = :applicationMessageId", HCSApplicationMessage.class)
                     .setParameter("applicationMessageId", applicationMessageId)
                     .getResultList()
                     .stream().findFirst().orElse(null);
             if (applicationMessage == null) {
+                session.close();
                 return null;
             }
+            session.close();
             return ApplicationMessage.parseFrom(applicationMessage.getApplicationMessage());
         } catch (InvalidProtocolBufferException e) {
             log.error(e);
         }
+        session.close();
         return null;
     }
     
     @Override
     public SXCApplicationMessageInterface getApplicationMessageEntity(String applicationMessageId) {
-        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         HCSApplicationMessage applicationMessage = session.createQuery("from HCSApplicationMessage m where m.applicationMessageId = :applicationMessageId", HCSApplicationMessage.class)
                 .setParameter("applicationMessageId", applicationMessageId)
                 .getResultList()
                 .stream().findFirst().orElse(null);
         if (applicationMessage == null) {
+            session.close();
             return null;
         }
+        session.close();
         return applicationMessage;
     }
 
@@ -402,7 +414,7 @@ implements SxcPersistence{
     public Map<String, ApplicationMessage> getApplicationMessages() {
         Map<String, ApplicationMessage> responseList = new HashMap<>();
 
-        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         List<HCSApplicationMessage> applicationMessages = session.createQuery("from HCSApplicationMessage", HCSApplicationMessage.class)
                 .list();
 
@@ -414,16 +426,18 @@ implements SxcPersistence{
             }
         });
 
+        session.close();
         return responseList;
     }
     
     
     @Override
-    public List<? extends SXCApplicationMessageInterface> getSCXApplicationMessages() {
+    public List<? extends SXCApplicationMessageInterface> getSXCApplicationMessages() {
          
-        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         List<HCSApplicationMessage> applicationMessages = session.createQuery("from HCSApplicationMessage", HCSApplicationMessage.class)
                 .list();
+        session.close();
         return applicationMessages;
     }
 
@@ -459,7 +473,7 @@ implements SxcPersistence{
 
         Instant lastConsensusTimestamp = Instant.EPOCH;
 
-        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<Long> criteriaQuery = builder.createQuery(Long.class);
 
@@ -477,6 +491,7 @@ implements SxcPersistence{
         }
         log.debug("Last consensus timestamp from database is : " + lastConsensusTimestamp.getEpochSecond() + " seconds, " + lastConsensusTimestamp.getNano() + " nanos.");
 
+        session.close();
         return lastConsensusTimestamp;
     }
 
@@ -484,17 +499,19 @@ implements SxcPersistence{
     public void clear() {
         partialMessages = new HashMap<>();
 
-        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         session.beginTransaction();
         session.createQuery("delete MirrorResponse").executeUpdate();
         session.createQuery("delete HCSTransaction").executeUpdate();
         session.createQuery("delete HCSApplicationMessage").executeUpdate();
+        session.flush();
         session.getTransaction().commit();
+        session.close();
     }
 
     @Override
     public void storeSecretKey(byte[] secretKey) {
-        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         List<KeyStore> resultList = session.createQuery("select k from KeyStore k").getResultList();
         if (resultList.size() == 1){
             KeyStore ks = resultList.get(0);
@@ -507,38 +524,33 @@ implements SxcPersistence{
             ks.setSecretKey(secretKey);
             session.save(ks);
         }
-        
-        
+        session.close();
     }
 
     @Override
     public byte[] getSecretKey() {
-        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         KeyStore ks = session.find(KeyStore.class, 0);
+        session.close();
         return ks.getSecretKey();
     }   
 
     @Override
     public void storePublicKey(byte[] publicKey) {
-        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         KeyStore ks = session.find(KeyStore.class, 0);
         ks.setPublicKey(publicKey);
         session.save(ks);
-        
+        session.close();
     }
 
     @Override
     public byte[] getPublicKey() {
         
-        final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
-       
-        
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         KeyStore ks = session.find(KeyStore.class, 0);
+        session.close();
         return ks.getPublicKey();
     }
-
-
-   
-
-  
+ 
 }

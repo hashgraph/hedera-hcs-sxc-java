@@ -34,6 +34,6 @@ public class CreateTopic {
         // create topics on HCS
         ConsensusTopicId topicId = new CreateHCSTopic(hcsCore)
                 .execute();
-        log.debug(topicId.toString());
+        System.out.println(topicId.toString());
     }
 }

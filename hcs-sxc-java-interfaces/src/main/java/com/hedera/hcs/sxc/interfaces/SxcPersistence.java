@@ -62,7 +62,7 @@ public interface SxcPersistence {
    );
    
    public Map<String, ApplicationMessage> getApplicationMessages();
-   public List<? extends SXCApplicationMessageInterface> getSCXApplicationMessages(); 
+   public List<? extends SXCApplicationMessageInterface> getSXCApplicationMessages(); 
     
    public SXCApplicationMessageInterface getApplicationMessageEntity(String applicationMessageId);
    public ApplicationMessage getApplicationMessage(String applicationMessageId) throws InvalidProtocolBufferException;

@@ -56,8 +56,9 @@ public class OutboundHCSMessageTest {
     
     @Test
     public void testOutBoundMessageBuilder() throws Exception {
-         HCSCore hcsCore = HCSCore.INSTANCE
-                .singletonInstance("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+//        HCSCore hcsCore = HCSCore.INSTANCE
+//                .singletonInstance("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+        HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
 
         Ed25519PrivateKey ed25519PrivateKey = Ed25519PrivateKey.generate();
         TransactionId transactionId = TransactionId.withValidStart(AccountId.fromString("0.0.10"), Instant.now());
@@ -78,7 +79,8 @@ public class OutboundHCSMessageTest {
             .overrideNodeMap(Map.of(AccountId.fromString("0.0.19"),"testing.hedera.com"))
             .overrideOperatorAccountId(AccountId.fromString("0.0.5"))
             .overrideOperatorKey(ed25519PrivateKey)
-            .withFirstTransactionId(transactionId);
+            .withFirstTransactionId(transactionId)
+            .overrideMessageEncryptionKey("key".getBytes());
         // test updated values
         assertTrue(outboundHCSMessage.getOverrideEncryptedMessages());
         assertTrue(outboundHCSMessage.getOverrideKeyRotation());
@@ -90,6 +92,50 @@ public class OutboundHCSMessageTest {
         assertArrayEquals(ed25519PrivateKey.toBytes(), outboundHCSMessage.getOverrideOperatorKey().toBytes());
         assertEquals(transactionId.accountId.toString(), outboundHCSMessage.getFirstTransactionId().accountId.toString());
         assertEquals(transactionId.validStart, outboundHCSMessage.getFirstTransactionId().validStart);
+        assertArrayEquals("key".getBytes(), outboundHCSMessage.getOverrideMessageEncryptionKey());
+    }
+
+    @Test
+    public void testOutBoundMessageNoSendNoEncryption() throws Exception {
+//        HCSCore hcsCore = HCSCore.INSTANCE
+//                .singletonInstance("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+        HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+
+        OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(hcsCore);
+        // pretend we're sending
+        TransactionId transactionId = outboundHCSMessage.sendMessageForTest(0, "testMessage".getBytes());
+        assertNotNull(transactionId);
+        
+    }
+    @Test
+    public void testOutBoundMessageNoSendWithEncryption() throws Exception {
+//        HCSCore hcsCore = HCSCore.INSTANCE
+//                .singletonInstance("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+        HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+
+        OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(hcsCore);
+        outboundHCSMessage.overrideMessageEncryptionKey(Ed25519PrivateKey.generate().toBytes());
+        outboundHCSMessage.overrideEncryptedMessages(true);
+        // pretend we're sending
+        TransactionId transactionId = outboundHCSMessage.sendMessageForTest(0, "testMessage".getBytes());
+        assertNotNull(transactionId);
+        
+    }
+
+    @Test
+    public void testOutBoundMessageNoSendWithEncryptionAndRotation() throws Exception {
+//        HCSCore hcsCore = HCSCore.INSTANCE
+//                .singletonInstance("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+        HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test")
+            .withMessageEncryptionKey(Ed25519PrivateKey.generate().toBytes())
+            .withEncryptedMessages(true)
+            .withKeyRotation(true, 1);
+
+        OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(hcsCore);
+        // pretend we're sending
+        TransactionId transactionId = outboundHCSMessage.sendMessageForTest(0, "testMessage".getBytes());
+        assertNotNull(transactionId);
+        
     }
     
 }

@@ -42,9 +42,9 @@ import lombok.extern.log4j.Log4j2;
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
 import javax.crypto.KeyAgreement;
 @Log4j2
-public enum HCSCore { // singleton implementation
+public class HCSCore { // singleton implementation
     
-    INSTANCE();
+    //INSTANCE();
     
     private boolean signMessages = false;
     private boolean encryptMessages = false;
@@ -84,9 +84,12 @@ public enum HCSCore { // singleton implementation
      */
     
     
-    private  HCSCore() throws  ExceptionInInitializerError {  
-    }
+//    private  HCSCore() throws  ExceptionInInitializerError {  
+//    }
     
+    public HCSCore() {  
+    }
+
     private void init(String appId, String configFilePath, String environmentFilePath) throws Exception {
         this.dotEnv = Dotenv.configure().filename(environmentFilePath).ignoreIfMissing().load();
         // optionally get operator key and account id from environment variables
@@ -125,7 +128,7 @@ public enum HCSCore { // singleton implementation
         this.messagePersistenceLevel = appnet.getPersistenceLevel();
 
         if(this.rotateKeys && !this.encryptMessages){
-            log.error("config.ini has key rotation enabled, however encryption is disabled. Exiting...");
+            log.error(configFilePath + " has key rotation enabled, however encryption is disabled. Exiting...");
             System.exit(0);
         }
         
@@ -150,59 +153,73 @@ public enum HCSCore { // singleton implementation
         return value;
     }
     
-    public HCSCore singletonInstance() throws Exception{
+//    public HCSCore singletonInstance() throws Exception{
+    public HCSCore builder() throws Exception{
         if( ! this.initialised) {
             init("", "./config/config.yaml", "./config/.env");
         }
-        return INSTANCE;
+        return this;
     }
 
-    public HCSCore singletonInstance(String appId) throws Exception{
+//    public HCSCore singletonInstance(String appId) throws Exception{
+    public HCSCore builder(String appId) throws Exception{
         if( ! this.initialised) {
             init(appId, "./config/config.yaml", "./config/.env");
         }
-        return INSTANCE;
+        return this;
     }
 
-    public HCSCore singletonInstance(String appId, String configFilePath, String environmentFilePath) throws Exception {
+//    public HCSCore singletonInstance(String appId, String configFilePath, String environmentFilePath) throws Exception {
+    public HCSCore builder(String appId, String configFilePath, String environmentFilePath) throws Exception {
         if( ! this.initialised) {
             init(appId,configFilePath, environmentFilePath);
         }
-        return INSTANCE;
+        return this;
     }
     
     public HCSCore withMessageSignature(boolean signMessages) {
         this.signMessages = signMessages;
-        return INSTANCE;
+        return this;
     }
-    public HCSCore withEncryptedMessages(boolean encryptMessages) {
+    public HCSCore withEncryptedMessages(boolean encryptMessages) throws Exception {
+        if (encryptMessages) {
+            if ((this.messageEncryptionKey == null) || (this.messageEncryptionKey.length == 0)) {
+                throw new Exception("Please set encryption key first - .withMessageEncryptionKey.");
+            }
+        }
         this.encryptMessages = encryptMessages;
-        return INSTANCE;
+        return this;
     }
     public HCSCore withMessageEncryptionKey(byte[] messageEncryptionKey) {
         this.messageEncryptionKey = messageEncryptionKey;
-        return INSTANCE;
+        return this;
     }
-    public HCSCore withKeyRotation(boolean keyRotation, int frequency) {
+    public HCSCore withKeyRotation(boolean keyRotation, int frequency) throws Exception {
+        if (( ! this.encryptMessages) && (keyRotation)) {
+            throw new Exception("Please enable encryption first - .withEncryptedMessages.");
+        }
+        if ((frequency == 0) && (keyRotation)) {
+            throw new Exception("Key rotation frequency must be greater than 0.");
+        }
         this.rotateKeys = keyRotation;
         this.rotationFrequency = frequency;
-        return INSTANCE;
+        return this;
     }
     public HCSCore withNodeMap(Map<AccountId, String> nodeMap) {
         this.nodeMap = nodeMap;
-        return INSTANCE;
+        return this;
     }
     public HCSCore withOperatorAccountId(AccountId operatorAccountId) {
         this.operatorAccountId = operatorAccountId;
-        return INSTANCE;
+        return this;
     }
     public HCSCore withOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
         this.operatorKey = ed25519PrivateKey;
-        return INSTANCE;
+        return this;
     }
     public HCSCore withTopicList(List<Topic> topics) {
         this.topics = topics;
-        return INSTANCE;
+        return this;
     }
     public boolean getSignMessages() {
         return this.signMessages;

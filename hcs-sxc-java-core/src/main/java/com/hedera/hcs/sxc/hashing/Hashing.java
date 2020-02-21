@@ -29,14 +29,12 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class Hashing {
 
-   //solutionSDK.hashMessage
    public static byte[] sha(String plaintext){
        byte[] encodedhash = null; 
        try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             encodedhash = digest.digest(
                     plaintext.getBytes(StandardCharsets.UTF_8));
-            return encodedhash;
         } catch (NoSuchAlgorithmException ex) {
             log.error(ex);
         }

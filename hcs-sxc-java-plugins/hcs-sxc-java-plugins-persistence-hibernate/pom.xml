@@ -1,17 +1,24 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+<project
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+    xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>com.hedera</groupId>
-    <artifactId>hcs-sxc-java-plugins</artifactId>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.hedera</groupId>
+        <artifactId>hcs-sxc-java-plugins</artifactId>
         <version>0.0.3-SNAPSHOT</version>
-  </parent>
+    </parent>
 
-  <artifactId>hcs-sxc-java-plugins-persistence-hibernate</artifactId>
+    <artifactId>hcs-sxc-java-plugins-persistence-hibernate</artifactId>
 
-  <name>hcs-sxc-java-plugins-persistence-hibernate</name>
+    <name>hcs-sxc-java-plugins-persistence-hibernate</name>
 
+    <properties>
+        <javax.inject.version>1</javax.inject.version>
+        <jaxb-api.version>2.3.1</jaxb-api.version>
+        <org.hibernate.validator.version>6.1.0.Final</org.hibernate.validator.version>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>io.github.classgraph</groupId>
@@ -33,6 +40,42 @@
             <artifactId>hcs-sxc-java-interfaces</artifactId>
             <version>${hcs-sxc.version}</version>
         </dependency>
+
+        <!-- TESTING -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>${jaxb-api.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>${javax.inject.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-core</artifactId>
+            <version>2.3.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.3.0.1</version>
+        </dependency>        
     </dependencies>
 
     <profiles>
@@ -74,9 +117,9 @@
             </activation>
             <dependencies>
                 <dependency>
-                <groupId>com.h2database</groupId>
-                <artifactId>h2</artifactId>
-                <version>${h2.version}</version>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                    <version>${h2.version}</version>
                 </dependency>
             </dependencies>
         </profile>

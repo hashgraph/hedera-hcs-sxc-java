@@ -20,12 +20,8 @@ package com.hedera.hcs.sxc.plugin.persistence.entities;
  * ‍
  */
 
-import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
-import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.SXCApplicationMessageInterface;
-import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.time.Instant;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -44,8 +40,8 @@ public class HCSApplicationMessage implements  SXCApplicationMessageInterface, S
     private byte[] applicationMessage;
     
     private Instant lastChronoPartConsensusTimestamp;
-    private long lastChronoPartShardNum;
-    private long lastChronoPartRealmNum;
+//    private long lastChronoPartShardNum;
+//    private long lastChronoPartRealmNum;
     private long lastChronoPartRealmTopicNum;
     private long lastChronoPartSequenceNum;
     private String lastChronoPartRunningHashHEX;
@@ -56,7 +52,7 @@ public class HCSApplicationMessage implements  SXCApplicationMessageInterface, S
     }
     
     @Override
-    public byte[] getBusinessProcessMessage(){
+    public byte[] getApplicationMessage(){
         return this.applicationMessage;
     }
     
@@ -65,14 +61,14 @@ public class HCSApplicationMessage implements  SXCApplicationMessageInterface, S
         return this.lastChronoPartConsensusTimestamp;
     }
     
-    @Override
-    public long getLastChronoPartShardNum () {
-        return this.lastChronoPartShardNum;
-    }
-    @Override
-    public long getLastChronoPartRealmNum(){
-        return this.lastChronoPartRealmNum;
-    }
+//    @Override
+//    public long getLastChronoPartShardNum () {
+//        return this.lastChronoPartShardNum;
+//    }
+//    @Override
+//    public long getLastChronoPartRealmNum(){
+//        return this.lastChronoPartRealmNum;
+//    }
     @Override
     public long getLastChronoPartSequenceNum(){
         return this.lastChronoPartSequenceNum;
@@ -81,8 +77,4 @@ public class HCSApplicationMessage implements  SXCApplicationMessageInterface, S
     public String getLastChronoPartRunningHashHEX(){
         return this.lastChronoPartRunningHashHEX;
     }
-    
-    
-    
-    
 }

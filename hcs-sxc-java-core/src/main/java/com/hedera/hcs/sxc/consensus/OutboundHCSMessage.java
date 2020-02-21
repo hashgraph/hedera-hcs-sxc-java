@@ -208,8 +208,6 @@ public final class OutboundHCSMessage {
             }
         }
 
-   
-
         // generate TXId for main and first message it not already set by caller
         TransactionId firstTransactionId = (this.transactionId == null) ? new TransactionId(this.operatorAccountId) : this.transactionId;
 

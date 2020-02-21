@@ -155,11 +155,11 @@ public class AuditController {
         HCSCore hcsCore = Statics.getAppData().getHCSCore();
         SxcPersistence persistence = hcsCore.getMessagePersistence();
 
-        List<? extends SXCApplicationMessageInterface> scxApplicationMessages = persistence.getSCXApplicationMessages();
+        List<? extends SXCApplicationMessageInterface> scxApplicationMessages = persistence.getSXCApplicationMessages();
         for (SXCApplicationMessageInterface m : scxApplicationMessages){
             //ApplicationMessage  = ApplicationMessage.parseFrom(m.getBusinessProcessMessage());
             SettlementBPM settlementBPM = SettlementBPM.parseFrom(
-                ApplicationMessage.parseFrom(m.getBusinessProcessMessage())
+                ApplicationMessage.parseFrom(m.getApplicationMessage())
                 .getBusinessProcessMessage()
             );
             if (settlementBPM.getThreadID().equals(threadId)) {

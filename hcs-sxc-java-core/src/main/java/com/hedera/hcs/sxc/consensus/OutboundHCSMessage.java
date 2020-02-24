@@ -393,7 +393,7 @@ public final class OutboundHCSMessage {
         if(recipientKeys != null){
             try {
                 // Hash of unencrypted business message should be included in application message
-                byte[] hashOfOriginalMessage = com.hedera.hcs.sxc.hashing.Hashing.sha(StringUtils.stringToByteArray(originalMessage));
+                byte[] hashOfOriginalMessage = com.hedera.hcs.sxc.hashing.Hashing.sha(StringUtils.byteArrayToHexString(originalMessage));
                 applicationMessageBuilder.setBusinessProcessHash(ByteString.copyFrom(hashOfOriginalMessage));
                 
                 // Signature (using sender’s private key) of hash (above) should also be included in application message

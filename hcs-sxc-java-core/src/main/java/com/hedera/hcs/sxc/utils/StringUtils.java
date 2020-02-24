@@ -70,4 +70,8 @@ public class StringUtils {
         }
         return b;
     }
+
+    public static String stringToByteArray(byte[] originalMessage) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
  }

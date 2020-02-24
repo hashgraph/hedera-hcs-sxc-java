@@ -90,7 +90,7 @@ public class OnHCSMessageCallbackTest {
     @Test
     public void testSingleChunking() throws IOException {
         byte[] message = "Single Chunk Message".getBytes();
-        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),message);
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),null,message,null);
         assertTrue(chunks.size() == 1);
         SxcPersistence persistence = new Persist(); 
         Optional<ApplicationMessage> messageOptional
@@ -104,7 +104,7 @@ public class OnHCSMessageCallbackTest {
     @Test
     public void testMultiChunking() throws IOException {
         byte[] longString = RandomStringUtils.random(5000, true, true).getBytes();
-        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),longString);
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),null,longString,null);
         assertTrue(chunks.size() == 2);
         
         Optional<ApplicationMessage> messageOptional = null;

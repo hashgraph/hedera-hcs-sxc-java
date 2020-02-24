@@ -20,6 +20,7 @@ package com.hedera.hcs.sxc.consensus;
  * ‍
  */
 
+import com.google.common.hash.Hashing;
 import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
 
@@ -37,6 +38,7 @@ import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
+import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.config.Topic;
 import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
@@ -53,6 +55,8 @@ import com.hedera.hcs.sxc.utils.StringUtils;
 
 import java.util.Arrays;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.crypto.KeyAgreement;
 
 import lombok.extern.log4j.Log4j2;
@@ -205,42 +209,31 @@ public final class OutboundHCSMessage {
     public List<TransactionId> sendMessage(int topicIndex, byte[] message) throws Exception {
         List<TransactionId> txIdList = new ArrayList<>();
         
-        if (signMessages) {
-
-        }
-        if (encryptMessages) {
-            if (this.overrideMessageEncryptionKey != null) {
-                this.messageEncryptionKey = this.overrideMessageEncryptionKey;
-                message = messageEncryptionPlugin.encrypt(this.messageEncryptionKey, message);
-     
-            } else if (this.addressList != null){ // get it from .env
-                this.addressList.forEach((k,v)->{
-                    // sign message
-                    // hash message
-                    // encrypt
-                    message = messageEncryptionPlugin.encrypt(
-                            StringUtils.hexStringToByteArray(v.get("sharedSymmetricEncryptionKey")), 
-                            message);
-                    doSendMessage(message, topicIndex);
-
-                });                
+        if (encryptMessages) { // send  to specific users 
+            if (this.addressList != null){ // get it from .env
+                for (String recipient : addressList.keySet()){
+                    TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, recipient);
+                    txIdList.add(doSendMessageTxId);
+                }                
                 //   this.messageEncryptionKey = hcsCore.getMessageEncryptionKey();
                 //   message = messageEncryptionPlugin.encrypt(this.messageEncryptionKey, message);
             } else {
-                throw new NoSuchElementException("Encryption set to true, but key not found, neither in .env nor provided by builder");
+                throw new NoSuchElementException("Encryption set to true, but keys not found in address book");
             }
+        } else { // broadcast
+            TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, null);
+            txIdList.add(doSendMessageTxId);     
         }
         
-        doSendMessage(message, topicIndex);
-
-        return firstTransactionId;
+        
+        return txIdList;
     }
 
-    private TransactionId doSendMessage(byte[] message, int topicIndex) {
+    private TransactionId doSendMessage(byte[] message, int topicIndex, String recipient) {
         // generate TXId for main and first message it not already set by caller
         TransactionId firstTransactionId = (this.transactionId == null) ? new TransactionId(this.operatorAccountId) : this.transactionId;
         //break up  (and the whole encrypted messages
-        List<ApplicationMessageChunk> parts = chunk(firstTransactionId, message);
+        List<ApplicationMessageChunk> parts = chunk(firstTransactionId, hcsCore, message, this.addressList.get(recipient));
         // send each part to the network
         try (Client client = new Client(this.nodeMap)) {
             
@@ -376,7 +369,7 @@ public final class OutboundHCSMessage {
         return firstTransactionId;
     }
 
-    public static  List<ApplicationMessageChunk> chunk(TransactionId transactionId,  byte[] message) {
+    public static  List<ApplicationMessageChunk> chunk(TransactionId transactionId, HCSCore hcsCore, byte[] message, Map<String,String> recipientKeys) {
 
         ApplicationMessageID transactionID = ApplicationMessageID.newBuilder()
                 .setAccountID(AccountID.newBuilder()
@@ -393,12 +386,44 @@ public final class OutboundHCSMessage {
 
         byte[] originalMessage = Arrays.copyOf(message, message.length);
 
-        ApplicationMessage applicationMessage = ApplicationMessage
+        ApplicationMessage.Builder applicationMessageBuilder = ApplicationMessage
                 .newBuilder()
-                .setApplicationMessageId(transactionID)
-                .setBusinessProcessMessage(ByteString.copyFrom(originalMessage))
-                .build();
-
+                .setApplicationMessageId(transactionID);
+                
+        if(recipientKeys != null){
+            try {
+                // Hash of unencrypted business message should be included in application message
+                byte[] hashOfOriginalMessage = com.hedera.hcs.sxc.hashing.Hashing.sha(StringUtils.stringToByteArray(originalMessage));
+                applicationMessageBuilder.setBusinessProcessHash(ByteString.copyFrom(hashOfOriginalMessage));
+                
+                // Signature (using sender’s private key) of hash (above) should also be included in application message
+                Ed25519PrivateKey messageSigningKey = hcsCore.getMessageSigningKey();
+                byte[] sign = messageSigningKey.sign(hashOfOriginalMessage);
+                applicationMessageBuilder.setBusinessProcessSignature(ByteString.copyFrom(sign));
+                
+                // encrypt
+                String encryptionKey = recipientKeys.get("sharedSymmetricEncryptionKey");
+                Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
+                SxcMessageEncryption encPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
+                byte[] encryptedMessage = encPlugin.encrypt(
+                        StringUtils.hexStringToByteArray(encryptionKey)
+                        , message);
+                applicationMessageBuilder.setBusinessProcessMessage(ByteString.copyFrom(encryptedMessage));
+      
+                
+                
+            } catch (Exception ex) {
+                Logger.getLogger(OutboundHCSMessage.class.getName()).log(Level.SEVERE, null, ex);
+                System.exit(0);
+            }
+            
+        } else {
+            applicationMessageBuilder.setBusinessProcessMessage(ByteString.copyFrom(originalMessage));
+        
+        }
+        
+        ApplicationMessage applicationMessage = applicationMessageBuilder.build();
+        
         List<ApplicationMessageChunk> parts = new ArrayList<>();
 
         //TransactionID transactionID = messageEnvelope.getMessageEnvelopeId();

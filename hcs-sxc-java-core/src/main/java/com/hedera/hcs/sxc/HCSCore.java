@@ -64,7 +64,7 @@ public enum HCSCore { // singleton implementation
     private MessagePersistenceLevel messagePersistenceLevel;
     private String mirrorAddress;
     private Map<String, String> hibernateConfig = new HashMap<>();
-    //private byte[] messageEncryptionKey = new byte[0];
+    private Ed25519PrivateKey messageSigningKey = null;
     private YAMLConfig yamlConfig;
     private KeyAgreement tempKeyAgreement = null; // if set, user is KR initiator. 
     private Config config;
@@ -90,6 +90,10 @@ public enum HCSCore { // singleton implementation
             this.operatorAccountId = AccountId.fromString(envValue);
         }
         
+        envValue = getOptionalEnvValue("SIGNING_KEY");
+        if ( ! envValue.isEmpty()) {
+            this.messageSigningKey = Ed25519PrivateKey.fromString(envValue);
+        }
         try {    
             this.config = new Config(configFilePath);
             this.yamlConfig = config.getConfig();
@@ -222,9 +226,9 @@ public enum HCSCore { // singleton implementation
     public boolean getEncryptMessages() {
         return this.encryptMessages;
     }
-    //public byte[] getMessageEncryptionKey() {
-    //    return this.messageEncryptionKey;
-    //}
+    public Ed25519PrivateKey getMessageSigningKey() {
+        return this.messageSigningKey;
+    }
     public boolean getRotateKeys() {
         return this.rotateKeys;
     }

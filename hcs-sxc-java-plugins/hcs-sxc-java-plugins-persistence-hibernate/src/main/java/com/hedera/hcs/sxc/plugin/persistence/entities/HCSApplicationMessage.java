@@ -20,12 +20,7 @@ package com.hedera.hcs.sxc.plugin.persistence.entities;
  * ‍
  */
 
-import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
-import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
-import com.hedera.hcs.sxc.interfaces.SXCApplicationMessageInterface;
-import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.time.Instant;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -33,11 +28,12 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import lombok.Data;
+import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
 
 @Entity
 @Data
 @Table(name = "ApplicationMessages")
-public class HCSApplicationMessage implements  SXCApplicationMessageInterface, Serializable{
+public class HCSApplicationMessage implements  SxcApplicationMessageInterface, Serializable{
     @Id
     private String applicationMessageId;
     @Lob

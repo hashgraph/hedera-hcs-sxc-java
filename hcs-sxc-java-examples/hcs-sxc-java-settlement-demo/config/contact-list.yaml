@@ -1,0 +1,29 @@
+# Specify a list of alternative addressbooks. Only one addressbook is 
+# active at a time and is set by the APP_ID in the .env file.
+# Notice that your ownEd25519PubKeyForSigning must be set in the .env
+# file as well.
+
+Alice:                           
+  ADDRESS_LIST:
+    Bob : 
+      sharedSymmetricEncryptionKey: a-b
+      theirEd25519PubKeyForSigning: b
+    Diana : 
+      sharedSymmetricEncryptionKey: a-d
+      theirEd25519PubKeyForSigning: d
+Bob:
+  ADDRESS_LIST:
+    Alice : 
+      sharedSymmetricEncryptionKey: a-b
+      theirEd25519PubKeyForSigning: a
+    Diana : 
+      sharedSymmetricEncryptionKey: b-d
+      theirEd25519PubKeyForSigning: d
+Diana:
+  ADDRESS_LIST:
+    Alice : 
+      sharedSymmetricEncryptionKey: a-d
+      theirEd25519PubKeyForSigning: a
+    Bob : 
+      sharedSymmetricEncryptionKey: b-d
+      theirEd25519PubKeyForSigning: b

@@ -1,7 +1,7 @@
 appClients:
-  - clientName: "Player 1"
-    clientKey: "player 1 key"
-  - clientName: "Player 2"
+  - clientName: "Player-1"
+    clientKey: "player-1-key"
+  - clientName: "Player-2"
     clientKey: "player 2 key"
-  - clientName: "Player 3"
-    clientKey: "player 3 key"
+  - clientName: "Player-3"
+    clientKey: "player-3-key"

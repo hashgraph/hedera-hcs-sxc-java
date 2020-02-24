@@ -84,3 +84,5 @@ hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/docker-compose.yml
 hcs-sxc-java-basics
 hcs-sxc-java-coverage/target
 /hcs-sxc-java-plugins/hcs-sxc-java-plugins-cryptography/nbproject/
+/hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/nbproject/
+/hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/nbproject/

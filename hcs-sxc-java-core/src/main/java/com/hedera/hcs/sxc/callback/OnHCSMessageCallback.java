@@ -36,7 +36,6 @@ import com.hedera.hcs.sxc.interfaces.HCSCallBackToAppInterface;
 import com.hedera.hcs.sxc.interfaces.HCSResponse;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcs.sxc.interfaces.MirrorSubscriptionInterface;
-import com.hedera.hcs.sxc.interfaces.SXCApplicationMessageInterface;
 import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
 import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
 import com.hedera.hcs.sxc.plugins.Plugins;
@@ -61,6 +60,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.crypto.KeyAgreement;
 import org.apache.commons.lang3.tuple.Pair;
+import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
 
 /**
  *
@@ -99,23 +99,14 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
             Class<?> messageKeyRotationClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcKeyRotation", true);
             this.keyRotationPlugin = (SxcKeyRotation)messageKeyRotationClass.newInstance();
         }
-        
-        // load persistence implementation at runtime
-        Class<?> persistenceClass = Plugins.find("com.hedera.hcs.sxc.plugin.persistence.*", "com.hedera.hcs.sxc.interfaces.SxcPersistence", true);
-        this.hcsCore.setMessagePersistence((SxcPersistence)persistenceClass.newInstance());
-        this.hcsCore.getMessagePersistence().setHibernateProperties(this.hcsCore.getHibernateConfig());
-
-        // load mirror callback implementation at runtime
-        Class<?> callbackClass = Plugins.find("com.hedera.hcs.sxc.plugin.mirror.*", "com.hedera.hcs.sxc.interfaces.MirrorSubscriptionInterface", true);
-        MirrorSubscriptionInterface mirrorSubscription = ((MirrorSubscriptionInterface)callbackClass.newInstance());
-
+         
         if (this.hcsCore.getCatchupHistory()) {
             log.debug("catching up with mirror history");
-            Optional<Instant> lastConsensusTimestamp = Optional.of(this.hcsCore.getMessagePersistence().getLastConsensusTimestamp());
-            mirrorSubscription.init(this, this.hcsCore.getApplicationId(), lastConsensusTimestamp, this.hcsCore.getMirrorAddress(), this.hcsCore.getConsensusTopicIds());
+            Optional<Instant> lastConsensusTimestamp = Optional.of(this.hcsCore.getPersistence().getLastConsensusTimestamp());
+            this.hcsCore.getMirrorSubscription().init(this, this.hcsCore.getApplicationId(), lastConsensusTimestamp, this.hcsCore.getMirrorAddress(), this.hcsCore.getConsensusTopicIds());
         } else {
             log.debug("NOT catching up with mirror history");
-            mirrorSubscription.init(this, this.hcsCore.getApplicationId(), Optional.of(Instant.now()), this.hcsCore.getMirrorAddress(), this.hcsCore.getConsensusTopicIds());
+            this.hcsCore.getMirrorSubscription().init(this, this.hcsCore.getApplicationId(), Optional.of(Instant.now()), this.hcsCore.getMirrorAddress(), this.hcsCore.getConsensusTopicIds());
         }
     }
     /**
@@ -138,7 +129,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
         observers.forEach(listener -> listener.onMessage(hcsResponse));
     }
     public void storeMirrorResponse(SxcConsensusMessage consensusMessage) {
-        hcsCore.getMessagePersistence().storeMirrorResponse(consensusMessage);
+        hcsCore.getPersistence().storeMirrorResponse(consensusMessage);
     }
     
     @Override
@@ -146,7 +137,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                 
         try {
             Optional<ApplicationMessage> messageEnvelopeOptional =
-                    pushUntilCompleteMessage(messagePart, this.hcsCore.getMessagePersistence());
+                    pushUntilCompleteMessage(messagePart, this.hcsCore.getPersistence());
             
             if (messageEnvelopeOptional.isPresent()){ // is present if all parts received
                 
@@ -159,8 +150,8 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                 if(this.encryptMessages){
                    
                     try {
-                        
-                        byte[] decryptedBPM = this.messageEncryptionPlugin.decrypt(hcsCore.getMessageEncryptionKey(), appMessage.getBusinessProcessMessage().toByteArray());
+                        byte[] sharedKey = null;
+                        byte[] decryptedBPM = this.messageEncryptionPlugin.decrypt(sharedKey, appMessage.getBusinessProcessMessage().toByteArray());
                         
                         Any any = Any.parseFrom(decryptedBPM);
                         
@@ -177,12 +168,13 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                 // create your own new key store it and respond
                                 Pair<byte[], byte[]> respond = keyRotationPlugin.respond(initiatorPublicKeyEncoded);
 
+                                /* changed due to encryption taken from address book
                                 byte[] newPublicKey =  respond.getLeft();
                                 byte[] newSecretKey = respond.getRight();  
                                 byte[] oldSecretKey = hcsCore.getMessageEncryptionKey();
                                 hcsCore.updateSecretKey(newSecretKey);
-                                hcsCore.getMessagePersistence().storeSecretKey(newSecretKey);
-
+                                hcsCore.getPersistence().storeSecretKey(newSecretKey);
+                                
 
                                 KeyRotationRespond kr2 = KeyRotationRespond.newBuilder()
                                     .setResponderPublicKeyEncoded(ByteString.copyFrom(newPublicKey))
@@ -192,7 +184,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
 
                                 Any anyPack = Any.pack(kr2);
                                 byte[] encryptedAnyPackedChunkBody = messageEncryptionPlugin.encrypt(oldSecretKey, anyPack.toByteArray());
-
+                                
                                 
                                 TransactionId transactionId = new TransactionId(hcsCore.getOperatorAccountId());
                                 ApplicationMessageID newAppId = ApplicationMessageID.newBuilder()
@@ -251,7 +243,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                 } catch (HederaNetworkException ex) {
                                     log.error(ex);
                                 }
-                                    
+                                */
                             } // test checking if initiator
                         } // end any test initialise
                         
@@ -271,8 +263,8 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                 hcsCore.setTempKeyAgreement(null);
                                 byte[] newSecretKey = keyRotationPlugin.finalise(responderPublicKeyEncoded, keyAgreement);
                                   // store new SecretKey in Database
-                                hcsCore.updateSecretKey(newSecretKey);
-                                hcsCore.getMessagePersistence().storeSecretKey(newSecretKey);
+                               //=======hcsCore.updateSecretKey(newSecretKey);
+                               //=======hcsCore.getPersistence().storeSecretKey(newSecretKey);
                                 
                             }
                         } else {
@@ -285,7 +277,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                     .setBusinessProcessSignature(appMessage.getBusinessProcessSignature())
                                     .build();
                                 appMessage = decryptedAppmessage;
-                                this.hcsCore.getMessagePersistence().storeApplicationMessage(
+                                this.hcsCore.getPersistence().storeApplicationMessage(
                                         appMessage,
                                         sxcConsensusMesssage.consensusTimestamp,
                                         StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),
@@ -301,7 +293,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                     }  
                     
                 } else { // not encrypted
-                    this.hcsCore.getMessagePersistence().storeApplicationMessage(
+                    this.hcsCore.getPersistence().storeApplicationMessage(
                             messageEnvelopeOptional.get(),
                             sxcConsensusMesssage.consensusTimestamp,
                             StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),

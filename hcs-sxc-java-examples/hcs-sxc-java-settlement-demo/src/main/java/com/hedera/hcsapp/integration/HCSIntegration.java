@@ -631,7 +631,7 @@ public class HCSIntegration {
     }
     
     private void deleteData() {
-        SxcPersistence persistence = this.appData.getHCSCore().getMessagePersistence();
+        SxcPersistence persistence = this.appData.getHCSCore().getPersistence();
 
         persistence.clear();
         

@@ -40,6 +40,8 @@ import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.log4j.Log4j2;
 
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
+import com.hedera.hcs.sxc.interfaces.MirrorSubscriptionInterface;
+import com.hedera.hcs.sxc.plugins.Plugins;
 import javax.crypto.KeyAgreement;
 @Log4j2
 public enum HCSCore { // singleton implementation
@@ -62,32 +64,21 @@ public enum HCSCore { // singleton implementation
     private MessagePersistenceLevel messagePersistenceLevel;
     private String mirrorAddress;
     private Map<String, String> hibernateConfig = new HashMap<>();
-    private byte[] messageEncryptionKey = new byte[0];
+    //private byte[] messageEncryptionKey = new byte[0];
     private YAMLConfig yamlConfig;
     private KeyAgreement tempKeyAgreement = null; // if set, user is KR initiator. 
     private Config config;
     private boolean initialised = false;
     private Dotenv dotEnv;
-    
-    /**
-     * Constructor for HCS Core
-     * @param applicationId - unique value per app instance using the component, if the app generates this value and stops/starts,
-     * it must reuse the same applicationId to ensure consistent message delivery
-     * @throws java.io.FileNotFoundException
-     */
-    /**
-     * Constructor for HCS Core
-     * @param applicationId - unique value per app instance using the component, if the app generates this value and stops/starts,
-     * @param configFilePath - path to the configuration files
-     * it must reuse the same applicationId to ensure consistent message delivery
-     * FOR TESTING PURPOSES ONLY
-     */
-    
+    private MirrorSubscriptionInterface mirrorSubscription;
+   
+
     
     private  HCSCore() throws  ExceptionInInitializerError {  
     }
     
-    private void init(String appId, String configFilePath, String environmentFilePath) throws Exception {
+    private void init(String appId, String configFilePath, String environmentFilePath) throws Exception {    
+        
         this.dotEnv = Dotenv.configure().filename(environmentFilePath).ignoreIfMissing().load();
         // optionally get operator key and account id from environment variables
         String envValue = getOptionalEnvValue("OPERATOR_KEY");
@@ -125,38 +116,46 @@ public enum HCSCore { // singleton implementation
         this.messagePersistenceLevel = appnet.getPersistenceLevel();
 
         if(this.rotateKeys && !this.encryptMessages){
-            log.error("config.ini has key rotation enabled, however encryption is disabled. Exiting...");
+            log.error("config.yaml has key rotation enabled, however encryption is disabled. Exiting...");
             System.exit(0);
         }
         
         // replace hibernate configuration {appid}
-        yamlConfig.getCoreHibernate().forEach((key,value) -> this.hibernateConfig.put(key, value.replace("{appid}",  this.applicationId)));
+        yamlConfig.getCoreHibernate().forEach((key,value) -> this.hibernateConfig.put(key, value.replace("{appid}",  this.applicationId)));  
+        
+        Class<?> persistenceClass = Plugins.find("com.hedera.hcs.sxc.plugin.persistence.*", "com.hedera.hcs.sxc.interfaces.SxcPersistence", true);
+        
+        
+        this.setPersistence((SxcPersistence)persistenceClass.newInstance());
+        this.getPersistence().setHibernateProperties(this.getHibernateConfig());
+        
+        
+        // load mirror callback implementation at runtime
+        Class<?> callbackClass = Plugins.find("com.hedera.hcs.sxc.plugin.mirror.*", "com.hedera.hcs.sxc.interfaces.MirrorSubscriptionInterface", true);
+        this.mirrorSubscription = ((MirrorSubscriptionInterface)callbackClass.newInstance());
 
+        
+        
         this.initialised = true;
     }
     
-    private String getOptionalEnvValue(String varName) throws Exception {
-        String value = "";
-        log.debug("Looking for " + varName + " in environment variables");
-        if (System.getProperty(varName) != null) {
-            value = System.getProperty(varName);
-            log.debug(varName + " found in command line parameters");
-        } else if ((this.dotEnv == null) || (this.dotEnv.get(varName) == null)) {
-            value = "";
-        } else {
-            value = this.dotEnv.get(varName);
-            log.debug(varName + " found in environment variables");
-        }
-        return value;
-    }
     
+    
+     
     public HCSCore singletonInstance() throws Exception{
         if( ! this.initialised) {
             init("", "./config/config.yaml", "./config/.env");
         }
         return INSTANCE;
     }
-
+    
+    /**
+     * Init for HCS Core
+     * @param applicationId - unique value per app instance using the component, if the app generates this value and stops/starts,
+     * it must reuse the same applicationId to ensure consistent message delivery
+     * @throws java.io.FileNotFoundException
+     */
+    
     public HCSCore singletonInstance(String appId) throws Exception{
         if( ! this.initialised) {
             init(appId, "./config/config.yaml", "./config/.env");
@@ -164,12 +163,25 @@ public enum HCSCore { // singleton implementation
         return INSTANCE;
     }
 
+    /**
+     * Init for HCS Core
+     * @param applicationId - unique value per app instance using the component, if the app generates this value and stops/starts,
+     * @param configFilePath - path to the configuration files
+     * it must reuse the same applicationId to ensure consistent message delivery
+     * FOR TESTING PURPOSES ONLY
+     */
     public HCSCore singletonInstance(String appId, String configFilePath, String environmentFilePath) throws Exception {
         if( ! this.initialised) {
             init(appId,configFilePath, environmentFilePath);
         }
         return INSTANCE;
     }
+    
+    public HCSCore addAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey){
+        this.getPersistence().addAppParticipant(appId, theirEd25519PubKeyForSigning, sharedSymmetricEncryptionKey);
+        return INSTANCE;
+    }
+    
     
     public HCSCore withMessageSignature(boolean signMessages) {
         this.signMessages = signMessages;
@@ -179,10 +191,10 @@ public enum HCSCore { // singleton implementation
         this.encryptMessages = encryptMessages;
         return INSTANCE;
     }
-    public HCSCore withMessageEncryptionKey(byte[] messageEncryptionKey) {
-        this.messageEncryptionKey = messageEncryptionKey;
-        return INSTANCE;
-    }
+    //public HCSCore withMessageEncryptionKey(byte[] messageEncryptionKey) {
+    //    this.messageEncryptionKey = messageEncryptionKey;
+    //    return INSTANCE;
+    //}
     public HCSCore withKeyRotation(boolean keyRotation, int frequency) {
         this.rotateKeys = keyRotation;
         this.rotationFrequency = frequency;
@@ -210,9 +222,9 @@ public enum HCSCore { // singleton implementation
     public boolean getEncryptMessages() {
         return this.encryptMessages;
     }
-    public byte[] getMessageEncryptionKey() {
-        return this.messageEncryptionKey;
-    }
+    //public byte[] getMessageEncryptionKey() {
+    //    return this.messageEncryptionKey;
+    //}
     public boolean getRotateKeys() {
         return this.rotateKeys;
     }
@@ -243,12 +255,12 @@ public enum HCSCore { // singleton implementation
     public boolean getCatchupHistory() {
         return this.catchupHistory;
     }
-    public void setMessagePersistence(SxcPersistence persistence) {
+    public void setPersistence(SxcPersistence persistence) {
         HCSCore.persistence = persistence;
         HCSCore.persistence.setPersistenceLevel(this.messagePersistenceLevel);
     }
 
-    public SxcPersistence getMessagePersistence() {
+    public SxcPersistence getPersistence() {
         return HCSCore.persistence;
     }
     
@@ -272,7 +284,27 @@ public enum HCSCore { // singleton implementation
         this.tempKeyAgreement = tempKeyAgreement;
     }
 
-    public void updateSecretKey(byte[] newSecretKey){
-        this.messageEncryptionKey = newSecretKey;
+    //public void updateSecretKey(byte[] newSecretKey){
+    //    this.messageEncryptionKey = newSecretKey;
+    //}
+
+    public MirrorSubscriptionInterface getMirrorSubscription() {
+        return mirrorSubscription;
     }
+    
+    private String getOptionalEnvValue(String varName) throws Exception {
+        String value = "";
+        log.debug("Looking for " + varName + " in environment variables");
+        if (System.getProperty(varName) != null) {
+            value = System.getProperty(varName);
+            log.debug(varName + " found in command line parameters");
+        } else if ((this.dotEnv == null) || (this.dotEnv.get(varName) == null)) {
+            value = "";
+        } else {
+            value = this.dotEnv.get(varName);
+            log.debug(varName + " found in environment variables");
+        }
+        return value;
+    }
+    
 }

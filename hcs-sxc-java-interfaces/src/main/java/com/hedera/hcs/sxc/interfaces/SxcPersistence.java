@@ -52,36 +52,41 @@ public interface SxcPersistence {
     public ConsensusMessageSubmitTransaction getSubmittedTransaction(String transactionId);
     public Map<String, ConsensusMessageSubmitTransaction> getSubmittedTransactions();
     
-   // application message persistence
+   // Application message persistence
   
-   public void storeApplicationMessage(
+    public void storeApplicationMessage(
         ApplicationMessage applicationMessage,
         Instant lastChronoPartConsensusTimestamp,
         String lastChronoPartRunningHashHEX,
         long lastChronoPartSequenceNum
-   );
-   
-   public Map<String, ApplicationMessage> getApplicationMessages();
-   public List<? extends SXCApplicationMessageInterface> getSCXApplicationMessages(); 
-    
-   public SXCApplicationMessageInterface getApplicationMessageEntity(String applicationMessageId);
-   public ApplicationMessage getApplicationMessage(String applicationMessageId) throws InvalidProtocolBufferException;
-   
-    
-    // secret key  and keySpec holder for key rotation
+    );
+
+    public Map<String, ApplicationMessage> getApplicationMessages();
+    public List<? extends SxcApplicationMessageInterface> getSCXApplicationMessages(); 
+
+    public SxcApplicationMessageInterface getApplicationMessageEntity(String applicationMessageId);
+    public ApplicationMessage getApplicationMessage(String applicationMessageId) throws InvalidProtocolBufferException;
+
+
+    // Secret key  and keySpec holder for key persistence
     public void storeSecretKey(byte[] secretKey);
     public byte[] getSecretKey();
-   
+
     public void storePublicKey(byte[] secretKey);
     public byte[] getPublicKey();
-       
+
     // consensus timestamp
     public Instant getLastConsensusTimestamp();
-    
+
     // persistence level
     public void setPersistenceLevel(MessagePersistenceLevel persistenceLevel);
-    
+
     // clear all data
     public void clear();
-  }
+
+    // AddressBook Persistence
+    public Map<String,Map<String,String>> getAddressList();
+    public void addAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey);
+
+}
     

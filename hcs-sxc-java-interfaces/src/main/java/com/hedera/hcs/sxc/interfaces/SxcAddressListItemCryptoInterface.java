@@ -24,15 +24,11 @@ import java.time.Instant;
 
 /**
  * 
- * Interface for application message Entities
+ * Interface for accessing the address list
  *
  */
-public interface SXCApplicationMessageInterface  {  
-    public byte[] getBusinessProcessMessage();
-    public String getApplicationMessageId();
-    public Instant getLastChronoPartConsensusTimestamp ();
-    public long getLastChronoPartShardNum ();
-    public long getLastChronoPartRealmNum();
-    public long getLastChronoPartSequenceNum();
-    public String getLastChronoPartRunningHashHEX();
+public interface SxcAddressListItemCryptoInterface  {  
+    public String getAppId();
+    public String getTheirEd25519PubKeyForSigning();
+    public String getSharedSymmetricEncryptionKey();
 }

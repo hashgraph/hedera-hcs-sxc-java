@@ -23,10 +23,12 @@ package com.hedera.hcsapp;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
+import java.util.Map;
 
 import lombok.extern.log4j.Log4j2;
 
 import java.util.Scanner;
+import main.java.com.hedera.hcsapp.AddressListCrypto;
 
 /**
  * Hello world!
@@ -45,15 +47,36 @@ public final class App {
         } else {
             appId = args[0];
         }
+        
         int topicIndex = 0; // refers to the first topic ID in the config.yaml
         
-        // Simplest setup and send
+        // 1 -  Load network participants from configuration file app.yaml
         Config config = new Config();
+        
+        // 2 - Init the core with data from  .env and config.yaml 
         HCSCore hcsCore = HCSCore.INSTANCE.singletonInstance(appId);
 
+        
+        // 3 - Load the addressbook from address-list yaml and supply the core.
+        AddressListCrypto
+                .INSTANCE
+                .singletonInstance(appId)
+                .getAddressList()
+                .forEach((k,v)->{
+                    hcsCore.addAppParticipant(k, v.get("theirEd25519PubKeyForSigning"), v.get("sharedSymmetricEncryptionKey"));
+                });
+        
         System.out.println("****************************************");
         System.out.println("** Welcome to a simple HCS demo");
-        System.out.println("** I am app: " + config.getConfig().getAppClients().get(Integer.parseInt(appId)).getClientName());
+        System.out.println("** I am app: " + 
+                config.getConfig().getAppClients()
+                .stream()
+                .filter(c -> c.getClientName()
+                        .equals(args[0]))
+                        .findFirst()
+                        .get()
+                        .getClientName()
+                );
         System.out.println("****************************************");
         
         // create a callback object to receive the message
@@ -82,7 +105,7 @@ public final class App {
                 try {
                     new OutboundHCSMessage(hcsCore)
                         //.overrideEncryptedMessages(false)
-                        .overrideMessageSignature(false)
+                        //.overrideMessageSignature(false)
                         .sendMessage(topicIndex, userInput.getBytes());
     
                     System.out.println("Message sent successfully.");

@@ -25,7 +25,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.config.Topic;
-import com.hedera.hcs.sxc.interfaces.SXCApplicationMessageInterface;
 import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
 import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
@@ -65,6 +64,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
 
 @Log4j2
 @RestController
@@ -153,11 +153,11 @@ public class AuditController {
 
         AuditApplicationMessages auditApplicationMessages = new AuditApplicationMessages();
         HCSCore hcsCore = Statics.getAppData().getHCSCore();
-        SxcPersistence persistence = hcsCore.getMessagePersistence();
+        SxcPersistence persistence = hcsCore.getPersistence();
 
 
-        List<? extends SXCApplicationMessageInterface> scxApplicationMessages = persistence.getSCXApplicationMessages();
-        for (SXCApplicationMessageInterface m : scxApplicationMessages){
+        List<? extends SxcApplicationMessageInterface> scxApplicationMessages = persistence.getSCXApplicationMessages();
+        for (SxcApplicationMessageInterface m : scxApplicationMessages){
             //ApplicationMessage  = ApplicationMessage.parseFrom(m.getBusinessProcessMessage());
             SettlementBPM settlementBPM = SettlementBPM.parseFrom(
                 ApplicationMessage.parseFrom(m.getBusinessProcessMessage())
@@ -175,7 +175,6 @@ public class AuditController {
             }
         };
 
-    
         return new ResponseEntity<>(auditApplicationMessages, headers, HttpStatus.OK);
     }
 
@@ -186,7 +185,7 @@ public class AuditController {
 
         AuditHCSMessages auditHCSMessages = new AuditHCSMessages();
         HCSCore hcsCore = Statics.getAppData().getHCSCore();
-        SxcPersistence persistence = hcsCore.getMessagePersistence();
+        SxcPersistence persistence = hcsCore.getPersistence();
 
         Map<String, SxcConsensusMessage> mirrorResponses = persistence.getMirrorResponses();
 

@@ -35,7 +35,6 @@ import com.hedera.hcs.sxc.plugin.persistence.entities.MirrorResponse;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
-import com.hedera.hcs.sxc.interfaces.SXCApplicationMessageInterface;
 import com.hedera.hcs.sxc.plugin.persistence.entities.KeyStore;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
@@ -56,6 +55,7 @@ import javax.persistence.criteria.Root;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
 
 @Log4j2
 public class Persist
@@ -385,7 +385,7 @@ implements SxcPersistence{
     }
     
     @Override
-    public SXCApplicationMessageInterface getApplicationMessageEntity(String applicationMessageId) {
+    public SxcApplicationMessageInterface getApplicationMessageEntity(String applicationMessageId) {
         final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         HCSApplicationMessage applicationMessage = session.createQuery("from HCSApplicationMessage m where m.applicationMessageId = :applicationMessageId", HCSApplicationMessage.class)
                 .setParameter("applicationMessageId", applicationMessageId)
@@ -419,7 +419,7 @@ implements SxcPersistence{
     
     
     @Override
-    public List<? extends SXCApplicationMessageInterface> getSCXApplicationMessages() {
+    public List<? extends SxcApplicationMessageInterface> getSCXApplicationMessages() {
          
         final Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         List<HCSApplicationMessage> applicationMessages = session.createQuery("from HCSApplicationMessage", HCSApplicationMessage.class)
@@ -537,7 +537,17 @@ implements SxcPersistence{
         return ks.getPublicKey();
     }
 
+    @Override
+    public void addAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 
+    @Override
+    public Map<String, Map<String, String>> getAddressList() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    
    
 
   

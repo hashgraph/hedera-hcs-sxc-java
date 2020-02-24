@@ -140,8 +140,8 @@ public final class AppData {
                 }
             }
         }
-        this.hcsCore =  HCSCore.INSTANCE.singletonInstance(this.appId, configFilePath, environmentFilePath)
-                .withMessageEncryptionKey(this.messageEncryptionKey);
+        this.hcsCore =  HCSCore.INSTANCE.singletonInstance(this.appId, configFilePath, environmentFilePath);
+                //.withMessageEncryptionKey(this.messageEncryptionKey);
     }
 
     public HCSCore getHCSCore() {

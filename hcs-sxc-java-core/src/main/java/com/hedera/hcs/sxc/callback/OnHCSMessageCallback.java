@@ -36,7 +36,6 @@ import com.hedera.hcs.sxc.interfaces.HCSCallBackToAppInterface;
 import com.hedera.hcs.sxc.interfaces.HCSResponse;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcs.sxc.interfaces.MirrorSubscriptionInterface;
-import com.hedera.hcs.sxc.interfaces.SXCApplicationMessageInterface;
 import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
 import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
 import com.hedera.hcs.sxc.plugins.Plugins;
@@ -72,12 +71,12 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
 
     private final List<HCSCallBackToAppInterface> observers = new ArrayList<>();
     private HCSCore hcsCore;
-    private  boolean signMessages;
-    private  boolean encryptMessages;
-    private  boolean rotateKeys;
+    private boolean signMessages;
+    private boolean encryptMessages;
+    private boolean rotateKeys;
     private Class<?> messageEncryptionClass;
     private SxcMessageEncryption messageEncryptionPlugin;
-    private  List<Topic> topics;
+    private List<Topic> topics;
     private SxcKeyRotation keyRotationPlugin;
     
     public OnHCSMessageCallback (HCSCore hcsCore) throws Exception {

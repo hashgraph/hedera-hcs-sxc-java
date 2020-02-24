@@ -92,10 +92,8 @@ public final class OutboundHCSMessage {
         Class<?> persistenceClass = Plugins.find("com.hedera.hcs.sxc.plugin.persistence.*", "com.hedera.hcs.sxc.interfaces.SxcPersistence", true);
         this.persistencePlugin = (SxcPersistence)persistenceClass.newInstance();
         
-        
         if(this.encryptMessages){
-            Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
-            this.messageEncryptionPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
+            getMessageEncryptionPlugin();
         }
         
         if(this.rotateKeys){
@@ -105,6 +103,11 @@ public final class OutboundHCSMessage {
         }
     }
 
+    private void getMessageEncryptionPlugin() throws Exception {
+        Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
+        this.messageEncryptionPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
+
+    }
     
     public boolean getOverrideMessageSignature() {
         return this.signMessages;
@@ -175,29 +178,50 @@ public final class OutboundHCSMessage {
         return this;
     }
     
+    public byte[] getOverrideMessageEncryptionKey (){
+        return this.overrideMessageEncryptionKey;
+    }
+
     public OutboundHCSMessage withFirstTransactionId(TransactionId transactionId) {
         this.transactionId = transactionId;
         return this;
     }
 
-    /**
+     /**
+     * Sends a single cleartext message but doesn't sent to hedera 
+     * This is for testing purposes only
+     *
+     * @param topicIndex the index reference in one of {@link #topics}
+     * @param message
+     * @throws Exception
+     * @return TransactionId
+     */
+    public TransactionId sendMessageForTest(int topicIndex, byte[] message) throws Exception {
+        return sendMessage(topicIndex, message, true);
+    }
+
+     /**
      * Sends a single cleartext message
      *
      * @param topicIndex the index reference in one of {@link #topics}
      * @param message
-     * @throws HederaNetworkException
-     * @throws IllegalArgumentException
      * @throws Exception
      * @return TransactionId
      */
     public TransactionId sendMessage(int topicIndex, byte[] message) throws Exception {
-
-        if (signMessages) {
+        return sendMessage(topicIndex, message, false);
+    }
+    
+    private TransactionId sendMessage(int topicIndex, byte[] message, boolean byPassSending) throws Exception {
+        if (this.signMessages) {
 
         }
-        if (encryptMessages) {
+        if (this.encryptMessages) {
             if (this.overrideMessageEncryptionKey != null) {
                 this.messageEncryptionKey = this.overrideMessageEncryptionKey;
+                if (this.messageEncryptionPlugin == null) {
+                    getMessageEncryptionPlugin();
+                }
                 message = messageEncryptionPlugin.encrypt(this.messageEncryptionKey, message);
      
             } else if (hcsCore.getMessageEncryptionKey() != null){ // get it from .env
@@ -242,17 +266,19 @@ public final class OutboundHCSMessage {
                 this.persistencePlugin.storeTransaction(transactionId, tx);
 
                 log.debug("Executing transaction");
-                TransactionId txId = tx.execute(client);
-                
-                TransactionReceipt receipt = txId.getReceipt(client, Duration.ofSeconds(30));
+                if ( ! byPassSending) {
+                    TransactionId txId = tx.execute(client);
+                    
+                    TransactionReceipt receipt = txId.getReceipt(client, Duration.ofSeconds(30));
+    
+                    transactionId = new TransactionId(this.operatorAccountId);
 
-                transactionId = new TransactionId(this.operatorAccountId);
-
-                log.debug("Message receipt status is {} "
-                        + "sequence no is {}"
-                        ,receipt.status
-                        ,receipt.getConsensusTopicSequenceNumber()
-                );
+                    log.debug("Message receipt status is {} "
+                            + "sequence no is {}"
+                            ,receipt.status
+                            ,receipt.getConsensusTopicSequenceNumber()
+                    );
+                }
             } // end-for
             
             // after sending all parts check if key rotation is due
@@ -317,15 +343,19 @@ public final class OutboundHCSMessage {
                         
                         // persist the transaction
                         this.persistencePlugin.storeTransaction(newTransactionId, txRotation);
-                        TransactionId txIdKR1 =  txRotation.execute(client);
-                        
-                        TransactionReceipt receiptKR1 = txIdKR1.getReceipt(client, Duration.ofSeconds(30));
-                       
-                        log.debug("Message receipt for KR1 status is {} "
-                                + "sequence no is {}"
-                                ,receiptKR1.status
-                                ,receiptKR1.getConsensusTopicSequenceNumber()
-                        );
+                        if ( ! byPassSending) {
+                            TransactionId txIdKR1 =  txRotation.execute(client);
+                            
+                            TransactionReceipt receiptKR1 = txIdKR1.getReceipt(client, Duration.ofSeconds(30));
+                           
+                            log.debug("Message receipt for KR1 status is {} "
+                                    + "sequence no is {}"
+                                    ,receiptKR1.status
+                                    ,receiptKR1.getConsensusTopicSequenceNumber()
+                            );
+                        } else {
+                            log.warn("Not sending, bypassing sending for testing");
+                        }
                     }
                 }
             
@@ -335,7 +365,7 @@ public final class OutboundHCSMessage {
             // do nothing
         } catch (Exception e) {
             log.error(e);
-            e.printStackTrace();
+            throw (e);
         } finally {
             
         }

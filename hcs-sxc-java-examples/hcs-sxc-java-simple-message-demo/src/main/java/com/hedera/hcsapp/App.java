@@ -49,7 +49,8 @@ public final class App {
         
         // Simplest setup and send
         Config config = new Config();
-        HCSCore hcsCore = HCSCore.INSTANCE.singletonInstance(appId);
+//        HCSCore hcsCore = HCSCore.INSTANCE.singletonInstance(appId);
+        HCSCore hcsCore = new HCSCore().builder(appId);
 
         System.out.println("****************************************");
         System.out.println("** Welcome to a simple HCS demo");

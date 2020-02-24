@@ -55,8 +55,6 @@ public class OnHCSMessageCallbackTest {
     
     @Test
     public void testAddObserverAndNotify() throws Exception {
-//         HCSCore hcsCore = HCSCore.INSTANCE
-//        .singletonInstance("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
         
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsCore);

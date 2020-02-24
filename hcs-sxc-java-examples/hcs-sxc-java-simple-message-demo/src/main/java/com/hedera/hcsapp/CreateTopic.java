@@ -38,7 +38,6 @@ public class CreateTopic {
         Ed25519PrivateKey operatorKey = Ed25519PrivateKey.fromString(dotEnv.get("OPERATOR_KEY"));
         AccountId operatorId = AccountId.fromString(dotEnv.get("OPERATOR_ID"));
 
-//        HCSCore hcsCore = HCSCore.INSTANCE.singletonInstance("0")
         HCSCore hcsCore = new HCSCore().builder("0")
                 .withOperatorAccountId(operatorId)
                 .withOperatorKey(operatorKey);

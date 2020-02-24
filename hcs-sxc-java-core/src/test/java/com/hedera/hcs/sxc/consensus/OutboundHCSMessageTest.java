@@ -56,8 +56,6 @@ public class OutboundHCSMessageTest {
     
     @Test
     public void testOutBoundMessageBuilder() throws Exception {
-//        HCSCore hcsCore = HCSCore.INSTANCE
-//                .singletonInstance("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
 
         Ed25519PrivateKey ed25519PrivateKey = Ed25519PrivateKey.generate();
@@ -97,8 +95,6 @@ public class OutboundHCSMessageTest {
 
     @Test
     public void testOutBoundMessageNoSendNoEncryption() throws Exception {
-//        HCSCore hcsCore = HCSCore.INSTANCE
-//                .singletonInstance("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
 
         OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(hcsCore);
@@ -109,8 +105,6 @@ public class OutboundHCSMessageTest {
     }
     @Test
     public void testOutBoundMessageNoSendWithEncryption() throws Exception {
-//        HCSCore hcsCore = HCSCore.INSTANCE
-//                .singletonInstance("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
 
         OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(hcsCore);
@@ -124,8 +118,6 @@ public class OutboundHCSMessageTest {
 
     @Test
     public void testOutBoundMessageNoSendWithEncryptionAndRotation() throws Exception {
-//        HCSCore hcsCore = HCSCore.INSTANCE
-//                .singletonInstance("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test")
             .withMessageEncryptionKey(Ed25519PrivateKey.generate().toBytes())
             .withEncryptedMessages(true)

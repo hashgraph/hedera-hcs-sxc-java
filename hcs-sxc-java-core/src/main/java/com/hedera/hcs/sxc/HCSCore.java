@@ -42,9 +42,7 @@ import lombok.extern.log4j.Log4j2;
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
 import javax.crypto.KeyAgreement;
 @Log4j2
-public class HCSCore { // singleton implementation
-    
-    //INSTANCE();
+public class HCSCore { 
     
     private boolean signMessages = false;
     private boolean encryptMessages = false;
@@ -57,7 +55,7 @@ public class HCSCore { // singleton implementation
     private List<Topic> topics = new ArrayList<Topic>();
     private long maxTransactionFee = 0L;
     private String applicationId = "";
-    private static SxcPersistence persistence;
+    private SxcPersistence persistence;
     private boolean catchupHistory;
     private MessagePersistenceLevel messagePersistenceLevel;
     private String mirrorAddress;
@@ -153,7 +151,6 @@ public class HCSCore { // singleton implementation
         return value;
     }
     
-//    public HCSCore singletonInstance() throws Exception{
     public HCSCore builder() throws Exception{
         if( ! this.initialised) {
             init("", "./config/config.yaml", "./config/.env");
@@ -161,7 +158,6 @@ public class HCSCore { // singleton implementation
         return this;
     }
 
-//    public HCSCore singletonInstance(String appId) throws Exception{
     public HCSCore builder(String appId) throws Exception{
         if( ! this.initialised) {
             init(appId, "./config/config.yaml", "./config/.env");
@@ -169,7 +165,6 @@ public class HCSCore { // singleton implementation
         return this;
     }
 
-//    public HCSCore singletonInstance(String appId, String configFilePath, String environmentFilePath) throws Exception {
     public HCSCore builder(String appId, String configFilePath, String environmentFilePath) throws Exception {
         if( ! this.initialised) {
             init(appId,configFilePath, environmentFilePath);
@@ -261,12 +256,12 @@ public class HCSCore { // singleton implementation
         return this.catchupHistory;
     }
     public void setMessagePersistence(SxcPersistence persistence) {
-        HCSCore.persistence = persistence;
-        HCSCore.persistence.setPersistenceLevel(this.messagePersistenceLevel);
+        this.persistence = persistence;
+        this.persistence.setPersistenceLevel(this.messagePersistenceLevel);
     }
 
     public SxcPersistence getMessagePersistence() {
-        return HCSCore.persistence;
+        return this.persistence;
     }
     
     public Map<String, String> getHibernateConfig() {

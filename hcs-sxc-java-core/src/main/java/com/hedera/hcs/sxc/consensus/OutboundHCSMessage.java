@@ -51,7 +51,9 @@ import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 import com.hedera.hcs.sxc.proto.ApplicationMessageID;
 import com.hedera.hcs.sxc.proto.KeyRotationInitialise;
 import com.hedera.hcs.sxc.proto.Timestamp;
+import com.hedera.hcs.sxc.signing.Signing;
 import com.hedera.hcs.sxc.utils.StringUtils;
+import java.time.Instant;
 
 import java.util.Arrays;
 import java.util.NoSuchElementException;
@@ -230,7 +232,7 @@ public final class OutboundHCSMessage {
     }
 
     private TransactionId doSendMessage(byte[] message, int topicIndex, String recipient) {
-        // generate TXId for main and first message it not already set by caller
+        // generate TXId for main and first message if not already set by caller
         TransactionId firstTransactionId = (this.transactionId == null) ? new TransactionId(this.operatorAccountId) : this.transactionId;
         //break up  (and the whole encrypted messages
         List<ApplicationMessageChunk> parts = chunk(firstTransactionId, hcsCore, message, this.addressList.get(recipient));
@@ -385,7 +387,8 @@ public final class OutboundHCSMessage {
                 ).build();
 
         byte[] originalMessage = Arrays.copyOf(message, message.length);
-
+        
+        ApplicationMessage applicationMessage  = null;
         ApplicationMessage.Builder applicationMessageBuilder = ApplicationMessage
                 .newBuilder()
                 .setApplicationMessageId(transactionID);
@@ -398,7 +401,8 @@ public final class OutboundHCSMessage {
                 
                 // Signature (using sender’s private key) of hash (above) should also be included in application message
                 Ed25519PrivateKey messageSigningKey = hcsCore.getMessageSigningKey();
-                byte[] sign = messageSigningKey.sign(hashOfOriginalMessage);
+                
+                byte[] sign = Signing.sign(hashOfOriginalMessage, messageSigningKey);
                 applicationMessageBuilder.setBusinessProcessSignature(ByteString.copyFrom(sign));
                 
                 // encrypt
@@ -409,8 +413,10 @@ public final class OutboundHCSMessage {
                         StringUtils.hexStringToByteArray(encryptionKey)
                         , message);
                 applicationMessageBuilder.setBusinessProcessMessage(ByteString.copyFrom(encryptedMessage));
-      
-                
+                applicationMessage = applicationMessageBuilder.build();
+               
+                // store the outgoing message encrypted - null parameters because missing consensus data. Consensus state is sored on inbound messages
+                hcsCore.getPersistence().storeApplicationMessage(applicationMessage, null, null, 0);    
                 
             } catch (Exception ex) {
                 Logger.getLogger(OutboundHCSMessage.class.getName()).log(Level.SEVERE, null, ex);
@@ -419,10 +425,11 @@ public final class OutboundHCSMessage {
             
         } else {
             applicationMessageBuilder.setBusinessProcessMessage(ByteString.copyFrom(originalMessage));
-        
+            applicationMessage = applicationMessageBuilder.build();
         }
         
-        ApplicationMessage applicationMessage = applicationMessageBuilder.build();
+        
+        
         
         List<ApplicationMessageChunk> parts = new ArrayList<>();
 

@@ -55,10 +55,10 @@ public interface SxcPersistence {
    // Application message persistence
   
     public void storeApplicationMessage(
-        ApplicationMessage applicationMessage,
-        Instant lastChronoPartConsensusTimestamp,
-        String lastChronoPartRunningHashHEX,
-        long lastChronoPartSequenceNum
+        ApplicationMessage applicationMessage, // the message
+        Instant lastChronoPartConsensusTimestamp, // consensus data if available
+        String lastChronoPartRunningHashHEX, // consensus data if available
+        long lastChronoPartSequenceNum // consensus data if available
     );
 
     public Map<String, ApplicationMessage> getApplicationMessages();

@@ -143,14 +143,28 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                 
                 // TODO check signature to test if message is for me, no need to decrypt
                 boolean isMessageForMe = true;
-                if (isMessageForMe == false) return; 
+                boolean didMeSendMessage = true;
+                
+               
                 
                 ApplicationMessage appMessage = messageEnvelopeOptional.get();
 
                 if(this.encryptMessages){
                    
                     try {
+                        // test if this message was sent by me
+                        String applicationMessageId = 
+                                appMessage.getApplicationMessageId().getAccountID().getShardNum()
+                        + "." + appMessage.getApplicationMessageId().getAccountID().getRealmNum()
+                        + "." + appMessage.getApplicationMessageId().getAccountID().getAccountNum()
+                        + "-" + appMessage.getApplicationMessageId().getValidStart().getSeconds()
+                        + "-" + appMessage.getApplicationMessageId().getValidStart().getNanos();
+                        
+                        SxcApplicationMessageInterface applicationMessageEntity = this.hcsCore.getPersistence().getApplicationMessageEntity(applicationMessageId);
+                        boolean wasMessageSentByMe = applicationMessageEntity != null;
                         byte[] sharedKey = null;
+                        
+                        
                         byte[] decryptedBPM = this.messageEncryptionPlugin.decrypt(sharedKey, appMessage.getBusinessProcessMessage().toByteArray());
                         
                         Any any = Any.parseFrom(decryptedBPM);

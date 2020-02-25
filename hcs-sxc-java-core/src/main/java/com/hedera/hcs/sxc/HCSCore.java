@@ -57,7 +57,7 @@ public class HCSCore { // singleton implementation
     private List<Topic> topics = new ArrayList<Topic>();
     private long maxTransactionFee = 0L;
     private String applicationId = "";
-    private static SxcPersistence persistence;
+    private SxcPersistence persistence;
     private boolean catchupHistory;
     private MessagePersistenceLevel messagePersistenceLevel;
     private String mirrorAddress;
@@ -261,12 +261,12 @@ public class HCSCore { // singleton implementation
         return this.catchupHistory;
     }
     public void setMessagePersistence(SxcPersistence persistence) {
-        HCSCore.persistence = persistence;
-        HCSCore.persistence.setPersistenceLevel(this.messagePersistenceLevel);
+        this.persistence = persistence;
+        this.persistence.setPersistenceLevel(this.messagePersistenceLevel);
     }
 
     public SxcPersistence getMessagePersistence() {
-        return HCSCore.persistence;
+        return this.persistence;
     }
     
     public Map<String, String> getHibernateConfig() {

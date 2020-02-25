@@ -335,9 +335,7 @@ public final class OutboundHCSMessage {
                                             //TODO: set hash
                                             .build()
                                             .toByteString()
-                            ).build();
-                    
-                    
+                            ).build();  
                     
                     ConsensusMessageSubmitTransaction txRotation = new ConsensusMessageSubmitTransaction()
                             .setMessage(appChunk.toByteArray())
@@ -395,6 +393,8 @@ public final class OutboundHCSMessage {
                 
         if(recipientKeys != null){
             try {
+                // build one encrypted and one unecrypted message. Store the latter in the core db
+                
                 // Hash of unencrypted business message should be included in application message
                 byte[] hashOfOriginalMessage = com.hedera.hcs.sxc.hashing.Hashing.sha(StringUtils.byteArrayToHexString(originalMessage));
                 applicationMessageBuilder.setBusinessProcessHash(ByteString.copyFrom(hashOfOriginalMessage));
@@ -413,11 +413,25 @@ public final class OutboundHCSMessage {
                         StringUtils.hexStringToByteArray(encryptionKey)
                         , message);
                 applicationMessageBuilder.setBusinessProcessMessage(ByteString.copyFrom(encryptedMessage));
-                applicationMessage = applicationMessageBuilder.build();
-               
-                // store the outgoing message encrypted - null parameters because missing consensus data. Consensus state is sored on inbound messages
-                hcsCore.getPersistence().storeApplicationMessage(applicationMessage, null, null, 0);    
                 
+                
+                
+                applicationMessage = applicationMessageBuilder.build();
+                
+                // store the outgoing message unencrypted - null parameters because missing consensus data. 
+                // Consensus state is sored on inbound messages
+                // This one is needed to know if the message was sent by me
+                // because I don't have a way to un-encrypt my own message
+                // I wouldn't now know what encryption key I used
+                
+                applicationMessageBuilder.setBusinessProcessMessage(ByteString.copyFrom(message));
+                ApplicationMessage tempUnencryptedAppMsg = applicationMessageBuilder.build();
+                
+                
+                hcsCore.getPersistence().storeApplicationMessage(tempUnencryptedAppMsg, null, null, 0);    
+           
+               
+                  
             } catch (Exception ex) {
                 Logger.getLogger(OutboundHCSMessage.class.getName()).log(Level.SEVERE, null, ex);
                 System.exit(0);
@@ -427,6 +441,8 @@ public final class OutboundHCSMessage {
             applicationMessageBuilder.setBusinessProcessMessage(ByteString.copyFrom(originalMessage));
             applicationMessage = applicationMessageBuilder.build();
         }
+        
+        
         
         
         

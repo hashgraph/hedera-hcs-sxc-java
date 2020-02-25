@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;

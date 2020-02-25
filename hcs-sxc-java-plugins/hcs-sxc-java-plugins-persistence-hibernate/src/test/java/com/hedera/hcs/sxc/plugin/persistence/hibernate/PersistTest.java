@@ -201,6 +201,7 @@ public class PersistTest {
         Map<String, ApplicationMessage> getApplicationMessages = persist.getApplicationMessages();
         assertEquals(2, getApplicationMessages.size());
         
+        @SuppressWarnings("unused")
         List<? extends SXCApplicationMessageInterface> getSXCApplicationMessages = persist.getSXCApplicationMessages();
         assertEquals(2, getApplicationMessages.size());
         

@@ -39,7 +39,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public final class AppData {
 
-    private static HCSCore hcsCore;
+    private HCSCore hcsCore;
     private int topicIndex = 0; // refers to the first topic ID in the config.yaml
     private String publicKey = "";
     private Ed25519PrivateKey operatorKey;

@@ -22,7 +22,6 @@ package com.hedera.hcsapp.controllers;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.Statics;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.integration.HCSMessages;

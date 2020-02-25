@@ -43,7 +43,7 @@ public class TopicTest {
 //                .singletonInstance("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test")
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test")
                 .withOperatorAccountId(AccountId.fromString("0.0.2"))
-                .withOperatorKey(ed25519PrivateKey.fromString("302e020100300506032b657004220420abb9499694bad1f081cb2a55a08989303cbc3322fae657db1044fdbf3b9eed65"));
+                .withOperatorKey(Ed25519PrivateKey.fromString("302e020100300506032b657004220420abb9499694bad1f081cb2a55a08989303cbc3322fae657db1044fdbf3b9eed65"));
 
         CreateHCSTopic createHCSTopic = new CreateHCSTopic(hcsCore);
 
@@ -86,7 +86,7 @@ public class TopicTest {
 //                .singletonInstance("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test")
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test")
                 .withOperatorAccountId(AccountId.fromString("0.0.2"))
-                .withOperatorKey(ed25519PrivateKey.fromString("302e020100300506032b657004220420abb9499694bad1f081cb2a55a08989303cbc3322fae657db1044fdbf3b9eed65"));
+                .withOperatorKey(Ed25519PrivateKey.fromString("302e020100300506032b657004220420abb9499694bad1f081cb2a55a08989303cbc3322fae657db1044fdbf3b9eed65"));
 
         UpdateHCSTopic updateHCSTopic = new UpdateHCSTopic(hcsCore);
 
@@ -134,7 +134,7 @@ public class TopicTest {
 //         HCSCore hcsCore = HCSCore.INSTANCE
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test")
                 .withOperatorAccountId(AccountId.fromString("0.0.2"))
-                .withOperatorKey(ed25519PrivateKey.fromString("302e020100300506032b657004220420abb9499694bad1f081cb2a55a08989303cbc3322fae657db1044fdbf3b9eed65"));
+                .withOperatorKey(Ed25519PrivateKey.fromString("302e020100300506032b657004220420abb9499694bad1f081cb2a55a08989303cbc3322fae657db1044fdbf3b9eed65"));
 
         DeleteHCSTopic deleteHCSTopic = new DeleteHCSTopic(hcsCore);
 
@@ -171,7 +171,7 @@ public class TopicTest {
 //                .singletonInstance("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test")
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test")
                 .withOperatorAccountId(AccountId.fromString("0.0.2"))
-                .withOperatorKey(ed25519PrivateKey.fromString("302e020100300506032b657004220420abb9499694bad1f081cb2a55a08989303cbc3322fae657db1044fdbf3b9eed65"));
+                .withOperatorKey(Ed25519PrivateKey.fromString("302e020100300506032b657004220420abb9499694bad1f081cb2a55a08989303cbc3322fae657db1044fdbf3b9eed65"));
 
         GetTopicInfo getTopicInfo = new GetTopicInfo(hcsCore);
 

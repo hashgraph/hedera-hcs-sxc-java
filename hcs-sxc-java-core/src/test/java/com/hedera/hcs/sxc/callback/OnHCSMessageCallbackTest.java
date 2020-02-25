@@ -22,8 +22,8 @@ package com.hedera.hcs.sxc.callback;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hcs.sxc.HCSCore;
+import com.hedera.hcs.sxc.commonobjects.HCSResponse;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
-import com.hedera.hcs.sxc.interfaces.HCSResponse;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcs.sxc.plugin.persistence.inmemory.Persist;
 import com.hedera.hcs.sxc.proto.AccountID;
@@ -46,17 +46,15 @@ public class OnHCSMessageCallbackTest {
     
     @Test
     public void testInstantiation() throws Exception {
-//         HCSCore hcsCore = HCSCore.INSTANCE
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
 
+        @SuppressWarnings("unused")
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsCore);
         
     }
     
     @Test
     public void testAddObserverAndNotify() throws Exception {
-//         HCSCore hcsCore = HCSCore.INSTANCE
-//        .singletonInstance("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
         
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsCore);

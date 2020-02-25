@@ -32,7 +32,7 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
-import com.hedera.hcs.sxc.interfaces.HCSResponse;
+import com.hedera.hcs.sxc.commonobjects.HCSResponse;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.States;

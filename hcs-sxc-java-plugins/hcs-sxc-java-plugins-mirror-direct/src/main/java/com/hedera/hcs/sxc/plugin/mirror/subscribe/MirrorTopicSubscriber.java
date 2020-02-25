@@ -25,6 +25,9 @@ package com.hedera.hcs.sxc.plugin.mirror.subscribe;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
+
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
 import com.google.common.util.concurrent.Uninterruptibles;
@@ -47,6 +50,8 @@ import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
  * if multiple topics are to be subscribed to
  */
 @Log4j2
+@Getter
+@EqualsAndHashCode(callSuper=false)
 public final class MirrorTopicSubscriber extends Thread {
     
     private String mirrorAddress = "";
@@ -54,16 +59,22 @@ public final class MirrorTopicSubscriber extends Thread {
     private ConsensusTopicId topicId;
     private Optional<Instant> subscribeFrom;
     private HCSCallBackFromMirror onHCSMessageCallback;
+    private boolean testMode = false;
     
-    public MirrorTopicSubscriber(String mirrorAddress, int mirrorPort, ConsensusTopicId topicId, Optional<Instant> subscribeFrom, HCSCallBackFromMirror onHCSMessageCallback) {
+    public MirrorTopicSubscriber(String mirrorAddress, int mirrorPort, ConsensusTopicId topicId, Optional<Instant> subscribeFrom, HCSCallBackFromMirror onHCSMessageCallback, boolean testMode) {
         this.mirrorAddress = mirrorAddress;
         this.mirrorPort = mirrorPort;
         this.topicId = topicId;
         this.subscribeFrom = subscribeFrom;
         this.onHCSMessageCallback = onHCSMessageCallback;
+        this.testMode = testMode;
     }
     
     public void run() {
+        subscribe();
+    }
+    
+    void subscribeForTest() {
         subscribe();
     }
     
@@ -85,50 +96,50 @@ public final class MirrorTopicSubscriber extends Thread {
     
             mirrorConsensusTopicQuery.setStartTime(this.subscribeFrom.get());
             
-            mirrorConsensusTopicQuery.subscribe(mirrorClient, resp -> {
-                log.debug("Got mirror message, calling handler");
-                this.subscribeFrom = Optional.of(resp.consensusTimestamp.plusNanos(1));
-                onMirrorMessage(resp, this.onHCSMessageCallback, this.topicId);   
-            },(error) -> {
-                // On gRPC error, print the stack trace
-                log.error(error);
-                log.debug("Sleeping 11s before attempting connection again");
-                Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(11));
-                log.debug("Attempting to reconnect");
-                subscribe();
-            }
-            );
-        
+            if ( ! this.testMode) {
+                mirrorConsensusTopicQuery.subscribe(mirrorClient, resp -> {
+                    log.debug("Got mirror message, calling handler");
+                    this.subscribeFrom = Optional.of(resp.consensusTimestamp.plusNanos(1));
+                    try {
+                        onMirrorMessage(resp, this.onHCSMessageCallback, this.topicId);
+                    } catch (InvalidProtocolBufferException e) {
+                        log.error(e);
+                    }   
+                },(error) -> {
+                    // On gRPC error, print the stack trace
+                    log.error(error);
+                    log.debug("Sleeping 11s before attempting connection again");
+                    Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(11));
+                    log.debug("Attempting to reconnect");
+                    subscribe();
+                }
+                );
+            }        
         } catch (Exception e1) {
             log.error(e1);
             log.debug("Sleeping 11s before attempting connection again");
             Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(11));
         }
     }
-    
-    void onMirrorMessage(MirrorConsensusTopicResponse resp, HCSCallBackFromMirror onHCSMessageCallback, ConsensusTopicId topicId) {
-          log.debug("Got message from mirror - persisting");
-          ConsensusTopicResponse consensusTopicResponse = ConsensusTopicResponse.newBuilder()
-                  .setConsensusTimestamp(Timestamp.newBuilder().setSeconds(resp.consensusTimestamp.getEpochSecond()).setNanos(resp.consensusTimestamp.getNano()).build())
-                  .setMessage(ByteString.copyFrom(resp.message))
-                  .setRunningHash(ByteString.copyFrom(resp.runningHash))
-                  .setSequenceNumber(resp.sequenceNumber)
-                  .build();
-          
-          SxcConsensusMessage consensusMessage = new SxcConsensusMessage(topicId, consensusTopicResponse);
-          onHCSMessageCallback.storeMirrorResponse(consensusMessage);
-          
-          byte[] message = resp.message;
-          ApplicationMessageChunk messagePart;
-        try {
-            messagePart = ApplicationMessageChunk.parseFrom(message);
-          log.debug("Got message from mirror - calling back");
-            onHCSMessageCallback.partialMessage(messagePart, consensusMessage);
-        } catch (InvalidProtocolBufferException e) {
-            log.error(e);
-        }
+
+    void onMirrorMessage(MirrorConsensusTopicResponse resp, HCSCallBackFromMirror onHCSMessageCallback, ConsensusTopicId topicId) throws InvalidProtocolBufferException {
+        log.debug("Got message from mirror - persisting");
+        ConsensusTopicResponse consensusTopicResponse = ConsensusTopicResponse.newBuilder()
+                .setConsensusTimestamp(Timestamp.newBuilder().setSeconds(resp.consensusTimestamp.getEpochSecond())
+                        .setNanos(resp.consensusTimestamp.getNano()).build())
+                .setMessage(ByteString.copyFrom(resp.message)).setRunningHash(ByteString.copyFrom(resp.runningHash))
+                .setSequenceNumber(resp.sequenceNumber).build();
+
+        SxcConsensusMessage consensusMessage = new SxcConsensusMessage(topicId, consensusTopicResponse);
+        onHCSMessageCallback.storeMirrorResponse(consensusMessage);
+
+        byte[] message = resp.message;
+        ApplicationMessageChunk messagePart;
+
+        messagePart = ApplicationMessageChunk.parseFrom(message);
+        log.debug("Got message from mirror - calling back");
+        onHCSMessageCallback.partialMessage(messagePart, consensusMessage);
 
         log.debug("Got message from mirror - acknowledged");
-      
     }
 }

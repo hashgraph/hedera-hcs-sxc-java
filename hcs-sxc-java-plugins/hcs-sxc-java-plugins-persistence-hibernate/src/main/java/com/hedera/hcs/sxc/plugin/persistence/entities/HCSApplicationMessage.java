@@ -34,6 +34,10 @@ import lombok.Data;
 @Data
 @Table(name = "ApplicationMessages")
 public class HCSApplicationMessage implements  SXCApplicationMessageInterface, Serializable{
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     @Id
     private String applicationMessageId;
     @Lob
@@ -42,7 +46,7 @@ public class HCSApplicationMessage implements  SXCApplicationMessageInterface, S
     private Instant lastChronoPartConsensusTimestamp;
 //    private long lastChronoPartShardNum;
 //    private long lastChronoPartRealmNum;
-    private long lastChronoPartRealmTopicNum;
+//    private long lastChronoPartRealmTopicNum;
     private long lastChronoPartSequenceNum;
     private String lastChronoPartRunningHashHEX;
     

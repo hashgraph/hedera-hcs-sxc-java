@@ -21,20 +21,11 @@ package com.hedera.hcs.sxc.plugin.cryptography.cryptography;
  * ‍
  */
 
-
-import com.hedera.hcs.sxc.utils.StringUtils;
-
-import lombok.extern.log4j.Log4j2;
-
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.security.KeyPair;
-import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
-@Log4j2
 public class CryptographyTest {
     public CryptographyTest() {
     }
@@ -43,25 +34,21 @@ public class CryptographyTest {
     public void testEncryptAndDecrypt() throws Exception {
         byte[] secretKey=null;
         String cleartext = "Hear my cries Hear 234sdf! �$%&*)_+ my call Lend me your ears See my fall See my error Know my faults Time halts See my loss ";
-        //KeyPair generateRsaKeyPair = null;
-        //byte[] privateKeyBytes = null;
-        //String privateKeyHexEncoded = null;
-        //byte[] publicKeyBytes = null;
-        //String publicKeyKexEncoded = null;
-        try {
-            KeyPair kp = Cryptography.generateRsaKeyPair();
-            secretKey =  kp.getPrivate().getEncoded();
-            //System.out.println(StringUtils.byteArrayToHexString(secretKey));
-        } catch (Exception ex) {
-            log.error(ex);
-        }
-        byte[] encrypt = Cryptography.load().encrypt(secretKey, StringUtils.stringToByteArray(cleartext));
-        String encryptHex = StringUtils.byteArrayToHexString(encrypt);
-        byte[] encryptPrime = StringUtils.hexStringToByteArray(encryptHex);
-        assertArrayEquals(encrypt, encryptPrime);
+
+        KeyPair kp = Cryptography.generateRsaKeyPair();
+        secretKey =  kp.getPrivate().getEncoded();
+
+        byte[] encrypt = Cryptography.load().encrypt(secretKey, cleartext.getBytes());
+        byte[] encryptClearText = Cryptography.load().encryptFromClearText(secretKey, cleartext);
+        
+        assertArrayEquals(encrypt, encryptClearText);
+        
         byte[] decrypt = Cryptography.load().decrypt(secretKey, encrypt);
-        assertTrue(Arrays.equals(StringUtils.stringToByteArray(cleartext), decrypt)); 
-        assertEquals(cleartext, StringUtils.byteArrayToString(decrypt));
-        assertEquals(cleartext, Cryptography.load().decryptToClearText(secretKey, encrypt));
+        
+        assertArrayEquals(cleartext.getBytes(), decrypt); 
+
+        String decryptString = Cryptography.load().decryptToClearText(secretKey, encrypt);
+        assertEquals(cleartext, decryptString); 
     }
+
 }

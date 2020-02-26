@@ -215,10 +215,8 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                         byte[] shaClrTxt = Hashing.sha(
                                                 StringUtils.byteArrayToHexString(decryptedBPM)
                                         );
-                                        byte[] signShaClrTxt = Signing.sign(shaClrTxt, hcsCore.getMessageSigningKey());
-
-                                        if (! Arrays.equals(signShaClrTxt, appMessage.getBusinessProcessSignature().toByteArray())){
-                                            System.out.println("Illegal message detected, exiting ...");
+                                        if (! Hashing.matchSHA(shaClrTxt, appMessage.getBusinessProcessHash().toByteArray())){
+                                            System.out.println("Corrupt detected, exiting ...");
                                             System.exit(0);
                                         } 
                                         isMessageForMe = true;

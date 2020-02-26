@@ -71,6 +71,10 @@ public class CreateHederaAccount {
         AccountId newAccountId = receipt.getAccountId();
 
         System.out.println("account = " + newAccountId);
+        
+        
+      
+        
     
     }
 

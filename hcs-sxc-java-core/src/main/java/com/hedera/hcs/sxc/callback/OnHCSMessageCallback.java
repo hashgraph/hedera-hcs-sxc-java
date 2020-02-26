@@ -173,26 +173,28 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                 System.exit(0);
                             } 
                             
-                            //message is `good` store it  back with consensus data applied to id.  
+                            //message is `good` store it  back with consensus data applied to it.  
                             this.hcsCore.getPersistence().storeApplicationMessage(
-                            ApplicationMessage.parseFrom(applicationMessageEntity.getBusinessProcessMessage()) ,
-                            sxcConsensusMesssage.consensusTimestamp,
-                            StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),
-                            sxcConsensusMesssage.sequenceNumber
+                                //TODO Add addressee
+                                ApplicationMessage.parseFrom(applicationMessageEntity.getBusinessProcessMessage()) ,
+                                sxcConsensusMesssage.consensusTimestamp,
+                                StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),
+                                sxcConsensusMesssage.sequenceNumber
                             );
-                            notifyObservers( clearTextAppMessage.toByteArray(), clearTextAppMessage.getApplicationMessageId());
+                            notifyObservers( clearTextAppMessage.getBusinessProcessMessage().toByteArray(), clearTextAppMessage.getApplicationMessageId());
                             
                         } else { // the message was not sent by me 
                                  // I need to loop through the addressbook and 
-                                 // if the message was sent to me then I need to find who sent it to me   and find the shared key to decrypt it. 
+                                 // if the message was sent to me then I need to find who sent it to me  and find the shared key to decrypt it. 
                              
                                  
-                            // was the message sent TO me?
-                            boolean isMessageforMe = false;
-                            byte[] sharedKey = null;
-                            
-                            // loop through signatures in address book and pull 
-                            // the one that passes verification
+                           
+                            boolean isMessageForMe = false;
+                          
+                            byte[] decryptedBPM  = null;
+                            // loop through signatures in address book and keep 
+                            // the ones that passes verification. Then test to see
+                            // if you can decrypt
                             
                             for(String appId : hcsCore.getPersistence().getAddressList().keySet() ){
                                 Map<String, String> keyMap = hcsCore.getPersistence().getAddressList().get(appId);
@@ -204,144 +206,153 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                             appMessage.getBusinessProcessSignature().toByteArray(),
                                             theirPubKey)
                                 ){
-                                    isMessageforMe = true;
-                                    sharedKey =
-                                            StringUtils.hexStringToByteArray(
-                                            keyMap.get("sharedSymmetricEncryptionKey")
-                                            );
+                                    try { 
+                                        byte[] sharedKey = StringUtils.hexStringToByteArray(
+                                               keyMap.get("sharedSymmetricEncryptionKey")
+                                        ); 
+                                        decryptedBPM = this.messageEncryptionPlugin.decrypt(sharedKey, appMessage.getBusinessProcessMessage().toByteArray());
+                                        //test if the message is illegal
+                                        byte[] shaClrTxt = Hashing.sha(
+                                                StringUtils.byteArrayToHexString(decryptedBPM)
+                                        );
+                                        byte[] signShaClrTxt = Signing.sign(shaClrTxt, hcsCore.getMessageSigningKey());
+
+                                        if (! Arrays.equals(signShaClrTxt, appMessage.getBusinessProcessSignature().toByteArray())){
+                                            System.out.println("Illegal message detected, exiting ...");
+                                            System.exit(0);
+                                        } 
+                                        isMessageForMe = true;
+                                        break;
+                                   } catch (Exception e){
+                                       continue;
+                                   }
                                 }
-                                
                             }
                             
                             
-                            if (! isMessageforMe){
+                            if (! isMessageForMe){
                                  // just skip, do nothing. 
+                            
+                                          
                             } else {
-                                // the message is for me, first decrypt it
-                                // and test if it is a KR instruction. If not KR
-                                // then build the envelope, save it in local db
-                                // and pass it onto the observers.
-                                
-                                
-                                byte[] decryptedBPM = this.messageEncryptionPlugin.decrypt(sharedKey, appMessage.getBusinessProcessMessage().toByteArray());
-                                
-                                
-                                Any any = Any.parseFrom(decryptedBPM);
-                                
-                                if(any.is(KeyRotationInitialise.class)){  //======= KR1==========================================
-                                    // an init message has arrived
-                                    // check if it was me who's the initiator. Skip msg if so.
-                                    boolean isMeInitiator = hcsCore.getTempKeyAgreement() != null;
+                               
+                                try  { Any any = Any.parseFrom(decryptedBPM); // if fails goto catch block - TODO, use typing to avoid control flow
+                                                                              // if succeeds then it is
+                                    if(any.is(KeyRotationInitialise.class)){  //======= KR1==========================================
+                                        // an init message has arrived
+                                        // check if it was me who's the initiator. Skip msg if so.
+                                        boolean isMeInitiator = hcsCore.getTempKeyAgreement() != null;
 
-                                    if ( ! isMeInitiator ) {
-                                        // do not remove commented section
-                                        /* changed due to encryption taken from address book
-                                        KeyRotationInitialise kr1 = any.unpack(KeyRotationInitialise.class);
-                                        byte[] initiatorPublicKeyEncoded = kr1.getInitiatorPublicKeyEncoded().toByteArray();
+                                        if ( ! isMeInitiator ) {
+                                            // do not remove commented section
+                                            /* changed due to encryption taken from address book
+                                            KeyRotationInitialise kr1 = any.unpack(KeyRotationInitialise.class);
+                                            byte[] initiatorPublicKeyEncoded = kr1.getInitiatorPublicKeyEncoded().toByteArray();
 
-                                        // create your own new key store it and respond
-                                        Pair<byte[], byte[]> respond = keyRotationPlugin.respond(initiatorPublicKeyEncoded);
+                                            // create your own new key store it and respond
+                                            Pair<byte[], byte[]> respond = keyRotationPlugin.respond(initiatorPublicKeyEncoded);
 
-                                        byte[] newPublicKey =  respond.getLeft();
-                                        byte[] newSecretKey = respond.getRight();  
-                                        byte[] oldSecretKey = hcsCore.getMessageEncryptionKey();
-                                        hcsCore.updateSecretKey(newSecretKey);
-                                        hcsCore.getPersistence().storeSecretKey(newSecretKey);
+                                            byte[] newPublicKey =  respond.getLeft();
+                                            byte[] newSecretKey = respond.getRight();  
+                                            byte[] oldSecretKey = hcsCore.getMessageEncryptionKey();
+                                            hcsCore.updateSecretKey(newSecretKey);
+                                            hcsCore.getPersistence().storeSecretKey(newSecretKey);
 
 
-                                        KeyRotationRespond kr2 = KeyRotationRespond.newBuilder()
-                                            .setResponderPublicKeyEncoded(ByteString.copyFrom(newPublicKey))
-                                            .build();
+                                            KeyRotationRespond kr2 = KeyRotationRespond.newBuilder()
+                                                .setResponderPublicKeyEncoded(ByteString.copyFrom(newPublicKey))
+                                                .build();
 
-                                        // prepare the response and send it over to the initiator
+                                            // prepare the response and send it over to the initiator
 
-                                        Any anyPack = Any.pack(kr2);
-                                        byte[] encryptedAnyPackedChunkBody = messageEncryptionPlugin.encrypt(oldSecretKey, anyPack.toByteArray());
+                                            Any anyPack = Any.pack(kr2);
+                                            byte[] encryptedAnyPackedChunkBody = messageEncryptionPlugin.encrypt(oldSecretKey, anyPack.toByteArray());
 
 
-                                        TransactionId transactionId = new TransactionId(hcsCore.getOperatorAccountId());
-                                        ApplicationMessageID newAppId = ApplicationMessageID.newBuilder()
-                                            .setAccountID(AccountID.newBuilder()
-                                                    .setShardNum(transactionId.accountId.shard)
-                                                    .setRealmNum(transactionId.accountId.realm)
-                                                    .setAccountNum(transactionId.accountId.account)
-                                                    .build()
-                                            )
-                                            .setValidStart(Timestamp.newBuilder()
-                                                    .setSeconds(transactionId.validStart.getEpochSecond())
-                                                    .setNanos(transactionId.validStart.getNano())
-                                                    .build()
+                                            TransactionId transactionId = new TransactionId(hcsCore.getOperatorAccountId());
+                                            ApplicationMessageID newAppId = ApplicationMessageID.newBuilder()
+                                                .setAccountID(AccountID.newBuilder()
+                                                        .setShardNum(transactionId.accountId.shard)
+                                                        .setRealmNum(transactionId.accountId.realm)
+                                                        .setAccountNum(transactionId.accountId.account)
+                                                        .build()
+                                                )
+                                                .setValidStart(Timestamp.newBuilder()
+                                                        .setSeconds(transactionId.validStart.getEpochSecond())
+                                                        .setNanos(transactionId.validStart.getNano())
+                                                        .build()
+                                                ).build();
+
+
+                                            ApplicationMessageChunk appChunk = ApplicationMessageChunk.newBuilder()
+                                                .setApplicationMessageId(newAppId)
+                                                .setChunkIndex(1)
+                                                .setChunksCount(1)
+                                                .setMessageChunk(
+                                                    //fit an antire ApplicationMessage in the chunk and set body message to the encrypted stuff
+                                                    ApplicationMessage.newBuilder()
+                                                        .setApplicationMessageId(newAppId)
+                                                        //TODO: set signature 
+                                                        .setBusinessProcessMessage(ByteString.copyFrom(encryptedAnyPackedChunkBody))
+                                                        //TODO: set hash
+                                                        .build()
+                                                        .toByteString()
                                             ).build();
 
 
-                                        ApplicationMessageChunk appChunk = ApplicationMessageChunk.newBuilder()
-                                            .setApplicationMessageId(newAppId)
-                                            .setChunkIndex(1)
-                                            .setChunksCount(1)
-                                            .setMessageChunk(
-                                                //fit an antire ApplicationMessage in the chunk and set body message to the encrypted stuff
-                                                ApplicationMessage.newBuilder()
-                                                    .setApplicationMessageId(newAppId)
-                                                    //TODO: set signature 
-                                                    .setBusinessProcessMessage(ByteString.copyFrom(encryptedAnyPackedChunkBody))
-                                                    //TODO: set hash
-                                                    .build()
-                                                    .toByteString()
-                                        ).build();
+                                            ConsensusMessageSubmitTransaction txRotation = new ConsensusMessageSubmitTransaction()
+                                                .setMessage(appChunk.toByteArray())
+                                                .setTopicId(this.topics.get(
+                                                        0 // TODO get the topic from the appMessage
+                                                ).getConsensusTopicId())
+                                                .setTransactionId(transactionId);
 
+                                            // submit to network
 
-                                        ConsensusMessageSubmitTransaction txRotation = new ConsensusMessageSubmitTransaction()
-                                            .setMessage(appChunk.toByteArray())
-                                            .setTopicId(this.topics.get(
-                                                    0 // TODO get the topic from the appMessage
-                                            ).getConsensusTopicId())
-                                            .setTransactionId(transactionId);
+                                            try (Client client = new Client(hcsCore.getNodeMap())) {
+                                                client.setOperator(
+                                                        hcsCore.getOperatorAccountId(),
+                                                         hcsCore.getEd25519PrivateKey()
+                                                );
 
-                                        // submit to network
+                                                client.setMaxTransactionFee(hcsCore.getMaxTransactionFee());
 
-                                        try (Client client = new Client(hcsCore.getNodeMap())) {
-                                            client.setOperator(
-                                                    hcsCore.getOperatorAccountId(),
-                                                     hcsCore.getEd25519PrivateKey()
-                                            );
+                                                TransactionId txIdKR2 =  txRotation.execute(client);
 
-                                            client.setMaxTransactionFee(hcsCore.getMaxTransactionFee());
+                                                TransactionReceipt receiptKR2 = txIdKR2.getReceipt(client, Duration.ofSeconds(30));
 
-                                            TransactionId txIdKR2 =  txRotation.execute(client);
-
-                                            TransactionReceipt receiptKR2 = txIdKR2.getReceipt(client, Duration.ofSeconds(30));
-
-                                        } catch (HederaStatusException ex) {
+                                            } catch (HederaStatusException ex) {
+                                                    log.error(ex);
+                                            } catch (HederaNetworkException ex) {
                                                 log.error(ex);
-                                        } catch (HederaNetworkException ex) {
-                                            log.error(ex);
-                                        }
-                                        */
-                                    } // test checking if initiator
-                                } // end any test initialise
+                                            }
+                                            */
+                                        } // test checking if initiator
+                                    } // end any test initialise
 
-                                if(any.is(KeyRotationRespond.class)){ // ============ KR2 =====================================================
-                                    // do not remove commented section
-                                    /*
-                                    // a respond message has arrived
-                                    // check if it was me who sent respond message. Skip msg if so.
-                                    boolean isMeResponder = hcsCore.getTempKeyAgreement() != null;
+                                    if(any.is(KeyRotationRespond.class)){ // ============ KR2 =====================================================
+                                        // do not remove commented section
+                                        /*
+                                        // a respond message has arrived
+                                        // check if it was me who sent respond message. Skip msg if so.
+                                        boolean isMeResponder = hcsCore.getTempKeyAgreement() != null;
 
-                                    if ( isMeResponder ) {
+                                        if ( isMeResponder ) {
 
-                                        KeyRotationRespond kr2 = any.unpack(KeyRotationRespond.class);
-                                        byte[] responderPublicKeyEncoded = kr2.getResponderPublicKeyEncoded().toByteArray();
+                                            KeyRotationRespond kr2 = any.unpack(KeyRotationRespond.class);
+                                            byte[] responderPublicKeyEncoded = kr2.getResponderPublicKeyEncoded().toByteArray();
 
-                                        // get the keyAgreement from core
-                                        KeyAgreement keyAgreement = hcsCore.getTempKeyAgreement();
-                                        hcsCore.setTempKeyAgreement(null);
-                                        byte[] newSecretKey = keyRotationPlugin.finalise(responderPublicKeyEncoded, keyAgreement);
-                                          // store new SecretKey in Database
-                                       hcsCore.updateSecretKey(newSecretKey);
-                                       hcsCore.getPersistence().storeSecretKey(newSecretKey);
-                                        
-                                    }*/
-                                } else {  // the message is not a KR instruction. It is a business message
+                                            // get the keyAgreement from core
+                                            KeyAgreement keyAgreement = hcsCore.getTempKeyAgreement();
+                                            hcsCore.setTempKeyAgreement(null);
+                                            byte[] newSecretKey = keyRotationPlugin.finalise(responderPublicKeyEncoded, keyAgreement);
+                                              // store new SecretKey in Database
+                                           hcsCore.updateSecretKey(newSecretKey);
+                                           hcsCore.getPersistence().storeSecretKey(newSecretKey);
+
+                                        }*/
+                                    }  else  { // the message is not a KR instruction. It is some other PROTO message
+                                               // send back the BPM;
                                         ApplicationMessage decryptedAppmessage = ApplicationMessage.newBuilder()
                                             .setApplicationMessageId(appMessage.getApplicationMessageId())
                                             .setBusinessProcessHash(appMessage.getBusinessProcessHash())
@@ -357,11 +368,31 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                                 StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),
                                                 sxcConsensusMesssage.sequenceNumber
                                         );
-
+                                    }
+                                
                                 }
-                                // when here message was stored already if it wasn't KR  
-                                notifyObservers( appMessage.toByteArray(), appMessage.getApplicationMessageId());
+                                catch(InvalidProtocolBufferException e){  // the message is not a proto message. It's sometihng else
+                                        ApplicationMessage decryptedAppmessage = ApplicationMessage.newBuilder()
+                                            .setApplicationMessageId(appMessage.getApplicationMessageId())
+                                            .setBusinessProcessHash(appMessage.getBusinessProcessHash())
+                                            .setBusinessProcessMessage( 
+                                                    ByteString.copyFrom(decryptedBPM)
+                                             )
+                                            .setBusinessProcessSignature(appMessage.getBusinessProcessSignature())
+                                            .build();
+                                        appMessage = decryptedAppmessage;
+                                        this.hcsCore.getPersistence().storeApplicationMessage(
+                                                decryptedAppmessage, 
+                                                sxcConsensusMesssage.consensusTimestamp,
+                                                StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),
+                                                sxcConsensusMesssage.sequenceNumber
+                                        );
 
+                                } finally {
+                                    notifyObservers( 
+                                              appMessage.getBusinessProcessMessage().toByteArray()
+                                            , appMessage.getApplicationMessageId());
+                                }
                             }
                       
                         }
@@ -377,7 +408,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                             StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),
                             sxcConsensusMesssage.sequenceNumber
                     );
-                    notifyObservers( appMessage.toByteArray(), appMessage.getApplicationMessageId());
+                    notifyObservers( appMessage.getBusinessProcessMessage().toByteArray(), appMessage.getApplicationMessageId());
                 }
                 
             } else { // message envelope not present

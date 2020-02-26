@@ -409,10 +409,13 @@ public final class OutboundHCSMessage {
                 String encryptionKey = recipientKeys.get("sharedSymmetricEncryptionKey");
                 Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
                 SxcMessageEncryption encPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
+                //Any.pack(message);
                 byte[] encryptedMessage = encPlugin.encrypt(
                         StringUtils.hexStringToByteArray(encryptionKey)
                         , message);
-                applicationMessageBuilder.setBusinessProcessMessage(ByteString.copyFrom(encryptedMessage));
+                applicationMessageBuilder.setBusinessProcessMessage(
+                        ByteString.copyFrom(encryptedMessage)
+                );
                 
                 
                 
@@ -428,7 +431,12 @@ public final class OutboundHCSMessage {
                 ApplicationMessage tempUnencryptedAppMsg = applicationMessageBuilder.build();
                 
                 
-                hcsCore.getPersistence().storeApplicationMessage(tempUnencryptedAppMsg, null, null, 0);    
+                hcsCore.getPersistence().storeApplicationMessage(
+                        //add recipient
+                        tempUnencryptedAppMsg, 
+                        null, 
+                        null, 0
+                );    
            
                
                   

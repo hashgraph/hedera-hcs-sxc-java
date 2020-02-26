@@ -1,4 +1,4 @@
-package com.hedera.hcsapp;
+package main.java.com.hedera.hcsapp;
 
 /*-
  * ‌
@@ -20,21 +20,14 @@ package com.hedera.hcsapp;
  * ‍
  */
 
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 import com.hedera.hcs.sxc.interfaces.HCSResponse;
-import com.hedera.hcs.sxc.proto.ApplicationMessage;
-import java.util.List;
-import java.util.Map;
 
 import lombok.extern.log4j.Log4j2;
 
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import main.java.com.hedera.hcsapp.AddressListCrypto;
 
 /**
  * Hello world!
@@ -56,8 +49,6 @@ public final class App {
         
         int topicIndex = 0; // refers to the first topic ID in the config.yaml
         
-        // 1 -  Load network participants from configuration file app.yaml
-        Config config = new Config();
         
         // 2 - Init the core with data from  .env and config.yaml 
         //HCSCore hcsCore = HCSCore.INSTANCE.singletonInstance(appId);
@@ -78,27 +69,13 @@ public final class App {
         
         System.out.println("****************************************");
         System.out.println("** Welcome to a simple HCS demo");
-        System.out.println("** I am app: " + 
-                config.getConfig().getAppClients()
-                .stream()
-                .filter(c -> c.getClientName()
-                        .equals(args[0]))
-                        .findFirst()
-                        .get()
-                        .getClientName()
-                );
+        System.out.println("** I am app: " + appId);
         System.out.println("****************************************");
         
         // create a callback object to receive the message
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsCore);
         onHCSMessageCallback.addObserver((HCSResponse hcsResponse) -> {
-            try {
-                System.out.println("Received : "+
-                        ApplicationMessage.parseFrom(hcsResponse.getMessage()
-                        ).getBusinessProcessMessage().toString() );
-            } catch (InvalidProtocolBufferException ex) {
-                Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            System.out.println("Received : "+ new String ( hcsResponse.getMessage() ) );
         });
 
         Scanner scan = new Scanner(System.in);

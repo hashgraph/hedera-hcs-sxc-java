@@ -20,14 +20,20 @@ package com.hedera.hcsapp;
  * ‍
  */
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
+import com.hedera.hcs.sxc.interfaces.HCSResponse;
+import com.hedera.hcs.sxc.proto.ApplicationMessage;
+import java.util.List;
 import java.util.Map;
 
 import lombok.extern.log4j.Log4j2;
 
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import main.java.com.hedera.hcsapp.AddressListCrypto;
 
 /**
@@ -54,8 +60,12 @@ public final class App {
         Config config = new Config();
         
         // 2 - Init the core with data from  .env and config.yaml 
-        HCSCore hcsCore = HCSCore.INSTANCE.singletonInstance(appId);
-
+        //HCSCore hcsCore = HCSCore.INSTANCE.singletonInstance(appId);
+        HCSCore hcsCore = HCSCore.INSTANCE.singletonInstance(
+                appId,
+                "./config/config.yaml",
+                "./config/.env"+appId
+        );
         
         // 3 - Load the addressbook from address-list yaml and supply the core.
         AddressListCrypto
@@ -81,8 +91,14 @@ public final class App {
         
         // create a callback object to receive the message
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsCore);
-        onHCSMessageCallback.addObserver(hcsResponse -> {
-            System.out.println("Received : "+ hcsResponse.getMessage());
+        onHCSMessageCallback.addObserver((HCSResponse hcsResponse) -> {
+            try {
+                System.out.println("Received : "+
+                        ApplicationMessage.parseFrom(hcsResponse.getMessage()
+                        ).getBusinessProcessMessage().toString() );
+            } catch (InvalidProtocolBufferException ex) {
+                Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
+            }
         });
 
         Scanner scan = new Scanner(System.in);

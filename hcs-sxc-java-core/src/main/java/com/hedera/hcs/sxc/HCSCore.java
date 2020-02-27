@@ -42,9 +42,7 @@ import lombok.extern.log4j.Log4j2;
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
 import javax.crypto.KeyAgreement;
 @Log4j2
-public class HCSCore { // singleton implementation
-    
-    //INSTANCE();
+public class HCSCore { 
     
     private boolean signMessages = false;
     private boolean encryptMessages = false;
@@ -153,7 +151,6 @@ public class HCSCore { // singleton implementation
         return value;
     }
     
-//    public HCSCore singletonInstance() throws Exception{
     public HCSCore builder() throws Exception{
         if( ! this.initialised) {
             init("", "./config/config.yaml", "./config/.env");
@@ -161,7 +158,6 @@ public class HCSCore { // singleton implementation
         return this;
     }
 
-//    public HCSCore singletonInstance(String appId) throws Exception{
     public HCSCore builder(String appId) throws Exception{
         if( ! this.initialised) {
             init(appId, "./config/config.yaml", "./config/.env");
@@ -169,7 +165,6 @@ public class HCSCore { // singleton implementation
         return this;
     }
 
-//    public HCSCore singletonInstance(String appId, String configFilePath, String environmentFilePath) throws Exception {
     public HCSCore builder(String appId, String configFilePath, String environmentFilePath) throws Exception {
         if( ! this.initialised) {
             init(appId,configFilePath, environmentFilePath);

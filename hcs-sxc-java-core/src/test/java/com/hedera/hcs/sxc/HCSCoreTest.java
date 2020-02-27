@@ -49,8 +49,6 @@ class HCSCoreTest {
         List<Topic> topics = new ArrayList<Topic>();
         topics.add(topic);
         
-//        HCSCore hcsCore = HCSCore.INSTANCE
-//                .singletonInstance("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test")
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test")
                 .withMessageEncryptionKey(msgEncryptKey.toBytes())
                 .withEncryptedMessages(true)

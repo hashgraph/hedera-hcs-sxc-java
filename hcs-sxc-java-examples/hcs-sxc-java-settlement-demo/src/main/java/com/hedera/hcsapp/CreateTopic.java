@@ -27,7 +27,6 @@ import com.hedera.hcs.sxc.consensus.CreateHCSTopic;
 public class CreateTopic {
 
     public static void main(String[] args) throws Exception {
-//        HCSCore hcsCore = HCSCore.INSTANCE.singletonInstance();
         HCSCore hcsCore = new HCSCore().builder();
         // create topics on HCS
         ConsensusTopicId topicId = new CreateHCSTopic(hcsCore)

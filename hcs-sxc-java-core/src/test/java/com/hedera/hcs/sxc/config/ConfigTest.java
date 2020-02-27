@@ -62,6 +62,7 @@ public class ConfigTest extends AbstractConfigTest {
                  () -> assertEquals(2, appNet.getTopics().size()),
                  () -> assertEquals("0.0.998", appNet.getTopics().get(0).getTopic()),
                  () -> assertEquals("0.0.999", appNet.getTopics().get(1).getTopic()),
+                 () -> assertEquals("302e020100300506032b657004220420b89e42e2e4c065f47fddde76b4784918da84012139f030866e1808bf2b3d5ef1", appNet.getTopics().get(0).getSubmitKey()),
                  () -> assertEquals(4, nodeList.size()),
                  () -> assertEquals("0.testnet.hedera.com:50211", nodeList.get(0).getAddress()),
                  () -> assertEquals("0.0.3", nodeList.get(0).getAccount()),
@@ -75,7 +76,8 @@ public class ConfigTest extends AbstractConfigTest {
                  () -> assertEquals(100000000, hcsTransactionFee),
                  () -> assertEquals("FULL", appNet.getPersistenceLevel().name()),
                  () -> assertTrue(appNet.getCatchupHistory()),
-                 () -> assertEquals("hcs.testnet.mirrornode.hedera.com:5600", yamlConfig.getMirrorNode().getAddress())
+                 () -> assertEquals("hcs.testnet.mirrornode.hedera.com:5600", yamlConfig.getMirrorNode().getAddress()),
+                 () -> assertEquals("org.h2.Driver", yamlConfig.getCoreHibernate().get("hibernate.connection.driver_class"))
          );
     }
 }

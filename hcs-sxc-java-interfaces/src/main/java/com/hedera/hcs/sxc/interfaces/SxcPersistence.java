@@ -54,21 +54,21 @@ public interface SxcPersistence {
     
    // Application message persistence
   
-    public void storeApplicationMessage(
+   public void storeApplicationMessage(
         ApplicationMessage applicationMessage, // the message
         Instant lastChronoPartConsensusTimestamp, // consensus data if available
         String lastChronoPartRunningHashHEX, // consensus data if available
         long lastChronoPartSequenceNum // consensus data if available
-    );
-
-    public Map<String, ApplicationMessage> getApplicationMessages();
-    public List<? extends SxcApplicationMessageInterface> getSCXApplicationMessages(); 
-
-    public SxcApplicationMessageInterface getApplicationMessageEntity(String applicationMessageId);
-    public ApplicationMessage getApplicationMessage(String applicationMessageId) throws InvalidProtocolBufferException;
-
-
-    // Secret key  and keySpec holder for key persistence
+   );
+   
+   public Map<String, ApplicationMessage> getApplicationMessages();
+   public List<? extends SxcApplicationMessageInterface> getSXCApplicationMessages(); 
+    
+   public SxcApplicationMessageInterface getApplicationMessageEntity(String applicationMessageId);
+   public ApplicationMessage getApplicationMessage(String applicationMessageId) throws InvalidProtocolBufferException;
+   
+    
+    // secret key  and keySpec holder for key rotation
     public void storeSecretKey(byte[] secretKey);
     public byte[] getSecretKey();
 

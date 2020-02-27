@@ -24,13 +24,14 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import com.hedera.hcs.sxc.HCSCore;
+import com.hedera.hcs.sxc.commonobjects.HCSResponse;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.config.Topic;
 import com.hedera.hcs.sxc.hashing.Hashing;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackFromMirror;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackToAppInterface;
-import com.hedera.hcs.sxc.interfaces.HCSResponse;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
+import com.hedera.hcs.sxc.interfaces.MirrorSubscriptionInterface;
 import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
 import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
 import com.hedera.hcs.sxc.plugins.Plugins;
@@ -65,12 +66,12 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
 
     private final List<HCSCallBackToAppInterface> observers = new ArrayList<>();
     private HCSCore hcsCore;
-    private  boolean signMessages;
-    private  boolean encryptMessages;
-    private  boolean rotateKeys;
+    private boolean signMessages;
+    private boolean encryptMessages;
+    private boolean rotateKeys;
     private Class<?> messageEncryptionClass;
     private SxcMessageEncryption messageEncryptionPlugin;
-    private  List<Topic> topics;
+    private List<Topic> topics;
     private SxcKeyRotation keyRotationPlugin;
     
     public OnHCSMessageCallback (HCSCore hcsCore) throws Exception {
@@ -158,7 +159,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                         if (wasMessageSentByMe){  // this is a message I just sent out myself
                             
                             // the message is not encrypted; check if it's good and just add missing consensus information store it back and notify observers that it has come back
-                            ApplicationMessage clearTextAppMessage = ApplicationMessage.parseFrom(applicationMessageEntity.getBusinessProcessMessage());
+                            ApplicationMessage clearTextAppMessage = ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage());
                             
                             //test if the message is `good`
                             byte[] shaClrTxt = Hashing.sha(
@@ -176,7 +177,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                             //message is `good` store it  back with consensus data applied to it.  
                             this.hcsCore.getPersistence().storeApplicationMessage(
                                 //TODO Add addressee
-                                ApplicationMessage.parseFrom(applicationMessageEntity.getBusinessProcessMessage()) ,
+                                ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage()) ,
                                 sxcConsensusMesssage.consensusTimestamp,
                                 StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),
                                 sxcConsensusMesssage.sequenceNumber

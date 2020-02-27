@@ -50,13 +50,13 @@ public class Persist
     @Data
     public class HCSApplicationMessage implements  SxcApplicationMessageInterface, Serializable{
          String applicationMessageId;
-         byte[] businessProcessMessage;
+         byte[] applicationMessage;
          Instant lastChronoPartConsensusTimestamp;
-         long lastChronoPartShardNum;
-         long lastChronoPartRealmNum;
-         long lastChronoPartRealmTopicNum;
+         //long lastChronoPartShardNum;
+         //long lastChronoPartRealmNum;
+         //long lastChronoPartRealmTopicNum;
          long lastChronoPartSequenceNum;
-         String lastChronoPartRunningHashHEX;
+         String lastChronoPartRunningHashHEX;    
     }
     
     @Data
@@ -169,7 +169,7 @@ public class Persist
         
         HCSApplicationMessage hcsApplicationMessage = new HCSApplicationMessage();
         hcsApplicationMessage.applicationMessageId = appMessageId;
-        hcsApplicationMessage.businessProcessMessage = applicationMessage.toByteArray();
+        hcsApplicationMessage.applicationMessage = applicationMessage.toByteArray();
         hcsApplicationMessage.lastChronoPartConsensusTimestamp = lastChronoPartConsensusTimestamp;
         hcsApplicationMessage.lastChronoPartRunningHashHEX= lastChronoPartRunningHashHEX;
         hcsApplicationMessage.lastChronoPartSequenceNum = lastChronoPartSequenceNum;
@@ -268,7 +268,8 @@ public class Persist
 
 
     @Override
-    public List<? extends SxcApplicationMessageInterface> getSCXApplicationMessages() {
+
+    public List<? extends SxcApplicationMessageInterface> getSXCApplicationMessages() {
         return this.hcsApplicationMessages.values().stream().collect(Collectors.toList());
     }
 

@@ -24,16 +24,13 @@ import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.consensus.CreateHCSTopic;
 
-import lombok.extern.log4j.Log4j2;
-
-@Log4j2
 public class CreateTopic {
 
     public static void main(String[] args) throws Exception {
-        HCSCore hcsCore = HCSCore.INSTANCE.singletonInstance();
+        HCSCore hcsCore = new HCSCore().builder();
         // create topics on HCS
         ConsensusTopicId topicId = new CreateHCSTopic(hcsCore)
                 .execute();
-        log.debug(topicId.toString());
+        System.out.println(topicId.toString());
     }
 }

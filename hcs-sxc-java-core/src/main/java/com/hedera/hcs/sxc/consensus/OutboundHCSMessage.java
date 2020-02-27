@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.HederaNetworkException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;
@@ -103,8 +102,7 @@ public final class OutboundHCSMessage {
         
         
         if(this.encryptMessages){
-            Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
-            this.messageEncryptionPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
+            getMessageEncryptionPlugin();
         }
         
         if(this.rotateKeys){
@@ -114,6 +112,10 @@ public final class OutboundHCSMessage {
         }
     }
 
+    private void getMessageEncryptionPlugin() throws Exception {
+        Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
+        this.messageEncryptionPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
+    }
     
     public boolean getOverrideMessageSignature() {
         return this.signMessages;
@@ -184,6 +186,10 @@ public final class OutboundHCSMessage {
         return this;
     }
     
+    public byte[] getOverrideMessageEncryptionKey (){
+        return this.overrideMessageEncryptionKey;
+    }
+
     public OutboundHCSMessage withFirstTransactionId(TransactionId transactionId) {
         this.transactionId = transactionId;
         return this;
@@ -198,23 +204,38 @@ public final class OutboundHCSMessage {
         return this;
     }
 
-    /**
+     /**
+     * Sends a single cleartext message but doesn't sent to hedera 
+     * This is for testing purposes only
+     *
+     * @param topicIndex the index reference in one of {@link #topics}
+     * @param message
+     * @throws Exception
+     * @return TransactionId
+     */
+    public List<TransactionId> sendMessageForTest(int topicIndex, byte[] message) throws Exception {
+        return sendMessage(topicIndex, message, true);
+    }
+
+     /**
      * Sends a single cleartext message
      *
      * @param topicIndex the index reference in one of {@link #topics}
      * @param message
-     * @throws HederaNetworkException
-     * @throws IllegalArgumentException
      * @throws Exception
      * @return TransactionId
      */
-    public List<TransactionId> sendMessage(int topicIndex, byte[] message) throws Exception {
+     public List<TransactionId> sendMessage(int topicIndex, byte[] message) throws Exception {
+        return sendMessage(topicIndex, message, false);
+    }
+     
+    public List<TransactionId> sendMessage(int topicIndex, byte[] message, boolean byPassSending) throws Exception {
         List<TransactionId> txIdList = new ArrayList<>();
         
         if (encryptMessages) { // send  to specific users 
             if (this.addressList != null){ // get it from .env
                 for (String recipient : addressList.keySet()){
-                    TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, recipient);
+                    TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, recipient, byPassSending);
                     txIdList.add(doSendMessageTxId);
                 }                
                 //   this.messageEncryptionKey = hcsCore.getMessageEncryptionKey();
@@ -223,7 +244,7 @@ public final class OutboundHCSMessage {
                 throw new NoSuchElementException("Encryption set to true, but keys not found in address book");
             }
         } else { // broadcast
-            TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, null);
+            TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, null, byPassSending);
             txIdList.add(doSendMessageTxId);     
         }
         
@@ -231,8 +252,8 @@ public final class OutboundHCSMessage {
         return txIdList;
     }
 
-    private TransactionId doSendMessage(byte[] message, int topicIndex, String recipient) {
-        // generate TXId for main and first message if not already set by caller
+    private TransactionId doSendMessage(byte[] message, int topicIndex, String recipient, boolean byPassSending) throws Exception {
+        // generate TXId for main and first message it not already set by caller
         TransactionId firstTransactionId = (this.transactionId == null) ? new TransactionId(this.operatorAccountId) : this.transactionId;
         //break up  (and the whole encrypted messages
         List<ApplicationMessageChunk> parts = chunk(firstTransactionId, hcsCore, message, this.addressList.get(recipient));
@@ -271,17 +292,19 @@ public final class OutboundHCSMessage {
                 this.persistencePlugin.storeTransaction(transactionId, tx);
 
                 log.debug("Executing transaction");
-                TransactionId txId = tx.execute(client);
-                
-                TransactionReceipt receipt = txId.getReceipt(client, Duration.ofSeconds(30));
+                if ( ! byPassSending) {
+                    TransactionId txId = tx.execute(client);
+                    
+                    TransactionReceipt receipt = txId.getReceipt(client, Duration.ofSeconds(30));
+    
+                    transactionId = new TransactionId(this.operatorAccountId);
 
-                transactionId = new TransactionId(this.operatorAccountId);
-
-                log.debug("Message receipt status is {} "
-                        + "sequence no is {}"
-                        ,receipt.status
-                        ,receipt.getConsensusTopicSequenceNumber()
-                );
+                    log.debug("Message receipt status is {} "
+                            + "sequence no is {}"
+                            ,receipt.status
+                            ,receipt.getConsensusTopicSequenceNumber()
+                    );
+                }
             } // end-for
             
             // after sending all parts check if key rotation is due
@@ -341,28 +364,31 @@ public final class OutboundHCSMessage {
                             .setMessage(appChunk.toByteArray())
                             .setTopicId(this.topics.get(topicIndex).getConsensusTopicId())
                             .setTransactionId(newTransactionId);
-                    
-                    // persist the transaction
-                    this.persistencePlugin.storeTransaction(newTransactionId, txRotation);
-                    TransactionId txIdKR1 =  txRotation.execute(client);
-                    
-                    TransactionReceipt receiptKR1 = txIdKR1.getReceipt(client, Duration.ofSeconds(30));
-                    
-                    log.debug("Message receipt for KR1 status is {} "
-                            + "sequence no is {}"
-                            ,receiptKR1.status
-                            ,receiptKR1.getConsensusTopicSequenceNumber()
-                    );
-                }
+                        
+                        // persist the transaction
+                        this.persistencePlugin.storeTransaction(newTransactionId, txRotation);
+                        if ( ! byPassSending) {
+                            TransactionId txIdKR1 =  txRotation.execute(client);
+                            
+                            TransactionReceipt receiptKR1 = txIdKR1.getReceipt(client, Duration.ofSeconds(30));
+                           
+                            log.debug("Message receipt for KR1 status is {} "
+                                    + "sequence no is {}"
+                                    ,receiptKR1.status
+                                    ,receiptKR1.getConsensusTopicSequenceNumber()
+                            );
+                        } else {
+                            log.warn("Not sending, bypassing sending for testing");
+                        }
+                    }
             }
-            
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (TimeoutException e) {
             // do nothing
         } catch (Exception e) {
             log.error(e);
-            e.printStackTrace();
+            throw (e);
         } finally {
             
         }

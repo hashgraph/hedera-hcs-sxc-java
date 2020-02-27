@@ -20,27 +20,16 @@ import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
  * ‍
  */
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-
-import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
-
-
 import javax.crypto.KeyAgreement;
-
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.DHParameterSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
-import lombok.extern.log4j.Log4j2;
-
-@Log4j2
 public class KeyRotation implements SxcKeyRotation{
 
     public KeyRotation() {
@@ -63,18 +52,15 @@ public class KeyRotation implements SxcKeyRotation{
        
         KeyAgreement initiatorKeyAgree = null;
         byte[] initiatorPubKeyEnc  = null;    
-        try {
-            KeyPairGenerator initiatorKeypairGen = KeyPairGenerator.getInstance("DH");
-            initiatorKeypairGen.initialize(2048);// 2048 if otherside not known
-            KeyPair initiatorKeypair = initiatorKeypairGen.generateKeyPair();
-            // keep the agreement in memory to reuse when responder sends its public key back to initiator
-            initiatorKeyAgree = KeyAgreement.getInstance("DH");
-            initiatorKeyAgree.init(initiatorKeypair.getPrivate());
-            // encode public key and give it to the responder.
-            initiatorPubKeyEnc = initiatorKeypair.getPublic().getEncoded();
-        } catch (NoSuchAlgorithmException ex) {
-            log.error(ex);
-        }
+
+        KeyPairGenerator initiatorKeypairGen = KeyPairGenerator.getInstance("DH");
+        initiatorKeypairGen.initialize(2048);// 2048 if otherside not known
+        KeyPair initiatorKeypair = initiatorKeypairGen.generateKeyPair();
+        // keep the agreement in memory to reuse when responder sends its public key back to initiator
+        initiatorKeyAgree = KeyAgreement.getInstance("DH");
+        initiatorKeyAgree.init(initiatorKeypair.getPrivate());
+        // encode public key and give it to the responder.
+        initiatorPubKeyEnc = initiatorKeypair.getPublic().getEncoded();
         
         return Pair.of(initiatorKeyAgree, initiatorPubKeyEnc);
     }
@@ -92,25 +78,23 @@ public class KeyRotation implements SxcKeyRotation{
     public Pair<byte[], byte[]> respond(byte[] initiatorPubKeyEnc) throws Exception {
         byte[] responderPubKeyEnc = null;
         byte[] responderSecret  = null;
-        try {
-            KeyFactory responderKeyFac = KeyFactory.getInstance("DH");
-            X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(initiatorPubKeyEnc);
-            PublicKey initiatorPubKey = responderKeyFac.generatePublic(x509KeySpec);
-            // Responder gets the DH parameters associated with the initiator's public key.
-            DHParameterSpec dhParamFromInitiatorPubKey = ((DHPublicKey) initiatorPubKey).getParams();
-            // Responder creates its own DH key pair
-            KeyPairGenerator responderKeypairGen = KeyPairGenerator.getInstance("DH");
-            responderKeypairGen.initialize(dhParamFromInitiatorPubKey);
-            KeyPair responderKeypair = responderKeypairGen.generateKeyPair();
-            // Responder creates and initializes its DH KeyAgreement object
-            KeyAgreement responderKeyAgree = KeyAgreement.getInstance("DH");
-            responderKeyAgree.init(responderKeypair.getPrivate());
-            responderPubKeyEnc = responderKeypair.getPublic().getEncoded();
-            responderKeyAgree.doPhase(initiatorPubKey, true);
-            responderSecret = responderKeyAgree.generateSecret();
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidAlgorithmParameterException | InvalidKeyException ex) {
-            log.error(ex);
-        }
+
+        KeyFactory responderKeyFac = KeyFactory.getInstance("DH");
+        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(initiatorPubKeyEnc);
+        PublicKey initiatorPubKey = responderKeyFac.generatePublic(x509KeySpec);
+        // Responder gets the DH parameters associated with the initiator's public key.
+        DHParameterSpec dhParamFromInitiatorPubKey = ((DHPublicKey) initiatorPubKey).getParams();
+        // Responder creates its own DH key pair
+        KeyPairGenerator responderKeypairGen = KeyPairGenerator.getInstance("DH");
+        responderKeypairGen.initialize(dhParamFromInitiatorPubKey);
+        KeyPair responderKeypair = responderKeypairGen.generateKeyPair();
+        // Responder creates and initializes its DH KeyAgreement object
+        KeyAgreement responderKeyAgree = KeyAgreement.getInstance("DH");
+        responderKeyAgree.init(responderKeypair.getPrivate());
+        responderPubKeyEnc = responderKeypair.getPublic().getEncoded();
+        responderKeyAgree.doPhase(initiatorPubKey, true);
+        responderSecret = responderKeyAgree.generateSecret();
+
         return Pair.of(responderPubKeyEnc, responderSecret);
     }
 
@@ -127,15 +111,12 @@ public class KeyRotation implements SxcKeyRotation{
     
     @Override
     public byte[] finalise(byte[] responderPubKeyEnc, KeyAgreement keyAgreement) throws Exception {
-        try {
-            KeyFactory initiatorKeyFac = KeyFactory.getInstance("DH");
-            X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(responderPubKeyEnc);
-            PublicKey responderPubKey = initiatorKeyFac.generatePublic(x509KeySpec);
-            keyAgreement.doPhase(responderPubKey, true);
+
+        KeyFactory initiatorKeyFac = KeyFactory.getInstance("DH");
+        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(responderPubKeyEnc);
+        PublicKey responderPubKey = initiatorKeyFac.generatePublic(x509KeySpec);
+        keyAgreement.doPhase(responderPubKey, true);
             
-        } catch (InvalidKeySpecException | InvalidKeyException | IllegalStateException | NoSuchAlgorithmException ex) {
-            log.error(ex);
-        }
         return keyAgreement.generateSecret();
     }
  }

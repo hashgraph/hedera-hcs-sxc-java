@@ -1,6 +1,7 @@
 package com.hedera.hcs.sxc.plugin.cryptography.cryptography;
       
 import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
+import com.hedera.hcs.sxc.plugin.cryptography.StringUtils;
 
 /*-
  * ‌
@@ -22,25 +23,16 @@ import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
  * ‍
  */
 
-import lombok.extern.log4j.Log4j2;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
-
-
 import javax.crypto.BadPaddingException;
 
 import javax.crypto.Cipher;
@@ -48,10 +40,8 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.hedera.hcs.sxc.utils.StringUtils;
 import javax.crypto.spec.GCMParameterSpec;
 
-@Log4j2
 public class Cryptography implements SxcMessageEncryption {
     
      public static Cryptography load(){
@@ -121,7 +111,7 @@ public class Cryptography implements SxcMessageEncryption {
         return cipher.doFinal(ciphertext);  
     }
     
-    public byte[] encryptFromCleatText(byte[] sharedSecret, String cleartext)
+    public byte[] encryptFromClearText(byte[] sharedSecret, String cleartext)
             throws NoSuchAlgorithmException, 
             NoSuchPaddingException, 
             InvalidKeyException, 
@@ -162,7 +152,6 @@ public class Cryptography implements SxcMessageEncryption {
         return StringUtils.byteArrayToString(decrypt(sharedSecret, ciphertext));
     }
     
-    
     /**
      * Generate a fresh RSA {@link KeyPair}
      * @return the KeyPair
@@ -174,54 +163,4 @@ public class Cryptography implements SxcMessageEncryption {
         KeyPair pair = generator.generateKeyPair();
         return pair;
     }
-    
-    /**
-     * Retrieve a {@link PrivateKey} that has been serialized using {@link #toHexString(java.security.PrivateKey) }
-     * @param privateKeyHexEncoded
-     * @return  The PrivateKey
-     */
-    public static PrivateKey fromHexPrivateKey(String privateKeyHexEncoded){
-        PrivateKey r = null;
-        try {
-            byte[] privateKeyBytes = StringUtils.hexStringToByteArray(privateKeyHexEncoded);
-            KeyFactory kf = KeyFactory.getInstance("RSA"); // or "EC" or whatever
-            r =  kf.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
-        } catch (InvalidKeySpecException | NoSuchAlgorithmException ex) {
-            log.error(ex);
-        }
-        return r;
-    }
-    
-    /**
-     * Retrieve a {@link PublicKey} that has been serialized using {@link #toHexString(java.security.PublicKey) }
-     * @param publicKeyHexEncoded
-     * @return  The PrivateKey
-     */
-    public static PublicKey fromHexPublicKey(String publicKeyHexEncoded){
-        PublicKey r = null;
-        try {
-            byte[] publicKeyBytes = StringUtils.hexStringToByteArray(publicKeyHexEncoded);
-            KeyFactory kf = KeyFactory.getInstance("RSA"); // or "EC" or whatever
-            r =  kf.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
-        } catch (InvalidKeySpecException | NoSuchAlgorithmException ex) {
-            log.error(ex);
-        }
-        return r;
-    }
-    
-    public static String toHexString (PublicKey publicKey){
-        return StringUtils.byteArrayToHexString(publicKey.getEncoded());
-    }
-    
-    public static String toHexString (PrivateKey privateKey){
-        return StringUtils.byteArrayToHexString(privateKey.getEncoded());
-    }
-
-   
-
-   
-
- 
-     
-
  }

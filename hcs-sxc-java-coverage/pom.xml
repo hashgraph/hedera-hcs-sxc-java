@@ -32,9 +32,10 @@
             <artifactId>hcs-sxc-java-simple-message-demo</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- no need to test interfaces <dependency> <groupId>com.hedera</groupId> 
-            <artifactId>hcs-sxc-java-interfaces</artifactId> <version>${project.version}</version> 
-            </dependency> -->
+        <dependency> <groupId>com.hedera</groupId> 
+            <artifactId>hcs-sxc-java-interfaces</artifactId> 
+            <version>${project.version}</version> 
+        </dependency>
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-plugins-mirror-direct</artifactId>

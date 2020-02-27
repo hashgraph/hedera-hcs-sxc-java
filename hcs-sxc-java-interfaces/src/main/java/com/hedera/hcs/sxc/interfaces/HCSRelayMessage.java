@@ -46,7 +46,6 @@ public class HCSRelayMessage implements Serializable {
     private long topicShard = 0;
     private long topicRealm = 0;
     private long topicNum = 0;
-    private int hash;
 
     public HCSRelayMessage(ConsensusMessage messagesResponse) {
         this.consensusTimestamp = messagesResponse.consensusTimestamp;
@@ -56,30 +55,5 @@ public class HCSRelayMessage implements Serializable {
         this.topicShard = messagesResponse.topicId.shard;
         this.topicRealm = messagesResponse.topicId.realm;
         this.topicNum = messagesResponse.topicId.topic;
-
-        hash = 3;
-        hash = 89 * hash + Objects.hashCode(messagesResponse);
-        hash = 89 * hash + Objects.hashCode(messagesResponse.topicId);
     }
-
-//    @Override
-//    public boolean equals(Object obj) {
-//        if (this == obj) {
-//            return true;
-//        }
-//        if (obj == null) {
-//            return false;
-//        }
-//        if (getClass() != obj.getClass()) {
-//            return false;
-//        }
-//        final HCSRelayMessage other = (HCSRelayMessage) obj;
-//        if (!Objects.equals(this.topicMessagesResponse, other.topicMessagesResponse)) {
-//            return false;
-//        }
-//        if (!Objects.equals(this.topicId, other.topicId)) {
-//            return false;
-//        }
-//        return true;
-//    }
 }

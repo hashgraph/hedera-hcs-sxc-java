@@ -48,15 +48,10 @@ import com.hedera.hcs.sxc.proto.ApplicationMessageID;
 import lombok.extern.log4j.Log4j2;
 import proto.SettlementBPM;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import org.apache.commons.codec.binary.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -79,14 +74,12 @@ public class AuditController {
     private boolean signMessages;
     private boolean encryptMessages;
     private boolean rotateKeys;
-    private List<Topic> topics;
     private SxcMessageEncryption messageEncryptionPlugin;
     private SxcKeyRotation keyRotationPlugin;
     public AuditController() throws Exception {
         this.signMessages = Statics.getAppData().getHCSCore().getSignMessages();
         this.encryptMessages = Statics.getAppData().getHCSCore().getEncryptMessages();
         this.rotateKeys = Statics.getAppData().getHCSCore().getRotateKeys();
-        this.topics = Statics.getAppData().getHCSCore().getTopics();
 
         if(this.signMessages){
 
@@ -156,11 +149,11 @@ public class AuditController {
         SxcPersistence persistence = hcsCore.getPersistence();
 
 
-        List<? extends SxcApplicationMessageInterface> scxApplicationMessages = persistence.getSCXApplicationMessages();
+        List<? extends SxcApplicationMessageInterface> scxApplicationMessages = persistence.getSXCApplicationMessages();
         for (SxcApplicationMessageInterface m : scxApplicationMessages){
             //ApplicationMessage  = ApplicationMessage.parseFrom(m.getBusinessProcessMessage());
             SettlementBPM settlementBPM = SettlementBPM.parseFrom(
-                ApplicationMessage.parseFrom(m.getBusinessProcessMessage())
+                ApplicationMessage.parseFrom(m.getApplicationMessage())
                 .getBusinessProcessMessage()
             );
             if (settlementBPM.getThreadID().equals(threadId)) {

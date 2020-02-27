@@ -139,7 +139,7 @@ implements SxcPersistence{
                 .setSequenceNumber(mirrorResponse.getSequenceNumber())
                 .build();
         
-        SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage(mirrorResponse.getTopicId(), consensusTopicResponse);
+         SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage(mirrorResponse.getTopicId(), consensusTopicResponse);
         session.close();
         return sxcConsensusMessage;
     }

@@ -33,6 +33,11 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class MirrorSubscribe implements MirrorSubscriptionInterface {
 
+    private boolean testMode = false;
+    
+    public void setTestMode(boolean testMode) {
+        this.testMode = testMode;
+    }
     @Override
     public void init(HCSCallBackFromMirror onHCSMessageCallback, String applicationId, Optional<Instant> lastConsensusTimestamp, String mirrorAddress, List<ConsensusTopicId> topicIds) throws Exception {
         log.debug("hcs-sxc-java-plugins-mirror-direct init");
@@ -46,10 +51,12 @@ public class MirrorSubscribe implements MirrorSubscriptionInterface {
         log.debug("Subscribing to mirror node");
         for (ConsensusTopicId topic : topicIds) {
             log.debug("Processing topic num: " + topic.toString());
-            // subscribe to topic with mirror node
-            MirrorTopicSubscriber subscriber = new MirrorTopicSubscriber(mirrorDetails[0], Integer.parseInt(mirrorDetails[1]), topic, lastConsensusTimestamp, onHCSMessageCallback);
-            Thread subscriberThread = new Thread(subscriber);
-            subscriberThread.start();
+            // subscribe to topic with mirror node (if not testing)
+            MirrorTopicSubscriber subscriber = new MirrorTopicSubscriber(mirrorDetails[0], Integer.parseInt(mirrorDetails[1]), topic, lastConsensusTimestamp, onHCSMessageCallback, this.testMode);
+            if ( ! this.testMode) {
+                Thread subscriberThread = new Thread(subscriber);
+                subscriberThread.start();
+            }
         }
     }
 }

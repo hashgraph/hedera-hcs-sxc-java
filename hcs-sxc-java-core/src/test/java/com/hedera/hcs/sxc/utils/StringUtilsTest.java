@@ -2,17 +2,10 @@ package com.hedera.hcs.sxc.utils;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-
-import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class StringUtilsTest {
     @Test

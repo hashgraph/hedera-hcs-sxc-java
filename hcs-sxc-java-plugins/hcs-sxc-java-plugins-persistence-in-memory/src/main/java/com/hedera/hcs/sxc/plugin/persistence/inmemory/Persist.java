@@ -45,13 +45,11 @@ public class Persist
     
     public class HCSApplicationMessage implements  SXCApplicationMessageInterface, Serializable{
 
+        private static final long serialVersionUID = 1L;
             private String applicationMessageId;
             private byte[] applicationMessage;
 
             private Instant lastChronoPartConsensusTimestamp;
-//            private long lastChronoPartShardNum;
-//            private long lastChronoPartRealmNum;
-//            private long lastChronoPartRealmTopicNum;
             private long lastChronoPartSequenceNum;
             private String lastChronoPartRunningHashHEX;
 

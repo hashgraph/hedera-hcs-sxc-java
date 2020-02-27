@@ -24,20 +24,14 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import lombok.extern.log4j.Log4j2;
 
-@Log4j2
 public class Hashing {
 
-   public static byte[] sha(String plaintext){
+   public static byte[] sha(String plaintext) throws NoSuchAlgorithmException{
        byte[] encodedhash = null; 
-       try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            encodedhash = digest.digest(
-                    plaintext.getBytes(StandardCharsets.UTF_8));
-        } catch (NoSuchAlgorithmException ex) {
-            log.error(ex);
-        }
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        encodedhash = digest.digest(
+                plaintext.getBytes(StandardCharsets.UTF_8));
         return encodedhash;
     }
    
@@ -45,7 +39,7 @@ public class Hashing {
        return Arrays.equals(sha1, sha2);
    }
    
-   public static boolean verifySHA(byte[] sha, String plaintext){
+   public static boolean verifySHA(byte[] sha, String plaintext) throws NoSuchAlgorithmException{
         return Arrays.equals(sha(plaintext), sha);
    }
 

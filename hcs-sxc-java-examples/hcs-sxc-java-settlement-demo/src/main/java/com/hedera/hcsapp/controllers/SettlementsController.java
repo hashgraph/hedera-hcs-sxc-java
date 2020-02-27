@@ -20,8 +20,6 @@ package com.hedera.hcsapp.controllers;
  * ‍
  */
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +32,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.Statics;
 import com.hedera.hcsapp.Utils;
 import com.hedera.hcsapp.entities.Settlement;

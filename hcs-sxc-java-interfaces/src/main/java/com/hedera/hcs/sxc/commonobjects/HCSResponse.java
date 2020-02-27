@@ -1,4 +1,4 @@
-package com.hedera.hcs.sxc.interfaces;
+package com.hedera.hcs.sxc.commonobjects;
 
 /*-
  * ‌

@@ -23,6 +23,8 @@ package com.hedera.hcs.sxc.hashing;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.security.NoSuchAlgorithmException;
+
 import org.junit.jupiter.api.Test;
 
 import com.hedera.hcs.sxc.hashing.Hashing;
@@ -37,7 +39,7 @@ public class HashingTest {
     final String hexOfHashOfPlainText="f39829c128492f289d15580844141549f395fd90292c708abdd1f786d9ce52fa";
 
     @Test
-    public void testSha() {
+    public void testSha() throws NoSuchAlgorithmException {
         log.debug("sha");
         byte[] expResult = StringUtils.hexStringToByteArray(hexOfHashOfPlainText);
         byte[] result = Hashing.sha(plaintext);
@@ -45,7 +47,7 @@ public class HashingTest {
     }
 
     @Test
-    public void testMatchSHA() {
+    public void testMatchSHA() throws NoSuchAlgorithmException {
         byte[] sha1 = StringUtils.hexStringToByteArray(hexOfHashOfPlainText);
         byte[] sha2 = Hashing.sha(plaintext);
         boolean expResult = true;
@@ -54,7 +56,7 @@ public class HashingTest {
     }
 
     @Test
-    public void testVerifySHA() {
+    public void testVerifySHA() throws NoSuchAlgorithmException {
         byte[] sha = Hashing.sha(plaintext);
         String _plaintext = this.plaintext;
         boolean expResult = true;

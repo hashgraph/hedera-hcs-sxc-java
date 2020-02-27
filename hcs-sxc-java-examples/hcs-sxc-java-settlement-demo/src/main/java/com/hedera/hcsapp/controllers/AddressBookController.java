@@ -33,7 +33,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hedera.hcsapp.AppData;
 import com.hedera.hcsapp.Statics;
 import com.hedera.hcsapp.dockercomposereader.DockerCompose;
 import com.hedera.hcsapp.dockercomposereader.DockerComposeReader;

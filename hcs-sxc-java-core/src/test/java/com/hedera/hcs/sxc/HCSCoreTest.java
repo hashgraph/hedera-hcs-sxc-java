@@ -80,6 +80,7 @@ class HCSCoreTest {
     
     @Test
     public void testCoreEmptyEnvironment() throws Exception {
+        @SuppressWarnings("unused")
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenvempty.test");
     }
     
@@ -101,15 +102,18 @@ class HCSCoreTest {
     }
     
     private void coreEncryptNoKey() throws Exception {
+        @SuppressWarnings("unused")
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test")
             .withEncryptedMessages(true);
     }
     private void coreRotateNoEncryption() throws Exception {
+        @SuppressWarnings("unused")
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test")
             .withEncryptedMessages(false)
             .withKeyRotation(true, 4);
     }
     private void coreRotateZero() throws Exception {
+        @SuppressWarnings("unused")
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test")
             .withMessageEncryptionKey("key".getBytes())
             .withEncryptedMessages(true)

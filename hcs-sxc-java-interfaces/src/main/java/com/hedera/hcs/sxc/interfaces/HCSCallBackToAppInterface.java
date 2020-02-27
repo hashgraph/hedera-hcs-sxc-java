@@ -1,5 +1,7 @@
 package com.hedera.hcs.sxc.interfaces;
 
+import com.hedera.hcs.sxc.commonobjects.HCSResponse;
+
 /*-
  * ‌
  * hcs-sxc-java

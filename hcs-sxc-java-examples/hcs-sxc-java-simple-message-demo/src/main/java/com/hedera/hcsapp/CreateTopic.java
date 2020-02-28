@@ -1,4 +1,4 @@
-package main.java.com.hedera.hcsapp;
+package com.hedera.hcsapp;
 
 import com.hedera.hashgraph.sdk.account.AccountId;
 
@@ -45,7 +45,7 @@ public class CreateTopic {
         // create topics on HCS
         CreateHCSTopic createHCSTopic = new CreateHCSTopic(hcsCore);
         ConsensusTopicId topicId = createHCSTopic.execute();
-        log.debug(topicId.topic);
+        System.out.println("New topic Id " + topicId.topic);
     }
 
 }

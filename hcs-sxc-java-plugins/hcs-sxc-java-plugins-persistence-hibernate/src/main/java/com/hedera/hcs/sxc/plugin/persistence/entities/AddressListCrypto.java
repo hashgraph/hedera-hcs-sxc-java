@@ -29,8 +29,8 @@ import java.io.Serializable;
 
 @Data
 @Entity
-@Table(name = "address_list_crypto")
-public class AddressListCrypto implements Serializable, SxcAddressListItemCryptoInterface{
+@Table(name = "addressListCrypto")
+public class AddressListCrypto {
 
     @Id
     private String appId;

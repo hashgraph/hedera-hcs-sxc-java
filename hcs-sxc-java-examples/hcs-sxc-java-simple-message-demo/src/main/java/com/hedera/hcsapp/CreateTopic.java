@@ -34,7 +34,7 @@ import lombok.extern.log4j.Log4j2;
 public class CreateTopic {
 
     public static void main(String[] args) throws Exception {
-        Dotenv dotEnv = Dotenv.load();
+        Dotenv dotEnv = Dotenv.configure().filename("./config/.env").load();
         Ed25519PrivateKey operatorKey = Ed25519PrivateKey.fromString(dotEnv.get("OPERATOR_KEY"));
         AccountId operatorId = AccountId.fromString(dotEnv.get("OPERATOR_ID"));
 

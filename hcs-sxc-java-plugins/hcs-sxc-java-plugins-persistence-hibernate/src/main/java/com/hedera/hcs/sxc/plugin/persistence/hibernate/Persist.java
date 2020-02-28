@@ -29,6 +29,7 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
+import com.hedera.hcs.sxc.plugin.persistence.entities.AddressListCrypto;
 import com.hedera.hcs.sxc.plugin.persistence.entities.HCSApplicationMessage;
 import com.hedera.hcs.sxc.plugin.persistence.entities.HCSTransaction;
 import com.hedera.hcs.sxc.plugin.persistence.entities.MirrorResponse;
@@ -228,98 +229,98 @@ implements SxcPersistence{
     @Override
     public ConsensusMessageSubmitTransaction getSubmittedTransaction(String transactionId) {
 
-        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
-        HCSTransaction hcsTransaction = session.createQuery("from HCSTransaction t where t.transactionId = :transactionId", HCSTransaction.class)
-                .setParameter("transactionId", transactionId)
-                .getResultList()
-                .stream().findFirst().orElse(null);
-        if (hcsTransaction == null) {
-            session.close();
-            return null;
-        }
-
-        try {
-          TransactionBody body = TransactionBody.parseFrom(hcsTransaction.getBodyBytes());
-
-          ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction();
-
-          tx.setTransactionMemo(body.getMemo());
-          tx.setMessage(body.getConsensusSubmitMessage().getMessage().toByteArray());
-          AccountId accountId = new AccountId(body.getNodeAccountID().getShardNum()
-                  ,body.getNodeAccountID().getRealmNum()
-                  ,body.getNodeAccountID().getAccountNum()
-          );
-          tx.setNodeAccountId(accountId);
-
-          ConsensusTopicId topicId = new ConsensusTopicId(body.getConsensusSubmitMessage().getTopicID().getShardNum()
-                  ,body.getConsensusSubmitMessage().getTopicID().getRealmNum()
-                  ,body.getConsensusSubmitMessage().getTopicID().getTopicNum()
-          );
-
-          tx.setTopicId(topicId);
-
-          tx.setMaxTransactionFee(body.getTransactionFee());
-
-          Instant start = Instant.ofEpochSecond(body.getTransactionID().getTransactionValidStart().getSeconds(), body.getTransactionID().getTransactionValidStart().getNanos());
-          TransactionId txId = TransactionId.withValidStart(accountId, start);
-          tx.setTransactionId(txId);
-          Duration validDuration = Duration.ofSeconds(body.getTransactionValidDuration().getSeconds());
-
-          tx.setTransactionValidDuration(validDuration);
-          session.close();
-          return tx;
-        } catch (InvalidProtocolBufferException e) {
-            log.error(e);
-            session.close();
-            return null;
-        }
-        //session.close();
+//        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+//        HCSTransaction hcsTransaction = session.createQuery("from HCSTransaction t where t.transactionId = :transactionId", HCSTransaction.class)
+//                .setParameter("transactionId", transactionId)
+//                .getResultList()
+//                .stream().findFirst().orElse(null);
+//        if (hcsTransaction == null) {
+//            session.close();
+//            return null;
+//        }
+//
+//        try {
+//          TransactionBody body = TransactionBody.parseFrom(hcsTransaction.getBodyBytes());
+//
+//          ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction();
+//
+//          tx.setTransactionMemo(body.getMemo());
+//          tx.setMessage(body.getConsensusSubmitMessage().getMessage().toByteArray());
+//          AccountId accountId = new AccountId(body.getNodeAccountID().getShardNum()
+//                  ,body.getNodeAccountID().getRealmNum()
+//                  ,body.getNodeAccountID().getAccountNum()
+//          );
+//          tx.setNodeAccountId(accountId);
+//
+//          ConsensusTopicId topicId = new ConsensusTopicId(body.getConsensusSubmitMessage().getTopicID().getShardNum()
+//                  ,body.getConsensusSubmitMessage().getTopicID().getRealmNum()
+//                  ,body.getConsensusSubmitMessage().getTopicID().getTopicNum()
+//          );
+//
+//          tx.setTopicId(topicId);
+//
+//          tx.setMaxTransactionFee(body.getTransactionFee());
+//
+//          Instant start = Instant.ofEpochSecond(body.getTransactionID().getTransactionValidStart().getSeconds(), body.getTransactionID().getTransactionValidStart().getNanos());
+//          TransactionId txId = TransactionId.withValidStart(accountId, start);
+//          tx.setTransactionId(txId);
+//          Duration validDuration = Duration.ofSeconds(body.getTransactionValidDuration().getSeconds());
+//
+//          tx.setTransactionValidDuration(validDuration);
+//          session.close();
+//          return tx;
+//        } catch (InvalidProtocolBufferException e) {
+//            log.error(e);
+//            session.close();
+//            return null;
+//        }
+        return null;
     }
 
     @Override
     public Map<String, ConsensusMessageSubmitTransaction> getSubmittedTransactions() {
         Map<String, ConsensusMessageSubmitTransaction> responseList = new HashMap<>();
-
-        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
-        List<HCSTransaction> hcsTransactions = session.createQuery("from HCSTransaction t order by t.transactionId desc", HCSTransaction.class)
-                .list();
-
-        hcsTransactions.forEach(hcsTransaction -> {
-            try {
-                ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction();
-
-                TransactionBody body = TransactionBody.parseFrom(hcsTransaction.getBodyBytes());
-                tx.setTransactionMemo(body.getMemo());
-                tx.setMessage(body.getConsensusSubmitMessage().getMessage().toByteArray());
-                AccountId accountId = new AccountId(body.getNodeAccountID().getShardNum()
-                        ,body.getNodeAccountID().getRealmNum()
-                        ,body.getNodeAccountID().getAccountNum()
-                        );
-                tx.setNodeAccountId(accountId);
-
-                ConsensusTopicId topicId = new ConsensusTopicId(body.getConsensusSubmitMessage().getTopicID().getShardNum()
-                        ,body.getConsensusSubmitMessage().getTopicID().getRealmNum()
-                        ,body.getConsensusSubmitMessage().getTopicID().getTopicNum()
-                        );
-
-                tx.setTopicId(topicId);
-
-                tx.setMaxTransactionFee(body.getTransactionFee());
-
-                Instant start = Instant.ofEpochSecond(body.getTransactionID().getTransactionValidStart().getSeconds(), body.getTransactionID().getTransactionValidStart().getNanos());
-                TransactionId txId = TransactionId.withValidStart(accountId, start);
-                tx.setTransactionId(txId);
-                Duration validDuration = Duration.ofSeconds(body.getTransactionValidDuration().getSeconds());
-
-                tx.setTransactionValidDuration(validDuration);
-
-                responseList.put(hcsTransaction.getTransactionId(), tx);
-            } catch (InvalidProtocolBufferException e) {
-                log.error(e);
-            }
-        });
-
-        session.close();
+//
+//        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+//        List<HCSTransaction> hcsTransactions = session.createQuery("from HCSTransaction t order by t.transactionId desc", HCSTransaction.class)
+//                .list();
+//
+//        hcsTransactions.forEach(hcsTransaction -> {
+//            try {
+//                ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction();
+//
+//                TransactionBody body = TransactionBody.parseFrom(hcsTransaction.getBodyBytes());
+//                tx.setTransactionMemo(body.getMemo());
+//                tx.setMessage(body.getConsensusSubmitMessage().getMessage().toByteArray());
+//                AccountId accountId = new AccountId(body.getNodeAccountID().getShardNum()
+//                        ,body.getNodeAccountID().getRealmNum()
+//                        ,body.getNodeAccountID().getAccountNum()
+//                        );
+//                tx.setNodeAccountId(accountId);
+//
+//                ConsensusTopicId topicId = new ConsensusTopicId(body.getConsensusSubmitMessage().getTopicID().getShardNum()
+//                        ,body.getConsensusSubmitMessage().getTopicID().getRealmNum()
+//                        ,body.getConsensusSubmitMessage().getTopicID().getTopicNum()
+//                        );
+//
+//                tx.setTopicId(topicId);
+//
+//                tx.setMaxTransactionFee(body.getTransactionFee());
+//
+//                Instant start = Instant.ofEpochSecond(body.getTransactionID().getTransactionValidStart().getSeconds(), body.getTransactionID().getTransactionValidStart().getNanos());
+//                TransactionId txId = TransactionId.withValidStart(accountId, start);
+//                tx.setTransactionId(txId);
+//                Duration validDuration = Duration.ofSeconds(body.getTransactionValidDuration().getSeconds());
+//
+//                tx.setTransactionValidDuration(validDuration);
+//
+//                responseList.put(hcsTransaction.getTransactionId(), tx);
+//            } catch (InvalidProtocolBufferException e) {
+//                log.error(e);
+//            }
+//        });
+//
+//        session.close();
         return responseList;
 
     }
@@ -557,12 +558,35 @@ implements SxcPersistence{
 
     @Override
     public void addAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        AddressListCrypto addressListCrypto = new AddressListCrypto();
+        addressListCrypto.setAppId(appId);
+        addressListCrypto.setSharedSymmetricEncryptionKey(sharedSymmetricEncryptionKey);
+        addressListCrypto.setTheirEd25519PubKeyForSigning(theirEd25519PubKeyForSigning);
+
+        // start a transaction
+        Transaction dbTransaction = null;
+        dbTransaction = session.beginTransaction();
+        session.save(addressListCrypto);
+        // commit transaction
+        session.flush();
+        dbTransaction.commit();
+        session.close();
     }
 
     @Override
     public Map<String, Map<String, String>> getAddressList() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Map<String, Map<String, String>> response = new HashMap<String, Map<String,String>>();
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+
+        List < AddressListCrypto > addressListCrypto = session.createQuery("from AddressListCrypto", AddressListCrypto.class).list();
+        
+        addressListCrypto.forEach(address -> {
+            response.put(address.getAppId(), Map.of("theirEd25519PubKeyForSigning", address.getTheirEd25519PubKeyForSigning(), "sharedSymmetricEncryptionKey", address.getSharedSymmetricEncryptionKey()));
+        });
+        
+        session.close();
+        return response;
     }
 
     

@@ -542,7 +542,10 @@ The project comes with two examples to get you started, these are fully function
 
 ### hcs-sxc-java-simple-message-demo
 
-This is a simple messaging demo between two participants. All messages sent from one participant are pushed to the Hedera HCS service and each participant subscribes to a mirror node to receive the consensus messages.
+This is a simple messaging demo between three participants. All messages sent from one participant are sent to the Hedera HCS service and each participant subscribes to a mirror node to receive the consensus messages.
+
+You can run the demo with or without encryption. If the demo is run without encryption, all communications are in clear text and all participants see the messages.
+If the demo is run with encryption, then only the participants who share a key with the sender can read and decrypt the messages. In the samples provided, player 1 can communicate with players 2 and 3, but 2 and 3 don't communicate with each other.
 
 To run the demo, first create a new HCS topic using the CreateTopic class in the examples and edit the `config.yaml` file to reflect the new topic id. This is to ensure that when you run the demo, you don't receive messages from someone else who you may be sharing a topic id with - although that could be fun.
 Also check other details such as the mirror node, hedera network, etc... are correct.
@@ -555,15 +558,46 @@ ensure that the following files are present and configured properly, `apps.yaml`
 
   - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/apps.yaml
   - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/config.yaml
-  - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/.env (copy of .env.sample with your own account and private key)
+  - hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/.env (copy of `dotenv.sample` with your own account and private key)
+
+Once you have these files, run `java -cp hcs-sxc-java-simple-message-demo-0.0.3-SNAPSHOT-shaded.jar com.hedera.hcsapp.GenerateConfigurationFiles`
+
+This will take the operator key and id from the .env file and create corresponding environment files for each of the three players in the `config` folder (.envPlayer-0, .envPlayer-1 and .envPlayer-2).
+It will also generate a `./config/contact-list.yaml` file but this is only necessary for encrypted demos.
+
+* Without encryption
+
+ensure `./config/config.yaml` has its `encryptMessages` property set to `false`.
 
 Open up to three terminal windows and in each type:
 
-  - terminal 1: linux/mac: `./runapp.sh 0`, windows: `runapp.cmd 0`
-  - terminal 2: linux/mac: `./runapp.sh 1`, windows: `runapp.cmd 1`
-  - terminal 3: linux/mac: `./runapp.sh 2`, windows: `runapp.cmd 2`
+  - terminal 1: linux/mac: `./runapp.sh Player-0`, windows: `runapp.cmd Player-0`
+  - terminal 2: linux/mac: `./runapp.sh Player-1`, windows: `runapp.cmd Player-1`
+  - terminal 3: linux/mac: `./runapp.sh Player-2`, windows: `runapp.cmd Player-2`
 
 All terminals should now be waiting for input, enter text in one terminal and press [return], after a few seconds, the message should be reflected in all three terminals.
+
+```
+****************************************
+** Welcome to a simple HCS demo
+** I am app: Player 1
+****************************************
+```
+
+* With pair-wise encryption
+
+ensure `./config/config.yaml` has its `encryptMessages` property set to `true`.
+
+Open up to three terminal windows and in each type:
+
+  - terminal 1: linux/mac: `./runapp.sh Player-0`, windows: `runapp.cmd Player-0`
+  - terminal 2: linux/mac: `./runapp.sh Player-1`, windows: `runapp.cmd Player-1`
+  - terminal 3: linux/mac: `./runapp.sh Player-2`, windows: `runapp.cmd Player-2`
+
+All terminals should now be waiting for input, enter text in one terminal and press [return], after a few seconds, the message should be reflected in all or some of the terminals.
+
+Messages sent by player 1 are echoed on Player 2 and 3
+Messages sent by players 2 and 3 are only echoed on player 1
 
 ```
 ****************************************
@@ -609,26 +643,7 @@ hcs-sxc-java-relay_1  | 2020-01-07 13:07:22 [Thread-1] INFO  MirrorTopicSubscrib
 hcs-sxc-java-relay_1  | 2020-01-07 13:07:52 [Thread-1] INFO  MirrorTopicSubscriber:131 - Sleeping 30s
 ```
 
-switch to the second terminal window and type
-
-linux/mac: `./runapp.sh 0`, windows: `runapp.cmd 0`
-
-in the third terminal window, type
-
-linux/mac: `./runapp.sh 1`, windows: `runapp.cmd 1`
-
-both windows should show a prompt
-
-```
-****************************************
-** Welcome to a simple HCS demo
-** I am app: Player 1
-****************************************
-```
-
-typing text and pressing `[RETURN]` should result in the message appearing in the other application's window after a short consensus delay.
-
-Both applications see the sent message, this is because both applications subscribe to mirror node notifications on topic and the sender essentially receives its own messages as well as those from others.
+Now refer to the `without relay and queue` instructions for running the player apps with or without encryption.
 
 ### hcs-sxc-java-settlement-demo
 

@@ -90,13 +90,13 @@
             <artifactId>hcs-sxc-java-plugins-persistence-hibernate</artifactId>
             <version>${hcs-sxc.version}</version>
         </dependency>
-        <!-- note: remove dub test dependency to avoid conflicts
+        <!-- 
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-plugins-persistence-in-memory</artifactId>
             <version>${hcs-sxc.version}</version>
-        </dependency>-->
-       
+        </dependency>
+        -->       
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-plugins-mirror-direct</artifactId>
@@ -128,13 +128,6 @@
                 </exclusion>
             </exclusions>            
         </dependency>
-        <dependency>
-            <groupId>com.hedera</groupId>
-            <artifactId>hcs-sxc-java-plugins-persistence-in-memory</artifactId>
-            <version>${hcs-sxc.version}</version>
-            <scope>test</scope>
-        </dependency>
-        
     </dependencies>
 
     <build>

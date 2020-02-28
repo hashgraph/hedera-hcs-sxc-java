@@ -35,7 +35,7 @@ public class PersistTest {
 
         hibernateProperties.put("hibernate.dialect.H2Dialect", "org.hibernate.dialect.H2Dialect");
         hibernateProperties.put("hibernate.cache.provider_class", "org.hibernate.cache.internal.NoCacheProvider");
-        hibernateProperties.put("hibernate.show_sql", "false");
+        hibernateProperties.put("hibernate.show_sql", "true");
         hibernateProperties.put("hibernate.hbm2ddl.auto", "update");
 
         return hibernateProperties;
@@ -320,6 +320,24 @@ public class PersistTest {
         assertNull(persist.getParts(applicationMessageID2));
     }
     
+    @Test
+    public void testAddressList() throws Exception {
+        Persist persist = new Persist();
+        persist.setHibernateProperties(getHibernateProperties("testAddressList"));
+        
+        assertDoesNotThrow( () -> {persist.addAppParticipant("0", "theirEd25519PubKeyForSigning0", "sharedSymmetricEncryptionKey0");});
+        assertDoesNotThrow( () -> {persist.addAppParticipant("1", "theirEd25519PubKeyForSigning1", "sharedSymmetricEncryptionKey1");});
+        
+        Map<String, Map<String, String>> gotAddressList = persist.getAddressList();
+        
+        assertNotNull(gotAddressList.size());
+        assertEquals(2, gotAddressList.size());
+        assertEquals("theirEd25519PubKeyForSigning0", gotAddressList.get("0").get("theirEd25519PubKeyForSigning"));
+        assertEquals("sharedSymmetricEncryptionKey0", gotAddressList.get("0").get("sharedSymmetricEncryptionKey"));
+        assertEquals("theirEd25519PubKeyForSigning1", gotAddressList.get("1").get("theirEd25519PubKeyForSigning"));
+        assertEquals("sharedSymmetricEncryptionKey1", gotAddressList.get("1").get("sharedSymmetricEncryptionKey"));
+    }
+
     private List<ApplicationMessageChunk> makeApplicationMessageChunks(ApplicationMessageID applicationMessageID) {
         List<ApplicationMessageChunk> chunks = new ArrayList<ApplicationMessageChunk>();
         

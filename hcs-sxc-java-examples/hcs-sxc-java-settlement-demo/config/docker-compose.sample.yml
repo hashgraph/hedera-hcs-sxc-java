@@ -35,7 +35,7 @@ services:
    image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
    restart: on-failure
    environment:
-    APP_ID: "Carlos"
+     APP_ID: "Carlos"
      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6c
      ROLES: "BUYER,SELLER"
      PAYMENT_ACCOUNT_DETAILS: "22-11-14 70925098"

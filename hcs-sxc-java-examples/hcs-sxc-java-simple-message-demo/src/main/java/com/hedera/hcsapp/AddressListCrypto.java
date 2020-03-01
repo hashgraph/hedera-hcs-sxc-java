@@ -1,4 +1,4 @@
-package main.java.com.hedera.hcsapp;
+package com.hedera.hcsapp;
 
 /*-
  * ‌
@@ -72,9 +72,10 @@ public enum AddressListCrypto {
             InputStream inputStream = new FileInputStream(configFile.getCanonicalPath());
             Map<String, Object> obj = yaml.load(inputStream);
             addressList = (Map<String, Map<String, String>>) obj.get(appId);
-            
-  
-            
+            if (addressList == null) {
+                System.out.println("Unable to locate player in contact list, check your app id is either Player-0, Player-1 or Player-2. I have: " + appId);
+                System.exit(0);
+            }
             this.isInitialised = true;
            
         } else {

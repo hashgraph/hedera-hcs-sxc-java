@@ -41,6 +41,10 @@ public class Signing {
         return verify(plainText.getBytes(), signature, publicKey);
     }
     public static boolean verify(byte[] plainText, byte[] signature, Ed25519PublicKey publicKey)  {
+        if (signature.length == 0) {
+            log.warn("Empty signature, unable to verify");
+            return false;
+        }
         return Ed25519.verify(signature, 0, publicKey.toBytes(), 0, plainText, 0, plainText.length);
     }        
  }

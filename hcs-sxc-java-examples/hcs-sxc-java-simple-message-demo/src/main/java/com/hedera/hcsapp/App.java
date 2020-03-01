@@ -1,4 +1,4 @@
-package main.java.com.hedera.hcsapp;
+package com.hedera.hcsapp;
 
 /*-
  * ‌
@@ -48,25 +48,26 @@ public final class App {
         }
         
         int topicIndex = 0; // refers to the first topic ID in the config.yaml
-        
 
         // 1 - Init the core with data from  .env and config.yaml 
         //HCSCore hcsCore = HCSCore.INSTANCE.singletonInstance(appId);
         HCSCore hcsCore = new HCSCore().builder(appId,
-
                 "./config/config.yaml",
                 "./config/.env"+appId
         );
         
-        // 2 - Load the addressbook from address-list yaml and supply the core.
-        AddressListCrypto
-                .INSTANCE
-                .singletonInstance(appId)
-                .getAddressList()
-                .forEach((k,v)->{
-                    hcsCore.addAppParticipant(k, v.get("theirEd25519PubKeyForSigning"), v.get("sharedSymmetricEncryptionKey"));
-                });
-        
+
+        if (hcsCore.getEncryptMessages()) {
+            // 3 - Load the addressbook from address-list yaml and supply the core.
+            AddressListCrypto
+                    .INSTANCE
+                    .singletonInstance(appId)
+                    .getAddressList()
+                    .forEach((k,v)->{
+                        hcsCore.addAppParticipant(k, v.get("theirEd25519PubKeyForSigning"), v.get("sharedSymmetricEncryptionKey"));
+                    });
+        }        
+
 
         System.out.println("****************************************");
         System.out.println("** Welcome to a simple HCS demo");
@@ -76,7 +77,8 @@ public final class App {
         // create a callback object to receive the message
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsCore);
         onHCSMessageCallback.addObserver((HCSResponse hcsResponse) -> {
-            System.out.println("Received : "+ new String ( hcsResponse.getMessage() ) );
+            System.out.println("Received : ");
+            System.out.println(new String (hcsResponse.getMessage()));
         });
 
         Scanner scan = new Scanner(System.in);
@@ -86,7 +88,6 @@ public final class App {
             System.out.println("Input a message to send to other parties, type exit [RETURN] to exit the application"
                     + ":");
             String userInput = scan.nextLine();
-
            
             if (userInput.equals("exit")) {
                 scan.close();

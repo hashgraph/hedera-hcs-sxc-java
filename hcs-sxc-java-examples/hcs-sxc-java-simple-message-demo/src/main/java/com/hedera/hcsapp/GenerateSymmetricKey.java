@@ -1,4 +1,4 @@
-package com.hedera.hcs.sxc.plugin.persistence.entities;
+package com.hedera.hcsapp;
 
 /*-
  * ‌
@@ -20,21 +20,16 @@ package com.hedera.hcs.sxc.plugin.persistence.entities;
  * ‍
  */
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import lombok.Data;
-import com.hedera.hcs.sxc.interfaces.SxcAddressListItemCryptoInterface;
-import java.io.Serializable;
+import java.security.KeyPair;
+import com.hedera.hcs.sxc.plugin.cryptography.StringUtils;
+import com.hedera.hcs.sxc.plugin.cryptography.cryptography.Cryptography;
 
-@Data
-@Entity
-@Table(name = "addressListCrypto")
-public class AddressListCrypto {
+public class GenerateSymmetricKey {
 
-    @Id
-    private String appId;
-    private String theirEd25519PubKeyForSigning; // HEX
-    private String sharedSymmetricEncryptionKey; // HEX
+    public static void main(String[] args) throws Exception {
+        KeyPair kp = Cryptography.generateRsaKeyPair();
+        byte[] secretKey =  kp.getPrivate().getEncoded();
+        System.out.println("Private key : " + StringUtils.byteArrayToHexString(secretKey));
+    }
 
 }

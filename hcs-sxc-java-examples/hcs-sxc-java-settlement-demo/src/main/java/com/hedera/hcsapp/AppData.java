@@ -26,6 +26,7 @@ import java.util.Map;
 
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
+import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.utils.StringUtils;
 import com.hedera.hcsapp.appconfig.AppClient;
@@ -123,6 +124,13 @@ public final class AppData {
             System.exit(0);
         }
 
+        
+        this.hcsCore = new HCSCore()
+                .builder(this.appId, configFilePath, environmentFilePath);
+                
+        
+                //.withMessageEncryptionKey(this.messageEncryptionKey);
+        
         for (Map.Entry<String, DockerService> service : dockerCompose.getServices().entrySet()) {
             DockerService dockerService = service.getValue();
             if (dockerService.getEnvironment() != null) {
@@ -133,7 +141,21 @@ public final class AppData {
                     appClient.setPaymentAccountDetails(dockerService.getEnvironment().get("PAYMENT_ACCOUNT_DETAILS"));
                     appClient.setRoles(dockerService.getEnvironment().get("ROLES"));
                     appClient.setColor(dockerService.getEnvironment().get("COLOR"));
-                    appClient.setAppId(dockerService.getEnvironment().get("APP_ID"));
+                    String appIdD = dockerService.getEnvironment().get("APP_ID");
+                    appClient.setAppId(appIdD);
+                    if (appIdD.equals(appId)){
+                        this.hcsCore = this.hcsCore.withMessageSigningKey(
+                                Ed25519PrivateKey.fromString(
+                                        dockerService.getEnvironment().get("SIGNKEY")
+                                ));
+                        AddressListCrypto
+                            .INSTANCE
+                            .singletonInstance(appId)
+                            .getAddressList()
+                            .forEach((k,v)->{
+                                hcsCore.addAppParticipant(k, v.get("theirEd25519PubKeyForSigning"), v.get("sharedSymmetricEncryptionKey"));
+                            });
+                    }
                     appClient.setWebPort(dockerService.getPortAsInteger());
 
                     this.appClients.add(appClient);
@@ -141,8 +163,7 @@ public final class AppData {
             }
         }
 
-        this.hcsCore = new HCSCore().builder(this.appId, configFilePath, environmentFilePath);
-                //.withMessageEncryptionKey(this.messageEncryptionKey);
+        
     }
 
     public HCSCore getHCSCore() {

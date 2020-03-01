@@ -66,21 +66,24 @@ public class Persist
         String sharedSymmetricEncryptionKey;
     }
     
-    private Map<ApplicationMessageID, List<ApplicationMessageChunk>> partialMessages;
-    private Map<String, ConsensusMessageSubmitTransaction> transactions;
-    private Map<String, SxcConsensusMessage> mirrorTopicMessages;
-    private Map<String, ApplicationMessage> applicationMessages;
-    private Map<String, HCSApplicationMessage> hcsApplicationMessages;
-    private Map<String, Map<String,String>> addressList;
-    private MessagePersistenceLevel persistenceLevel = MessagePersistenceLevel.FULL;
+    private static boolean isInstantiated = false;
+    private static Map<ApplicationMessageID, List<ApplicationMessageChunk>> partialMessages;
+    private static Map<String, ConsensusMessageSubmitTransaction> transactions;
+    private static Map<String, SxcConsensusMessage> mirrorTopicMessages;
+    private static Map<String, ApplicationMessage> applicationMessages;
+    private static Map<String, HCSApplicationMessage> hcsApplicationMessages;
+    private static Map<String, Map<String,String>> addressList;
+    private static MessagePersistenceLevel persistenceLevel = MessagePersistenceLevel.FULL;
     
     public Persist() throws IOException{
+        if(isInstantiated) return;
         partialMessages = new HashMap<>();
         transactions = new HashMap<>();
         mirrorTopicMessages = new HashMap<>();
         applicationMessages = new HashMap<>();
         hcsApplicationMessages = new HashMap<>();
         addressList = new HashMap<>();
+        isInstantiated = true;
     }
     
     public void setPersistenceLevel(MessagePersistenceLevel persistenceLevel) {

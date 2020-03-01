@@ -50,7 +50,7 @@ public final class App {
         int topicIndex = 0; // refers to the first topic ID in the config.yaml
         
 
-        // 2 - Init the core with data from  .env and config.yaml 
+        // 1 - Init the core with data from  .env and config.yaml 
         //HCSCore hcsCore = HCSCore.INSTANCE.singletonInstance(appId);
         HCSCore hcsCore = new HCSCore().builder(appId,
 
@@ -58,7 +58,7 @@ public final class App {
                 "./config/.env"+appId
         );
         
-        // 3 - Load the addressbook from address-list yaml and supply the core.
+        // 2 - Load the addressbook from address-list yaml and supply the core.
         AddressListCrypto
                 .INSTANCE
                 .singletonInstance(appId)

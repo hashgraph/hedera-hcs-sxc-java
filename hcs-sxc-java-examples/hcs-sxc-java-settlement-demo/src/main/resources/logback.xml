@@ -1,13 +1,11 @@
 <configuration>
-
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <!-- encoders are assigned the type
-         ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+   
     <encoder>
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
   </appender>
-
+<!--
 <logger name="com.hedera.hcs.sxc" level="error"
         additivity="false">
     <appender-ref ref="STDOUT" />
@@ -28,8 +26,8 @@
         additivity="false">
     <appender-ref ref="STDOUT" />
 </logger>
+-->
 <root level="info">
     <appender-ref ref="STDOUT" />
-  </root>
+</root>
 </configuration>
-

@@ -283,7 +283,7 @@ public class HCSCore {
         this.persistence.setPersistenceLevel(this.messagePersistenceLevel);
     }
 
-    public SxcPersistence getPersistence() {
+        public SxcPersistence getPersistence() {
         return this.persistence;
 
     }

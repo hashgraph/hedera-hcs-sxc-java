@@ -13,7 +13,7 @@ public class AppDataTest {
         AppData appData = new AppData("./src/test/resources/config.yaml", "./src/test/resources/dotenv.sample", "./src/test/resources/docker-compose.yml");
         assertEquals(4, appData.getAppClients().size());
         assertEquals("Alice", appData.getAppId());
-        assertEquals("302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6b", appData.getPublicKey());
+        assertEquals("302a300506032b65700321000c5fd53530c52e9950e98932e2bdc35c6f9cad0069198da76a611e28d4fe434b", appData.getPublicKey());
         assertEquals(0, appData.getTopicIndex());
         assertEquals("Alice", appData.getUserName());
         assertEquals(8081, appData.getWebPort());

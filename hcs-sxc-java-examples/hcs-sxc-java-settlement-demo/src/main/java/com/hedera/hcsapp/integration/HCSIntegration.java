@@ -94,8 +94,8 @@ public class HCSIntegration {
 
     public void processHCSMessage(HCSResponse hcsResponse) {
         try {
-            ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(hcsResponse.getMessage());
-            SettlementBPM settlementBPM = SettlementBPM.parseFrom(applicationMessage.getBusinessProcessMessage().toByteArray());
+            //ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(hcsResponse.getMessage());
+            SettlementBPM settlementBPM = SettlementBPM.parseFrom(hcsResponse.getMessage());
             // (CREDIT_PENDING , r ,threadId ,credit) => (CREDIT_AWAIT_ACK ,r ,threadId , credit[threadId].txId=r.MessageId)
             String threadId = settlementBPM.getThreadID();
             if (settlementBPM.hasCredit()) {

@@ -94,7 +94,7 @@ public final class HCSMessages {
 
         credit.setCreatedDate(Utils.timestampToDate(seconds, nanos));
         credit.setCreatedTime(Utils.timestampToTime(seconds, nanos));
-        credit.setApplicationMessageId(Utils.transactionIdToString(transactionId));
+        //credit.setApplicationMessageId(Utils.transactionIdToString(transactionId));
         credit.setAutomatic(creditCreate.isAutomatic());
         credit.setThreadId(threadId);
         
@@ -112,8 +112,8 @@ public final class HCSMessages {
         credit = creditRepository.save(credit);
         new OutboundHCSMessage(appData.getHCSCore())
               //.overrideEncryptedMessages(false)
-              .overrideMessageSignature(false)
-              .withFirstTransactionId(transactionId)
+              //.overrideMessageSignature(false)
+              //.withFirstTransactionId(transactionId)
               .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
 
         log.debug("Message sent successfully.");

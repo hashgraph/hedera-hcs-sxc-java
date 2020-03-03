@@ -1,0 +1,122 @@
+version: '3.3'
+services:
+  Alice:
+    container_name: Alice
+    image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
+    restart: on-failure
+    environment:
+      APP_ID: Alice
+      ROLES: BUYER,SELLER
+      PAYMENT_ACCOUNT_DETAILS: 10-11-12 80640665
+      COLOR: 0a2c5a
+      PUBKEY: 302a300506032b6570032100d9d63da68accd8015bc145b8c4047fddaceaf3f9151e51ed61979b9b80f25ac2
+      SIGNKEY: 302e020100300506032b6570042204206c537ab9c168b38f7c6c8af5c57ae41f6e8bd104fee3ecf4eb99ecf80c15bcd9
+    ports:
+    - 8081:8081
+    volumes:
+    - ./:/config
+  Bob:
+    container_name: Bob
+    image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
+    restart: on-failure
+    environment:
+      APP_ID: Bob
+      ROLES: BUYER,SELLER
+      PAYMENT_ACCOUNT_DETAILS: 13-01-32 79832564
+      COLOR: 0d431f
+      PUBKEY: 302a300506032b6570032100d7fa4ceefc2962ea8d1d96a5392621439513f2364a3113bd7d7dc03fd3820f8e
+      SIGNKEY: 302e020100300506032b657004220420226816ea02516463da132617f6eb52ec71b6c6697b058c5d38daa56d308ba817
+    ports:
+    - 8082:8082
+    volumes:
+    - ./:/config
+  Carlos:
+    container_name: Carlos
+    image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
+    restart: on-failure
+    environment:
+      APP_ID: Carlos
+      ROLES: BUYER,SELLER
+      PAYMENT_ACCOUNT_DETAILS: 22-11-14 70925098
+      COLOR: 275f4f
+      PUBKEY: 302a300506032b6570032100fd943ec1e89830f51d7bcce80492108eeb6fb2d1b68582d9a987fd5241253e8e
+      SIGNKEY: 302e020100300506032b657004220420ff70e83042463e1bf027891269cf29683e3267d88e73db86863d4215f2e1985b
+    ports:
+    - 8083:8083
+    volumes:
+    - ./:/config
+  Diana:
+    container_name: Diana
+    image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
+    restart: on-failure
+    environment:
+      APP_ID: Diana
+      ROLES: PAYCHANNEL
+      PAYMENT_ACCOUNT_DETAILS: 12-52-23 26789524
+      COLOR: 3f370b
+      PUBKEY: 302a300506032b6570032100ef9cc5bde0f0dc669f8b8bdba76113b1aa89c011d2b755c992fa1a91e61aca37
+      SIGNKEY: 302e020100300506032b657004220420ac51b8bb4afbadbf4b9e21dd4f4d3175db6e7c18aa92ff433d4c6759bd65f40c
+    ports:
+    - 8084:8084
+    volumes:
+    - ./:/config
+  Erica:
+    container_name: Erica
+    image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
+    restart: on-failure
+    environment:
+      APP_ID: Erica
+      ROLES: BUYER,SELLER
+      PAYMENT_ACCOUNT_DETAILS: 09-34-21 46324354
+      COLOR: 49200e
+      PUBKEY: 302a300506032b65700321005f4457bfde8b4b328001d3da1cae71751795848db8c78d7949b1ad655797b952
+      SIGNKEY: 302e020100300506032b6570042204208f4aa14a91bdac82881194a54d47557cdd941b8997f89d0f9db7eb4befede740
+    ports:
+    - 8085:8085
+    volumes:
+    - ./:/config
+  Farouk:
+    container_name: Farouk
+    image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
+    restart: on-failure
+    environment:
+      APP_ID: Farouk
+      ROLES: ARBITER,AUDITOR
+      PAYMENT_ACCOUNT_DETAILS: 10-69-43 86535765
+      COLOR: 2c0f4f
+      PUBKEY: 302a300506032b6570032100e60c1f7dface53c7109f9098a90b13835b0747a28e90bf0ae449fe40ad0b7dca
+      SIGNKEY: 302e020100300506032b657004220420e543cbda11a4474eeed50e9f1b95b08539c58e5d31a2943a63e554b962c167a3
+    ports:
+    - 8086:8086
+    volumes:
+    - ./:/config
+  Grace:
+    container_name: Grace
+    image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
+    restart: on-failure
+    environment:
+      APP_ID: Grace
+      ROLES: DEMO
+      PAYMENT_ACCOUNT_DETAILS: 10-32-52 55424452
+      COLOR: 4f0500
+      PUBKEY: 302a300506032b65700321006aa99b7446d5af0d6e47dc4dbb88e6f4de7a3a7cc721f5e8b2d3cb90863d3635
+      SIGNKEY: 302e020100300506032b657004220420541d6eeda752fa20095742c2245847c6f8b33ce8ccdd5782289e9e5d97029b3e
+    ports:
+    - 8087:8087
+    volumes:
+    - ./:/config
+  Harry:
+    container_name: Harry
+    image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
+    restart: on-failure
+    environment:
+      APP_ID: Harry
+      ROLES: PAYCHANNEL
+      PAYMENT_ACCOUNT_DETAILS: 10-21-33 98321542
+      COLOR: 4d4c1f
+      PUBKEY: 302a300506032b6570032100f39abd4cf8ce584bb4a320db4049f76fb398472608c6903869dc8bd3100c8138
+      SIGNKEY: 302e020100300506032b657004220420a592028b52a25d41c692a5b9fa47f6c4d0c1773e2a0b193941e57747e8507fde
+    ports:
+    - 8088:8088
+    volumes:
+    - ./:/config

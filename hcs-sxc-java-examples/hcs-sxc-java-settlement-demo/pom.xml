@@ -84,7 +84,7 @@
         </dependency>
 
         <!-- PLUGINS -->
- <!-- note: remove dub test dependency to avoid conflicts
+        <!-- note: remove dub test dependency to avoid conflicts
        
         <dependency>
             <groupId>com.hedera</groupId>

@@ -146,7 +146,7 @@ public final class HCSMessages {
 
         new OutboundHCSMessage(appData.getHCSCore())
               //.overrideEncryptedMessages(false)
-              .overrideMessageSignature(false)
+              //.overrideMessageSignature(false)
               .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
 
         log.debug("Message sent successfully.");
@@ -214,8 +214,9 @@ public final class HCSMessages {
 
         new OutboundHCSMessage(appData.getHCSCore())
                 //.overrideEncryptedMessages(false)
-                .overrideMessageSignature(false)
-                .withFirstTransactionId(transactionId).sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
+                //.overrideMessageSignature(false)
+                //.withFirstTransactionId(transactionId)
+                .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
 
         log.debug("Message sent successfully.");
 
@@ -569,7 +570,8 @@ public final class HCSMessages {
 
         new OutboundHCSMessage(appData.getHCSCore())
                 //.overrideEncryptedMessages(false)
-                .overrideMessageSignature(false).sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
+                //.overrideMessageSignature(false)
+                .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
 
         log.debug("Message sent successfully.");
 

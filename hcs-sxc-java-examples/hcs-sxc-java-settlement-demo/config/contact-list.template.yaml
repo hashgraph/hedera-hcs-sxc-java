@@ -1,0 +1,29 @@
+# This is a temmplate defining a X -talks-to-> {Y,Z} relationship. 
+# The file docker-compose.template is required for this template to work.
+# The file is read from GenerateConfigurationFiles.class and the 
+# output is is placed in this  folder. 
+
+
+Alice :                              
+  Bob :
+  Grace :
+  Diana :
+Bob : 
+  Alice :  
+  Grace :
+Diana:
+  Alice:
+  Bob:
+Carlos:
+  Grace:
+Erica: 
+  Grace :
+Farouk :
+  Grace : 
+Grace : 
+  Alice :  
+  Bob :  
+  Carlos :
+  Diana :
+  Farouk : 
+  Erica : 

@@ -14,6 +14,7 @@ These components use the Hedera Java SDK to communicate with Hedera's HCS servic
     - *With message signature*
     - Optionally across multiple topics
 - Chunking and re-assembly of large messages (Hedera transactions are limited to 4k)
+- Pairwise symmetric key encryption between participants
 - Protobuf application message structure
 - Persistence of transactions sent and messages sent/received
     - In memory or in database via plugins. All messages are automatically persisted and made available to the application through an interface such that it can perform audit for example.
@@ -55,6 +56,7 @@ In order to provide some privacy, the HCS SXC Core component will implement plug
 Further, an encrypted message is only truly safe if the key used to decrypt it isn't known to the public, but only to the intended recipient of the message. One solution is to implement key rotation, whereby the keys used to encrypt and decrypt messages are rotated more or less frequently. Assuming rotated keys are discarded, it should not be possible to subsequently decrypt messages.
 
 Finally, the HCS SXC Core component will provide functionality such that messages can be signed (whether encrypted or not), this can be used to prove the origin of a message.
+
 
 ### Persistence
 
@@ -649,10 +651,11 @@ Now refer to the `without relay and queue` instructions for running the player a
 
 This is a more complex application which is based on spring boot with a web UI. Each instance of the application represents a participant in a settlement use case where participants can issue credit notes to each other, approve them, group them to reach a settlement amount, employ a third party to effect the payment and finally both original parties confirm the payment was completed. In addition to this, an audit log is provided so that the full history of messages between participants can be consulted.
 
-To run the demo, first create a new HCS topic using the SDK and edit the `config.yaml` file to reflect the new topic id. This is to ensure that when you run the demo, you don't receive messages from someone else who you may be sharing a topic id with - although that could be fun.
+To run the demo, first create a new HCS topic using the SDK `CreateTopic.java` and edit the `config.yaml` file to reflect the new topic id. This is to ensure that when you run the demo, you don't receive messages from someone else who you may be sharing a topic id with - although that could be fun.
 Also check other details such as the mirror node, hedera network, etc... are correct.
 
 In order to reduce the load on your computer, you may want to comment out some sections of the `docker-compose.yml` file too. Comment out the containers for Erica, Farouk, Grace and Henry, they're not strictly necessary to run the example.
+The `docker-compose.yml` also specifies App environment specific settings such as color code of each participant's interface as well as  public and private signing-keys.
 
 Also create a `.env` file with the following information
 
@@ -662,6 +665,10 @@ OPERATOR_ID=0.0.xxxx
 # APP Net
 APP_ID="Alice"
 ```
+
+
+If you want to use encryption then enable the relevant setting in `config.yaml`. The demo uses pairwise encryption and only parties that share a key can see each other's messages. The file  `contact-list.yaml` contains a sample configuration to kick start things: it has a list of participants and all parties with whom each of them can communicate. You may notice that the file does not specify the public key that corresponds to the private signing key. The public key resides in the `docker-compose.yml` file. If you want to specify custom communication relationships between participants then edit  the `contact-list.template.yaml` file  (see instruction in the file) and run `GenerateConfigurationFiles.java` to automatically generate both a `docker-compose.yml` and a `contact-list.yaml` file with all keys set. 
+
 
 This demo does not use the queue and relay components, although it's possible to enable them by modifying the `pom.xml` file of the `hcs-sxc-java-settlement-demo` project to include them, they will also need to run as docker containers.
 

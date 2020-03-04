@@ -1,6 +1,7 @@
 package com.hedera.hcsapp.integration;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +18,7 @@ import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.entities.Settlement;
 import com.hedera.hcsapp.entities.SettlementItem;
 import com.hedera.hcsapp.entities.SettlementItemId;
+import com.hedera.hcsapp.repository.AddressBookRepository;
 import com.hedera.hcsapp.repository.CreditRepository;
 import com.hedera.hcsapp.repository.SettlementItemRepository;
 import com.hedera.hcsapp.repository.SettlementRepository;
@@ -55,6 +57,9 @@ public final class HCSMessages {
     @Autowired
     private SettlementItemRepository settlementItemRepository;
     
+    @Autowired
+    private AddressBookRepository addressBookRepository;
+    
     public CreditRest creditNew(AppData appData, CreditProposal creditCreate) throws Exception {
         log.debug("creditNew");
         Instant now = Instant.now();
@@ -63,25 +68,25 @@ public final class HCSMessages {
         String threadId = Utils.getThreadId();
 
         Money value = Money.newBuilder()
-                .setCurrencyCode(creditCreate.getCurrency())
-                .setUnits(creditCreate.getAmount())
-                .build();
+            .setCurrencyCode(creditCreate.getCurrency())
+            .setUnits(creditCreate.getAmount())
+            .build();
         CreditBPM creditBPM = CreditBPM.newBuilder()
-                .setAdditionalNotes(creditCreate.getAdditionalNotes())
-                .setPayerName(creditCreate.getPayerName())
-                .setRecipientName(creditCreate.getRecipientName())
-                .setServiceRef(creditCreate.getReference())
-                .setValue(value)
-                .setCreatedDate(Utils.timestampToDate(seconds, nanos))
-                .setCreatedTime(Utils.timestampToTime(seconds, nanos))
-                .build();
+            .setAdditionalNotes(creditCreate.getAdditionalNotes())
+            .setPayerName(creditCreate.getPayerName())
+            .setRecipientName(creditCreate.getRecipientName())
+            .setServiceRef(creditCreate.getReference())
+            .setValue(value)
+            .setCreatedDate(Utils.timestampToDate(seconds, nanos))
+            .setCreatedTime(Utils.timestampToTime(seconds, nanos))
+            .build();
         SettlementBPM settlementBPM = SettlementBPM.newBuilder()
-                .setThreadID(threadId)
-                .setCredit(creditBPM)
-                .setAutomatic(creditCreate.isAutomatic())
-                .build();
+            .setThreadID(threadId)
+            .setCredit(creditBPM)
+            .setAutomatic(creditCreate.isAutomatic())
+            .build();
 
-        TransactionId transactionId = new TransactionId(appData.getHCSCore().getOperatorAccountId());
+//        TransactionId transactionId = new TransactionId(appData.getHCSCore().getOperatorAccountId());
 
         Credit credit = new Credit();
         // copy data from new credit
@@ -111,9 +116,7 @@ public final class HCSMessages {
         
         credit = creditRepository.save(credit);
         new OutboundHCSMessage(appData.getHCSCore())
-              //.overrideEncryptedMessages(false)
-              //.overrideMessageSignature(false)
-              //.withFirstTransactionId(transactionId)
+              .restrictTo(getCreditRecipientAndAuditors(credit))
               .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
 
         log.debug("Message sent successfully.");
@@ -127,14 +130,14 @@ public final class HCSMessages {
         CreditBPM creditBPM = Utils.creditBPMFromCredit(credit);
 
         CreditAckBPM creditAckBPM = CreditAckBPM.newBuilder()
-                .setCredit(creditBPM)
-                .build();
+            .setCredit(creditBPM)
+            .build();
 
         SettlementBPM settlementBPM = SettlementBPM.newBuilder()
-                .setThreadID(threadId)
-                .setCreditAck(creditAckBPM)
-                .setAutomatic(automatic)
-                .build();
+            .setThreadID(threadId)
+            .setCreditAck(creditAckBPM)
+            .setAutomatic(automatic)
+            .build();
 
         if ( ! credit.getStatus().contentEquals(States.CREDIT_AGREED.name())) {
             // avoiding race condition
@@ -145,9 +148,8 @@ public final class HCSMessages {
         }
 
         new OutboundHCSMessage(appData.getHCSCore())
-              //.overrideEncryptedMessages(false)
-              //.overrideMessageSignature(false)
-              .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
+            .restrictTo(getCreditRecipientAndAuditors(credit))
+            .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
 
         log.debug("Message sent successfully.");
 
@@ -164,21 +166,21 @@ public final class HCSMessages {
         String threadId = Utils.getThreadId();
 
         Money value = Money.newBuilder().setCurrencyCode(settleProposal.getCurrency())
-                .setUnits(settleProposal.getNetValue()).build();
+            .setUnits(settleProposal.getNetValue()).build();
         SettleProposeBPM.Builder settleProposeBPM = SettleProposeBPM.newBuilder()
-                .setAdditionalNotes(settleProposal.getAdditionalNotes()).setPayerName(settleProposal.getPayerName())
-                .setRecipientName(settleProposal.getRecipientName())
-                .setCreatedDate(Utils.timestampToDate(seconds, nanos))
-                .setCreatedTime(Utils.timestampToTime(seconds, nanos)).setNetValue(value);
+            .setAdditionalNotes(settleProposal.getAdditionalNotes()).setPayerName(settleProposal.getPayerName())
+            .setRecipientName(settleProposal.getRecipientName())
+            .setCreatedDate(Utils.timestampToDate(seconds, nanos))
+            .setCreatedTime(Utils.timestampToTime(seconds, nanos)).setNetValue(value);
 
         for (String proposedThreadId : settleProposal.getThreadIds()) {
             settleProposeBPM.addThreadIDs(proposedThreadId);
         }
 
         SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
-                .setSettlePropose(settleProposeBPM.build())
-                .setAutomatic(settleProposal.isAutomatic())
-                .build();
+            .setSettlePropose(settleProposeBPM.build())
+            .setAutomatic(settleProposal.isAutomatic())
+            .build();
 
         TransactionId transactionId = new TransactionId(appData.getHCSCore().getOperatorAccountId());
 
@@ -213,10 +215,8 @@ public final class HCSMessages {
         }
 
         new OutboundHCSMessage(appData.getHCSCore())
-                //.overrideEncryptedMessages(false)
-                //.overrideMessageSignature(false)
-                //.withFirstTransactionId(transactionId)
-                .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
+            .restrictTo(getSettlementRecipientAndAuditors(settlement))
+            .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
 
         log.debug("Message sent successfully.");
 
@@ -558,7 +558,6 @@ public final class HCSMessages {
         
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
-        
 
         if ( ! settlement.getStatus().contentEquals(newState.name())) {
             settlement.setStatus(newState.name() + "_PENDING");
@@ -568,14 +567,83 @@ public final class HCSMessages {
 
         Settlement newSettlement = settlementRepository.save(settlement);
 
-        new OutboundHCSMessage(appData.getHCSCore())
-                //.overrideEncryptedMessages(false)
-                //.overrideMessageSignature(false)
-                .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
+        switch (newState) {
+        
+        case SETTLE_PROPOSED:
+        case SETTLE_PAY_CHANNEL_PROPOSED:
+        case SETTLE_RCPT_REQUESTED:
+            // from payer to receiver
+            new OutboundHCSMessage(appData.getHCSCore())
+            .restrictTo(getSettlementRecipientAndAuditors(newSettlement))
+            .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
+            break;
+        case SETTLE_AGREED:
+        case SETTLE_PAY_CHANNEL_AGREED:
+        case SETTLE_RCPT_CONFIRMED:
+            // from receiver to payer
+            new OutboundHCSMessage(appData.getHCSCore())
+            .restrictTo(getSettlementPayerAndAuditors(newSettlement))
+            .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
+            break;
+
+        case SETTLE_PAY_PROPOSED:
+        case SETTLE_PAY_CONFIRMED:
+        case SETTLE_COMPLETE:
+            // from payer to pay channel
+            new OutboundHCSMessage(appData.getHCSCore())
+            .restrictTo(getSettlementPayChannelAndAuditors(newSettlement))
+            .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
+            break;
+
+        case SETTLE_PAY_AGREED:
+        case SETTLE_PAY_MADE:
+        case SETTLE_PAY_ACK:
+            // from pay channel to payer
+            new OutboundHCSMessage(appData.getHCSCore())
+            .restrictTo(getSettlementPayerAndAuditors(newSettlement))
+            .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
+            break;
+        default:
+            // do nothing
+        }
 
         log.debug("Message sent successfully.");
 
         SettlementRest settlementResponse = new SettlementRest(newSettlement, appData, settlementItemRepository, creditRepository);
         return settlementResponse;
+    }
+    
+    private List<String> getAuditors() {
+        List<String> auditorList = addressBookRepository.findNamesByRole("AUDITOR");
+        if (auditorList == null) {
+            return new ArrayList<String>();
+        } else {
+            return auditorList;
+        }
+    }
+    private List<String> getCreditPayerAndAuditors(Credit credit) {
+        List<String> userList = getAuditors();
+        userList.add(credit.getPayerName());
+        return userList;
+    }
+    private List<String> getCreditRecipientAndAuditors(Credit credit) {
+        List<String> userList = getAuditors();
+        userList.add(credit.getRecipientName());
+        return userList;
+    }
+    private List<String> getSettlementPayerAndAuditors(Settlement settlement) {
+        List<String> userList = getAuditors();
+        userList.add(settlement.getPayerName());
+        return userList;
+    }
+    private List<String> getSettlementRecipientAndAuditors(Settlement settlement) {
+        List<String> userList = getAuditors();
+        userList.add(settlement.getRecipientName());
+        return userList;
+    }
+    private List<String> getSettlementPayChannelAndAuditors(Settlement settlement) {
+        List<String> userList = getAuditors();
+        userList.add(settlement.getPaymentChannelName());
+        return userList;
     }
 }

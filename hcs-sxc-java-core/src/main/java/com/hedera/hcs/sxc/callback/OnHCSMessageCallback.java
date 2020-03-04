@@ -136,7 +136,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
             if (messageEnvelopeOptional.isPresent()){ // is present if all parts received
               
                 ApplicationMessage appMessage = messageEnvelopeOptional.get();
-
+                
                 if(this.encryptMessages){
                    
                     try {
@@ -157,7 +157,6 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                         boolean wasMessageSentByMe = applicationMessageEntity != null && applicationMessageEntity.getLastChronoPartConsensusTimestamp() == null;
 
                         if (wasMessageSentByMe){  // this is a message I just sent out myself
-                            
                             // the message is not encrypted; check if it's good and just add missing consensus information store it back and notify observers that it has come back
                             ApplicationMessage clearTextAppMessage = ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage());
                             
@@ -170,27 +169,23 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                             byte[] signShaClrTxt = Signing.sign(shaClrTxt, hcsCore.getMessageSigningKey());
                             
                             if (! Arrays.equals(signShaClrTxt, appMessage.getBusinessProcessSignature().toByteArray())){
-                                System.out.println("Illegal message detected, exiting ...");
-                                System.exit(0);
-                            } 
-                            
-                            //message is `good` store it  back with consensus data applied to it.  
-                            this.hcsCore.getPersistence().storeApplicationMessage(
-                                //TODO Add addressee
-                                ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage()) ,
-                                sxcConsensusMesssage.consensusTimestamp,
-                                StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),
-                                sxcConsensusMesssage.sequenceNumber
-                            );
-                            notifyObservers( clearTextAppMessage.getBusinessProcessMessage().toByteArray(), clearTextAppMessage.getApplicationMessageId());
-                            
+                                log.error("Illegal message detected, not processing ...");
+                            } else { 
+                                //message is `good` store it  back with consensus data applied to it.  
+                                this.hcsCore.getPersistence().storeApplicationMessage(
+                                    //TODO Add addressee
+                                    ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage()) ,
+                                    sxcConsensusMesssage.consensusTimestamp,
+                                    StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),
+                                    sxcConsensusMesssage.sequenceNumber
+                                );
+                                notifyObservers( clearTextAppMessage.getBusinessProcessMessage().toByteArray(), clearTextAppMessage.getApplicationMessageId());
+                            }                            
                         } else { // the message was not sent by me 
                                  // I need to loop through the addressbook and 
                                  // if the message was sent to me then I need to find who sent it to me  and find the shared key to decrypt it. 
                              
-                                 
-                           
-                            boolean isMessageForMe = false;
+                            boolean messageIsForMe = false;
                           
                             byte[] decryptedBPM  = null;
                             // loop through signatures in address book and keep 
@@ -217,10 +212,10 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                                 StringUtils.byteArrayToHexString(decryptedBPM)
                                         );
                                         if (! Hashing.matchSHA(shaClrTxt, appMessage.getBusinessProcessHash().toByteArray())){
-                                            System.out.println("Corrupt detected, exiting ...");
-                                            System.exit(0);
+                                            log.error("Corrupt message detected.");
+                                            throw new Exception("Corrupt message detected.");
                                         } 
-                                        isMessageForMe = true;
+                                        messageIsForMe = true;
                                         break;
                                    } catch (Exception e){
                                        continue;
@@ -229,12 +224,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                             }
                             
                             
-                            if (! isMessageForMe){
-                                 // just skip, do nothing. 
-                            
-                                          
-                            } else {
-                               
+                            if (messageIsForMe){
                                 try  { Any any = Any.parseFrom(decryptedBPM); // if fails goto catch block - TODO, use typing to avoid control flow
                                                                               // if succeeds then it is
                                     if(any.is(KeyRotationInitialise.class)){  //======= KR1==========================================

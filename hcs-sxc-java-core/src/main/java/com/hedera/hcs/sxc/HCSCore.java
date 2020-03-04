@@ -175,8 +175,13 @@ public class HCSCore {
         return this;
     }
     
-    public HCSCore addAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey){
-        this.getPersistence().addAppParticipant(appId, theirEd25519PubKeyForSigning, sharedSymmetricEncryptionKey);
+    public HCSCore addOrUpdateAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey){
+        this.getPersistence().addOrUpdateAppParticipant(appId, theirEd25519PubKeyForSigning, sharedSymmetricEncryptionKey);
+        return this;
+    }
+    
+    public HCSCore removeAppParticipant(String appId){
+        this.getPersistence().removeAppParticipant(appId);
         return this;
     }
     

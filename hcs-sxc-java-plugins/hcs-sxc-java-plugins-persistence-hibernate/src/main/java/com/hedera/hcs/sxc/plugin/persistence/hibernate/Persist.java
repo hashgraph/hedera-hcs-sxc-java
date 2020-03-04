@@ -556,23 +556,7 @@ implements SxcPersistence{
         return ks.getPublicKey();
     }
 
-    @Override
-    public void addAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey) {
-        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
-        AddressListCrypto addressListCrypto = new AddressListCrypto();
-        addressListCrypto.setAppId(appId);
-        addressListCrypto.setSharedSymmetricEncryptionKey(sharedSymmetricEncryptionKey);
-        addressListCrypto.setTheirEd25519PubKeyForSigning(theirEd25519PubKeyForSigning);
 
-        // start a transaction
-        Transaction dbTransaction = null;
-        dbTransaction = session.beginTransaction();
-        session.save(addressListCrypto);
-        // commit transaction
-        session.flush();
-        dbTransaction.commit();
-        session.close();
-    }
 
     @Override
     public Map<String, Map<String, String>> getAddressList() {
@@ -587,6 +571,41 @@ implements SxcPersistence{
         
         session.close();
         return response;
+    }
+
+    @Override
+    public void addOrUpdateAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey) {
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        AddressListCrypto addressListCrypto = new AddressListCrypto();
+        addressListCrypto.setAppId(appId);
+        addressListCrypto.setSharedSymmetricEncryptionKey(sharedSymmetricEncryptionKey);
+        addressListCrypto.setTheirEd25519PubKeyForSigning(theirEd25519PubKeyForSigning);
+
+        // start a transaction
+        Transaction dbTransaction = null;
+        dbTransaction = session.beginTransaction();
+        session.saveOrUpdate(addressListCrypto);
+        // commit transaction
+        session.flush();
+        dbTransaction.commit();
+        session.close();
+
+    }
+
+    @Override
+    public void removeAppParticipant(String appId) {
+        Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
+        AddressListCrypto addressListCrypto = session.find(AddressListCrypto.class, appId);
+        
+        // start a transaction
+        Transaction dbTransaction = null;
+        dbTransaction = session.beginTransaction();
+        session.delete(addressListCrypto);
+        // commit transaction
+        session.flush();
+        dbTransaction.commit();
+        session.close();
+    
     }
 
     

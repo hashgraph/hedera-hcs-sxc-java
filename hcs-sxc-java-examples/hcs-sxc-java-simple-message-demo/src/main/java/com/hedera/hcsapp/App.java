@@ -64,7 +64,7 @@ public final class App {
                     .singletonInstance(appId)
                     .getAddressList()
                     .forEach((k,v)->{
-                        hcsCore.addAppParticipant(k, v.get("theirEd25519PubKeyForSigning"), v.get("sharedSymmetricEncryptionKey"));
+                        hcsCore.addOrUpdateAppParticipant(k, v.get("theirEd25519PubKeyForSigning"), v.get("sharedSymmetricEncryptionKey"));
                     });
         }        
 

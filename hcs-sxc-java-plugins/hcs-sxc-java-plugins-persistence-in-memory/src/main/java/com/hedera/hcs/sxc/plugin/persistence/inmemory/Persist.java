@@ -45,7 +45,7 @@ import lombok.Data;
 public class Persist 
         implements com.hedera.hcs.sxc.interfaces.SxcPersistence{
 
- 
+
     
     @Data
     public class HCSApplicationMessage implements  SxcApplicationMessageInterface, Serializable{
@@ -288,9 +288,15 @@ public class Persist
     }
     
     @Override
-    public void addAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey) {
+    public void addOrUpdateAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey) {
         this.addressList.put(appId, Map.of("theirEd25519PubKeyForSigning", theirEd25519PubKeyForSigning, "sharedSymmetricEncryptionKey", sharedSymmetricEncryptionKey));
     }
-    
+    @Override
+    public void removeAppParticipant(String appId) {
+        this.addressList.remove(appId);
+
+    }
+
+ 
    
 }

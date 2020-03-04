@@ -26,6 +26,7 @@ import javax.persistence.Table;
 import lombok.Data;
 import com.hedera.hcs.sxc.interfaces.SxcAddressListItemCryptoInterface;
 import java.io.Serializable;
+import javax.persistence.Column;
 
 @Data
 @Entity
@@ -35,6 +36,7 @@ public class AddressListCrypto {
     @Id
     private String appId;
     private String theirEd25519PubKeyForSigning; // HEX
+    @Column(length=2500)
     private String sharedSymmetricEncryptionKey; // HEX
 
 }

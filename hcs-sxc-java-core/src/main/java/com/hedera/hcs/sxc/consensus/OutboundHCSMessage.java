@@ -196,14 +196,22 @@ public final class OutboundHCSMessage {
     }
     
     public OutboundHCSMessage restrictTo(String... appIds){
-        Map<String, Map<String, String>> newAddressList = this.addressList;
+        Map<String, Map<String, String>> newAddressList = new HashMap<String, Map<String, String>>();
+        for (String appId: appIds ){
+            newAddressList.put(appId, this.addressList.get(appId));
+        }
+        return this;
+    }
+
+    public OutboundHCSMessage restrictTo(List<String> appIds){
+        Map<String, Map<String, String>> newAddressList = new HashMap<String, Map<String, String>>();
         for (String appId: appIds ){
             newAddressList.put(appId, this.addressList.get(appId));
         }
         this.addressList = newAddressList;
         return this;
     }
-
+    
      /**
      * Sends a single cleartext message but doesn't sent to hedera 
      * This is for testing purposes only
@@ -442,8 +450,6 @@ public final class OutboundHCSMessage {
                 applicationMessageBuilder.setBusinessProcessMessage(
                         ByteString.copyFrom(encryptedMessage)
                 );
-                
-                
                 
                 applicationMessage = applicationMessageBuilder.build();
                 

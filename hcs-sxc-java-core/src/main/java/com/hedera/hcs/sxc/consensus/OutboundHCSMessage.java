@@ -243,6 +243,7 @@ public final class OutboundHCSMessage {
         if (encryptMessages) { // send  to specific users 
             if (this.addressList != null){ // get it from .env
                 for (String recipient : addressList.keySet()){
+                    log.debug("Sending to " + recipient);
                     TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, recipient, byPassSending);
                     txIdList.add(doSendMessageTxId);
                 }                
@@ -255,7 +256,6 @@ public final class OutboundHCSMessage {
             TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, null, byPassSending);
             txIdList.add(doSendMessageTxId);     
         }
-        
         
         return txIdList;
     }
@@ -449,7 +449,7 @@ public final class OutboundHCSMessage {
                     String encryptionKey = recipientKeys.get("sharedSymmetricEncryptionKey");
                     Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
                     SxcMessageEncryption encPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
-                    //Any.pack(message);
+                    log.debug("Encrypting message with key " + encryptionKey.substring(encryptionKey.length()-10, encryptionKey.length()-1));
                     byte[] encryptedMessage = encPlugin.encrypt(
                             StringUtils.hexStringToByteArray(encryptionKey)
                             , message);

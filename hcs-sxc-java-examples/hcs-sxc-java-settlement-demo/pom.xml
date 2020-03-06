@@ -84,7 +84,6 @@
         </dependency>
 
         <!-- PLUGINS -->
-       <!-- note: remove dub test dependency to avoid conflicts
     
         <dependency>
             <groupId>com.hedera</groupId>
@@ -92,12 +91,13 @@
             <version>${hcs-sxc.version}</version>
             <scope>compile</scope>
         </dependency>
-           -->    
+<!-- 
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-plugins-persistence-in-memory</artifactId>
             <version>${hcs-sxc.version}</version>
         </dependency>
+ -->    
     
         <dependency>
             <groupId>com.hedera</groupId>

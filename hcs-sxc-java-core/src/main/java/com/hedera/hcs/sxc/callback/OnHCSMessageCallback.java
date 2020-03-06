@@ -157,6 +157,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                         boolean wasMessageSentByMe = applicationMessageEntity != null && applicationMessageEntity.getLastChronoPartConsensusTimestamp() == null;
 
                         if (wasMessageSentByMe){  // this is a message I just sent out myself
+                            log.debug("Mirror notification with message I sent");
                             // the message is not encrypted; check if it's good and just add missing consensus information store it back and notify observers that it has come back
                             ApplicationMessage clearTextAppMessage = ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage());
                             
@@ -184,6 +185,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                         } else { // the message was not sent by me 
                                  // I need to loop through the addressbook and 
                                  // if the message was sent to me then I need to find who sent it to me  and find the shared key to decrypt it. 
+                            log.debug("Mirror notification with message I didn't send");
                              
                             boolean messageIsForMe = false;
                           
@@ -202,10 +204,12 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                             appMessage.getBusinessProcessSignature().toByteArray(),
                                             theirPubKey)
                                 ){
+                                    log.debug("Signature verification on message passed with " + appId + ", message is from them.");
                                     try { 
-                                        byte[] sharedKey = StringUtils.hexStringToByteArray(
-                                               keyMap.get("sharedSymmetricEncryptionKey")
-                                        ); 
+                                        String key = keyMap.get("sharedSymmetricEncryptionKey");
+                                        byte[] sharedKey = StringUtils.hexStringToByteArray(key); 
+                                        log.debug("Decrypting message with key " + key.substring(key.length()-10, key.length()-1));
+                                        
                                         decryptedBPM = this.messageEncryptionPlugin.decrypt(sharedKey, appMessage.getBusinessProcessMessage().toByteArray());
                                         //test if the message is illegal
                                         byte[] shaClrTxt = Hashing.sha(
@@ -215,9 +219,11 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                             log.error("Corrupt message detected.");
                                             throw new Exception("Corrupt message detected.");
                                         } 
+                                        log.debug("Able to decrypt message");
                                         messageIsForMe = true;
                                         break;
                                    } catch (Exception e){
+                                       log.debug("Unable to decrypt message");
                                        continue;
                                    }
                                 }
@@ -225,6 +231,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                             
                             
                             if (messageIsForMe){
+                                log.debug("Message is for me, parsing");
                                 try  { Any any = Any.parseFrom(decryptedBPM); // if fails goto catch block - TODO, use typing to avoid control flow
                                                                               // if succeeds then it is
                                     if(any.is(KeyRotationInitialise.class)){  //======= KR1==========================================
@@ -391,6 +398,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                     }  
                     
                 } else { // not encrypted
+                    log.debug("Received clear text message");
                     this.hcsCore.getPersistence().storeApplicationMessage(
                             messageEnvelopeOptional.get(),
                             sxcConsensusMesssage.consensusTimestamp,

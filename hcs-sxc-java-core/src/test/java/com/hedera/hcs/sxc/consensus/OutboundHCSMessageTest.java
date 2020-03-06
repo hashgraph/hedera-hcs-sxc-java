@@ -41,16 +41,20 @@ public class OutboundHCSMessageTest {
     
    
     @Test
-    public void testSingleChunking() {
-        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),null,"Single Chunk Message".getBytes(),null);
+    public void testSingleChunking() throws Exception {
+        HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),hcsCore,"Single Chunk Message".getBytes(),null);
         assertTrue(chunks.size() == 1);
         
-    }
+    }        
     
     @Test
-    public void testMultiChunking() {
+    public void testMultiChunking() throws Exception {
+        HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+
         String longString = RandomStringUtils.random(5000, true, true);
-        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)) ,null,longString.getBytes(),null);
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)) ,hcsCore,longString.getBytes(),null);
         assertTrue(chunks.size() == 2);
     }
     

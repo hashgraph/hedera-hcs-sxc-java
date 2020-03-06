@@ -25,10 +25,13 @@ import com.hedera.hcs.sxc.plugin.cryptography.StringUtils;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.security.KeyPair;
+import java.security.Security;
+import java.util.Base64;
 import org.junit.jupiter.api.Test;
 
 public class CryptographyTest {
     public CryptographyTest() {
+        
     }
    
     @Test
@@ -36,8 +39,8 @@ public class CryptographyTest {
         byte[] secretKey=null;
         String cleartext = "Hear my cries Hear 234sdf! �$%&*)_+ my call Lend me your ears See my fall See my error Know my faults Time halts See my loss ";
 
-        KeyPair kp = Cryptography.generateRsaKeyPair();
-        secretKey =  kp.getPrivate().getEncoded();
+       // KeyPair kp = Cryptography.generateRsaKeyPair();
+        secretKey =  Cryptography.generateSecretKey();
 
         byte[] encrypt = Cryptography.load().encrypt(secretKey, StringUtils.stringToByteArray(cleartext));
         byte[] encryptClearText = Cryptography.load().encryptFromClearText(secretKey, cleartext);
@@ -49,6 +52,33 @@ public class CryptographyTest {
         assertArrayEquals(StringUtils.stringToByteArray(cleartext), decrypt); 
 
         String decryptString = Cryptography.load().decryptToClearText(secretKey, encrypt);
+        assertEquals(cleartext, decryptString); 
+    }
+    
+    @Test
+    public void testEncryptAndDecryptWithDifferentKeys() throws Exception {
+        byte[] secretKey= Cryptography.generateSecretKey();
+        
+        String encodeToString = Base64.getEncoder().encodeToString(secretKey);
+        String byteArrayToHexString = StringUtils.byteArrayToHexString(secretKey);
+        
+        String cleartext = "Hear my cries Hear 234sdf! �$%&*)_+ my call Lend me your ears See my fall See my error Know my faults Time halts See my loss ";
+
+        
+        byte[] aliceDianaSecret = StringUtils.hexStringToByteArray("0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF");
+        byte[] aliceBobSecret =   StringUtils.hexStringToByteArray("0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF");
+        
+        
+        byte[] encrypt = Cryptography.load().encrypt(aliceDianaSecret, StringUtils.stringToByteArray(cleartext));
+        byte[] encryptClearText = Cryptography.load().encryptFromClearText(aliceDianaSecret, cleartext);
+        
+        assertArrayEquals(encrypt, encryptClearText);
+        
+        byte[] decrypt = Cryptography.load().decrypt(aliceBobSecret, encrypt);
+        
+        assertArrayEquals(StringUtils.stringToByteArray(cleartext), decrypt); 
+
+        String decryptString = Cryptography.load().decryptToClearText(aliceBobSecret, encrypt);
         assertEquals(cleartext, decryptString); 
     }
 

@@ -196,11 +196,7 @@ public final class OutboundHCSMessage {
     }
     
     public OutboundHCSMessage restrictTo(String... appIds){
-        Map<String, Map<String, String>> newAddressList = new HashMap<String, Map<String, String>>();
-        for (String appId: appIds ){
-            newAddressList.put(appId, this.addressList.get(appId));
-        }
-        return this;
+       return restrictTo(List.of(appIds));
     }
 
     public OutboundHCSMessage restrictTo(List<String> appIds){
@@ -320,6 +316,9 @@ public final class OutboundHCSMessage {
             
             // after sending all parts check if key rotation is due
             if (rotateKeys) {
+                
+                /** ROTATION CODE - UNCOMMENT TO ENABLE
+                
                 if (!this.encryptMessages) {
                     throw new Exception("Trying to initiate key rotation but encryption is disabled");   
                 }
@@ -392,6 +391,7 @@ public final class OutboundHCSMessage {
                             log.warn("Not sending, bypassing sending for testing");
                         }
                     }
+                ROTATION CODE - UNCOMMENT TO ENABLE */
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

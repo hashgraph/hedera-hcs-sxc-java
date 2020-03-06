@@ -58,11 +58,11 @@ public class GenerateConfigurationFiles {
             Files.write(file, lines, StandardCharsets.UTF_8);
         }
 
-        KeyPair kp = Cryptography.generateRsaKeyPair();
-        byte[] secretKey =  kp.getPrivate().getEncoded();
+        //KeyPair kp = Cryptography.generateRsaKeyPair();
+        byte[] secretKey = Cryptography.generateSecretKey();
         String P0P1 = StringUtils.byteArrayToHexString(secretKey);
-        kp = Cryptography.generateRsaKeyPair();
-        secretKey =  kp.getPrivate().getEncoded();
+        //kp = Cryptography.generateRsaKeyPair();
+        secretKey =  Cryptography.generateSecretKey();
         String P0P2 = StringUtils.byteArrayToHexString(secretKey);
         
         File pathToFile = new File("./config/contact-list.yaml");

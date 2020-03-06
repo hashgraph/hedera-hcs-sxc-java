@@ -88,9 +88,9 @@ public class GenerateConfigurationFiles {
                      // set pair wise shared keys
                     for (String playerInAddress : addressTemplate.keySet()){
                         if (addressTemplate.get(playerInAddress).containsKey(player)){
-                            //if (addressTemplate.get(playerInAddress).get(player) == null){
+                                //if (addressTemplate.get(playerInAddress).get(player) == null){
                                 //Map<String, String> p = addressTemplate.get(playerInAddress).get(player);
-                                String sharedKey = StringUtils.byteArrayToHexString( Cryptography.generateRsaKeyPair().getPrivate().getEncoded());
+                                String sharedKey = StringUtils.byteArrayToHexString( Cryptography.generateSecretKey());
                                 //Map<String,String> m2 = new HashMap<>();
                                 
                                 addressTemplate.get(playerInAddress)
@@ -106,7 +106,6 @@ public class GenerateConfigurationFiles {
                                 }
                             }    
                         //}   
-                        
                    
                     }
                     

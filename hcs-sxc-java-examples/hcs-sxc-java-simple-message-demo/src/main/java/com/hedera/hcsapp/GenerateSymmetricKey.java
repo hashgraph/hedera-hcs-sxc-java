@@ -27,8 +27,7 @@ import com.hedera.hcs.sxc.plugin.cryptography.cryptography.Cryptography;
 public class GenerateSymmetricKey {
 
     public static void main(String[] args) throws Exception {
-        KeyPair kp = Cryptography.generateRsaKeyPair();
-        byte[] secretKey =  kp.getPrivate().getEncoded();
+        byte[] secretKey =  Cryptography.generateSecretKey();
         System.out.println("Private key : " + StringUtils.byteArrayToHexString(secretKey));
     }
 

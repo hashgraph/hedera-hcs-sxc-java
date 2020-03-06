@@ -1,5 +1,6 @@
 package com.hedera.hcs.sxc.plugin.cryptography.cryptography;
       
+import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
 import com.hedera.hcs.sxc.plugin.cryptography.StringUtils;
 
@@ -33,10 +34,12 @@ import java.security.KeyPairGenerator;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.Security;
 import javax.crypto.BadPaddingException;
 
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -46,6 +49,10 @@ public class Cryptography implements SxcMessageEncryption {
     
      public static Cryptography load(){
          return new Cryptography();
+     }
+     
+     public void Cryptography(){
+         Security.setProperty("crypto.policy", "unlimited");
      }
     
     /**
@@ -71,7 +78,8 @@ public class Cryptography implements SxcMessageEncryption {
             BadPaddingException, 
             UnsupportedEncodingException, 
             InvalidAlgorithmParameterException{
-        SecretKeySpec aesKey = new SecretKeySpec(sharedSecret, 0, 16, "AES");
+        if (sharedSecret.length!=32) throw new IllegalArgumentException("Key must be 32 bytes long");
+        SecretKeySpec aesKey = new SecretKeySpec(sharedSecret, "AES");
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
         cipher.init(Cipher.ENCRYPT_MODE, aesKey, new GCMParameterSpec(128, new byte[16]));
         byte[] ciphertext = cipher.doFinal(cleartext);
@@ -105,7 +113,7 @@ public class Cryptography implements SxcMessageEncryption {
             BadPaddingException,
             IOException
     {
-        SecretKeySpec aesKey = new SecretKeySpec(sharedSecret,0, 16, "AES"); 
+        SecretKeySpec aesKey = new SecretKeySpec(sharedSecret, "AES"); 
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
         cipher.init(Cipher.DECRYPT_MODE, aesKey, new GCMParameterSpec(128, new byte[16]));
         return cipher.doFinal(ciphertext);  
@@ -119,6 +127,8 @@ public class Cryptography implements SxcMessageEncryption {
             BadPaddingException, 
             UnsupportedEncodingException, 
             InvalidAlgorithmParameterException{
+        //if (sharedSecret.length!=32) throw new IllegalArgumentException("Key must be 32 bytes long");
+        
         return encrypt(sharedSecret, StringUtils.stringToByteArray(cleartext));
     }
     
@@ -149,6 +159,7 @@ public class Cryptography implements SxcMessageEncryption {
             BadPaddingException,
             IOException
     {
+        //if (sharedSecret.length!=32) throw new IllegalArgumentException("Key must be 32 bytes long");
         return StringUtils.byteArrayToString(decrypt(sharedSecret, ciphertext));
     }
     
@@ -157,10 +168,12 @@ public class Cryptography implements SxcMessageEncryption {
      * @return the KeyPair
      * @throws Exception 
      */
-    public static KeyPair generateRsaKeyPair() throws Exception {
-        KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-        generator.initialize(2048, new SecureRandom());
-        KeyPair pair = generator.generateKeyPair();
-        return pair;
+
+    public static byte[] generateSecretKey() throws Exception {
+        KeyGenerator generator = KeyGenerator.getInstance("AES");
+        generator.init(256);
+        //KeyPair pair = generator.generateKeyPair();
+        return generator.generateKey().getEncoded();
     }
+    
  }

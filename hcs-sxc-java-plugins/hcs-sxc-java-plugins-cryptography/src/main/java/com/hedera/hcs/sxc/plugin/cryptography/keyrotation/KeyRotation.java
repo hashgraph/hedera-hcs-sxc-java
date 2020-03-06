@@ -54,7 +54,7 @@ public class KeyRotation implements SxcKeyRotation{
         byte[] initiatorPubKeyEnc  = null;    
 
         KeyPairGenerator initiatorKeypairGen = KeyPairGenerator.getInstance("DH");
-        initiatorKeypairGen.initialize(2048);// 2048 if otherside not known
+        initiatorKeypairGen.initialize(2048);// 256 byte keys
         KeyPair initiatorKeypair = initiatorKeypairGen.generateKeyPair();
         // keep the agreement in memory to reuse when responder sends its public key back to initiator
         initiatorKeyAgree = KeyAgreement.getInstance("DH");

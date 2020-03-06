@@ -30,6 +30,7 @@ import com.hedera.hcsapp.restclasses.SettlementRest;
 import lombok.extern.log4j.Log4j2;
 import proto.CreditAckBPM;
 import proto.CreditBPM;
+import proto.CreditToSettle;
 import proto.Money;
 import proto.PaymentInitAckBPM;
 import proto.PaymentInitBPM;
@@ -85,8 +86,6 @@ public final class HCSMessages {
             .setCredit(creditBPM)
             .setAutomatic(creditCreate.isAutomatic())
             .build();
-
-//        TransactionId transactionId = new TransactionId(appData.getHCSCore().getOperatorAccountId());
 
         Credit credit = new Credit();
         // copy data from new credit
@@ -148,7 +147,7 @@ public final class HCSMessages {
         }
 
         new OutboundHCSMessage(appData.getHCSCore())
-            .restrictTo(getCreditRecipientAndAuditors(credit))
+            .restrictTo(getCreditPayerAndAuditors(credit))
             .sendMessage(appData.getTopicIndex(), settlementBPM.toByteArray());
 
         log.debug("Message sent successfully.");
@@ -327,8 +326,42 @@ public final class HCSMessages {
                         .setPayerAccountDetails(payerAccountDetails)
                         .setRecipientAccountDetails(recipientAccountDetails)
                         .setAdditionalNotes(additionalNotes)
-                        .setNetValue(Utils.moneyFromSettlement(settlement.get()));
-    
+                        .setCreatedDate(settlement.get().getCreatedDate())
+                        .setCreatedTime(settlement.get().getCreatedTime())
+                        .setNetValue(Utils.moneyFromSettlement(settlement.get()))
+                        .setPaymentChannelName(settlement.get().getPaymentChannelName());
+
+                // get list of credits for this settlement and add to the payment init message
+                // so that the payment channel has all the necessary details
+                settlementItemRepository.findAllSettlementItems(settlement.get().getThreadId()).forEach(
+                        (settlementItem) -> {
+                            creditRepository.findById(settlementItem.getId().getSettledThreadId()).ifPresent(
+                                    (credit) -> {
+                                        Money value = Money.newBuilder()
+                                                .setCurrencyCode(credit.getCurrency())
+                                                .setUnits(credit.getAmount())
+                                                .build();
+                                        CreditBPM creditBPM = CreditBPM.newBuilder()
+                                                .setAdditionalNotes(credit.getAdditionalNotes())
+                                                .setApplicationMessageID(credit.getApplicationMessageId())
+                                                .setCreatedDate(credit.getCreatedDate())
+                                                .setCreatedTime(credit.getCreatedTime())
+                                                .setPayerName(credit.getPayerName())
+                                                .setRecipientName(credit.getRecipientName())
+                                                .setServiceRef(credit.getReference())
+                                                .setValue(value)
+                                                .setThreadId(credit.getThreadId())
+                                                .build();
+                                        CreditToSettle creditToSettle = CreditToSettle.newBuilder()
+                                                .setCreditThreadID(credit.getThreadId())
+                                                .setCredit(creditBPM)
+                                                .build();
+                                        paymentInitBPM.addCreditsToSettle(creditToSettle);
+                                    }
+                            );
+                        }
+                );
+                
                 SettlementBPM settlementBPM = SettlementBPM.newBuilder().setThreadID(threadId)
                         .setPaymentInit(paymentInitBPM)
                         .setAutomatic(automatic)
@@ -567,6 +600,8 @@ public final class HCSMessages {
 
         Settlement newSettlement = settlementRepository.save(settlement);
 
+        log.debug("New State : " + newState);
+        
         switch (newState) {
         
         case SETTLE_PROPOSED:
@@ -587,8 +622,8 @@ public final class HCSMessages {
             break;
 
         case SETTLE_PAY_PROPOSED:
+        case SETTLE_PAY_ACK:
         case SETTLE_PAY_CONFIRMED:
-        case SETTLE_COMPLETE:
             // from payer to pay channel
             new OutboundHCSMessage(appData.getHCSCore())
             .restrictTo(getSettlementPayChannelAndAuditors(newSettlement))
@@ -597,7 +632,7 @@ public final class HCSMessages {
 
         case SETTLE_PAY_AGREED:
         case SETTLE_PAY_MADE:
-        case SETTLE_PAY_ACK:
+        case SETTLE_COMPLETE:
             // from pay channel to payer
             new OutboundHCSMessage(appData.getHCSCore())
             .restrictTo(getSettlementPayerAndAuditors(newSettlement))
@@ -624,26 +659,38 @@ public final class HCSMessages {
     private List<String> getCreditPayerAndAuditors(Credit credit) {
         List<String> userList = getAuditors();
         userList.add(credit.getPayerName());
+        outputUserList(userList);
         return userList;
     }
     private List<String> getCreditRecipientAndAuditors(Credit credit) {
         List<String> userList = getAuditors();
         userList.add(credit.getRecipientName());
+        outputUserList(userList);
         return userList;
     }
     private List<String> getSettlementPayerAndAuditors(Settlement settlement) {
         List<String> userList = getAuditors();
         userList.add(settlement.getPayerName());
+        outputUserList(userList);
         return userList;
     }
     private List<String> getSettlementRecipientAndAuditors(Settlement settlement) {
         List<String> userList = getAuditors();
         userList.add(settlement.getRecipientName());
+        outputUserList(userList);
         return userList;
     }
     private List<String> getSettlementPayChannelAndAuditors(Settlement settlement) {
         List<String> userList = getAuditors();
         userList.add(settlement.getPaymentChannelName());
+        outputUserList(userList);
         return userList;
+    }
+    private void outputUserList(List<String> userList) {
+        String output = "Sending to";
+        for (String user : userList) {
+            output = output.concat(" : ").concat(user);
+        }
+        log.debug(output);
     }
 }

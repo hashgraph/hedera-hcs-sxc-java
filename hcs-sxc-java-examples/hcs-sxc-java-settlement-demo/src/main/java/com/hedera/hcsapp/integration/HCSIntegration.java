@@ -52,6 +52,7 @@ import com.hedera.hcsapp.repository.Util;
 
 import lombok.extern.log4j.Log4j2;
 import proto.CreditBPM;
+import proto.CreditToSettle;
 import proto.PaymentInitBPM;
 import proto.PaymentSentBPM;
 import proto.SettleCompleteBPM;
@@ -314,11 +315,10 @@ public class HCSIntegration {
 
                 String payerName = settlementBPM.getPaymentInit().getPayerName();
                 String recipientName = settlementBPM.getPaymentInit().getRecipientName();
-                notify("settlements", payerName, recipientName, threadId);
 
                 PaymentInitBPM paymentInitBPM = settlementBPM.getPaymentInit();
                 // update the settlement state
-                settlementRepository.findById(threadId).ifPresent(
+                settlementRepository.findById(threadId).ifPresentOrElse(
                         (settlement) -> {
                             // only update status if user is paychannel or initiator
                             if ((settlement.getPayerName().endsWith(this.appData.getUserName())) || (settlement.getPaymentChannelName().equals(this.appData.getUserName()))) {
@@ -337,9 +337,53 @@ public class HCSIntegration {
                                     log.error("Settlement status should be " + priorState + " or " + nextState + ", found : " + settlement.getStatus());
                                 }
                             }
+                        },
+                        () -> {
+                            Settlement settlement = new Settlement();
+                            settlement.setAdditionalNotes(paymentInitBPM.getAdditionalNotes());
+                            settlement.setApplicationMessageId(Utils.applicationMessageIdToString(hcsResponse.getApplicationMessageId()));
+                            settlement.setAutomatic(settlementBPM.getAutomatic());
+                            settlement.setCreatedDate(paymentInitBPM.getCreatedDate());
+                            settlement.setCreatedTime(paymentInitBPM.getCreatedTime());
+                            settlement.setCurrency(paymentInitBPM.getNetValue().getCurrencyCode());
+                            settlement.setNetValue(paymentInitBPM.getNetValue().getUnits());
+                            settlement.setPayerAccountDetails(paymentInitBPM.getPayerAccountDetails());
+                            settlement.setPayerName(paymentInitBPM.getPayerName());
+                            settlement.setPaymentChannelName(paymentInitBPM.getPaymentChannelName());
+                            settlement.setRecipientAccountDetails(paymentInitBPM.getRecipientAccountDetails());
+                            settlement.setRecipientName(paymentInitBPM.getRecipientName());
+                            settlement.setStatus(nextState);
+                            settlement.setThreadId(threadId);
+                            
+                            settlementRepository.save(settlement);
+                            
+                            // now add the credits
+                            // and link them to settlement
+                            for (CreditToSettle creditToSettle : paymentInitBPM.getCreditsToSettleList()) {
+                                Credit credit = new Credit();
+                                CreditBPM creditBPM = creditToSettle.getCredit();
+                                credit.setAdditionalNotes(creditBPM.getAdditionalNotes());
+                                credit.setAmount(creditBPM.getValue().getUnits());
+                                credit.setApplicationMessageId(creditBPM.getApplicationMessageID());
+                                credit.setAutomatic(settlementBPM.getAutomatic());
+                                credit.setCreatedDate(creditBPM.getCreatedDate());
+                                credit.setCreatedTime(creditBPM.getCreatedTime());
+                                credit.setCurrency(creditBPM.getValue().getCurrencyCode());
+                                credit.setPayerName(creditBPM.getPayerName());
+                                credit.setRecipientName(creditBPM.getRecipientName());
+                                credit.setReference(creditBPM.getServiceRef());
+                                credit.setStatus(nextState);
+                                credit.setThreadId(creditBPM.getThreadId());
+                                
+                                creditRepository.save(credit);
+
+                                SettlementItem settlementItem = new SettlementItem();
+                                settlementItem.setId(new SettlementItemId(credit.getThreadId(), threadId));
+                                settlementItemRepository.save(settlementItem);
+                            }
                         }
                 );
-                
+                        
                 if (settlementBPM.getAutomatic()) {
                     // automatic processing, send ACK if appropriate
                     settlementRepository.findById(threadId).ifPresent(
@@ -354,6 +398,7 @@ public class HCSIntegration {
                             }
                 });
                 }
+                notify("settlements", payerName, recipientName, threadId);
             } else if (settlementBPM.hasPaymentInitAck()) {
                 log.debug("settlementBPM.hasPaymentInitAck()");
                 // Pay channel initiates payment (bank transfer between parties) and sends payment made message if

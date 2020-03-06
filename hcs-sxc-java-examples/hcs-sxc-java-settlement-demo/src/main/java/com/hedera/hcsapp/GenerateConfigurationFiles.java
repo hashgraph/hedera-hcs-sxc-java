@@ -35,7 +35,9 @@ import org.yaml.snakeyaml.Yaml;
 public class GenerateConfigurationFiles {
 
     public static void main(String[] args) throws Exception {
-
+        generateConfig();
+    }
+    public static void generateConfig() throws Exception {
         // load the composer template that contains all participants
         Yaml dockerComposeYaml = new Yaml();
         String dockerComposeFile = new File("./config/docker-compose.yml").getCanonicalPath();

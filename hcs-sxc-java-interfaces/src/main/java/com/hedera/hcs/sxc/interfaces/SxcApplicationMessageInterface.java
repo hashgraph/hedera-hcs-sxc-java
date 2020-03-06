@@ -31,8 +31,6 @@ public interface SxcApplicationMessageInterface  {
     public byte[] getApplicationMessage();
     public String getApplicationMessageId();
     public Instant getLastChronoPartConsensusTimestamp ();
-//    public long getLastChronoPartShardNum ();
-//    public long getLastChronoPartRealmNum();
     public long getLastChronoPartSequenceNum();
     public String getLastChronoPartRunningHashHEX();
 }

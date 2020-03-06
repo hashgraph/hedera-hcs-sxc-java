@@ -160,9 +160,12 @@ public class AuditController {
 
                 AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(Statics.getAppData());
                 auditApplicationMessage.setApplicationMessageId(m.getApplicationMessageId());
-                auditApplicationMessage.setLastChronoPartConsensusTimestamp(m.getLastChronoPartConsensusTimestamp().toString());
+                if (m.getLastChronoPartConsensusTimestamp() == null) {
+                    auditApplicationMessage.setLastChronoPartConsensusTimestamp("Pending");
+                } else {
+                    auditApplicationMessage.setLastChronoPartConsensusTimestamp(m.getLastChronoPartConsensusTimestamp().toString());
+                }
                 auditApplicationMessage.setLastChronoPartSequenceNum(m.getLastChronoPartSequenceNum());
-
                 auditApplicationMessage.setMessage(settlementBPM.toString());
                 auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
             }

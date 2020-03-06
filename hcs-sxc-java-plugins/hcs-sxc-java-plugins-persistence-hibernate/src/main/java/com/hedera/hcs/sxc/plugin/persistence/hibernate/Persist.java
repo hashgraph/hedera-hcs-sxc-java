@@ -353,22 +353,22 @@ implements SxcPersistence{
         
         if (hcsApplicationMessage == null) {
             hcsApplicationMessage = new HCSApplicationMessage();
-
-            hcsApplicationMessage.setApplicationMessageId(appMessageId);
-            hcsApplicationMessage.setApplicationMessage(applicationMessage.toByteArray());
-            hcsApplicationMessage.setLastChronoPartConsensusTimestamp(lastChronoPartConsensusTimestamp);
-            hcsApplicationMessage.setLastChronoPartRunningHashHEX(lastChronoPartRunningHash);
-            hcsApplicationMessage.setLastChronoPartSequenceNum(lastChronoPartSequenceNum);
-            Transaction dbTransaction = null;
-            dbTransaction = session.beginTransaction();
-            session.save(hcsApplicationMessage);
-            session.flush();
-            dbTransaction.commit();
-    
             log.debug("storeApplicationMessage " + appMessageId + "-" + applicationMessage);
         } else {
-            log.debug("Application message already in database");
+            log.debug("Updating Application message");
         }
+        
+        hcsApplicationMessage.setApplicationMessageId(appMessageId);
+        hcsApplicationMessage.setApplicationMessage(applicationMessage.toByteArray());
+        hcsApplicationMessage.setLastChronoPartConsensusTimestamp(lastChronoPartConsensusTimestamp);
+        hcsApplicationMessage.setLastChronoPartRunningHashHEX(lastChronoPartRunningHash);
+        hcsApplicationMessage.setLastChronoPartSequenceNum(lastChronoPartSequenceNum);
+        Transaction dbTransaction = null;
+        dbTransaction = session.beginTransaction();
+        session.save(hcsApplicationMessage);
+        session.flush();
+        dbTransaction.commit();
+    
         session.close();
     }
     
@@ -438,7 +438,7 @@ implements SxcPersistence{
     public List<? extends SxcApplicationMessageInterface> getSXCApplicationMessages() {
          
         Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
-        List<HCSApplicationMessage> applicationMessages = session.createQuery("from HCSApplicationMessage", HCSApplicationMessage.class)
+        List<HCSApplicationMessage> applicationMessages = session.createQuery("from HCSApplicationMessage hcsa order by hcsa.lastChronoPartSequenceNum desc", HCSApplicationMessage.class)
                 .list();
         session.close();
         return applicationMessages;

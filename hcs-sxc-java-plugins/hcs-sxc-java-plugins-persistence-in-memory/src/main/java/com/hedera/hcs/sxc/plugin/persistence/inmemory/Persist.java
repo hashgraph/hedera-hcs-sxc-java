@@ -34,6 +34,7 @@ import lombok.extern.log4j.Log4j2;
 import java.io.IOException;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,15 +49,23 @@ public class Persist
 
     
     @Data
-    public class HCSApplicationMessage implements  SxcApplicationMessageInterface, Serializable{
+    public class HCSApplicationMessage implements SxcApplicationMessageInterface, Serializable, Comparable<HCSApplicationMessage>{
          String applicationMessageId;
          byte[] applicationMessage;
          Instant lastChronoPartConsensusTimestamp;
-         //long lastChronoPartShardNum;
-         //long lastChronoPartRealmNum;
-         //long lastChronoPartRealmTopicNum;
          long lastChronoPartSequenceNum;
-         String lastChronoPartRunningHashHEX;    
+         String lastChronoPartRunningHashHEX;
+        @Override
+        public int compareTo(HCSApplicationMessage other) {
+            // comparison 
+            if (this.lastChronoPartSequenceNum > other.getLastChronoPartSequenceNum()) {
+                return 1;
+            } else if (this.lastChronoPartSequenceNum < other.getLastChronoPartSequenceNum()) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }    
     }
     
     @Data
@@ -273,7 +282,8 @@ public class Persist
     @Override
 
     public List<? extends SxcApplicationMessageInterface> getSXCApplicationMessages() {
-        return this.hcsApplicationMessages.values().stream().collect(Collectors.toList());
+        
+        return this.hcsApplicationMessages.values().stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
     }
 
     @Override

@@ -28,7 +28,6 @@ import com.hedera.hcsapp.Statics;
 import com.hedera.hcsapp.entities.Credit;
 import com.hedera.hcsapp.repository.AddressBookRepository;
 import com.hedera.hcsapp.repository.CreditRepository;
-import com.hedera.hcsapp.repository.SettlementItemRepository;
 import com.hedera.hcsapp.repository.SettlementRepository;
 
 import lombok.extern.log4j.Log4j2;
@@ -54,9 +53,6 @@ public class AdminController {
 
     @Autowired
     SettlementRepository settlementRepository;
-
-    @Autowired
-    SettlementItemRepository settlementItemRepository;
 
     @Autowired
     AddressBookRepository addressBookRepository;

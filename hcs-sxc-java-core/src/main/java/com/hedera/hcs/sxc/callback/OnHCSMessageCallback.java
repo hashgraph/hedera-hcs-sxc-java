@@ -55,6 +55,7 @@ import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
 import com.hedera.hcs.sxc.signing.Signing;
 import java.util.Arrays;
 import java.util.Map;
+import org.apache.commons.lang3.SerializationUtils;
 
 /**
  *
@@ -128,7 +129,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
     
     @Override
     public void partialMessage(ApplicationMessageChunk messagePart, SxcConsensusMessage sxcConsensusMesssage) {
-                
+        
         try {
             Optional<ApplicationMessage> messageEnvelopeOptional =
                     pushUntilCompleteMessage(messagePart, this.hcsCore.getPersistence());

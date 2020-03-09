@@ -119,13 +119,35 @@ public class OutboundHCSMessageTest {
         assertNotNull(transactionId);
         
     }
-
+  
     @Test
     public void testOutBoundMessageNoSendWithEncryptionAndRotation() throws Exception {
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test")
             .withMessageEncryptionKey(Ed25519PrivateKey.generate().toBytes())
             .withEncryptedMessages(true)
+            .withMessageSigningKey(Ed25519PrivateKey.generate())
             .withKeyRotation(true, 1);
+
+        OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(hcsCore);
+        // pretend we're sending
+        List<TransactionId> transactionId = outboundHCSMessage.sendMessageForTest(0, "testMessage".getBytes());
+        assertNotNull(transactionId);
+        
+    }
+    
+    @Test
+    public void testOutBoundMessageNoSendWithEncryptionFromConfig() throws Exception {
+        HCSCore hcsCore = new HCSCore()
+            .builder("0"
+                    , "./src/test/resources/config3.yaml"
+                    , "./src/test/resources/dotenv.test")
+            .withMessageSigningKey(Ed25519PrivateKey.generate())
+            ;
+        hcsCore.addOrUpdateAppParticipant("1", 
+                "302a300506032b6570032100c969fbb7b67b36f5560aa59a754a38bd88fd53ff870dad33011bbe2f37f34396", 
+                "817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449"
+        );
+   
 
         OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(hcsCore);
         // pretend we're sending

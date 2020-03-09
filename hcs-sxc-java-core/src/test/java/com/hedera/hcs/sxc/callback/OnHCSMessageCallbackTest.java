@@ -19,10 +19,15 @@ package com.hedera.hcs.sxc.callback;
  * limitations under the License.
  * ‍
  */
+import com.google.protobuf.ByteString;
+import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.account.AccountId;
+import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
+import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.commonobjects.HCSResponse;
+import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcs.sxc.plugin.persistence.inmemory.Persist;
@@ -32,12 +37,12 @@ import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 import com.hedera.hcs.sxc.proto.ApplicationMessageID;
 import com.hedera.hcs.sxc.proto.Timestamp;
 
+
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -133,5 +138,80 @@ public class OnHCSMessageCallbackTest {
         assertTrue(messageOptional.isPresent());
         ApplicationMessage applicationMessage = messageOptional.get();
         assertArrayEquals(longString,applicationMessage.getBusinessProcessMessage().toByteArray());
+    }
+    
+    
+    @Test
+    public void testSingleChunkUnencrypted() throws IOException, Exception {
+        byte[] message = "Single Chunk Message".getBytes();
+        HCSCore hcsCore  = null;
+
+        hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test")
+          .withMessageSigningKey(Ed25519PrivateKey.generate())
+        ;
+        hcsCore.addOrUpdateAppParticipant("1", 
+                "302a300506032b6570032100c969fbb7b67b36f5560aa59a754a38bd88fd53ff870dad33011bbe2f37f34396", 
+                "817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449"
+        );
+
+       
+        
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),hcsCore,message, Map.of("sharedSymmetricEncryptionKey","817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449")  );
+        assertTrue(chunks.size() == 1);
+        
+        ConsensusTopicId consensusTopicId = new ConsensusTopicId(1, 2, 3);
+        com.hedera.hashgraph.proto.Timestamp timestamp2 = com.hedera.hashgraph.proto.Timestamp.newBuilder()
+                        .setSeconds(Instant.now().getEpochSecond())
+                        .setNanos(Instant.now().getNano())
+                        .build();
+        ConsensusTopicResponse consensusTopicResponse = ConsensusTopicResponse
+                .newBuilder()
+                .setConsensusTimestamp(timestamp2)
+                .setMessage(ByteString.copyFromUtf8("message"))
+                .setRunningHash(ByteString.copyFromUtf8("runninghash"))
+                .setSequenceNumber(20)
+                .build();
+        
+        SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage(consensusTopicId, consensusTopicResponse);
+        OnHCSMessageCallback cb = new OnHCSMessageCallback(hcsCore);
+        cb.partialMessage(chunks.get(0), sxcConsensusMessage);
+        
+    }
+    
+    @Test
+    public void testSingleChunkEncrypted() throws IOException, Exception {
+        byte[] message = "Single Chunk Message".getBytes();
+        HCSCore hcsCore  = null;
+
+        hcsCore = new HCSCore().builder("0", "./src/test/resources/config3.yaml", "./src/test/resources/dotenv.test")
+          .withMessageSigningKey(Ed25519PrivateKey.generate())
+        ;
+        hcsCore.addOrUpdateAppParticipant("1", 
+                "302a300506032b6570032100c969fbb7b67b36f5560aa59a754a38bd88fd53ff870dad33011bbe2f37f34396", 
+                "817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449"
+        );
+
+       
+        
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),hcsCore,message, Map.of("sharedSymmetricEncryptionKey","817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449")  );
+        assertTrue(chunks.size() == 1);
+        
+        ConsensusTopicId consensusTopicId = new ConsensusTopicId(1, 2, 3);
+        com.hedera.hashgraph.proto.Timestamp timestamp2 = com.hedera.hashgraph.proto.Timestamp.newBuilder()
+                        .setSeconds(Instant.now().getEpochSecond())
+                        .setNanos(Instant.now().getNano())
+                        .build();
+        ConsensusTopicResponse consensusTopicResponse = ConsensusTopicResponse
+                .newBuilder()
+                .setConsensusTimestamp(timestamp2)
+                .setMessage(ByteString.copyFromUtf8("message"))
+                .setRunningHash(ByteString.copyFromUtf8("runninghash"))
+                .setSequenceNumber(20)
+                .build();
+        
+        SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage(consensusTopicId, consensusTopicResponse);
+        OnHCSMessageCallback cb = new OnHCSMessageCallback(hcsCore);
+        cb.partialMessage(chunks.get(0), sxcConsensusMessage);
+        
     }
 }

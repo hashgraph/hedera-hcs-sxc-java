@@ -148,13 +148,15 @@ public final class AppData {
                                 Ed25519PrivateKey.fromString(
                                         dockerService.getEnvironment().get("SIGNKEY")
                                 ));
-                        AddressListCrypto
-                            .INSTANCE
-                            .singletonInstance(appId)
-                            .getAddressList()
-                            .forEach((k,v)->{
-                                hcsCore.addOrUpdateAppParticipant(k, v.get("theirEd25519PubKeyForSigning"), v.get("sharedSymmetricEncryptionKey"));
-                            });
+                        if (AddressListCrypto.INSTANCE.singletonInstance(appId).getAddressList() != null) {
+                            AddressListCrypto
+                                .INSTANCE
+                                .singletonInstance(appId)
+                                .getAddressList()
+                                .forEach((k,v)->{
+                                    hcsCore.addOrUpdateAppParticipant(k, v.get("theirEd25519PubKeyForSigning"), v.get("sharedSymmetricEncryptionKey"));
+                                });
+                        }
                     }
                     appClient.setWebPort(dockerService.getPortAsInteger());
 

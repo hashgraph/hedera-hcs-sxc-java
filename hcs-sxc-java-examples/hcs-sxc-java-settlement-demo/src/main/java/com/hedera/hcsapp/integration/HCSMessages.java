@@ -659,38 +659,31 @@ public final class HCSMessages {
     private List<String> getCreditPayerAndAuditors(Credit credit) {
         List<String> userList = getAuditors();
         userList.add(credit.getPayerName());
-        outputUserList(userList);
+        userList.sort(null);
         return userList;
     }
     private List<String> getCreditRecipientAndAuditors(Credit credit) {
         List<String> userList = getAuditors();
         userList.add(credit.getRecipientName());
-        outputUserList(userList);
+        userList.sort(null);
         return userList;
     }
     private List<String> getSettlementPayerAndAuditors(Settlement settlement) {
         List<String> userList = getAuditors();
         userList.add(settlement.getPayerName());
-        outputUserList(userList);
+        userList.sort(null);
         return userList;
     }
     private List<String> getSettlementRecipientAndAuditors(Settlement settlement) {
         List<String> userList = getAuditors();
         userList.add(settlement.getRecipientName());
-        outputUserList(userList);
+        userList.sort(null);
         return userList;
     }
     private List<String> getSettlementPayChannelAndAuditors(Settlement settlement) {
         List<String> userList = getAuditors();
         userList.add(settlement.getPaymentChannelName());
-        outputUserList(userList);
+        userList.sort(null);
         return userList;
-    }
-    private void outputUserList(List<String> userList) {
-        String output = "Sending to";
-        for (String user : userList) {
-            output = output.concat(" : ").concat(user);
-        }
-        log.debug(output);
     }
 }

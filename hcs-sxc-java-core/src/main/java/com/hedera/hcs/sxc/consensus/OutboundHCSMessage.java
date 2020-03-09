@@ -27,6 +27,7 @@ import com.google.protobuf.ByteString;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
@@ -200,7 +201,8 @@ public final class OutboundHCSMessage {
     }
 
     public OutboundHCSMessage restrictTo(List<String> appIds){
-        Map<String, Map<String, String>> newAddressList = new HashMap<String, Map<String, String>>();
+        // linked hashmap to preserve order
+        Map<String, Map<String, String>> newAddressList = new LinkedHashMap<String, Map<String, String>>();
         for (String appId: appIds ){
             newAddressList.put(appId, this.addressList.get(appId));
         }

@@ -82,7 +82,7 @@ services:
     environment:
       APP_ID: "Farouk"
       PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6f
-      ROLES: "ARBITER,AUDITOR"
+      ROLES: "ARBITER"
       PAYMENT_ACCOUNT_DETAILS: "10-69-43 86535765"
       COLOR: 2c0f4f
     ports:
@@ -97,7 +97,7 @@ services:
     environment:
       APP_ID: "Grace"
       PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab7a
-      ROLES: "DEMO"
+      ROLES: "AUDITOR"
       PAYMENT_ACCOUNT_DETAILS: "10-32-52 55424452"
       COLOR: 4f0500
     ports:

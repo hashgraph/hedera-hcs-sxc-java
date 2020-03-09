@@ -68,15 +68,15 @@ public class GenerateConfigurationFiles {
                         break;
                     case "BUYER,SELLER":
                         // buyer/seller exchange with everyone
-                    case "DEMO":
+                    case "AUDITOR":
                         // Demo receive from everyone
-                    case "ARBITER,AUDITOR":
-                        // Arbiter/auditor receive from everyone
                         if (addressTemplate.get(appUser) == null) {
                             addressTemplate.put(appUser,new HashMap<String, Map<String, String>>());
                         }
                         addressTemplate.get(appUser).put(otherParty, new HashMap<String, String>());
                         break;
+                    case "ARBITER":
+                        // Arbiter/auditor - not involved yet
                     }
                 }
             }

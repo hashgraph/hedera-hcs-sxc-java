@@ -18,6 +18,6 @@
         <module>hcs-sxc-java-plugins-persistence-hibernate</module>
         <module>hcs-sxc-java-plugins-mirror-queue-artemis</module>
         <module>hcs-sxc-java-plugins-mirror-direct</module>
-        <module>hcs-sxc-java-plugins-cryptography</module>
+        <module>hcs-sxc-java-plugins-encryption-diffie-hellman</module>
     </modules>
 </project>

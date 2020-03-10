@@ -8,9 +8,9 @@
         <version>0.0.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>hcs-sxc-java-plugins-cryptography</artifactId>
+    <artifactId>hcs-sxc-java-plugins-encryption-diffie-hellman</artifactId>
 
-    <name>hcs-sxc-java-plugins-cryptography</name>
+    <name>hcs-sxc-java-plugins-encryption-diffie-hellman</name>
   
     <dependencies>
         <dependency>

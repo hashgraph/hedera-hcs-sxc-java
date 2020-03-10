@@ -1,8 +1,6 @@
-package com.hedera.hcs.sxc.plugin.cryptography.cryptography;
+package com.hedera.hcs.sxc.plugin.encryption.diffiehellman;
       
-import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
-import com.hedera.hcs.sxc.plugin.cryptography.StringUtils;
 
 /*-
  * ‌
@@ -26,14 +24,10 @@ import com.hedera.hcs.sxc.plugin.cryptography.StringUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.Security;
 import javax.crypto.BadPaddingException;
 
@@ -45,32 +39,32 @@ import javax.crypto.spec.SecretKeySpec;
 
 import javax.crypto.spec.GCMParameterSpec;
 
-public class Cryptography implements SxcMessageEncryption {
+public class Encryption implements SxcMessageEncryption {
     
-     public static Cryptography load(){
-         return new Cryptography();
+     public static Encryption load(){
+         return new Encryption();
      }
      
-     public void Cryptography(){
+     public void Encryption(){
          Security.setProperty("crypto.policy", "unlimited");
      }
     
-    /**
-     * Encrypt a cleartext message using AES and a shared secret generated using the 
-     * Diffie Hellman compatible secret obtained via the {@link KeyRotation} utility
-     * @param sharedSecret A shared secret obtained from {@link KeyRotation}
-     * @param cleartext
-     * @return the ciphertext
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
-     * @throws IllegalBlockSizeException
-     * @throws BadPaddingException
-     * @throws UnsupportedEncodingException
-     * @throws InvalidAlgorithmParameterException
-     */
+     /**
+      * Encrypt a cleartext message using AES and a shared secret generated using a 
+      * Diffie Hellman compatible secret 
+      * @param sharedSecret A shared secret 
+      * @param byte[] cleartext
+      * @return the ciphertext
+      * @throws NoSuchAlgorithmException
+      * @throws NoSuchPaddingException
+      * @throws InvalidKeyException
+      * @throws IllegalBlockSizeException
+      * @throws BadPaddingException
+      * @throws UnsupportedEncodingException
+      * @throws InvalidAlgorithmParameterException
+      */
     @Override
-    public  byte[] encrypt (byte[] sharedSecret, byte[] cleartext) 
+    public  byte[] encrypt(byte[] sharedSecret, byte[] cleartext) 
             throws NoSuchAlgorithmException, 
             NoSuchPaddingException, 
             InvalidKeyException, 
@@ -86,13 +80,37 @@ public class Cryptography implements SxcMessageEncryption {
         return ciphertext;
     }
     
-    
+    /**
+     * Encrypt a cleartext message using AES and a shared secret generated using a 
+     * Diffie Hellman compatible secret 
+     * @param sharedSecret A shared secret 
+     * @param String cleartext
+     * @return the ciphertext
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
+     * @throws UnsupportedEncodingException
+     * @throws InvalidAlgorithmParameterException
+     */
+    @Override    
+    public byte[] encrypt(byte[] sharedSecret, String cleartext)
+            throws NoSuchAlgorithmException, 
+            NoSuchPaddingException, 
+            InvalidKeyException, 
+            IllegalBlockSizeException, 
+            BadPaddingException, 
+            UnsupportedEncodingException, 
+            InvalidAlgorithmParameterException{
+        return encrypt(sharedSecret, StringUtils.stringToByteArray(cleartext));
+    }
     
     /**
-     * Decrypt a ciphertext  with a shared secret generated using the 
-     * Diffie Hellman compatible secret from the {@link KeyRotation} utility
+     * Decrypt a ciphertext  with a shared secret generated using a 
+     * Diffie Hellman compatible secret
      * @param sharedSecret
-     * @param ciphertext
+     * @param byte[] ciphertext
      * @return the cleartext
      * @throws NoSuchAlgorithmException
      * @throws NoSuchPaddingException
@@ -103,7 +121,7 @@ public class Cryptography implements SxcMessageEncryption {
      * @throws IOException 
      */
     @Override
-    public  byte[] decrypt (byte[]  sharedSecret, byte[] ciphertext) 
+    public byte[] decrypt(byte[] sharedSecret, byte[] ciphertext) 
             throws 
             NoSuchAlgorithmException, 
             NoSuchPaddingException, 
@@ -119,26 +137,12 @@ public class Cryptography implements SxcMessageEncryption {
         return cipher.doFinal(ciphertext);  
     }
     
-    public byte[] encryptFromClearText(byte[] sharedSecret, String cleartext)
-            throws NoSuchAlgorithmException, 
-            NoSuchPaddingException, 
-            InvalidKeyException, 
-            IllegalBlockSizeException, 
-            BadPaddingException, 
-            UnsupportedEncodingException, 
-            InvalidAlgorithmParameterException{
-        //if (sharedSecret.length!=32) throw new IllegalArgumentException("Key must be 32 bytes long");
-        
-        return encrypt(sharedSecret, StringUtils.stringToByteArray(cleartext));
-    }
-    
-    
     /**
      * Decrypts using {@link #decrypt(byte[], byte[]) and converts result into to 
      * human readable string. 
      * @param sharedSecret
      * @param ciphertext
-     * @return cleartext string
+     * @return cleartext String
      * @throws NoSuchAlgorithmException
      * @throws NoSuchAlgorithmException
      * @throws NoSuchPaddingException
@@ -148,7 +152,8 @@ public class Cryptography implements SxcMessageEncryption {
      * @throws BadPaddingException
      * @throws IOException 
      */
-    public  String decryptToClearText(byte[]  sharedSecret, byte[] ciphertext) 
+    @Override
+    public String decryptToString(byte[] sharedSecret, byte[] ciphertext) 
             throws 
             NoSuchAlgorithmException,
             NoSuchAlgorithmException, 
@@ -159,7 +164,6 @@ public class Cryptography implements SxcMessageEncryption {
             BadPaddingException,
             IOException
     {
-        //if (sharedSecret.length!=32) throw new IllegalArgumentException("Key must be 32 bytes long");
         return StringUtils.byteArrayToString(decrypt(sharedSecret, ciphertext));
     }
     
@@ -168,7 +172,6 @@ public class Cryptography implements SxcMessageEncryption {
      * @return the KeyPair
      * @throws Exception 
      */
-
     public static byte[] generateSecretKey() throws Exception {
         KeyGenerator generator = KeyGenerator.getInstance("AES");
         generator.init(256);

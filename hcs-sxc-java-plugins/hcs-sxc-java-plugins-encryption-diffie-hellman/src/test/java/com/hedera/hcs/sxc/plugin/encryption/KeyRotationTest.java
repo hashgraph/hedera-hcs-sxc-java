@@ -1,4 +1,4 @@
-package com.hedera.hcs.sxc.plugin.cryptography.keyrotation;
+package com.hedera.hcs.sxc.plugin.encryption;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -6,6 +6,8 @@ import java.util.Arrays;
 import javax.crypto.KeyAgreement;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
+
+import com.hedera.hcs.sxc.plugin.encryption.diffiehellman.KeyRotation;
 
 
 public class KeyRotationTest {

@@ -21,8 +21,9 @@ package com.hedera.hcsapp;
  */
 
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
-import com.hedera.hcs.sxc.plugin.cryptography.StringUtils;
-import com.hedera.hcs.sxc.plugin.cryptography.cryptography.Cryptography;
+import com.hedera.hcs.sxc.plugin.encryption.diffiehellman.Encryption;
+import com.hedera.hcs.sxc.plugin.encryption.diffiehellman.StringUtils;
+
 import java.io.File;
 
 import java.io.FileInputStream;
@@ -106,7 +107,7 @@ public class GenerateConfigurationFiles {
             for (String playerInAddress : addressTemplate.keySet()) {
                 if (addressTemplate.get(playerInAddress).containsKey(player)) {
                     String sharedKey = StringUtils
-                            .byteArrayToHexString(Cryptography.generateSecretKey());
+                            .byteArrayToHexString(Encryption.generateSecretKey());
 
                     addressTemplate.get(playerInAddress).get(player).put("sharedSymmetricEncryptionKey", sharedKey);
                     if (addressTemplate.get(player) != null) {

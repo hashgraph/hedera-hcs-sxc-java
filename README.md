@@ -89,7 +89,7 @@ Looking through the java project, we have the following Maven components/artifac
         * hcs-sxc-java-settlement-demo
     * hcs-sxc-java-proto
     * hcs-sxc-java-plugins
-        * hcs-sxc-java-plugins-cryptography
+        * hcs-sxc-java-plugins-encryption-diffie-hellman
         * hcs-sxc-java-plugins-persistence-in-memory
         * hcs-sxc-java-plugins-persistence-hibernate
         * hcs-sxc-java-plugins-mirror-direct
@@ -128,15 +128,15 @@ Defined in the `hcs-sxc-java-Interfaces` project, these are data structures that
 This project contains a series of plugins to be used in conjunction with the hcs sxc core component, at the time of writing, the following plug-ins are available.
 The choice of a plug-in architecture is to enable additional plugins to be developed without needing to change the projects that may later depend on them and so to offer extensibility with a choice of options.
 
-* hcs-sxc-java-plugins-cryptography - plugin to encrypt messages and manage key rotation
+* hcs-sxc-java-plugins-encryption-diffie-hellman - plugin to encrypt messages and manage key rotation using Diffie Hellman
 * hcs-sxc-java-plugins-mirror-direct - plugin to enable the `hcs-sxc-java-core` to subscribe to mirror notifications directly
 * hcs-sxc-java-plugins-mirror-queue-artemis - plugin to enable the `hcs-sxc-java-core` to subscribe to mirror notifications via an Artemis Message Queue (which receives messages via the `hcs-sxc-java-relay` component)
 * hcs-sxc-java-plugins-persistence-hibernate - plug in to provide data persistence in a database through hibernate
 * hcs-sxc-java-plugins-persistence-in-memory - plug in to provide data persistence in memory
 
-#### hcs-sxc-java-plugins-cryptography
+#### hcs-sxc-java-plugins-encryption-diffie-hellman
 
-Manages message encryption and decryption while also optionally dealing with key rotation.
+Manages message encryption and decryption while also optionally dealing with key rotation using Diffie Hellman.
 
 #### hcs-sxc-java-plugins-mirror-direct
 

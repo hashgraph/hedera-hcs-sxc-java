@@ -109,7 +109,7 @@
 
         <dependency>
             <groupId>com.hedera</groupId>
-            <artifactId>hcs-sxc-java-plugins-cryptography</artifactId>
+            <artifactId>hcs-sxc-java-plugins-encryption-diffie-hellman</artifactId>
             <version>0.0.3-SNAPSHOT</version>
         </dependency>
 

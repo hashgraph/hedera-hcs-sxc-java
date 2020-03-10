@@ -157,9 +157,9 @@ public class PersistTest {
                 .build();
         ApplicationMessage applicationMessage = ApplicationMessage.newBuilder()
                 .setApplicationMessageId(applicationMessageID)
-                .setBusinessProcessHash(ByteString.copyFromUtf8("businessProcessHash"))
+                .setUnencryptedBusinessProcessMessageHash(ByteString.copyFromUtf8("businessProcessHash"))
                 .setBusinessProcessMessage(ByteString.copyFromUtf8("businessProcessMessage"))
-                .setBusinessProcessSignature(ByteString.copyFromUtf8("businessProcessSignature"))
+                .setBusinessProcessSignatureOnHash(ByteString.copyFromUtf8("businessProcessSignature"))
                 .build();
         
         Instant lastChronoPartConsensusTimestamp = Instant.now();
@@ -175,8 +175,8 @@ public class PersistTest {
         ApplicationMessage applicationMessage2 = ApplicationMessage.newBuilder()
                 .setApplicationMessageId(applicationMessageID2)
                 .setBusinessProcessMessage(ByteString.copyFromUtf8("businessProcessMessage2"))
-                .setBusinessProcessHash(ByteString.copyFromUtf8("businessProcessHash2"))
-                .setBusinessProcessSignature(ByteString.copyFromUtf8("businessProcessSignature2"))
+                .setUnencryptedBusinessProcessMessageHash(ByteString.copyFromUtf8("businessProcessHash2"))
+                .setBusinessProcessSignatureOnHash(ByteString.copyFromUtf8("businessProcessSignature2"))
                 .build();
         
         Instant lastChronoPartConsensusTimestamp2 = Instant.now();
@@ -194,9 +194,9 @@ public class PersistTest {
         ApplicationMessage getApplicationMessage = persist.getApplicationMessage(appMessageId);
         assertNotNull(getApplicationMessage);
         assertEquals(applicationMessageID, getApplicationMessage.getApplicationMessageId());
-        assertEquals("businessProcessHash", getApplicationMessage.getBusinessProcessHash().toStringUtf8());
+        assertEquals("businessProcessHash", getApplicationMessage.getUnencryptedBusinessProcessMessageHash().toStringUtf8());
         assertEquals("businessProcessMessage", getApplicationMessage.getBusinessProcessMessage().toStringUtf8());
-        assertEquals("businessProcessSignature", getApplicationMessage.getBusinessProcessSignature().toStringUtf8());
+        assertEquals("businessProcessSignature", getApplicationMessage.getBusinessProcessSignatureOnHash().toStringUtf8());
 
         Map<String, ApplicationMessage> getApplicationMessages = persist.getApplicationMessages();
         assertEquals(2, getApplicationMessages.size());

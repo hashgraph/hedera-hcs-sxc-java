@@ -170,7 +170,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                             );
                             byte[] signShaClrTxt = Signing.sign(shaClrTxt, hcsCore.getMessageSigningKey());
                             
-                            if (! Arrays.equals(signShaClrTxt, appMessage.getBusinessProcessSignature().toByteArray())){
+                            if (! Arrays.equals(signShaClrTxt, appMessage.getBusinessProcessSignatureOnHash().toByteArray())){
                                 log.error("Illegal message detected, not processing ...");
                             } else { 
                                 //message is `good` store it  back with consensus data applied to it.  
@@ -201,8 +201,9 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                         keyMap.get("theirEd25519PubKeyForSigning"));
                                 if ( 
                                     Signing.verify(
-                                            appMessage.getBusinessProcessHash().toByteArray(),
-                                            appMessage.getBusinessProcessSignature().toByteArray(),
+                                            appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray(),
+                                            appMessage.getBusinessProcessSignatureOnHash().toByteArray(),
+
                                             theirPubKey)
                                 ){
                                     log.debug("Signature verification on message passed with " + appId + ", message is from them.");
@@ -218,7 +219,8 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                         byte[] shaClrTxt = Hashing.sha(
                                                 StringUtils.byteArrayToHexString(decryptedBPM)
                                         );
-                                        if (! Hashing.matchSHA(shaClrTxt, appMessage.getBusinessProcessHash().toByteArray())){
+                                        if (! Hashing.matchSHA(shaClrTxt, appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray())){
+
                                             log.error("Corrupt message detected.");
                                             throw new Exception("Corrupt message detected.");
                                         } 
@@ -355,11 +357,11 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                                // block. TODO, rewrite to avoid trycatch controll flow
                                         ApplicationMessage decryptedAppmessage = ApplicationMessage.newBuilder()
                                             .setApplicationMessageId(appMessage.getApplicationMessageId())
-                                            .setBusinessProcessHash(appMessage.getBusinessProcessHash())
+                                            .setUnencryptedBusinessProcessMessageHash(appMessage.getUnencryptedBusinessProcessMessageHash())
                                             .setBusinessProcessMessage( 
                                                     ByteString.copyFrom(decryptedBPM)
                                              )
-                                            .setBusinessProcessSignature(appMessage.getBusinessProcessSignature())
+                                            .setBusinessProcessSignatureOnHash(appMessage.getBusinessProcessSignatureOnHash())
                                             .build();
                                         appMessage = decryptedAppmessage;
                                         this.hcsCore.getPersistence().storeApplicationMessage(
@@ -374,11 +376,12 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                 catch(InvalidProtocolBufferException e){  // IF NOT PROTO: the message is not a PROTO message. It's sometihng else
                                         ApplicationMessage decryptedAppmessage = ApplicationMessage.newBuilder()
                                             .setApplicationMessageId(appMessage.getApplicationMessageId())
-                                            .setBusinessProcessHash(appMessage.getBusinessProcessHash())
+                                            .setUnencryptedBusinessProcessMessageHash(appMessage.getUnencryptedBusinessProcessMessageHash())
                                             .setBusinessProcessMessage( 
                                                     ByteString.copyFrom(decryptedBPM)
                                              )
-                                            .setBusinessProcessSignature(appMessage.getBusinessProcessSignature())
+                                            .setBusinessProcessSignatureOnHash(appMessage.getBusinessProcessSignatureOnHash())
+
                                             .build();
                                         appMessage = decryptedAppmessage;
                                         this.hcsCore.getPersistence().storeApplicationMessage(

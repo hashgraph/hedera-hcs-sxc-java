@@ -25,8 +25,8 @@ message ApplicationMessageID {
 message ApplicationMessage {
     ApplicationMessageID applicationMessageId = 1;
     bytes businessProcessMessage = 2;  // the payload
-    bytes businessProcessHash = 3;
-    bytes businessProcessSignature = 4;
+    bytes unencryptedBusinessProcessMessageHash  = 3;
+    bytes businessProcessSignatureOnHash  = 4;
     bytes encryptionRandom = 5;
 }
 

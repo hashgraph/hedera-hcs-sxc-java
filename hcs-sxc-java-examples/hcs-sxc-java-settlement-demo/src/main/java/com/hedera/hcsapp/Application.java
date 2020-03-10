@@ -9,9 +9,9 @@ package com.hedera.hcsapp;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,7 @@ public class Application {
 
     @Resource
     AddressBookRepository addressBookRepository;
-    
+
     public static void main(String[] args) throws Exception {
 
         if ((args.length > 0) && (args[0].contentEquals("generateconfig"))) {
@@ -46,16 +46,16 @@ public class Application {
             app.run(args);
         }
     }
-    
+
     @Bean
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
         return args -> {
 
             // delete the address book
             addressBookRepository.deleteAll();
-            
+
             // populate the address book
-            for (AppClient appClient : Statics.getAppData().getAppClients()) {   
+            for (AppClient appClient : Statics.getAppData().getAppClients()) {
                 AddressBook addressBook = new AddressBook();
                 addressBook.setName(appClient.getClientName());
                 addressBook.setPublicKey(appClient.getClientKey());
@@ -67,6 +67,6 @@ public class Application {
                 addressBookRepository.save(addressBook);
             }
         };
-    }    
-    
-}       
+    }
+
+}

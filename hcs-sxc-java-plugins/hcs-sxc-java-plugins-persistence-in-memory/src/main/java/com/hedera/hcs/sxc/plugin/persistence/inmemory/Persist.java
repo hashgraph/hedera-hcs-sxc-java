@@ -251,6 +251,7 @@ public class Persist
         transactions = new HashMap<>();
         mirrorTopicMessages = new HashMap<>();
         applicationMessages = new HashMap<>();
+        hcsApplicationMessages = new HashMap<>();
     }
 
     @Override

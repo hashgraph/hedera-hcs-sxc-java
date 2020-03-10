@@ -73,8 +73,6 @@ public enum AddressListCrypto {
             Map<String, Object> obj = yaml.load(inputStream);
             addressList = (Map<String, Map<String, String>>) obj.get(appId);
             
-  
-            
             this.isInitialised = true;
            
         } else {
@@ -86,8 +84,4 @@ public enum AddressListCrypto {
     public  Map<String, Map<String, String>> getAddressList(){
         return this.addressList;
     }
-    
-  
-
- 
 }

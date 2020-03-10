@@ -81,7 +81,8 @@ public final class AppData {
         loadEnv("./config/.env");
         init("./config/config.yaml", "./config/docker-compose.yml", "./config/.env");
     }
-    public AppData(String configFilePath, String environmentFilePath, String dockerFilePath) throws Exception {
+    public AppData(String configFilePath, String environmentFilePath, String dockerFilePath, String addressFilePath) throws Exception {
+        AddressListCrypto.INSTANCE.singletonInstance(appId, addressFilePath);
         loadEnv(environmentFilePath);
         init(configFilePath, dockerFilePath, environmentFilePath);
     }
@@ -105,11 +106,8 @@ public final class AppData {
             System.exit(0);
         }
 
-        
         this.hcsCore = new HCSCore()
                 .builder(this.appId, configFilePath, environmentFilePath);
-                
-        
                 //.withMessageEncryptionKey(this.messageEncryptionKey);
         
         for (Map.Entry<String, DockerService> service : dockerCompose.getServices().entrySet()) {

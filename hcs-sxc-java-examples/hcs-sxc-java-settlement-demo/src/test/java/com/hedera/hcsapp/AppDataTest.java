@@ -8,7 +8,12 @@ public class AppDataTest {
     
     @Test
     public void testInstantiation() throws Exception {
-        AppData appData = new AppData("./src/test/resources/config.yaml", "./src/test/resources/dotenv.sample", "./src/test/resources/docker-compose.yml");
+        AppData appData = new AppData(
+                "./src/test/resources/config.yaml", 
+                "./src/test/resources/dotenv.sample", 
+                "./src/test/resources/docker-compose.yml",
+                "./src/test/resources/contact-list.yaml"
+        );
         assertEquals(4, appData.getAppClients().size());
         assertEquals("Alice", appData.getAppId());
         assertEquals("302a300506032b65700321000c5fd53530c52e9950e98932e2bdc35c6f9cad0069198da76a611e28d4fe434b", appData.getPublicKey());

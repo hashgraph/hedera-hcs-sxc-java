@@ -71,7 +71,7 @@ public class SettlementRestTest {
         Mockito.when(settlementItemRepository.findAllSettlementItems("threadId"))
             .thenReturn(settlementItems);
 
-        AppData appData = new AppData("./src/test/resources/config.yaml", "./src/test/resources/dotenv.sample", "./src/test/resources/docker-compose.yml");
+        AppData appData = new AppData("./src/test/resources/config.yaml", "./src/test/resources/dotenv.sample", "./src/test/resources/docker-compose.yml","./src/test/resources/contact-list.yaml");
         
         Settlement settlement = new Settlement();
         settlement.setAdditionalNotes("additionalNotes");

@@ -12,7 +12,7 @@ import com.hedera.hcsapp.entities.Credit;
 public class CreditRestTest {
     @Test
     public void testCreditRest() throws Exception {
-        AppData appData = new AppData("./src/test/resources/config.yaml", "./src/test/resources/dotenv.sample", "./src/test/resources/docker-compose.yml");
+        AppData appData = new AppData("./src/test/resources/config.yaml", "./src/test/resources/dotenv.sample", "./src/test/resources/docker-compose.yml","./src/test/resources/contact-list.yaml");
 
         Credit credit = new Credit();
         credit.setAdditionalNotes("additionalNotes");

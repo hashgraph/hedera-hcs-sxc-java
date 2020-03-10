@@ -20,7 +20,7 @@ import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
-import com.hedera.hcs.sxc.interfaces.SXCApplicationMessageInterface;
+import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
 import com.hedera.hcs.sxc.proto.AccountID;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
@@ -185,10 +185,10 @@ public class PersistTest {
         assertEquals(2, getApplicationMessages.size());
         
         @SuppressWarnings("unused")
-        List<? extends SXCApplicationMessageInterface> getSXCApplicationMessages = persist.getSXCApplicationMessages();
+        List<? extends SxcApplicationMessageInterface> getSXCApplicationMessages = persist.getSXCApplicationMessages();
         assertEquals(2, getApplicationMessages.size());
         
-        SXCApplicationMessageInterface getSXCApplicationMessage = persist.getApplicationMessageEntity(appMessageId);
+        SxcApplicationMessageInterface getSXCApplicationMessage = persist.getApplicationMessageEntity(appMessageId);
         assertNotNull(getSXCApplicationMessage);
         assertEquals(appMessageId, getSXCApplicationMessage.getApplicationMessageId());
         assertArrayEquals(applicationMessage.toByteArray(), getSXCApplicationMessage.getApplicationMessage());

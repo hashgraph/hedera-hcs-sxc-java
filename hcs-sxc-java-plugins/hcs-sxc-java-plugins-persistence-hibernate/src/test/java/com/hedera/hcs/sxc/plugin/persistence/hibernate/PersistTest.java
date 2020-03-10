@@ -15,7 +15,7 @@ import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
-import com.hedera.hcs.sxc.interfaces.SXCApplicationMessageInterface;
+import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
 import com.hedera.hcs.sxc.proto.AccountID;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
@@ -35,7 +35,7 @@ public class PersistTest {
 
         hibernateProperties.put("hibernate.dialect.H2Dialect", "org.hibernate.dialect.H2Dialect");
         hibernateProperties.put("hibernate.cache.provider_class", "org.hibernate.cache.internal.NoCacheProvider");
-        hibernateProperties.put("hibernate.show_sql", "false");
+        hibernateProperties.put("hibernate.show_sql", "true");
         hibernateProperties.put("hibernate.hbm2ddl.auto", "update");
 
         return hibernateProperties;
@@ -202,14 +202,14 @@ public class PersistTest {
         assertEquals(2, getApplicationMessages.size());
         
         @SuppressWarnings("unused")
-        List<? extends SXCApplicationMessageInterface> getSXCApplicationMessages = persist.getSXCApplicationMessages();
+        List<? extends SxcApplicationMessageInterface> getSXCApplicationMessages = persist.getSXCApplicationMessages();
         assertEquals(2, getApplicationMessages.size());
         
-        SXCApplicationMessageInterface getSXCApplicationMessage = persist.getApplicationMessageEntity(appMessageId);
+        SxcApplicationMessageInterface getSXCApplicationMessage = persist.getApplicationMessageEntity(appMessageId);
         assertNotNull(getSXCApplicationMessage);
         assertEquals(appMessageId, getSXCApplicationMessage.getApplicationMessageId());
         assertArrayEquals(applicationMessage.toByteArray(), getSXCApplicationMessage.getApplicationMessage());
-        assertEquals(lastChronoPartConsensusTimestamp, getSXCApplicationMessage.getLastChronoPartConsensusTimestamp());
+        assertTrue(lastChronoPartConsensusTimestamp.equals(getSXCApplicationMessage.getLastChronoPartConsensusTimestamp()));
         assertEquals(lastChronoPartRunningHashHEX, getSXCApplicationMessage.getLastChronoPartRunningHashHEX());
         assertEquals(lastChronoPartSequenceNum, getSXCApplicationMessage.getLastChronoPartSequenceNum());
 
@@ -319,6 +319,43 @@ public class PersistTest {
         assertNull(persist.getParts(applicationMessageID));
         assertNull(persist.getParts(applicationMessageID2));
     }
+    
+    @Test
+    public void testAddressList() throws Exception {
+        Persist persist = new Persist();
+        persist.setHibernateProperties(getHibernateProperties("testAddressList"));
+        
+        assertDoesNotThrow( () -> {persist.addOrUpdateAppParticipant("0", "theirEd25519PubKeyForSigning0", "sharedSymmetricEncryptionKey0");});
+        assertDoesNotThrow( () -> {persist.addOrUpdateAppParticipant("1", "theirEd25519PubKeyForSigning1", "sharedSymmetricEncryptionKey1");});
+        
+        Map<String, Map<String, String>> gotAddressList = persist.getAddressList();
+        
+        assertNotNull(gotAddressList.size());
+        assertEquals(2, gotAddressList.size());
+        assertEquals("theirEd25519PubKeyForSigning0", gotAddressList.get("0").get("theirEd25519PubKeyForSigning"));
+        assertEquals("sharedSymmetricEncryptionKey0", gotAddressList.get("0").get("sharedSymmetricEncryptionKey"));
+        assertEquals("theirEd25519PubKeyForSigning1", gotAddressList.get("1").get("theirEd25519PubKeyForSigning"));
+        assertEquals("sharedSymmetricEncryptionKey1", gotAddressList.get("1").get("sharedSymmetricEncryptionKey"));
+    }
+
+    
+    @Test
+    public void testStoreRetrieveSecretKey() throws Exception {
+        Persist persist = new Persist();
+        persist.setHibernateProperties(getHibernateProperties("testAddressList"));
+        byte[] secretkey = "1234".getBytes();
+        persist.storeSecretKey(secretkey);
+        byte[] secretkeyFromDb = persist.getSecretKey();
+        
+        assertArrayEquals(secretkey, secretkeyFromDb);
+        // do one more time to test update
+        secretkey = "9876".getBytes();
+        persist.storeSecretKey(secretkey);
+        secretkeyFromDb = persist.getSecretKey();
+        assertArrayEquals(secretkey, secretkeyFromDb);
+        
+    }
+
     
     private List<ApplicationMessageChunk> makeApplicationMessageChunks(ApplicationMessageID applicationMessageID) {
         List<ApplicationMessageChunk> chunks = new ArrayList<ApplicationMessageChunk>();

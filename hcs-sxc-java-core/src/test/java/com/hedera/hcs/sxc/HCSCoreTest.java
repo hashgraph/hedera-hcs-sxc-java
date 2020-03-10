@@ -68,7 +68,7 @@ class HCSCoreTest {
         assertEquals(1, hcsCore.getHibernateConfig().size());
         assertEquals(100000000, hcsCore.getMaxTransactionFee());
         assertArrayEquals(msgEncryptKey.toBytes(), hcsCore.getMessageEncryptionKey());
-        assertNull(hcsCore.getMessagePersistence());
+        assertTrue(hcsCore.getPersistence() != null);
         assertEquals("hcs.testnet.mirrornode.hedera.com:5600", hcsCore.getMirrorAddress());
         assertEquals(2, hcsCore.getNodeMap().size());
         assertEquals(AccountId.fromString("1.1.1"), hcsCore.getOperatorAccountId());

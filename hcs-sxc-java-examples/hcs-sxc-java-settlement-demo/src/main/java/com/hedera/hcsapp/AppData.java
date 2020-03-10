@@ -51,24 +51,6 @@ public final class AppData {
     private int webPort = 8080;
     private Dotenv dotEnv;
     
-    private String getEnvValue(String varName) throws Exception {
-        String value = "";
-        log.debug("Looking for " + varName + " in environment variables");
-        if (System.getProperty(varName) != null) {
-            value = System.getProperty(varName);
-            log.debug(varName + " found in command line parameters");
-        } else if ((this.dotEnv == null) || (this.dotEnv.get(varName) == null) || (this.dotEnv.get(varName).isEmpty())) {
-            log.error(varName + " environment variable is not set");
-            log.error(varName + " environment variable not found in ./config/.env");
-            log.error(varName + " environment variable not found in command line parameters");
-            System.exit(0);
-        } else {
-            value = this.dotEnv.get(varName);
-            log.debug(varName + " found in environment variables");
-        }
-        return value;
-    }
-
     private String getOptionalEnvValue(String varName) throws Exception {
         String value = "";
         log.debug("Looking for " + varName + " in environment variables");
@@ -99,7 +81,8 @@ public final class AppData {
         loadEnv("./config/.env");
         init("./config/config.yaml", "./config/docker-compose.yml", "./config/.env");
     }
-    public AppData(String configFilePath, String environmentFilePath, String dockerFilePath) throws Exception {
+    public AppData(String configFilePath, String environmentFilePath, String dockerFilePath, String addressFilePath) throws Exception {
+        AddressListCrypto.INSTANCE.singletonInstance(appId, addressFilePath);
         loadEnv(environmentFilePath);
         init(configFilePath, dockerFilePath, environmentFilePath);
     }
@@ -123,6 +106,10 @@ public final class AppData {
             System.exit(0);
         }
 
+        this.hcsCore = new HCSCore()
+                .builder(this.appId, configFilePath, environmentFilePath);
+                //.withMessageEncryptionKey(this.messageEncryptionKey);
+        
         for (Map.Entry<String, DockerService> service : dockerCompose.getServices().entrySet()) {
             DockerService dockerService = service.getValue();
             if (dockerService.getEnvironment() != null) {
@@ -133,15 +120,31 @@ public final class AppData {
                     appClient.setPaymentAccountDetails(dockerService.getEnvironment().get("PAYMENT_ACCOUNT_DETAILS"));
                     appClient.setRoles(dockerService.getEnvironment().get("ROLES"));
                     appClient.setColor(dockerService.getEnvironment().get("COLOR"));
-                    appClient.setAppId(dockerService.getEnvironment().get("APP_ID"));
+                    String appIdD = dockerService.getEnvironment().get("APP_ID");
+                    appClient.setAppId(appIdD);
+                    if (appIdD.equals(appId)){
+                        this.hcsCore = this.hcsCore.withMessageSigningKey(
+                                Ed25519PrivateKey.fromString(
+                                        dockerService.getEnvironment().get("SIGNKEY")
+                                ));
+                        if (AddressListCrypto.INSTANCE.singletonInstance(appId).getAddressList() != null) {
+                            AddressListCrypto
+                                .INSTANCE
+                                .singletonInstance(appId)
+                                .getAddressList()
+                                .forEach((k,v)->{
+                                    hcsCore.addOrUpdateAppParticipant(k, v.get("theirEd25519PubKeyForSigning"), v.get("sharedSymmetricEncryptionKey"));
+                                });
+                        }
+                    }
                     appClient.setWebPort(dockerService.getPortAsInteger());
 
                     this.appClients.add(appClient);
                 }
             }
         }
-        this.hcsCore = new HCSCore().builder(this.appId, configFilePath, environmentFilePath)
-                .withMessageEncryptionKey(this.messageEncryptionKey);
+
+        
     }
 
     public HCSCore getHCSCore() {

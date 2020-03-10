@@ -41,16 +41,20 @@ public class OutboundHCSMessageTest {
     
    
     @Test
-    public void testSingleChunking() {
-        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),"Single Chunk Message".getBytes());
+    public void testSingleChunking() throws Exception {
+        HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),hcsCore,"Single Chunk Message".getBytes(),null);
         assertTrue(chunks.size() == 1);
         
-    }
+    }        
     
     @Test
-    public void testMultiChunking() {
+    public void testMultiChunking() throws Exception {
+        HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+
         String longString = RandomStringUtils.random(5000, true, true);
-        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),longString.getBytes());
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)) ,hcsCore,longString.getBytes(),null);
         assertTrue(chunks.size() == 2);
     }
     
@@ -99,7 +103,7 @@ public class OutboundHCSMessageTest {
 
         OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(hcsCore);
         // pretend we're sending
-        TransactionId transactionId = outboundHCSMessage.sendMessageForTest(0, "testMessage".getBytes());
+        List<TransactionId> transactionId = outboundHCSMessage.sendMessageForTest(0, "testMessage".getBytes());
         assertNotNull(transactionId);
         
     }
@@ -111,21 +115,43 @@ public class OutboundHCSMessageTest {
         outboundHCSMessage.overrideMessageEncryptionKey(Ed25519PrivateKey.generate().toBytes());
         outboundHCSMessage.overrideEncryptedMessages(true);
         // pretend we're sending
-        TransactionId transactionId = outboundHCSMessage.sendMessageForTest(0, "testMessage".getBytes());
+        List<TransactionId> transactionId = outboundHCSMessage.sendMessageForTest(0, "testMessage".getBytes());
         assertNotNull(transactionId);
         
     }
-
+  
     @Test
     public void testOutBoundMessageNoSendWithEncryptionAndRotation() throws Exception {
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test")
             .withMessageEncryptionKey(Ed25519PrivateKey.generate().toBytes())
             .withEncryptedMessages(true)
+            .withMessageSigningKey(Ed25519PrivateKey.generate())
             .withKeyRotation(true, 1);
 
         OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(hcsCore);
         // pretend we're sending
-        TransactionId transactionId = outboundHCSMessage.sendMessageForTest(0, "testMessage".getBytes());
+        List<TransactionId> transactionId = outboundHCSMessage.sendMessageForTest(0, "testMessage".getBytes());
+        assertNotNull(transactionId);
+        
+    }
+    
+    @Test
+    public void testOutBoundMessageNoSendWithEncryptionFromConfig() throws Exception {
+        HCSCore hcsCore = new HCSCore()
+            .builder("0"
+                    , "./src/test/resources/config3.yaml"
+                    , "./src/test/resources/dotenv.test")
+            .withMessageSigningKey(Ed25519PrivateKey.generate())
+            ;
+        hcsCore.addOrUpdateAppParticipant("1", 
+                "302a300506032b6570032100c969fbb7b67b36f5560aa59a754a38bd88fd53ff870dad33011bbe2f37f34396", 
+                "817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449"
+        );
+   
+
+        OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(hcsCore);
+        // pretend we're sending
+        List<TransactionId> transactionId = outboundHCSMessage.sendMessageForTest(0, "testMessage".getBytes());
         assertNotNull(transactionId);
         
     }

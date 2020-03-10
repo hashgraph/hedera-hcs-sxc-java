@@ -78,6 +78,7 @@
         <jackson-databind.version>2.10.0</jackson-databind.version>
         <java-dotenv.version>5.0.1</java-dotenv.version>
         <jib.version>1.7.0</jib.version>
+        <junit.version>4.11</junit.version>
         <junit-jupiter.version>5.5.2</junit-jupiter.version>
         <jacoco.version>0.8.5</jacoco.version>
 
@@ -88,13 +89,15 @@
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
         <maven-shade-plugin.version>3.2.0</maven-shade-plugin.version>
-
+        
+        <operadriver.version>1.5</operadriver.version>
         <os-maven-plugin.version>1.6.1</os-maven-plugin.version>
 
         <protobuf-java.version>3.11.1</protobuf-java.version>
         <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
         <protoc.version>3.11.2</protoc.version>
 
+        <selenium-java.version>2.44.0</selenium-java.version>
         <snakeyaml.version>1.21</snakeyaml.version>
         <surefire.version>3.0.0-M4</surefire.version>
     </properties>

@@ -1,0 +1,13 @@
+# Specify a list of alternative addressbooks. Only one addressbook is 
+# active at a time and is set by the APP_ID in the .env file.
+# Notice that your ownEd25519PubKeyForSigning must be set in the .env
+# file as well. All keys specified here are in HEX format.
+
+Player-1 :                              
+  Player-2 :
+    sharedSymmetricEncryptionKey: p1-p2
+    theirEd25519PubKeyForSigning: p2
+Player-2 : 
+  Player-1 :  
+    sharedSymmetricEncryptionKey: p1-p2
+    theirEd25519PubKeyForSigning: p1

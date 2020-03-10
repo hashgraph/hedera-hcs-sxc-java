@@ -52,36 +52,42 @@ public interface SxcPersistence {
     public ConsensusMessageSubmitTransaction getSubmittedTransaction(String transactionId);
     public Map<String, ConsensusMessageSubmitTransaction> getSubmittedTransactions();
     
-   // application message persistence
+   // Application message persistence
   
    public void storeApplicationMessage(
-        ApplicationMessage applicationMessage,
-        Instant lastChronoPartConsensusTimestamp,
-        String lastChronoPartRunningHashHEX,
-        long lastChronoPartSequenceNum
+        ApplicationMessage applicationMessage, // the message
+        Instant lastChronoPartConsensusTimestamp, // consensus data if available
+        String lastChronoPartRunningHashHEX, // consensus data if available
+        long lastChronoPartSequenceNum // consensus data if available
    );
    
    public Map<String, ApplicationMessage> getApplicationMessages();
-   public List<? extends SXCApplicationMessageInterface> getSXCApplicationMessages(); 
+   public List<? extends SxcApplicationMessageInterface> getSXCApplicationMessages(); 
     
-   public SXCApplicationMessageInterface getApplicationMessageEntity(String applicationMessageId);
+   public SxcApplicationMessageInterface getApplicationMessageEntity(String applicationMessageId);
    public ApplicationMessage getApplicationMessage(String applicationMessageId) throws InvalidProtocolBufferException;
    
     
     // secret key  and keySpec holder for key rotation
     public void storeSecretKey(byte[] secretKey);
     public byte[] getSecretKey();
-   
+
     public void storePublicKey(byte[] secretKey);
     public byte[] getPublicKey();
-       
+
     // consensus timestamp
     public Instant getLastConsensusTimestamp();
-    
+
     // persistence level
     public void setPersistenceLevel(MessagePersistenceLevel persistenceLevel);
-    
+
     // clear all data
     public void clear();
-  }
+
+    // AddressBook Persistence
+    public Map<String,Map<String,String>> getAddressList();
+    public void addOrUpdateAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey);
+    public void removeAppParticipant(String appId);
+
+}
     

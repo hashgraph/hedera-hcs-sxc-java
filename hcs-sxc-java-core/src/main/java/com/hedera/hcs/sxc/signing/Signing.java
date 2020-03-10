@@ -27,6 +27,8 @@ import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
+
+
 public class Signing {
  
     public static byte[] sign(String messageToSign, Ed25519PrivateKey privateKey) throws Exception {
@@ -41,6 +43,10 @@ public class Signing {
         return verify(plainText.getBytes(), signature, publicKey);
     }
     public static boolean verify(byte[] plainText, byte[] signature, Ed25519PublicKey publicKey)  {
+        if (signature.length == 0) {
+            log.warn("Empty signature, unable to verify");
+            return false;
+        }
         return Ed25519.verify(signature, 0, publicKey.toBytes(), 0, plainText, 0, plainText.length);
     }        
  }

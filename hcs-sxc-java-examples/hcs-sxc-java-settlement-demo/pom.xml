@@ -84,19 +84,21 @@
         </dependency>
 
         <!-- PLUGINS -->
-
+    
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-plugins-persistence-hibernate</artifactId>
             <version>${hcs-sxc.version}</version>
+            <scope>compile</scope>
         </dependency>
-        <!-- note: remove dub test dependency to avoid conflicts
+<!-- 
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-plugins-persistence-in-memory</artifactId>
             <version>${hcs-sxc.version}</version>
-        </dependency>-->
-       
+        </dependency>
+ -->    
+    
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-plugins-mirror-direct</artifactId>
@@ -107,7 +109,7 @@
 
         <dependency>
             <groupId>com.hedera</groupId>
-            <artifactId>hcs-sxc-java-plugins-cryptography</artifactId>
+            <artifactId>hcs-sxc-java-plugins-encryption-diffie-hellman</artifactId>
             <version>0.0.3-SNAPSHOT</version>
         </dependency>
 
@@ -128,13 +130,7 @@
                 </exclusion>
             </exclusions>            
         </dependency>
-        <dependency>
-            <groupId>com.hedera</groupId>
-            <artifactId>hcs-sxc-java-plugins-persistence-in-memory</artifactId>
-            <version>${hcs-sxc.version}</version>
-            <scope>test</scope>
-        </dependency>
-        
+
     </dependencies>
 
     <build>
@@ -182,6 +178,21 @@
                     <execution>
                         <goals>
                             <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <configuration>
+                    <mainClass>com.hedera.hcsapp.Application</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
                         </goals>
                     </execution>
                 </executions>

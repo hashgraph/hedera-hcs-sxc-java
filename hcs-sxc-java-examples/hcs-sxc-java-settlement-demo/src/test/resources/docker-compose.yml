@@ -6,7 +6,8 @@ services:
     restart: on-failure
     environment:
       APP_ID: "Alice"
-      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6b
+      PUBKEY: 302a300506032b65700321000c5fd53530c52e9950e98932e2bdc35c6f9cad0069198da76a611e28d4fe434b
+      SIGNKEY: 302e020100300506032b65700422042031f39a2808278f5b247ee4a40574385a38e13be52b3354ac948a13892ddd10cc
       ROLES: "BUYER,SELLER"
       PAYMENT_ACCOUNT_DETAILS: "10-11-12 80640665"
       COLOR: 0a2c5a
@@ -21,7 +22,8 @@ services:
     restart: on-failure
     environment:
       APP_ID: "Bob"
-      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6a
+      PUBKEY: 302a300506032b6570032100ec2e65689463b5a47b15ecf70de32ddfc3328ce4e3c9d9ebf61745e2df25c3a2
+      SIGNKEY: 302e020100300506032b657004220420cf15447c8ab46dd0f893064ffe338eb48e1d24f60ad65e6439c4ca49117afb1c
       ROLES: "BUYER,SELLER"
       PAYMENT_ACCOUNT_DETAILS: "13-01-32 79832564"
       COLOR: 0d431f
@@ -30,20 +32,6 @@ services:
     volumes:
       - ./:/config
 
-  Carlos:
-   container_name: Carlos
-   image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
-   restart: on-failure
-   environment:
-     APP_ID: "Carlos"
-     PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6c
-     ROLES: "BUYER,SELLER"
-     PAYMENT_ACCOUNT_DETAILS: "22-11-14 70925098"
-     COLOR: 275f4f
-   ports:
-     - 8083:8083
-   volumes:
-     - ./:/config
 
   Diana:
     container_name: Diana
@@ -51,7 +39,8 @@ services:
     restart: on-failure
     environment:
       APP_ID: "Diana"
-      PUBKEY: 302a300506032b6570032100bcabbb31c4c6418ea323e02dd46c060f82936141b5d2d2a1da89e59e1267ab6d
+      PUBKEY: 302a300506032b6570032100976d0504809bf0ecfe981a8f6a2a255d3a3a1d41a16aceb61addec387bf1bab5
+      SIGNKEY: 302e020100300506032b6570042204208f86fd7416e3ccd2e6ceba5680374259823978fcbe49162d8847405416c299a2
       ROLES: "PAYCHANNEL"
       PAYMENT_ACCOUNT_DETAILS: "12-52-23 26789524"
       COLOR: 3f370b
@@ -59,3 +48,19 @@ services:
       - 8084:8084
     volumes:
       - ./:/config
+
+  Grace:
+   container_name: Grace
+   image: hederahashgraph/hcs-sxc-java-settlement-demo:latest
+   restart: on-failure
+   environment:
+     APP_ID: "Grace"
+     PUBKEY: 302a300506032b65700321005a12a4e6b90ede5b5d2e858fb3196e7ff219e961fe1a9837fd23970bceadf5cd
+     SIGNKEY: 302e020100300506032b65700422042047af3ff55fb97cc16d976ae931f1b9e160e3e688868295dad592b6c73b1f4c0d
+     ROLES: "DEMO"
+     PAYMENT_ACCOUNT_DETAILS: "10-32-52 55424452"
+     COLOR: 4f0500
+   ports:
+     - 8087:8087
+   volumes:
+     - ./:/config

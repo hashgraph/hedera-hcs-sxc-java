@@ -1,22 +1,11 @@
 package com.hedera.hcs.sxc.signing;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.jupiter.api.Test;
-
-import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
-import com.hedera.hcs.sxc.config.Topic;
 
 /*-
  * ‌
@@ -40,7 +29,8 @@ import com.hedera.hcs.sxc.config.Topic;
 
 
 class SigningTest {
-    
+
+
     @Test
     public void testSigning() throws Exception {
         Ed25519PrivateKey privateKey = Ed25519PrivateKey.generate();
@@ -57,5 +47,13 @@ class SigningTest {
         assertFalse(Signing.verify("not the original message", signBytes, privateKey.publicKey));
 
         assertFalse(Signing.verify(cleartext, signBytes, fakepublicKey));
+        
+       
+        
+        assertFalse(Signing.verify(cleartext, new byte[0], privateKey.publicKey ));
+        
+        
     }
+
+
 }

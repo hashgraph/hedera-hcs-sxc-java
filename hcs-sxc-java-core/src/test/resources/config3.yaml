@@ -1,0 +1,42 @@
+appNet:
+  # Should messages be signed
+  signMessages: false
+  # Should messages be encrypted
+  encryptMessages: true
+  # Should messages be rotated
+  rotateKeys: false
+  # How often (messages) should keys be rotated
+  rotateKeyFrequency: 0
+  # HCS topics to be used
+  topics:
+    - topic: 0.0.998
+      submitKey: 302e020100300506032b657004220420b89e42e2e4c065f47fddde76b4784918da84012139f030866e1808bf2b3d5ef1
+    - topic: 0.0.999
+  # Which level of persistence should be used
+  persistenceLevel: "FULL"
+  # Should history of messages be caught up
+  catchupHistory: true
+  
+# Default HCS transaction fee in tinybar
+HCSTransactionFee: 100000000
+
+coreHibernate:
+  # these values will be loaded as a map, add or remove properties as necessary
+  # {appId} will be replaced with the application instance id
+  hibernate.connection.driver_class: "org.h2.Driver"
+
+mirrorNode:
+  # Address of the mirror node's subscription end point
+  address: "hcs.testnet.mirrornode.hedera.com:5600"
+
+# List of Hedera Nodes to send HCS messages to, if more than one is specified, the SDK will randomly choose a node with each transaction
+nodes:
+  - address: 0.testnet.hedera.com:50211
+    account: 0.0.3
+  - address: 1.testnet.hedera.com:50211
+    account: 0.0.4
+  - address: 2.testnet.hedera.com:50211
+    account: 0.0.5
+  - address: 3.testnet.hedera.com:50211
+    account: 0.0.6
+    

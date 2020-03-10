@@ -22,6 +22,7 @@ package com.hedera.hcsapp;
 
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
+import com.hedera.hcs.sxc.commonobjects.HCSResponse;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 
 import lombok.extern.log4j.Log4j2;
@@ -45,21 +46,39 @@ public final class App {
         } else {
             appId = args[0];
         }
-        int topicIndex = 0; // refers to the first topic ID in the config.yaml
         
-        // Simplest setup and send
-        Config config = new Config();
-        HCSCore hcsCore = new HCSCore().builder(appId);
+        int topicIndex = 0; // refers to the first topic ID in the config.yaml
+
+        // 1 - Init the core with data from  .env and config.yaml 
+        //HCSCore hcsCore = HCSCore.INSTANCE.singletonInstance(appId);
+        HCSCore hcsCore = new HCSCore().builder(appId,
+                "./config/config.yaml",
+                "./config/.env"+appId
+        );
+        
+
+        if (hcsCore.getEncryptMessages()) {
+            // 3 - Load the addressbook from address-list yaml and supply the core.
+            AddressListCrypto
+                    .INSTANCE
+                    .singletonInstance(appId)
+                    .getAddressList()
+                    .forEach((k,v)->{
+                        hcsCore.addOrUpdateAppParticipant(k, v.get("theirEd25519PubKeyForSigning"), v.get("sharedSymmetricEncryptionKey"));
+                    });
+        }        
+
 
         System.out.println("****************************************");
         System.out.println("** Welcome to a simple HCS demo");
-        System.out.println("** I am app: " + config.getConfig().getAppClients().get(Integer.parseInt(appId)).getClientName());
+        System.out.println("** I am app: " + appId);
         System.out.println("****************************************");
         
         // create a callback object to receive the message
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsCore);
-        onHCSMessageCallback.addObserver(hcsResponse -> {
-            System.out.println("Received : "+ hcsResponse.getMessage());
+        onHCSMessageCallback.addObserver((HCSResponse hcsResponse) -> {
+            System.out.println("Received : ");
+            System.out.println(new String (hcsResponse.getMessage()));
         });
 
         Scanner scan = new Scanner(System.in);
@@ -69,7 +88,6 @@ public final class App {
             System.out.println("Input a message to send to other parties, type exit [RETURN] to exit the application"
                     + ":");
             String userInput = scan.nextLine();
-
            
             if (userInput.equals("exit")) {
                 scan.close();
@@ -82,7 +100,7 @@ public final class App {
                 try {
                     new OutboundHCSMessage(hcsCore)
                         //.overrideEncryptedMessages(false)
-                        .overrideMessageSignature(false)
+                        //.overrideMessageSignature(false)
                         .sendMessage(topicIndex, userInput.getBytes());
     
                     System.out.println("Message sent successfully.");

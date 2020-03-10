@@ -32,29 +32,31 @@ import org.hibernate.cfg.Configuration;
 
 public class HibernateUtil {
     private static StandardServiceRegistry registry;
-
+    private static MetadataSources sources;
+    private static Metadata metadata;
+    private static SessionFactory sessionFactory;
+    
     public static Session getHibernateSession(Map<String, String> hibernateProperties) {
-        // get configuration from config
-        Configuration configuration = new Configuration();
-        hibernateProperties.forEach((key,value) -> configuration.setProperty(key, value)); 
-
-        // Create registry
-        registry = new StandardServiceRegistryBuilder()
-                .configure()
-                .applySettings(configuration.getProperties())
-                .build();
+        if (registry == null) {
+            // get configuration from config
+            Configuration configuration = new Configuration();
+            hibernateProperties.forEach((key,value) -> configuration.setProperty(key, value)); 
+            // Create registry
+            registry = new StandardServiceRegistryBuilder()
+                    .configure()
+                    .applySettings(configuration.getProperties())
+                    .build();
         
-        // Create MetadataSources
-        MetadataSources sources = new MetadataSources(registry);
+            // Create MetadataSources
+            sources = new MetadataSources(registry);
         
-        // Create Metadata
-        Metadata metadata = sources.getMetadataBuilder().build();
+            // Create Metadata
+            metadata = sources.getMetadataBuilder().build();
         
-        // Create SessionFactory
-        final SessionFactory sessionFactory = metadata.getSessionFactoryBuilder().build();
-        final Session session = sessionFactory.openSession();
-        
-        return session;
+            // Create SessionFactory
+            sessionFactory = metadata.getSessionFactoryBuilder().build();
+        }
+        return sessionFactory.openSession();
     }
 
     public static void shutdown() {

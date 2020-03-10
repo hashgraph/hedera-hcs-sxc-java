@@ -49,10 +49,34 @@
         </dependency>
         <dependency>
             <groupId>com.hedera</groupId>
-            <artifactId>hcs-sxc-java-plugins-cryptography</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
+            <artifactId>hcs-sxc-java-plugins-encryption-diffie-hellman</artifactId>
+            <version>${hcs-sxc.version}</version>
             <scope>test</scope>
-        </dependency>        
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <scope>test</scope>
+            <version>${selenium-java.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opera</groupId>
+            <artifactId>operadriver</artifactId>
+            <scope>test</scope>
+            <version>${operadriver.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.seleniumhq.selenium</groupId>
+                    <artifactId>selenium-remote-driver</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+            <version>${junit.version}</version>
+        </dependency>
     </dependencies>
     <profiles>
         <profile>
@@ -64,6 +88,7 @@
                         <artifactId>jacoco-maven-plugin</artifactId>
                     </plugin>
                 </plugins>
+                
             </build>
         </profile>
     </profiles>

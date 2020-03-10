@@ -23,16 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * ‍
  */
 
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.Arrays;
-
 import org.junit.jupiter.api.Test;
 
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.proto.Timestamp;
 import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
-import com.hedera.hashgraph.sdk.TimestampHelper;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 
 public class SxcConsensusMessageTest {

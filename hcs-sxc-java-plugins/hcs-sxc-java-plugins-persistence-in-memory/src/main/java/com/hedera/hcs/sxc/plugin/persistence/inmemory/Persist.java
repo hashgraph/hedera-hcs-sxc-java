@@ -24,7 +24,7 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.MessagePersistenceLevel;
-import com.hedera.hcs.sxc.interfaces.SXCApplicationMessageInterface;
+import com.hedera.hcs.sxc.interfaces.SxcAddressListItemCryptoInterface;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 import com.hedera.hcs.sxc.proto.ApplicationMessageID;
@@ -34,77 +34,67 @@ import lombok.extern.log4j.Log4j2;
 import java.io.IOException;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
+import lombok.Data;
 
 @Log4j2
 public class Persist 
         implements com.hedera.hcs.sxc.interfaces.SxcPersistence{
     
-    public class HCSApplicationMessage implements  SXCApplicationMessageInterface, Serializable{
-
-        private static final long serialVersionUID = 1L;
-            private String applicationMessageId;
-            private byte[] applicationMessage;
-
-            private Instant lastChronoPartConsensusTimestamp;
-            private long lastChronoPartSequenceNum;
-            private String lastChronoPartRunningHashHEX;
-
-            @Override
-            public String getApplicationMessageId(){
-                return this.applicationMessageId;
+    @Data
+    public class HCSApplicationMessage implements SxcApplicationMessageInterface, Serializable, Comparable<HCSApplicationMessage>{
+         String applicationMessageId;
+         byte[] applicationMessage;
+         Instant lastChronoPartConsensusTimestamp;
+         long lastChronoPartSequenceNum;
+         String lastChronoPartRunningHashHEX;
+        @Override
+        public int compareTo(HCSApplicationMessage other) {
+            // comparison 
+            if (this.lastChronoPartSequenceNum > other.getLastChronoPartSequenceNum()) {
+                return 1;
+            } else if (this.lastChronoPartSequenceNum < other.getLastChronoPartSequenceNum()) {
+                return -1;
+            } else {
+                return 0;
             }
-
-            @Override
-            public byte[] getApplicationMessage(){
-                return this.applicationMessage;
-            }
-
-            @Override
-            public Instant getLastChronoPartConsensusTimestamp () {
-                return this.lastChronoPartConsensusTimestamp;
-            }
-
-//            @Override
-//            public long getLastChronoPartShardNum () {
-//                return this.lastChronoPartShardNum;
-//            }
-//            @Override
-//            public long getLastChronoPartRealmNum(){
-//                return this.lastChronoPartRealmNum;
-//            }
-            @Override
-            public long getLastChronoPartSequenceNum(){
-                return this.lastChronoPartSequenceNum;
-            }
-            @Override
-            public String getLastChronoPartRunningHashHEX(){
-                return this.lastChronoPartRunningHashHEX;
-            }
+        }    
     }
     
+    @Data
+    public class AddressListItem implements SxcAddressListItemCryptoInterface {
+        String appId;
+        String theirEd25519PubKeyForSigning;
+        String sharedSymmetricEncryptionKey;
+    }
     
-    private Map<ApplicationMessageID, List<ApplicationMessageChunk>> partialMessages;
-    private Map<String, ConsensusMessageSubmitTransaction> transactions;
-    private Map<String, SxcConsensusMessage> mirrorTopicMessages;
-    private Map<String, ApplicationMessage> applicationMessages;
-    private Map<String, HCSApplicationMessage> hcsApplicationMessages;
-    
-    private MessagePersistenceLevel persistenceLevel = MessagePersistenceLevel.FULL;
+    private static boolean isInstantiated = false;
+    private static Map<ApplicationMessageID, List<ApplicationMessageChunk>> partialMessages;
+    private static Map<String, ConsensusMessageSubmitTransaction> transactions;
+    private static Map<String, SxcConsensusMessage> mirrorTopicMessages;
+    private static Map<String, ApplicationMessage> applicationMessages;
+    private static Map<String, HCSApplicationMessage> hcsApplicationMessages;
+    private static Map<String, Map<String,String>> addressList;
+    private static MessagePersistenceLevel persistenceLevel = MessagePersistenceLevel.FULL;
     
     public Persist() throws IOException{
+        if(isInstantiated) return;
         partialMessages = new HashMap<>();
         transactions = new HashMap<>();
         mirrorTopicMessages = new HashMap<>();
         applicationMessages = new HashMap<>();
         hcsApplicationMessages = new HashMap<>();
+        addressList = new HashMap<>();
+        isInstantiated = true;
     }
     
     public void setPersistenceLevel(MessagePersistenceLevel persistenceLevel) {
-        this.persistenceLevel = persistenceLevel;
+        Persist.persistenceLevel = persistenceLevel;
     }
 
 //    0: none
@@ -168,7 +158,7 @@ public class Persist
     
     @Override
     public List<ApplicationMessageChunk> getParts(ApplicationMessageID applicationMessageId) {
-        return this.partialMessages.get(applicationMessageId);
+        return Persist.partialMessages.get(applicationMessageId);
     }
 
     @Override
@@ -215,7 +205,7 @@ public class Persist
         // always keep data to allow for reassembly of messages,
         // part messages can be deleted once full messages have been reconstituted
         // see removeParts
-        this.partialMessages.put(applicationMessageId, l);            
+        Persist.partialMessages.put(applicationMessageId, l);            
     }
 
     @Override
@@ -228,10 +218,10 @@ public class Persist
                 // do not remove stored data
                 break;
             case MESSAGE_ONLY:
-                this.partialMessages.remove(applicationMessageId);
+                Persist.partialMessages.remove(applicationMessageId);
                 break;
             case NONE:
-                this.partialMessages.remove(applicationMessageId);
+                Persist.partialMessages.remove(applicationMessageId);
                 break;
         }
     }
@@ -259,6 +249,7 @@ public class Persist
         transactions = new HashMap<>();
         mirrorTopicMessages = new HashMap<>();
         applicationMessages = new HashMap<>();
+        hcsApplicationMessages = new HashMap<>();
     }
 
     @Override
@@ -288,13 +279,33 @@ public class Persist
 
 
     @Override
-    public List<? extends SXCApplicationMessageInterface> getSXCApplicationMessages() {
-        return this.hcsApplicationMessages.values().stream().collect(Collectors.toList());
+
+    public List<? extends SxcApplicationMessageInterface> getSXCApplicationMessages() {
+        
+        return Persist.hcsApplicationMessages.values().stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
     }
 
     @Override
-    public SXCApplicationMessageInterface getApplicationMessageEntity(String applicationMessageId) {
-        return this.hcsApplicationMessages.get(applicationMessageId);
+    public SxcApplicationMessageInterface getApplicationMessageEntity(String applicationMessageId) {
+        return Persist.hcsApplicationMessages.get(applicationMessageId);
     }
+    
+    
+    @Override
+    public Map<String,Map<String,String>> getAddressList(){
+        return Persist.addressList;
+    }
+    
+    @Override
+    public void addOrUpdateAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey) {
+        Persist.addressList.put(appId, Map.of("theirEd25519PubKeyForSigning", theirEd25519PubKeyForSigning, "sharedSymmetricEncryptionKey", sharedSymmetricEncryptionKey));
+    }
+    @Override
+    public void removeAppParticipant(String appId) {
+        Persist.addressList.remove(appId);
+
+    }
+
+ 
    
 }

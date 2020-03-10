@@ -39,8 +39,12 @@ public class Application {
     
     public static void main(String[] args) throws Exception {
 
-        SpringApplication app = new SpringApplication(Application.class);
-        app.run(args);
+        if ((args.length > 0) && (args[0].contentEquals("generateconfig"))) {
+            GenerateConfigurationFiles.generateConfig();
+        } else {
+            SpringApplication app = new SpringApplication(Application.class);
+            app.run(args);
+        }
     }
     
     @Bean

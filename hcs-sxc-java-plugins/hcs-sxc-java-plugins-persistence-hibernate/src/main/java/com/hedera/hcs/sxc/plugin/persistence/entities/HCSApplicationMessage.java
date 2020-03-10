@@ -20,7 +20,8 @@ package com.hedera.hcs.sxc.plugin.persistence.entities;
  * ‍
  */
 
-import com.hedera.hcs.sxc.interfaces.SXCApplicationMessageInterface;
+
+import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
 import java.io.Serializable;
 import java.time.Instant;
 import javax.persistence.Entity;
@@ -29,11 +30,12 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import lombok.Data;
+import javax.persistence.Column;
 
 @Entity
 @Data
 @Table(name = "ApplicationMessages")
-public class HCSApplicationMessage implements  SXCApplicationMessageInterface, Serializable{
+public class HCSApplicationMessage implements  SxcApplicationMessageInterface, Serializable{
     /**
      * 
      */
@@ -43,6 +45,7 @@ public class HCSApplicationMessage implements  SXCApplicationMessageInterface, S
     @Lob
     private byte[] applicationMessage;
     
+    @Column(columnDefinition = "TIMESTAMP(9)")
     private Instant lastChronoPartConsensusTimestamp;
 //    private long lastChronoPartShardNum;
 //    private long lastChronoPartRealmNum;

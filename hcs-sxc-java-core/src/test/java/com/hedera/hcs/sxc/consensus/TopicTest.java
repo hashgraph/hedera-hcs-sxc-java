@@ -118,6 +118,7 @@ public class TopicTest {
         
         // test updated values
         // note some values are allocated to a Transaction object inside createHCSTopic which don't have getters
+        
         assertEquals(1, updateHCSTopic.getNodeMap().size());
         assertEquals("testing.hedera.com", updateHCSTopic.getNodeMap().get(AccountId.fromString("0.0.19")));
         assertEquals("0.0.10", updateHCSTopic.getOperatorAccountId().toString());

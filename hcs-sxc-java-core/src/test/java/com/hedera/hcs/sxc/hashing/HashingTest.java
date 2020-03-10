@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class HashingTest {
     
     final String plaintext = "Welcome to the Hedera Hashgraph Concensus Service";
-    final String hexOfHashOfPlainText="f39829c128492f289d15580844141549f395fd90292c708abdd1f786d9ce52fa";
+    final String hexOfHashOfPlainText="a9182d102bb8a40cc99ddecfb0176bd0b21363e149fde28f1eafa0307c5599141a5d643a582072a8b6ae805b560f84cf";
 
     @Test
     public void instance() {
@@ -50,6 +50,7 @@ public class HashingTest {
         log.debug("sha");
         byte[] expResult = StringUtils.hexStringToByteArray(hexOfHashOfPlainText);
         byte[] result = Hashing.sha(plaintext);
+        String byteArrayToHexString = StringUtils.byteArrayToHexString(result);
         assertArrayEquals(expResult, result);
     }
 

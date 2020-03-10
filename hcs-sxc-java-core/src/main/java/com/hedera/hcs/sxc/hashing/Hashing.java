@@ -29,7 +29,7 @@ public class Hashing {
 
    public static byte[] sha(String plaintext) throws NoSuchAlgorithmException{
        byte[] encodedhash = null; 
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        MessageDigest digest = MessageDigest.getInstance("SHA-384");
         encodedhash = digest.digest(
                 plaintext.getBytes(StandardCharsets.UTF_8));
         return encodedhash;

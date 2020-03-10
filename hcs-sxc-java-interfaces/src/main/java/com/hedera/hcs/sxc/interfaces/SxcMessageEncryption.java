@@ -1,76 +1,48 @@
 package com.hedera.hcs.sxc.interfaces;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import java.security.KeyPair;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
+import com.hedera.hcs.sxc.commonobjects.EncryptedData;
 
 public interface SxcMessageEncryption {
     /**
-     * Encrypt a cleartext message using AES and a shared secret generated using a 
-     * Diffie Hellman compatible secret 
+     * Encrypt a cleartext message using a shared secret 
      * @param sharedSecret A shared secret 
      * @param byte[] cleartext
-     * @return the ciphertext
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
-     * @throws IllegalBlockSizeException
-     * @throws BadPaddingException
-     * @throws UnsupportedEncodingException
-     * @throws InvalidAlgorithmParameterException
+     * @return EncryptedData
+     * @throws Exception
      */
-    public byte[] encrypt(byte[] sharedSecret, byte[] cleartext) throws Exception;
+    public EncryptedData encrypt(byte[] sharedSecret, byte[] cleartext) throws Exception;
     /**
-     * Encrypt a cleartext message using AES and a shared secret generated using a 
-     * Diffie Hellman compatible secret 
+     * Encrypt a cleartext message using a shared secret 
      * @param sharedSecret A shared secret 
      * @param String cleartext
-     * @return the ciphertext
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
-     * @throws IllegalBlockSizeException
-     * @throws BadPaddingException
-     * @throws UnsupportedEncodingException
-     * @throws InvalidAlgorithmParameterException
+     * @return EncryptedData
+     * @throws Exception
      */
-    public byte[] encrypt(byte[] sharedSecret, String cleartext) throws Exception;
+    public EncryptedData encrypt(byte[] sharedSecret, String cleartext) throws Exception;
     /**
-     * Decrypts using {@link #decrypt(byte[], byte[]) and converts result into to 
-     * human readable string. 
+     * Decrypts cipherText using sharedSecret and random 
      * @param sharedSecret
-     * @param ciphertext
-     * @return cleartext string
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
-     * @throws InvalidAlgorithmParameterException
-     * @throws IllegalBlockSizeException
-     * @throws BadPaddingException
-     * @throws IOException 
+     * @param encryptedData
+     * @return byte[]
+     * @throws Exception
      */    
-    public byte[] decrypt(byte[] sharedSecret, byte[] ciphertext) throws Exception;
+    public byte[] decrypt(byte[] sharedSecret, EncryptedData encryptedData) throws Exception;
     /**
-     * Decrypts using {@link #decrypt(byte[], byte[]) and converts result into to 
+     * Decrypts using {@link #decrypt(byte[], EncryptedData) and converts result into to 
      * human readable string. 
      * @param sharedSecret
-     * @param ciphertext
+     * @param encryptedData
      * @return cleartext String
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
-     * @throws InvalidAlgorithmParameterException
-     * @throws IllegalBlockSizeException
-     * @throws BadPaddingException
-     * @throws IOException 
+     * @throws Exception
      */
-    public String decryptToString(byte[] sharedSecret, byte[] ciphertext) throws Exception; 
+    public String decryptToString(byte[] sharedSecret, EncryptedData encryptedData) throws Exception; 
+
+    /**
+     * Generate a secret key
+     * @return the secret key
+     * @throws Exception 
+     */
+    public byte[] generateSecretKey() throws Exception;
 }

@@ -27,6 +27,7 @@ message ApplicationMessage {
     bytes businessProcessMessage = 2;  // the payload
     bytes businessProcessHash = 3;
     bytes businessProcessSignature = 4;
+    bytes encryptionRandom = 5;
 }
 
 // parts of a complete message

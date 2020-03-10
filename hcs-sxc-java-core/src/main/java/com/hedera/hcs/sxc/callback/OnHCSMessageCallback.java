@@ -24,6 +24,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import com.hedera.hcs.sxc.HCSCore;
+import com.hedera.hcs.sxc.commonobjects.EncryptedData;
 import com.hedera.hcs.sxc.commonobjects.HCSResponse;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.config.Topic;
@@ -31,7 +32,6 @@ import com.hedera.hcs.sxc.hashing.Hashing;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackFromMirror;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackToAppInterface;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
-import com.hedera.hcs.sxc.interfaces.MirrorSubscriptionInterface;
 import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
 import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
 import com.hedera.hcs.sxc.plugins.Plugins;
@@ -210,8 +210,10 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                         String key = keyMap.get("sharedSymmetricEncryptionKey");
                                         byte[] sharedKey = StringUtils.hexStringToByteArray(key); 
                                         log.debug("Decrypting message with key " + key.substring(key.length()-10, key.length()-1));
-                                        
-                                        decryptedBPM = this.messageEncryptionPlugin.decrypt(sharedKey, appMessage.getBusinessProcessMessage().toByteArray());
+                                        EncryptedData encryptedData = new EncryptedData();
+                                        encryptedData.setEncryptedData(appMessage.getBusinessProcessMessage().toByteArray());
+                                        encryptedData.setRandom(appMessage.getEncryptionRandom().toByteArray());
+                                        decryptedBPM = this.messageEncryptionPlugin.decrypt(sharedKey, encryptedData);
                                         //test if the message is illegal
                                         byte[] shaClrTxt = Hashing.sha(
                                                 StringUtils.byteArrayToHexString(decryptedBPM)

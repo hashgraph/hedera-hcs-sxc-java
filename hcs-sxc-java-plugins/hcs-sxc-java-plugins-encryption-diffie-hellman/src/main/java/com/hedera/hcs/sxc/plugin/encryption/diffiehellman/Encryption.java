@@ -1,5 +1,6 @@
 package com.hedera.hcs.sxc.plugin.encryption.diffiehellman;
       
+import com.hedera.hcs.sxc.commonobjects.EncryptedData;
 import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
 
 /*-
@@ -22,19 +23,11 @@ import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
  * ‍
  */
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
 import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.Security;
-import javax.crypto.BadPaddingException;
-
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 import javax.crypto.spec.GCMParameterSpec;
@@ -45,7 +38,7 @@ public class Encryption implements SxcMessageEncryption {
          return new Encryption();
      }
      
-     public void Encryption(){
+     public Encryption(){
          Security.setProperty("crypto.policy", "unlimited");
      }
     
@@ -54,117 +47,64 @@ public class Encryption implements SxcMessageEncryption {
       * Diffie Hellman compatible secret 
       * @param sharedSecret A shared secret 
       * @param byte[] cleartext
-      * @return the ciphertext
-      * @throws NoSuchAlgorithmException
-      * @throws NoSuchPaddingException
-      * @throws InvalidKeyException
-      * @throws IllegalBlockSizeException
-      * @throws BadPaddingException
-      * @throws UnsupportedEncodingException
-      * @throws InvalidAlgorithmParameterException
+      * @return EncryptedData
+      * @throws Exception
       */
-    @Override
-    public  byte[] encrypt(byte[] sharedSecret, byte[] cleartext) 
-            throws NoSuchAlgorithmException, 
-            NoSuchPaddingException, 
-            InvalidKeyException, 
-            IllegalBlockSizeException, 
-            BadPaddingException, 
-            UnsupportedEncodingException, 
-            InvalidAlgorithmParameterException{
+     @Override
+     public EncryptedData encrypt(byte[] sharedSecret, byte[] cleartext) throws Exception {
         if (sharedSecret.length!=32) throw new IllegalArgumentException("Key must be 32 bytes long");
         SecretKeySpec aesKey = new SecretKeySpec(sharedSecret, "AES");
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-        cipher.init(Cipher.ENCRYPT_MODE, aesKey, new GCMParameterSpec(128, new byte[16]));
+        SecureRandom random = new SecureRandom();
+        byte[] randomIV = new byte[16];
+        random.nextBytes(randomIV);
+        cipher.init(Cipher.ENCRYPT_MODE, aesKey, new GCMParameterSpec(128, randomIV));
         byte[] ciphertext = cipher.doFinal(cleartext);
-        return ciphertext;
+        EncryptedData result = new EncryptedData();
+        result.setEncryptedData(ciphertext);
+        result.setRandom(randomIV);
+        return result;
     }
     
-    /**
-     * Encrypt a cleartext message using AES and a shared secret generated using a 
-     * Diffie Hellman compatible secret 
-     * @param sharedSecret A shared secret 
-     * @param String cleartext
-     * @return the ciphertext
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
-     * @throws IllegalBlockSizeException
-     * @throws BadPaddingException
-     * @throws UnsupportedEncodingException
-     * @throws InvalidAlgorithmParameterException
-     */
-    @Override    
-    public byte[] encrypt(byte[] sharedSecret, String cleartext)
-            throws NoSuchAlgorithmException, 
-            NoSuchPaddingException, 
-            InvalidKeyException, 
-            IllegalBlockSizeException, 
-            BadPaddingException, 
-            UnsupportedEncodingException, 
-            InvalidAlgorithmParameterException{
+     /**
+      * Encrypt a cleartext message using AES and a shared secret generated using a 
+      * Diffie Hellman compatible secret 
+      * @param sharedSecret A shared secret 
+      * @param String cleartext
+      * @return EncryptedData
+      * @throws Exception
+      */
+     @Override    
+     public EncryptedData encrypt(byte[] sharedSecret, String cleartext) throws Exception {
         return encrypt(sharedSecret, StringUtils.stringToByteArray(cleartext));
     }
     
-    /**
-     * Decrypt a ciphertext  with a shared secret generated using a 
-     * Diffie Hellman compatible secret
-     * @param sharedSecret
-     * @param byte[] ciphertext
-     * @return the cleartext
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
-     * @throws InvalidAlgorithmParameterException
-     * @throws IllegalBlockSizeException
-     * @throws BadPaddingException
-     * @throws IOException 
-     */
-    @Override
-    public byte[] decrypt(byte[] sharedSecret, byte[] ciphertext) 
-            throws 
-            NoSuchAlgorithmException, 
-            NoSuchPaddingException, 
-            InvalidKeyException, 
-            InvalidAlgorithmParameterException, 
-            IllegalBlockSizeException, 
-            BadPaddingException,
-            IOException
-    {
+     /**
+      * Decrypts cipherText using sharedSecret and random 
+      * @param sharedSecret
+      * @param encryptedData
+      * @return byte[]
+      * @throws Exception
+      */    
+     @Override
+     public byte[] decrypt(byte[] sharedSecret, EncryptedData encryptedData) throws Exception {
         SecretKeySpec aesKey = new SecretKeySpec(sharedSecret, "AES"); 
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-        cipher.init(Cipher.DECRYPT_MODE, aesKey, new GCMParameterSpec(128, new byte[16]));
-        return cipher.doFinal(ciphertext);  
+        cipher.init(Cipher.DECRYPT_MODE, aesKey, new GCMParameterSpec(128, encryptedData.getRandom()));
+        return cipher.doFinal(encryptedData.getEncryptedData());  
     }
     
-    /**
-     * Decrypts using {@link #decrypt(byte[], byte[]) and converts result into to 
-     * human readable string. 
-     * @param sharedSecret
-     * @param ciphertext
-     * @return cleartext String
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchPaddingException
-     * @throws InvalidKeyException
-     * @throws InvalidAlgorithmParameterException
-     * @throws IllegalBlockSizeException
-     * @throws BadPaddingException
-     * @throws IOException 
-     */
-    @Override
-    public String decryptToString(byte[] sharedSecret, byte[] ciphertext) 
-            throws 
-            NoSuchAlgorithmException,
-            NoSuchAlgorithmException, 
-            NoSuchPaddingException, 
-            InvalidKeyException, 
-            InvalidAlgorithmParameterException, 
-            IllegalBlockSizeException, 
-            BadPaddingException,
-            IOException
-    {
-        return StringUtils.byteArrayToString(decrypt(sharedSecret, ciphertext));
+     /**
+      * Decrypts using {@link #decrypt(byte[], EncryptedData) and converts result into to 
+      * human readable string. 
+      * @param sharedSecret
+      * @param encryptedData
+      * @return cleartext String
+      * @throws Exception
+      */
+     @Override
+     public String decryptToString(byte[] sharedSecret, EncryptedData encryptedData) throws Exception { 
+        return StringUtils.byteArrayToString(decrypt(sharedSecret, encryptedData));
     }
     
     /**
@@ -172,10 +112,10 @@ public class Encryption implements SxcMessageEncryption {
      * @return the KeyPair
      * @throws Exception 
      */
-    public static byte[] generateSecretKey() throws Exception {
+     @Override
+    public byte[] generateSecretKey() throws Exception {
         KeyGenerator generator = KeyGenerator.getInstance("AES");
         generator.init(256);
-        //KeyPair pair = generator.generateKeyPair();
         return generator.generateKey().getEncoded();
     }
     

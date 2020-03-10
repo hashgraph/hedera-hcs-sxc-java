@@ -6,7 +6,7 @@ import com.hedera.hcs.sxc.plugin.encryption.diffiehellman.StringUtils;
 public class GenerateSymmetricKey {
 
     public static void main(String[] args) throws Exception {
-        byte[] secretKey =  Encryption.generateSecretKey();
+        byte[] secretKey = new Encryption().generateSecretKey();
         System.out.println("Private key : " + StringUtils.byteArrayToHexString(secretKey));
     }
 

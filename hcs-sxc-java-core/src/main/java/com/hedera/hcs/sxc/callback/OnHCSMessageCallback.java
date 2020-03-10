@@ -203,6 +203,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                     Signing.verify(
                                             appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray(),
                                             appMessage.getBusinessProcessSignatureOnHash().toByteArray(),
+
                                             theirPubKey)
                                 ){
                                     log.debug("Signature verification on message passed with " + appId + ", message is from them.");
@@ -219,6 +220,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                                 StringUtils.byteArrayToHexString(decryptedBPM)
                                         );
                                         if (! Hashing.matchSHA(shaClrTxt, appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray())){
+
                                             log.error("Corrupt message detected.");
                                             throw new Exception("Corrupt message detected.");
                                         } 
@@ -379,6 +381,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                                     ByteString.copyFrom(decryptedBPM)
                                              )
                                             .setBusinessProcessSignatureOnHash(appMessage.getBusinessProcessSignatureOnHash())
+
                                             .build();
                                         appMessage = decryptedAppmessage;
                                         this.hcsCore.getPersistence().storeApplicationMessage(

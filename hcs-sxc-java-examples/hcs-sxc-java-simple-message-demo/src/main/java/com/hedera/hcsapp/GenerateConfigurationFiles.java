@@ -58,9 +58,9 @@ public class GenerateConfigurationFiles {
             Files.write(file, lines, StandardCharsets.UTF_8);
         }
 
-        byte[] secretKey = Encryption.generateSecretKey();
+        byte[] secretKey = new Encryption().generateSecretKey();
         String P0P1 = StringUtils.byteArrayToHexString(secretKey);
-        secretKey =  Encryption.generateSecretKey();
+        secretKey =  new Encryption().generateSecretKey();
         String P0P2 = StringUtils.byteArrayToHexString(secretKey);
         
         File pathToFile = new File("./config/contact-list.yaml");

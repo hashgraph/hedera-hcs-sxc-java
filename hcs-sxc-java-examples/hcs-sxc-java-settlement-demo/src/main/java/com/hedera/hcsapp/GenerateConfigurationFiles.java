@@ -107,7 +107,7 @@ public class GenerateConfigurationFiles {
             for (String playerInAddress : addressTemplate.keySet()) {
                 if (addressTemplate.get(playerInAddress).containsKey(player)) {
                     String sharedKey = StringUtils
-                            .byteArrayToHexString(Encryption.generateSecretKey());
+                            .byteArrayToHexString(new Encryption().generateSecretKey());
 
                     addressTemplate.get(playerInAddress).get(player).put("sharedSymmetricEncryptionKey", sharedKey);
                     if (addressTemplate.get(player) != null) {

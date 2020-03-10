@@ -37,6 +37,7 @@ import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcs.sxc.HCSCore;
+import com.hedera.hcs.sxc.commonobjects.EncryptedData;
 import com.hedera.hcs.sxc.config.Topic;
 import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
 import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
@@ -443,11 +444,14 @@ public final class OutboundHCSMessage {
                     Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
                     SxcMessageEncryption encPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
                     log.debug("Encrypting message with key " + encryptionKey.substring(encryptionKey.length()-10, encryptionKey.length()-1));
-                    byte[] encryptedMessage = encPlugin.encrypt(
+                    EncryptedData encryptedData = encPlugin.encrypt(
                             StringUtils.hexStringToByteArray(encryptionKey)
                             , message);
                     applicationMessageBuilder.setBusinessProcessMessage(
-                            ByteString.copyFrom(encryptedMessage)
+                            ByteString.copyFrom(encryptedData.getEncryptedData())
+                    );
+                    applicationMessageBuilder.setEncryptionRandom(
+                            ByteString.copyFrom(encryptedData.getRandom())
                     );
                     
                     applicationMessage = applicationMessageBuilder.build();

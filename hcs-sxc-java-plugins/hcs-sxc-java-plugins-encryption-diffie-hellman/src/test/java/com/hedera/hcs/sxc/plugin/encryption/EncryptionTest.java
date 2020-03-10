@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Base64;
 import org.junit.jupiter.api.Test;
 
+import com.hedera.hcs.sxc.commonobjects.EncryptedData;
 import com.hedera.hcs.sxc.plugin.encryption.diffiehellman.Encryption;
 import com.hedera.hcs.sxc.plugin.encryption.diffiehellman.StringUtils;
 
@@ -19,24 +20,24 @@ public class EncryptionTest {
         byte[] secretKey=null;
         String cleartext = "Hear my cries Hear 234sdf! �$%&*)_+ my call Lend me your ears See my fall See my error Know my faults Time halts See my loss ";
 
-        secretKey =  Encryption.generateSecretKey();
+        secretKey = new Encryption().generateSecretKey();
 
-        byte[] encrypt = Encryption.load().encrypt(secretKey, StringUtils.stringToByteArray(cleartext));
-        byte[] encryptClearText = Encryption.load().encrypt(secretKey, cleartext);
+        EncryptedData encrypted = Encryption.load().encrypt(secretKey, StringUtils.stringToByteArray(cleartext));
+        EncryptedData encryptedClearText = Encryption.load().encrypt(secretKey, cleartext);
         
-        assertArrayEquals(encrypt, encryptClearText);
+        assertArrayEquals(encrypted.getEncryptedData(), encryptedClearText.getEncryptedData());
         
-        byte[] decrypt = Encryption.load().decrypt(secretKey, encrypt);
+        byte[] decrypted = Encryption.load().decrypt(secretKey, encrypted);
         
-        assertArrayEquals(StringUtils.stringToByteArray(cleartext), decrypt); 
+        assertArrayEquals(StringUtils.stringToByteArray(cleartext), decrypted); 
 
-        String decryptString = Encryption.load().decryptToString(secretKey, encrypt);
-        assertEquals(cleartext, decryptString); 
+        String decryptedString = Encryption.load().decryptToString(secretKey, encrypted);
+        assertEquals(cleartext, decryptedString); 
     }
     
     @Test
     public void testEncryptAndDecryptWithDifferentKeys() throws Exception {
-        byte[] secretKey= Encryption.generateSecretKey();
+        byte[] secretKey= new Encryption().generateSecretKey();
         
         String encodeToString = Base64.getEncoder().encodeToString(secretKey);
         String byteArrayToHexString = StringUtils.byteArrayToHexString(secretKey);
@@ -46,18 +47,17 @@ public class EncryptionTest {
         byte[] aliceDianaSecret = StringUtils.hexStringToByteArray("0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF");
         byte[] aliceBobSecret =   StringUtils.hexStringToByteArray("0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF");
         
+        EncryptedData encrypted = Encryption.load().encrypt(aliceDianaSecret, StringUtils.stringToByteArray(cleartext));
+        EncryptedData encryptedClearText = Encryption.load().encrypt(aliceDianaSecret, cleartext);
         
-        byte[] encrypt = Encryption.load().encrypt(aliceDianaSecret, StringUtils.stringToByteArray(cleartext));
-        byte[] encryptClearText = Encryption.load().encrypt(aliceDianaSecret, cleartext);
+        assertArrayEquals(encrypted.getEncryptedData(), encryptedClearText.getEncryptedData());
         
-        assertArrayEquals(encrypt, encryptClearText);
+        byte[] decrypted = Encryption.load().decrypt(aliceBobSecret, encrypted);
         
-        byte[] decrypt = Encryption.load().decrypt(aliceBobSecret, encrypt);
-        
-        assertArrayEquals(StringUtils.stringToByteArray(cleartext), decrypt); 
+        assertArrayEquals(StringUtils.stringToByteArray(cleartext), decrypted); 
 
-        String decryptString = Encryption.load().decryptToString(aliceBobSecret, encrypt);
-        assertEquals(cleartext, decryptString); 
+        String decryptedString = Encryption.load().decryptToString(aliceBobSecret, encrypted);
+        assertEquals(cleartext, decryptedString); 
     }
 
 }

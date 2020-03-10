@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import com.hedera.hcs.sxc.utils.StringUtils;
-
 public class AppDataTest {    
     
     @Test

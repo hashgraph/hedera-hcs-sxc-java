@@ -45,8 +45,6 @@ import lombok.Data;
 @Log4j2
 public class Persist 
         implements com.hedera.hcs.sxc.interfaces.SxcPersistence{
-
-
     
     @Data
     public class HCSApplicationMessage implements SxcApplicationMessageInterface, Serializable, Comparable<HCSApplicationMessage>{
@@ -96,7 +94,7 @@ public class Persist
     }
     
     public void setPersistenceLevel(MessagePersistenceLevel persistenceLevel) {
-        this.persistenceLevel = persistenceLevel;
+        Persist.persistenceLevel = persistenceLevel;
     }
 
 //    0: none
@@ -160,7 +158,7 @@ public class Persist
     
     @Override
     public List<ApplicationMessageChunk> getParts(ApplicationMessageID applicationMessageId) {
-        return this.partialMessages.get(applicationMessageId);
+        return Persist.partialMessages.get(applicationMessageId);
     }
 
     @Override
@@ -207,7 +205,7 @@ public class Persist
         // always keep data to allow for reassembly of messages,
         // part messages can be deleted once full messages have been reconstituted
         // see removeParts
-        this.partialMessages.put(applicationMessageId, l);            
+        Persist.partialMessages.put(applicationMessageId, l);            
     }
 
     @Override
@@ -220,10 +218,10 @@ public class Persist
                 // do not remove stored data
                 break;
             case MESSAGE_ONLY:
-                this.partialMessages.remove(applicationMessageId);
+                Persist.partialMessages.remove(applicationMessageId);
                 break;
             case NONE:
-                this.partialMessages.remove(applicationMessageId);
+                Persist.partialMessages.remove(applicationMessageId);
                 break;
         }
     }
@@ -284,27 +282,27 @@ public class Persist
 
     public List<? extends SxcApplicationMessageInterface> getSXCApplicationMessages() {
         
-        return this.hcsApplicationMessages.values().stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+        return Persist.hcsApplicationMessages.values().stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
     }
 
     @Override
     public SxcApplicationMessageInterface getApplicationMessageEntity(String applicationMessageId) {
-        return this.hcsApplicationMessages.get(applicationMessageId);
+        return Persist.hcsApplicationMessages.get(applicationMessageId);
     }
     
     
     @Override
     public Map<String,Map<String,String>> getAddressList(){
-        return this.addressList;
+        return Persist.addressList;
     }
     
     @Override
     public void addOrUpdateAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey) {
-        this.addressList.put(appId, Map.of("theirEd25519PubKeyForSigning", theirEd25519PubKeyForSigning, "sharedSymmetricEncryptionKey", sharedSymmetricEncryptionKey));
+        Persist.addressList.put(appId, Map.of("theirEd25519PubKeyForSigning", theirEd25519PubKeyForSigning, "sharedSymmetricEncryptionKey", sharedSymmetricEncryptionKey));
     }
     @Override
     public void removeAppParticipant(String appId) {
-        this.addressList.remove(appId);
+        Persist.addressList.remove(appId);
 
     }
 

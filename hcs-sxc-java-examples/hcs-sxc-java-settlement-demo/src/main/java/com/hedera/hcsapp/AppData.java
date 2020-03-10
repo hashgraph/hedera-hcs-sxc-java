@@ -26,7 +26,6 @@ import java.util.Map;
 
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
-import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.utils.StringUtils;
 import com.hedera.hcsapp.appconfig.AppClient;
@@ -52,24 +51,6 @@ public final class AppData {
     private int webPort = 8080;
     private Dotenv dotEnv;
     
-    private String getEnvValue(String varName) throws Exception {
-        String value = "";
-        log.debug("Looking for " + varName + " in environment variables");
-        if (System.getProperty(varName) != null) {
-            value = System.getProperty(varName);
-            log.debug(varName + " found in command line parameters");
-        } else if ((this.dotEnv == null) || (this.dotEnv.get(varName) == null) || (this.dotEnv.get(varName).isEmpty())) {
-            log.error(varName + " environment variable is not set");
-            log.error(varName + " environment variable not found in ./config/.env");
-            log.error(varName + " environment variable not found in command line parameters");
-            System.exit(0);
-        } else {
-            value = this.dotEnv.get(varName);
-            log.debug(varName + " found in environment variables");
-        }
-        return value;
-    }
-
     private String getOptionalEnvValue(String varName) throws Exception {
         String value = "";
         log.debug("Looking for " + varName + " in environment variables");

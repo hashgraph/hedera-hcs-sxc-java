@@ -20,8 +20,6 @@ package com.hedera.hcsapp;
  * ‍
  */
 
-import java.security.KeyPair;
-
 import com.hedera.hcs.sxc.plugin.encryption.diffiehellman.Encryption;
 import com.hedera.hcs.sxc.plugin.encryption.diffiehellman.StringUtils;
 

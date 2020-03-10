@@ -23,15 +23,11 @@ package com.hedera.hcs.sxc.plugin.persistence.hibernate;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.proto.Timestamp;
-import com.hedera.hashgraph.proto.TransactionBody;
 import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
 import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
-import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hcs.sxc.plugin.persistence.entities.AddressListCrypto;
 import com.hedera.hcs.sxc.plugin.persistence.entities.HCSApplicationMessage;
-import com.hedera.hcs.sxc.plugin.persistence.entities.HCSTransaction;
 import com.hedera.hcs.sxc.plugin.persistence.entities.MirrorResponse;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
@@ -43,7 +39,6 @@ import com.hedera.hcs.sxc.proto.ApplicationMessageID;
 
 import lombok.extern.log4j.Log4j2;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;

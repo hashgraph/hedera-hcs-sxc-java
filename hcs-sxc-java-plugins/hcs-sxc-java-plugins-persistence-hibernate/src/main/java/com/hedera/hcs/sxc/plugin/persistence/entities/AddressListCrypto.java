@@ -24,8 +24,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import lombok.Data;
-import com.hedera.hcs.sxc.interfaces.SxcAddressListItemCryptoInterface;
-import java.io.Serializable;
 import javax.persistence.Column;
 
 @Data

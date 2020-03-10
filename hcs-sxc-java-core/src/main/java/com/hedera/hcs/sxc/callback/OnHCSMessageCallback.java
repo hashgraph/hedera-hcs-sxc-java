@@ -192,7 +192,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                           
                             byte[] decryptedBPM  = null;
                             // loop through signatures in address book and keep 
-                            // the ones that passes verification. Then test to see
+                            // the ones that pass verification. Then test to see
                             // if you can decrypt
                             
                             for(String appId : hcsCore.getPersistence().getAddressList().keySet() ){
@@ -349,7 +349,8 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
 
                                         }*/
                                     }  else  { // the message is not a KR instruction. It is some other PROTO message
-                                               // send back the BPM;
+                                               // send back the BPM; IF it's not a PROTO message then use the CATCH 
+                                               // block. TODO, rewrite to avoid trycatch controll flow
                                         ApplicationMessage decryptedAppmessage = ApplicationMessage.newBuilder()
                                             .setApplicationMessageId(appMessage.getApplicationMessageId())
                                             .setBusinessProcessHash(appMessage.getBusinessProcessHash())
@@ -368,7 +369,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                     }
                                 
                                 }
-                                catch(InvalidProtocolBufferException e){  // the message is not a proto message. It's sometihng else
+                                catch(InvalidProtocolBufferException e){  // IF NOT PROTO: the message is not a PROTO message. It's sometihng else
                                         ApplicationMessage decryptedAppmessage = ApplicationMessage.newBuilder()
                                             .setApplicationMessageId(appMessage.getApplicationMessageId())
                                             .setBusinessProcessHash(appMessage.getBusinessProcessHash())

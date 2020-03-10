@@ -17,6 +17,10 @@ import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import com.hedera.hcs.sxc.config.Topic;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 
 /*-
  * ‌
@@ -40,7 +44,8 @@ import com.hedera.hcs.sxc.config.Topic;
 
 
 class SigningTest {
-    
+
+
     @Test
     public void testSigning() throws Exception {
         Ed25519PrivateKey privateKey = Ed25519PrivateKey.generate();
@@ -57,5 +62,13 @@ class SigningTest {
         assertFalse(Signing.verify("not the original message", signBytes, privateKey.publicKey));
 
         assertFalse(Signing.verify(cleartext, signBytes, fakepublicKey));
+        
+       
+        
+        assertFalse(Signing.verify(cleartext, new byte[0], privateKey.publicKey ));
+        
+        
     }
+
+
 }

@@ -3,12 +3,14 @@ package com.hedera.hcs.sxc.plugin.encryption;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import java.util.Base64;
 import org.junit.jupiter.api.Test;
 
 import com.hedera.hcs.sxc.commonobjects.EncryptedData;
 import com.hedera.hcs.sxc.plugin.encryption.diffiehellman.Encryption;
 import com.hedera.hcs.sxc.plugin.encryption.diffiehellman.StringUtils;
+import java.util.Arrays;
 
 public class EncryptionTest {
     public EncryptionTest() {
@@ -25,7 +27,8 @@ public class EncryptionTest {
         EncryptedData encrypted = Encryption.load().encrypt(secretKey, StringUtils.stringToByteArray(cleartext));
         EncryptedData encryptedClearText = Encryption.load().encrypt(secretKey, cleartext);
         
-        assertArrayEquals(encrypted.getEncryptedData(), encryptedClearText.getEncryptedData());
+       
+        assertFalse( Arrays.equals(encrypted.getEncryptedData(), encryptedClearText.getEncryptedData()));
         
         byte[] decrypted = Encryption.load().decrypt(secretKey, encrypted);
         
@@ -50,7 +53,7 @@ public class EncryptionTest {
         EncryptedData encrypted = Encryption.load().encrypt(aliceDianaSecret, StringUtils.stringToByteArray(cleartext));
         EncryptedData encryptedClearText = Encryption.load().encrypt(aliceDianaSecret, cleartext);
         
-        assertArrayEquals(encrypted.getEncryptedData(), encryptedClearText.getEncryptedData());
+        assertFalse( Arrays.equals(encrypted.getEncryptedData(), encryptedClearText.getEncryptedData()));
         
         byte[] decrypted = Encryption.load().decrypt(aliceBobSecret, encrypted);
         

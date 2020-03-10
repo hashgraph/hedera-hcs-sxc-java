@@ -1,7 +1,5 @@
 package com.hedera.hcsapp;
 
-import com.hedera.hashgraph.sdk.account.AccountId;
-
 /*-
  * ‌
  * hcs-sxc-java
@@ -22,15 +20,13 @@ import com.hedera.hashgraph.sdk.account.AccountId;
  * ‍
  */
 
+import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.consensus.CreateHCSTopic;
-
 import io.github.cdimascio.dotenv.Dotenv;
-import lombok.extern.log4j.Log4j2;
 
-@Log4j2
 public class CreateTopic {
 
     public static void main(String[] args) throws Exception {

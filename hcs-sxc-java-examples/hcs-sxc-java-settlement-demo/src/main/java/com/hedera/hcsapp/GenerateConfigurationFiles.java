@@ -125,7 +125,6 @@ public class GenerateConfigurationFiles {
         dockComposeWriter.write(dockComposeOut.dumpAsMap(dockComposeTemplate));
         dockComposeWriter.close();
 
-        Yaml addressOut = new Yaml();
         String contactListFile = new File("./config/contact-list.yaml").getCanonicalPath();
         FileWriter addressOutWriter = new FileWriter(contactListFile);
         addressOutWriter.write(dockComposeOut.dumpAsMap(addressTemplate));

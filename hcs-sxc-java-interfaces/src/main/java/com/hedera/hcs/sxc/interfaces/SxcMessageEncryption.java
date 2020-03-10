@@ -1,7 +1,5 @@
 package com.hedera.hcs.sxc.interfaces;
 
-import java.security.KeyPair;
-
 import com.hedera.hcs.sxc.commonobjects.EncryptedData;
 
 public interface SxcMessageEncryption {

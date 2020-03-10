@@ -20,7 +20,6 @@ package com.hedera.hcsapp;
  * ‍
  */
 
-import java.security.KeyPair;
 import java.util.Arrays;
 import java.util.List;
 import java.io.File;

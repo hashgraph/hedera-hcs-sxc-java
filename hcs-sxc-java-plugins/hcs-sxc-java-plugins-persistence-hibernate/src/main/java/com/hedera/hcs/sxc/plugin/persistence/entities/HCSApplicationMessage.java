@@ -30,7 +30,6 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import lombok.Data;
-import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
 import javax.persistence.Column;
 
 @Entity

@@ -36,8 +36,6 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -111,15 +109,12 @@ public class OnHCSMessageCallbackTest {
     
     @Test
     public void testMultiChunking() throws IOException {
-        byte[] message = "Single Chunk Message".getBytes();
         HCSCore hcsCore  = null;
         try {
             hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
         } catch (Exception ex) {
             fail("Core failed to init");
         }
-
-        
         
         byte[] longString = RandomStringUtils.random(5000, true, true).getBytes();
         List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),hcsCore,longString,null);

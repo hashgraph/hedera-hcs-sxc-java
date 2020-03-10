@@ -348,6 +348,11 @@ public class PersistTest {
         byte[] secretkeyFromDb = persist.getSecretKey();
         
         assertArrayEquals(secretkey, secretkeyFromDb);
+        // do one more time to test update
+        secretkey = "9876".getBytes();
+        persist.storeSecretKey(secretkey);
+        secretkeyFromDb = persist.getSecretKey();
+        assertArrayEquals(secretkey, secretkeyFromDb);
         
     }
 

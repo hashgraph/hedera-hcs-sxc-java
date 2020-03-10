@@ -81,7 +81,7 @@ services:
     restart: on-failure
     environment:
       APP_ID: Farouk
-      ROLES: ARBITER,AUDITOR
+      ROLES: ARBITER
       PAYMENT_ACCOUNT_DETAILS: 10-69-43 86535765
       COLOR: 2c0f4f
       PUBKEY: 302a300506032b65700321001b3b6440cfd4585bc811ec5b15a45af2931f869577e3c697a360af9ad94e0353
@@ -96,7 +96,7 @@ services:
     restart: on-failure
     environment:
       APP_ID: Grace
-      ROLES: DEMO
+      ROLES: AUDITOR
       PAYMENT_ACCOUNT_DETAILS: 10-32-52 55424452
       COLOR: 4f0500
       PUBKEY: 302a300506032b6570032100b8abb42f8438e4e58f66bf44700dece140d492d3e29fb03de36b21ee2b20e5d7

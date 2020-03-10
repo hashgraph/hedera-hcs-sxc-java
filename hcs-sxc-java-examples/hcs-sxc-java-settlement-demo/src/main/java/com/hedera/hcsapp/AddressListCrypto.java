@@ -55,7 +55,7 @@ public enum AddressListCrypto {
         return INSTANCE;
     }
     
-    public AddressListCrypto singletonInstance(String addressFilePath, String appId) throws Exception{
+    public AddressListCrypto singletonInstance(String appId, String addressFilePath) throws Exception{
         if( ! this.isInitialised) {
             this.init(addressFilePath, appId);
         }

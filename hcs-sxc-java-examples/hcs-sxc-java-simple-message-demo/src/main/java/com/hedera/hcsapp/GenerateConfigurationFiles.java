@@ -30,8 +30,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
-import com.hedera.hcs.sxc.plugin.cryptography.StringUtils;
-import com.hedera.hcs.sxc.plugin.cryptography.cryptography.Cryptography;
+import com.hedera.hcs.sxc.plugin.encryption.diffiehellman.Encryption;
+import com.hedera.hcs.sxc.plugin.encryption.diffiehellman.StringUtils;
 
 import io.github.cdimascio.dotenv.Dotenv;
 public class GenerateConfigurationFiles {
@@ -58,11 +58,9 @@ public class GenerateConfigurationFiles {
             Files.write(file, lines, StandardCharsets.UTF_8);
         }
 
-        //KeyPair kp = Cryptography.generateRsaKeyPair();
-        byte[] secretKey = Cryptography.generateSecretKey();
+        byte[] secretKey = Encryption.generateSecretKey();
         String P0P1 = StringUtils.byteArrayToHexString(secretKey);
-        //kp = Cryptography.generateRsaKeyPair();
-        secretKey =  Cryptography.generateSecretKey();
+        secretKey =  Encryption.generateSecretKey();
         String P0P2 = StringUtils.byteArrayToHexString(secretKey);
         
         File pathToFile = new File("./config/contact-list.yaml");

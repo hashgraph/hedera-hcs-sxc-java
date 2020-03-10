@@ -1,4 +1,4 @@
-package com.hedera.hcs.sxc.plugin.cryptography.keyrotation;
+package com.hedera.hcs.sxc.plugin.encryption.diffiehellman;
 import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
 /*-
  * ‌

@@ -1,4 +1,4 @@
-package com.hedera.hcs.sxc.plugin.cryptography;
+package com.hedera.hcs.sxc.plugin.encryption.diffiehellman;
 
 /*-
  * ‌

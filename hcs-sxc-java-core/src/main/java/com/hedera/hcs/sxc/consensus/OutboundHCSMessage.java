@@ -20,8 +20,6 @@ package com.hedera.hcs.sxc.consensus;
  * ‍
  */
 
-import com.google.common.hash.Hashing;
-import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
 
 import java.time.Duration;
@@ -38,7 +36,6 @@ import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
-import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.config.Topic;
 import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
@@ -49,20 +46,14 @@ import com.hedera.hcs.sxc.proto.AccountID;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 import com.hedera.hcs.sxc.proto.ApplicationMessageID;
-import com.hedera.hcs.sxc.proto.KeyRotationInitialise;
 import com.hedera.hcs.sxc.proto.Timestamp;
 import com.hedera.hcs.sxc.signing.Signing;
 import com.hedera.hcs.sxc.utils.StringUtils;
-import java.time.Instant;
-
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.crypto.KeyAgreement;
-
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.tuple.Pair;
 
 @Log4j2
 public final class OutboundHCSMessage {
@@ -108,13 +99,13 @@ public final class OutboundHCSMessage {
         
         if(this.rotateKeys){
             
-            Class<?> messageKeyRotationClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcKeyRotation", true);
+            Class<?> messageKeyRotationClass = Plugins.find("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcKeyRotation", true);
             this.keyRotationPlugin = (SxcKeyRotation)messageKeyRotationClass.newInstance();
         }
     }
 
     private void getMessageEncryptionPlugin() throws Exception {
-        Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
+        Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
         this.messageEncryptionPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
     }
     
@@ -449,7 +440,7 @@ public final class OutboundHCSMessage {
                     
                     // encrypt
                     String encryptionKey = recipientKeys.get("sharedSymmetricEncryptionKey");
-                    Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
+                    Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
                     SxcMessageEncryption encPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
                     log.debug("Encrypting message with key " + encryptionKey.substring(encryptionKey.length()-10, encryptionKey.length()-1));
                     byte[] encryptedMessage = encPlugin.encrypt(

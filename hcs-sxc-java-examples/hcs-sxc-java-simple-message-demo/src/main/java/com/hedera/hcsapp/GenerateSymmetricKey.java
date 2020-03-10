@@ -21,13 +21,14 @@ package com.hedera.hcsapp;
  */
 
 import java.security.KeyPair;
-import com.hedera.hcs.sxc.plugin.cryptography.StringUtils;
-import com.hedera.hcs.sxc.plugin.cryptography.cryptography.Cryptography;
+
+import com.hedera.hcs.sxc.plugin.encryption.diffiehellman.Encryption;
+import com.hedera.hcs.sxc.plugin.encryption.diffiehellman.StringUtils;
 
 public class GenerateSymmetricKey {
 
     public static void main(String[] args) throws Exception {
-        byte[] secretKey =  Cryptography.generateSecretKey();
+        byte[] secretKey =  Encryption.generateSecretKey();
         System.out.println("Private key : " + StringUtils.byteArrayToHexString(secretKey));
     }
 

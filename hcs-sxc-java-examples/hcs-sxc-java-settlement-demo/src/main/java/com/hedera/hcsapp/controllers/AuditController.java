@@ -85,11 +85,11 @@ public class AuditController {
 
         }
         if (this.encryptMessages){
-            Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
+            Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
             this.messageEncryptionPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
         }
          if(this.rotateKeys){
-            Class<?> messageKeyRotationClass = Plugins.find("com.hedera.hcs.sxc.plugin.cryptography.*", "com.hedera.hcs.sxc.interfaces.SxcKeyRotation", true);
+            Class<?> messageKeyRotationClass = Plugins.find("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcKeyRotation", true);
             this.keyRotationPlugin = (SxcKeyRotation)messageKeyRotationClass.newInstance();
         }
     }

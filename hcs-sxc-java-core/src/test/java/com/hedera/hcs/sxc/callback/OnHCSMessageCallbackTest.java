@@ -46,6 +46,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
@@ -174,7 +175,9 @@ public class OnHCSMessageCallbackTest {
         
         SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage(consensusTopicId, consensusTopicResponse);
         OnHCSMessageCallback cb = new OnHCSMessageCallback(hcsCore);
-        cb.partialMessage(chunks.get(0), sxcConsensusMessage);
+        assertDoesNotThrow( () -> {
+            cb.partialMessage(chunks.get(0), sxcConsensusMessage);
+        });
         
     }
     
@@ -211,7 +214,9 @@ public class OnHCSMessageCallbackTest {
         
         SxcConsensusMessage sxcConsensusMessage = new SxcConsensusMessage(consensusTopicId, consensusTopicResponse);
         OnHCSMessageCallback cb = new OnHCSMessageCallback(hcsCore);
-        cb.partialMessage(chunks.get(0), sxcConsensusMessage);
+        assertDoesNotThrow( () -> {
+            cb.partialMessage(chunks.get(0), sxcConsensusMessage);
+        });
         
     }
     
@@ -262,7 +267,9 @@ public class OnHCSMessageCallbackTest {
         
         // remove from database to simulate message not sent by me
         hcsCore.getPersistence().clear();
-        cb.partialMessage(chunks.get(0), sxcConsensusMessage);
+        assertDoesNotThrow( () -> {
+            cb.partialMessage(chunks.get(0), sxcConsensusMessage);
+        });
         
     }
     
@@ -312,7 +319,9 @@ public class OnHCSMessageCallbackTest {
         
         // remove from database to simulate message not sent by me
         hcsCore.getPersistence().clear();
-        cb.partialMessage(chunks.get(0), sxcConsensusMessage);
+        assertDoesNotThrow( () -> {
+            cb.partialMessage(chunks.get(0), sxcConsensusMessage);
+        });
         
     }
     
@@ -364,7 +373,9 @@ public class OnHCSMessageCallbackTest {
         
         // remove from database to simulate message not sent by me
         hcsCore.getPersistence().clear();
-        cb.partialMessage(chunks.get(0), sxcConsensusMessage);
+        assertDoesNotThrow( () -> {
+            cb.partialMessage(chunks.get(0), sxcConsensusMessage);
+        });
         
     }
 }

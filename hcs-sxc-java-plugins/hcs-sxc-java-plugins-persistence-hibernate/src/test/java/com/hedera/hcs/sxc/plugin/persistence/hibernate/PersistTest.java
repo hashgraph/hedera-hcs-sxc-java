@@ -338,6 +338,20 @@ public class PersistTest {
         assertEquals("sharedSymmetricEncryptionKey1", gotAddressList.get("1").get("sharedSymmetricEncryptionKey"));
     }
 
+    
+    @Test
+    public void testStoreRetrieveSecretKey() throws Exception {
+        Persist persist = new Persist();
+        persist.setHibernateProperties(getHibernateProperties("testAddressList"));
+        byte[] secretkey = "1234".getBytes();
+        persist.storeSecretKey(secretkey);
+        byte[] secretkeyFromDb = persist.getSecretKey();
+        
+        assertArrayEquals(secretkey, secretkeyFromDb);
+        
+    }
+
+    
     private List<ApplicationMessageChunk> makeApplicationMessageChunks(ApplicationMessageID applicationMessageID) {
         List<ApplicationMessageChunk> chunks = new ArrayList<ApplicationMessageChunk>();
         

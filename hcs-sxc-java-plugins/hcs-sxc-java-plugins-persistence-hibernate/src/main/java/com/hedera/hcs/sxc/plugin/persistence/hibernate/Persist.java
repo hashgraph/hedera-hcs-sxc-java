@@ -516,6 +516,8 @@ implements SxcPersistence{
     public void storeSecretKey(byte[] secretKey) {
         Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         List<KeyStore> resultList = session.createQuery("select k from KeyStore k").getResultList();
+        Transaction dbTransaction = null;
+        dbTransaction = session.beginTransaction();
         if (resultList.size() == 1){
             KeyStore ks = resultList.get(0);
             ks.setId(0);
@@ -527,13 +529,17 @@ implements SxcPersistence{
             ks.setSecretKey(secretKey);
             session.save(ks);
         }
+        session.flush();
+        dbTransaction.commit();
+       
         session.close();
+      
     }
 
     @Override
     public byte[] getSecretKey() {
         Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
-        KeyStore ks = session.find(KeyStore.class, 0);
+        KeyStore ks = session.createQuery("select k from KeyStore k", KeyStore.class).getResultList().get(0);
         session.close();
         return ks.getSecretKey();
     }   

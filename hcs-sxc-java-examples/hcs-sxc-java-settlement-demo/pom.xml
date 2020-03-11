@@ -84,27 +84,27 @@
         </dependency>
 
         <!-- PLUGINS -->
-    
+
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-plugins-persistence-hibernate</artifactId>
             <version>${hcs-sxc.version}</version>
             <scope>compile</scope>
         </dependency>
-<!-- 
+<!--
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-plugins-persistence-in-memory</artifactId>
             <version>${hcs-sxc.version}</version>
         </dependency>
- -->    
-    
+ -->
+
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-plugins-mirror-direct</artifactId>
             <version>${hcs-sxc.version}</version>
         </dependency>
-        <!-- <dependency> <groupId>com.hedera</groupId> <artifactId>hcs-sxc-java-plugins-mirror-queue-artemis</artifactId> 
+        <!-- <dependency> <groupId>com.hedera</groupId> <artifactId>hcs-sxc-java-plugins-mirror-queue-artemis</artifactId>
             <version>${hcs-sxc.version}</version> </dependency> -->
 
         <dependency>
@@ -128,7 +128,7 @@
                     <groupId>org.junit.vintage</groupId>
                     <artifactId>junit-vintage-engine</artifactId>
                 </exclusion>
-            </exclusions>            
+            </exclusions>
         </dependency>
 
     </dependencies>
@@ -212,8 +212,8 @@
                 </plugins>
             </build>
         </profile>
-        <!-- profile which adds the possibility to build docker images Call 
-            "mvn clean install -Pdocker" to invoke this additional plugin in the maven 
+        <!-- profile which adds the possibility to build docker images Call
+            "mvn clean install -Pdocker" to invoke this additional plugin in the maven
             build -->
         <profile>
             <id>docker</id>
@@ -246,28 +246,6 @@
                                 <phase>install</phase>
                                 <goals>
                                     <goal>dockerBuild</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>fatjar</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                        <version>${spring-boot.version}</version>
-                        <configuration>
-                            <mainClass>com.hedera.hcsapp.Application</mainClass>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>repackage</goal>
                                 </goals>
                             </execution>
                         </executions>

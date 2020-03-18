@@ -88,6 +88,21 @@ public interface SxcPersistence {
     public Map<String,Map<String,String>> getAddressList();
     public void addOrUpdateAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey);
     public void removeAppParticipant(String appId);
+    
+    //extract primary key
+    public static String extractApplicationMessageStringId(ApplicationMessageID applicationMessageID){
+         {
+        // need to know if message was sent by me. I have to lookup
+        // in db to see if I placed it into it when I sent with OutboutHCS...
+        String applicationMessageId =
+                applicationMessageID.getAccountID().getShardNum()
+                + "." + applicationMessageID.getAccountID().getRealmNum()
+                + "." + applicationMessageID.getAccountID().getAccountNum()
+                + "-" + applicationMessageID.getValidStart().getSeconds()
+                + "-" + applicationMessageID.getValidStart().getNanos();
+        return applicationMessageId;
+    }
 
+    }
 }
     

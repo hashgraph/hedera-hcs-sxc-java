@@ -20,6 +20,7 @@ package com.hedera.hcs.sxc.consensus;
  * ‍
  */
 
+import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
 
 import java.time.Duration;
@@ -36,6 +37,7 @@ import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
+import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.commonobjects.EncryptedData;
 import com.hedera.hcs.sxc.config.Topic;
@@ -47,7 +49,9 @@ import com.hedera.hcs.sxc.proto.AccountID;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 import com.hedera.hcs.sxc.proto.ApplicationMessageID;
+import com.hedera.hcs.sxc.proto.RequestProof;
 import com.hedera.hcs.sxc.proto.Timestamp;
+import com.hedera.hcs.sxc.proto.VerifiableMessage;
 import com.hedera.hcs.sxc.signing.Signing;
 import com.hedera.hcs.sxc.utils.StringUtils;
 import java.util.Arrays;
@@ -226,6 +230,23 @@ public final class OutboundHCSMessage {
      public List<TransactionId> sendMessage(int topicIndex, byte[] message) throws Exception {
         return sendMessage(topicIndex, message, false);
     }
+     
+    public List<TransactionId> requestProof(int topicIndex, String applicationMessageId, String cleartext, Ed25519PublicKey publicKey) throws Exception {
+        RequestProof rp = RequestProof.newBuilder()
+                .addApplicationMessage(
+  
+                        VerifiableMessage.newBuilder()
+                                .setApplicationMessagePrimaryChunkTimestamp(Timestamp.newBuilder().build())
+                                .setOriginalBusinessProcessMessage(ByteString.copyFrom(cleartext.getBytes()))
+                                .setSenderPublicSigningKey(ByteString.copyFrom(publicKey.toBytes()))
+                                .build()
+                ).build();
+        
+        
+        Any pack = Any.pack(rp);
+        return this.sendMessage(topicIndex,pack.toByteArray());
+    }
+     
      
     public List<TransactionId> sendMessage(int topicIndex, byte[] message, boolean byPassSending) throws Exception {
         List<TransactionId> txIdList = new ArrayList<>();

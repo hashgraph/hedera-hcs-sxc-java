@@ -22,6 +22,11 @@ package com.hedera.hcs.sxc.callback;
 import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.HederaStatusException;
+import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.commonobjects.EncryptedData;
@@ -52,7 +57,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
+import com.hedera.hcs.sxc.proto.AccountID;
+import com.hedera.hcs.sxc.proto.RequestProof;
+import com.hedera.hcs.sxc.proto.Timestamp;
+import com.hedera.hcs.sxc.proto.VerifiableMessage;
+import com.hedera.hcs.sxc.proto.VerifiedMessage;
 import com.hedera.hcs.sxc.signing.Signing;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
 import org.apache.commons.lang3.SerializationUtils;
@@ -142,14 +153,8 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                    
                     try {
                         
-                        // need to know if message was sent by me. I have to lookup
-                        // in db to see if I placed it into it when I sent on outgoing.
                         String applicationMessageId = 
-                                appMessage.getApplicationMessageId().getAccountID().getShardNum()
-                        + "." + appMessage.getApplicationMessageId().getAccountID().getRealmNum()
-                        + "." + appMessage.getApplicationMessageId().getAccountID().getAccountNum()
-                        + "-" + appMessage.getApplicationMessageId().getValidStart().getSeconds()
-                        + "-" + appMessage.getApplicationMessageId().getValidStart().getNanos();
+                                SxcPersistence.extractApplicationMessageStringId(appMessage.getApplicationMessageId());
                         
                         // check if the message was stored on outgoing and test if it was sent by me
                         SxcApplicationMessageInterface applicationMessageEntity = this.hcsCore.getPersistence().getApplicationMessageEntity(applicationMessageId);
@@ -331,7 +336,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                         } // test checking if initiator
                                     } // end any test initialise
 
-                                    if(any.is(KeyRotationRespond.class)){ // ============ KR2 =====================================================
+                                    else if(any.is(KeyRotationRespond.class)){ // ============ KR2 =====================================================
                                         // do not remove commented section
                                         /*
                                         // a respond message has arrived
@@ -352,7 +357,91 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                            hcsCore.getPersistence().storeSecretKey(newSecretKey);
 
                                         }*/
-                                    }  else  { // the message is not a KR instruction. It is some other PROTO message
+                                    } else if (any.is(RequestProof.class)) {    
+                                        System.out.println("I received a proof request and am attempting doing it. If done I'll send it back to my address book");
+                                        RequestProof requestProof = any.unpack(RequestProof.class);
+                                         // prove the message. if OK, send back an OK message (set the `appMessage`) , don't save this
+                                        VerifiableMessage verifiableMessage =  requestProof.getApplicationMessage(0);
+                                        boolean isVerified =  prove(
+                                            verifiableMessage.getApplicationMessagePrimaryChunkTimestamp(),
+                                            verifiableMessage.getOriginalBusinessProcessMessage(),
+                                            verifiableMessage.getSenderPublicSigningKey()
+                                                
+                                       );
+                                       
+                                       // prepare a response and send it to the network. 
+                                       
+                                        VerifiedMessage verifiedMessage = VerifiedMessage
+                                                .newBuilder()
+                                                .setApplicationMessage(verifiableMessage)
+                                                .setProved(isVerified)
+                                                .build();
+
+                                        Any anyPack = Any.pack(verifiedMessage);
+                                        byte[] sharedKey = null;
+                                        byte[] encryptedAnyPackedChunkBody = messageEncryptionPlugin.encrypt(sharedKey, anyPack.toByteArray()).getEncryptedData();
+
+
+                                        TransactionId transactionId = new TransactionId(hcsCore.getOperatorAccountId());
+                                        ApplicationMessageID newAppId = ApplicationMessageID.newBuilder()
+                                            .setAccountID(AccountID.getDefaultInstance().newBuilder()
+                                                    .setShardNum(transactionId.accountId.shard)
+                                                    .setRealmNum(transactionId.accountId.realm)
+                                                    .setAccountNum(transactionId.accountId.account)
+                                                    .build()
+                                            )
+                                            .setValidStart(Timestamp.newBuilder()
+                                                    .setSeconds(transactionId.validStart.getEpochSecond())
+                                                    .setNanos(transactionId.validStart.getNano())
+                                                    .build()
+                                            ).build();
+
+
+                                        ApplicationMessageChunk appChunk = ApplicationMessageChunk.newBuilder()
+                                            .setApplicationMessageId(newAppId)
+                                            .setChunkIndex(1)
+                                            .setChunksCount(1)
+                                            .setMessageChunk(
+                                                //fit an antire ApplicationMessage in the chunk and set body message to the encrypted stuff
+                                                ApplicationMessage.newBuilder()
+                                                    .setApplicationMessageId(newAppId)
+                                                    //TODO: set signature 
+                                                    .setBusinessProcessMessage(ByteString.copyFrom(encryptedAnyPackedChunkBody))
+                                                    //TODO: set hash
+                                                    .build()
+                                                    .toByteString()
+                                        ).build();
+
+
+                                        ConsensusMessageSubmitTransaction txVerifiedMessage = new ConsensusMessageSubmitTransaction()
+                                            .setMessage(appChunk.toByteArray())
+                                            .setTopicId(this.topics.get(
+                                                    0 // TODO get the topic from the appMessage
+                                            ).getConsensusTopicId())
+                                            .setTransactionId(transactionId);
+
+                                        // submit to network
+
+                                        try (Client client = new Client(hcsCore.getNodeMap())) {
+                                            client.setOperator(
+                                                    hcsCore.getOperatorAccountId(),
+                                                    hcsCore.getEd25519PrivateKey()
+                                            );
+
+                                            client.setMaxTransactionFee(hcsCore.getMaxTransactionFee());
+
+                                            TransactionId txIdVMessage =  txVerifiedMessage.execute(client);
+
+                                            TransactionReceipt receiptIdVMessage = txIdVMessage.getReceipt(client, Duration.ofSeconds(30));
+
+                                        } catch (Exception ex) {
+                                                log.error(ex);
+                                        }
+
+                                        
+                                        
+                                        
+                                    } else { // the message is not a KR or PROOF instruction. It is some other PROTO message
                                                // send back the BPM; IF it's not a PROTO message then use the CATCH 
                                                // block. TODO, rewrite to avoid trycatch controll flow
                                         ApplicationMessage decryptedAppmessage = ApplicationMessage.newBuilder()
@@ -423,6 +512,8 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
             log.error(ex);
         }     
     }
+
+   
     
     /**
      * Adds ApplicationMessageChunk into memory and returns
@@ -465,4 +556,10 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
             return Optional.empty();
         }
     }
+    
+    
+    private boolean prove(Timestamp applicationMessagePrimaryChunkTimestamp, ByteString originalBusinessProcessMessage, ByteString senderPublicSigningKey) {
+        return true;
+    }
+    
 }

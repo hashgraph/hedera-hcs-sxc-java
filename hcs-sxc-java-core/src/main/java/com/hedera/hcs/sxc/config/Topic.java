@@ -48,4 +48,8 @@ public final class Topic {
     public String getSubmitKey() {
         return this.submitKey;
     }
+    @Override
+    public String toString() {
+        return shard + "." + realm + "." + num;
+    }
 }

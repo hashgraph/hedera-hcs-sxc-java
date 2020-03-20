@@ -183,7 +183,7 @@ public final class App {
         while (true) {
             
             // wait for user input
-            System.out.println("- Input a message to send to other parties\n- type prove applicationId [RETURN] to perform proof after the fact\n eg prove  0.0.95518-1584411224-26856500  \n- type exit [RETURN] to exit the application"
+            System.out.println("- Input a message to send to other parties\n- type prove applicationId publickey (see above) [RETURN] to perform proof after the fact\n Send a random message first and then watch the output to get a usable application id. You can find a public key at the begining of this application. \n eg prove  0.0.95518-1584411224-26856500 302a300506032b657003210011ccdc3b4fa456254d9fec6abc015fa5512308d6a6e07d29754fadfd48f15227  \n- type exit [RETURN] to exit the application"
                     + ":");
             
             String userInput = scan.nextLine();

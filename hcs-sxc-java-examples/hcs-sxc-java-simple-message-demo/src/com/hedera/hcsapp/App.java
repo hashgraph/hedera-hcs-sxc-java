@@ -23,6 +23,7 @@ package com.hedera.hcsapp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.google.common.base.Joiner;
+import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
@@ -35,8 +36,11 @@ import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
+import com.hedera.hcs.sxc.proto.VerifiableApplicationMessage;
+import com.hedera.hcs.sxc.proto.VerifiedMessage;
 import com.hedera.hcs.sxc.signing.Signing;
 import com.hedera.hcs.sxc.utils.StringUtils;
+import com.sun.source.util.TaskEvent;
 
 import java.util.Map;
 
@@ -89,7 +93,8 @@ public final class App {
         System.out.println("****************************************");
         System.out.println("** Welcome to a simple HCS demo");
         System.out.println("** I am app: " + appId);
-        System.out.println("** My signing key is: " + hcsCore.getMessageSigningKey().publicKey);
+        System.out.println("** My signing key (private) is: " + hcsCore.getMessageSigningKey());
+        System.out.println("** My signing key (public) is: " + hcsCore.getMessageSigningKey().publicKey);
         Map<String, Map<String, String>> addressList = AddressListCrypto.INSTANCE.getAddressList();
         System.out.println("** My buddies are: " + Joiner.on(",").withKeyValueSeparator("=").join(addressList));
         System.out.println("****************************************");
@@ -131,11 +136,28 @@ public final class App {
                         appMessage.getBusinessProcessSignatureOnHash().toByteArray()
                     )
                 );
-                System.out.printf("        Unencrypted Business Message: %s \n",
-                    StringUtils.byteArrayToString(
-                          appMessage.getBusinessProcessMessage().toByteArray()
-                    )
-                );
+                
+                byte[] bpm = appMessage.getBusinessProcessMessage().toByteArray();
+                
+                try  { Any any = Any.parseFrom(bpm); 
+                    if (any.is(VerifiableApplicationMessage.class)){
+                        
+                    } else if (any.is(VerifiedMessage.class)){
+                        VerifiedMessage unpack = any.unpack(VerifiedMessage.class);
+                                System.out.printf("        Message verification result: %s \n",
+                                        unpack.getProved() 
+                        ); 
+                        
+                    } else {
+                        
+                    }
+                                         
+                } catch (InvalidProtocolBufferException e){
+                     // do nothing
+                }
+                
+                        
+                
                 System.out.printf("        Encryption random: %s \n",
                     StringUtils.byteArrayToHexString(
                           appMessage.getEncryptionRandom().toByteArray()
@@ -144,9 +166,7 @@ public final class App {
                 
                 System.out.printf("        Is this a self message?: %s \n",
                     Signing.verify(
-                        StringUtils.byteArrayToString(
-                            appMessage.getBusinessProcessMessage().toByteArray()
-                        )
+                          appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray()
                         , appMessage.getBusinessProcessSignatureOnHash().toByteArray()
                         , hcsCore.getMessageSigningKey().publicKey
                     )
@@ -177,16 +197,23 @@ public final class App {
                 scan.close();
                 System.exit(0);
             } else if (userInput.startsWith("prove")) {
-                String appStringId = userInput.split("\\s+")[1];
-                String clearTextMessage = "getMessageFromAppId";
-                Ed25519PublicKey publicKey = hcsCore.getMessageSigningKey().publicKey;
-                try {
-                    new OutboundHCSMessage(hcsCore)
-                            .requestProof(0, appStringId,  clearTextMessage, publicKey);
-                    System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>=============== Message sent to ALL participants (in addressbook) =============");
-                } catch (Exception e) {
-                    log.error(e);
+                String applicationMessageId = userInput.split("\\s+")[1];
+                Ed25519PublicKey publicKey = Ed25519PublicKey.fromString(userInput.split("\\s+")[2]);
+                    
+                SxcApplicationMessageInterface applicationMessageEntity = hcsCore.getPersistence().getApplicationMessageEntity(applicationMessageId);
+                if (applicationMessageEntity == null) {
+                    System.out.println("Message not available in local db.");
+                } else {
+                    ByteString businessProcessMessage = ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage()).getBusinessProcessMessage();
+                    try {
+                        new OutboundHCSMessage(hcsCore)
+                                .requestProof(0, applicationMessageEntity.getApplicationMessageId(),  businessProcessMessage.toStringUtf8(), publicKey);
+                        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>=============== Message sent to ALL participants (in addressbook) =============");
+                    } catch (Exception e) {
+                        log.error(e);
+                    }
                 }
+               
             } else {
                 try {
                     new OutboundHCSMessage(hcsCore)

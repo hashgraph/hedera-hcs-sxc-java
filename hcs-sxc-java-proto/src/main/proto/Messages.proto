@@ -57,10 +57,22 @@ message VerifiedMessage {
 }
 
 message VerifiableMessage {
-    Timestamp applicationMessagePrimaryChunkTimestamp = 1; 
-    bytes originalBusinessProcessMessage = 2;
-    bytes senderPublicSigningKey = 3;
+    oneof oneOfVerifiableMessages {
+    	VerifiableMessageOfChunks verifiableMessageOfChunks = 1;
+    	VerifiableApplicationMessage verifiableApplicationMessage =2;
+    }
 }
+message VerifiableMessageOfChunks {
+    ApplicationMessageID applicationMessageId = 1; 
+    repeated Timestamp applicationMessageChunkTimestamp = 2; // all chunks that make up an application message
+    bytes originalBusinessProcessMessage = 3;
+    bytes senderPublicSigningKey = 4;	
+}
+message VerifiableApplicationMessage {
+    ApplicationMessageID applicationMessageId = 1; 
+    bytes originalBusinessProcessMessage = 2;
+    bytes senderPublicSigningKey = 3;	
+}  
 
 message ConfirmProof {
     RequestProof messagesToProve = 1;

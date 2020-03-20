@@ -51,6 +51,7 @@ import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 import com.hedera.hcs.sxc.proto.ApplicationMessageID;
 import com.hedera.hcs.sxc.proto.RequestProof;
 import com.hedera.hcs.sxc.proto.Timestamp;
+import com.hedera.hcs.sxc.proto.VerifiableApplicationMessage;
 import com.hedera.hcs.sxc.proto.VerifiableMessage;
 import com.hedera.hcs.sxc.signing.Signing;
 import com.hedera.hcs.sxc.utils.StringUtils;
@@ -232,17 +233,20 @@ public final class OutboundHCSMessage {
     }
      
     public List<TransactionId> requestProof(int topicIndex, String applicationMessageId, String cleartext, Ed25519PublicKey publicKey) throws Exception {
+        
         RequestProof rp = RequestProof.newBuilder()
                 .addApplicationMessage(
-  
-                        VerifiableMessage.newBuilder()
-                                .setApplicationMessagePrimaryChunkTimestamp(Timestamp.newBuilder().build())
-                                .setOriginalBusinessProcessMessage(ByteString.copyFrom(cleartext.getBytes()))
-                                .setSenderPublicSigningKey(ByteString.copyFrom(publicKey.toBytes()))
-                                .build()
+                        VerifiableMessage.newBuilder().
+                                setVerifiableApplicationMessage(
+                                        VerifiableApplicationMessage.newBuilder()
+                                                .setApplicationMessageId(
+                                                    SxcPersistence.getApplicationMessageIdIdFromPrimaryKey(applicationMessageId)
+                                                )                      
+                                        .setOriginalBusinessProcessMessage(ByteString.copyFrom(cleartext.getBytes()))
+                                        .setSenderPublicSigningKey(ByteString.copyFrom(publicKey.toBytes()))
+                                        .build()
+                                ).build()
                 ).build();
-        
-        
         Any pack = Any.pack(rp);
         return this.sendMessage(topicIndex,pack.toByteArray());
     }
@@ -453,14 +457,16 @@ public final class OutboundHCSMessage {
                     // Hash of unencrypted business message should be included in application message
                     byte[] hashOfOriginalMessage = com.hedera.hcs.sxc.hashing.Hashing.sha(StringUtils.byteArrayToHexString(originalMessage));
                     applicationMessageBuilder.setUnencryptedBusinessProcessMessageHash(ByteString.copyFrom(hashOfOriginalMessage));
-
+                    System.out.println("Hash of original message   " + StringUtils.byteArrayToHexString(hashOfOriginalMessage));
                     
                     // Signature (using sender’s private key) of hash (above) should also be included in application message
                     Ed25519PrivateKey messageSigningKey = hcsCore.getMessageSigningKey();
                     
                     byte[] sign = Signing.sign(hashOfOriginalMessage, messageSigningKey);
+                    
+                    
                     applicationMessageBuilder.setBusinessProcessSignatureOnHash(ByteString.copyFrom(sign));
-
+                    
                     
                     // encrypt
                     String encryptionKey = recipientKeys.get("sharedSymmetricEncryptionKey");

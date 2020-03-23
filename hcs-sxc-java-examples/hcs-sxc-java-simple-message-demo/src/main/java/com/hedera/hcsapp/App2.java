@@ -1,4 +1,4 @@
-package com.hedera  .hcsapp;
+package main.java.com.hedera.hcsapp;
 /*-
  * ‌
  * hcs-sxc-java

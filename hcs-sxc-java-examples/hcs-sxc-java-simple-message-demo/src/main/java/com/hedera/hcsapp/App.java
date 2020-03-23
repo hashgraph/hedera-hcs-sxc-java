@@ -1,10 +1,4 @@
-package com.hedera.hcsapp;
-
-import com.google.common.base.Joiner;
-import com.google.protobuf.Any;
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
+package main.java.com.hedera.hcsapp;
 /*-
  * ‌
  * hcs-sxc-java
@@ -24,6 +18,11 @@ import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
  * limitations under the License.
  * ‍
  */
+import com.google.common.base.Joiner;
+import com.google.protobuf.Any;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
 import com.hedera.hcs.sxc.commonobjects.HCSResponse;
@@ -46,6 +45,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Hello world!
@@ -88,7 +89,8 @@ public final class App {
                         });
             }
         }        
-
+        
+        
         Ansi.print("****************************************");
         Ansi.print("** Welcome to a simple HCS demo");
         Ansi.print("** I am app: " + appId);
@@ -149,21 +151,25 @@ public final class App {
                     if (split.length != 3) {
                         System.out.println("Invalid number of argumets");
                     } else { 
+                        
                         String applicationMessageId = split[1];
-                        Ed25519PublicKey publicKey = Ed25519PublicKey.fromString(split[2]);
-
-                        SxcApplicationMessageInterface applicationMessageEntity = hcsCore.getPersistence().getApplicationMessageEntity(applicationMessageId);
-                        if (applicationMessageEntity == null) {
-                            System.out.println("Message not available in local db.");
-                        } else {
-                            ByteString businessProcessMessage = ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage()).getBusinessProcessMessage();
-                            try {
-                                new OutboundHCSMessage(hcsCore)
-                                        .requestProof(0, applicationMessageEntity.getApplicationMessageId(),  businessProcessMessage.toStringUtf8(), publicKey);
-                                System.out.println("message sent to ALL participants (in addressbook) =============");
-                            } catch (Exception e) {
-                                log.error(e);
+                        try {
+                            Ed25519PublicKey publicKey = Ed25519PublicKey.fromString(split[2]);
+                            SxcApplicationMessageInterface applicationMessageEntity = hcsCore.getPersistence().getApplicationMessageEntity(applicationMessageId);
+                            if (applicationMessageEntity == null) {
+                                System.out.println("Message not available in local db.");
+                            } else {
+                                ByteString businessProcessMessage = ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage()).getBusinessProcessMessage();
+                                try {
+                                    new OutboundHCSMessage(hcsCore)
+                                            .requestProof(0, applicationMessageEntity.getApplicationMessageId(),  businessProcessMessage.toStringUtf8(), publicKey);
+                                    System.out.println("proof request sent to ALL participants (in addressbook) awaiting their replies");
+                                } catch (Exception e) {
+                                    log.error(e);
+                                }
                             }
+                        } catch (Exception e){
+                            System.out.println("Invalid public key");
                         }
                     }
                     
@@ -195,70 +201,7 @@ public final class App {
                         + "(yellow)" + message
                         + "(reset)");
                 
-                
-                //System.out.printf("Received from HCSResponse after consensus: %s \n",new String (hcsResponse.getMessage()));
-                
-                SxcApplicationMessageInterface applicationMessageEntity = 
-                    hcsCore
-                    .getPersistence()
-                    .getApplicationMessageEntity(
-                            SxcPersistence.extractApplicationMessageStringId(
-                                    hcsResponse.getApplicationMessageId()
-                            )
-                    );
-                System.out.println("Details stored as applicationMessageEntity : ");
-                System.out.printf ("    applicationMessageId: %s \n",applicationMessageEntity.getApplicationMessageId());
-                System.out.printf ("    last chrono chunk consensus sequenceNum: %s \n",applicationMessageEntity.getLastChronoPartSequenceNum());
-                System.out.printf ("    last chrono chunk consensus running hash: %s \n",applicationMessageEntity.getLastChronoPartRunningHashHEX());
-                System.out.println("    ApplicationMessage: ");
-                ApplicationMessage appMessage = ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage());
-                System.out.printf ("        Id: %s \n",SxcPersistence.extractApplicationMessageStringId(appMessage.getApplicationMessageId()));
-                System.out.printf ("        Hash of unencrypted message: %s \n",
-                    StringUtils.byteArrayToHexString(
-                        appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray()
-                    )
-                );
-                System.out.printf ("        Signature on hash above: %s \n",
-                    StringUtils.byteArrayToHexString(
-                        appMessage.getBusinessProcessSignatureOnHash().toByteArray()
-                    )
-                );
-                
-                byte[] bpm = appMessage.getBusinessProcessMessage().toByteArray();
-                
-                try  { Any any = Any.parseFrom(bpm); 
-                    if (any.is(VerifiableApplicationMessage.class)){
-                        
-                    } else if (any.is(VerifiedMessage.class)){
-                        VerifiedMessage unpack = any.unpack(VerifiedMessage.class);
-                                System.out.printf("        Message verification result: %s \n",
-                                        unpack.getProved() 
-                        ); 
-                        
-                    } else {
-                        
-                    }
-                                         
-                } catch (InvalidProtocolBufferException e){
-                     // do nothing
-                }
-                
-                        
-                
-                System.out.printf("        Encryption random: %s \n",
-                    StringUtils.byteArrayToHexString(
-                          appMessage.getEncryptionRandom().toByteArray()
-                    )
-                );
-                
-                System.out.printf("        Is this a self message?: %s \n",
-                    Signing.verify(
-                          appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray()
-                        , appMessage.getBusinessProcessSignatureOnHash().toByteArray()
-                        , hcsCore.getMessageSigningKey().publicKey
-                    )
-                );
-                
+                printVerboseDetails(hcsCore,hcsResponse);
             } else if (simpleMessage.hasNewMessageThread()) {
                 // creating a new thread
                 String newThreadName = simpleMessage.getNewMessageThread().getThreadName();
@@ -266,14 +209,85 @@ public final class App {
                 Ansi.print("(green)received thread creation notification from mirror: " 
                         + "(yellow)" + newThreadName 
                         + "(reset)");
-                
+                printVerboseDetails(hcsCore,hcsResponse);
                 
                 
             }
         } catch (InvalidProtocolBufferException e) {
-            
+            printVerboseDetails(hcsCore,hcsResponse);
         }
     }
+    
+    private static void printVerboseDetails (HCSCore hcsCore, HCSResponse hcsResponse){
+        try  { 
+            SxcApplicationMessageInterface applicationMessageEntity =
+                    hcsCore
+                            .getPersistence()
+                            .getApplicationMessageEntity(
+                                    SxcPersistence.extractApplicationMessageStringId(
+                                            hcsResponse.getApplicationMessageId()
+                                    )
+                            );
+            System.out.println("Details stored as applicationMessageEntity : ");
+            System.out.printf ("    applicationMessageId: %s \n",applicationMessageEntity.getApplicationMessageId());
+            System.out.printf ("    last chrono chunk consensus sequenceNum: %s \n",applicationMessageEntity.getLastChronoPartSequenceNum());
+            System.out.printf ("    last chrono chunk consensus running hash: %s \n",applicationMessageEntity.getLastChronoPartRunningHashHEX());
+            System.out.println("    ApplicationMessage: ");
+            ApplicationMessage appMessage = ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage());
+            System.out.printf ("        Id: %s \n",SxcPersistence.extractApplicationMessageStringId(appMessage.getApplicationMessageId()));
+            System.out.printf ("        Hash of unencrypted message: %s \n",
+                    StringUtils.byteArrayToHexString(
+                            appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray()
+                    )
+            );
+            System.out.printf ("        Signature on hash above: %s \n",
+                    StringUtils.byteArrayToHexString(
+                            appMessage.getBusinessProcessSignatureOnHash().toByteArray()
+                    )
+            );
+            
+            byte[] bpm = appMessage.getBusinessProcessMessage().toByteArray();
+            
+            try  { Any any = Any.parseFrom(bpm); 
+            if (any.is(VerifiableApplicationMessage.class)){
+                System.out.print("Echo of Verifiable Message received. Awaiting replies. ");
+
+            } else if (any.is(VerifiedMessage.class)){
+                VerifiedMessage unpack = any.unpack(VerifiedMessage.class);
+                System.out.printf("        Message verification result: %s \n",
+                        unpack.getProved()
+                );
+                
+            } else {
+
+            }
+            
+            } catch (InvalidProtocolBufferException e){
+                System.out.println("why here");
+            }
+            
+            
+            
+            System.out.printf("        Encryption random: %s \n",
+                    StringUtils.byteArrayToHexString(
+                            appMessage.getEncryptionRandom().toByteArray()
+                    )
+            );
+            
+            System.out.printf("        Is this a self message?: %s \n",
+                    Signing.verify(
+                            appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray()
+                            , appMessage.getBusinessProcessSignatureOnHash().toByteArray()
+                            , hcsCore.getMessageSigningKey().publicKey
+                    )
+            );
+            
+        } catch (InvalidProtocolBufferException ex){
+             log.error(ex.getStackTrace());
+        }
+                
+    }
+    
     
     private static void showThreadList() {
         Ansi.print("(cyan)Known threads(reset)");
@@ -375,6 +389,7 @@ public final class App {
         Ansi.print("(cyan)select (yellow)thread_name(reset) to create a new thread (purple)(note doesn't change current thread)(reset)");
         Ansi.print("(cyan)list(reset) to show a list of threads");
         Ansi.print("(cyan)show(reset) to list all messages for the current thread");
+        Ansi.print("(cyan)prove (yellow) application_id (green) public_key (reset) to prove message after the fact; you can generate a message first and copy its resulting application id. ");
         Ansi.print("(cyan)help(reset) to print this help");
         Ansi.print("(cyan)exit(reset) to quit");
     }

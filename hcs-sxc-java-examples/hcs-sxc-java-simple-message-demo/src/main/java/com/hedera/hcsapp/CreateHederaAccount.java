@@ -1,4 +1,4 @@
-package com.hedera.hcsapp;
+package main.java.com.hedera.hcsapp;
 
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;

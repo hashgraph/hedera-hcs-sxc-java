@@ -1,8 +1,9 @@
-package com.hedera.hcsapp;
+package main.java.com.hedera.hcsapp;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
 
 public class Ansi {
     private static boolean isWindows = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;

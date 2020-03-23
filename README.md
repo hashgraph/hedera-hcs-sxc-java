@@ -585,13 +585,22 @@ Open up to three terminal windows and in each type:
   - terminal 2: linux/mac: `./runapp.sh Player-1`, windows: `runapp.cmd Player-1`
   - terminal 3: linux/mac: `./runapp.sh Player-2`, windows: `runapp.cmd Player-2`
 
-All terminals should now be waiting for input, enter text in one terminal and press [return], after a few seconds, the message should be reflected in all three terminals.
+All terminals should now be waiting for input, after a few seconds, the message should be reflected in all three terminals.
 
 ```
 ****************************************
 ** Welcome to a simple HCS demo
 ** I am app: Player 1
 ****************************************
+Input these commands to interact with the application:
+new `thread_name` to create a new thread (note doesn't change current thread)
+select `thread_name` to switch to `thread_name`
+list to show a list of threads (current thread is highlighted in bold or **)
+show to list all messages for the current thread
+help to print this help
+exit to quit
+
+>
 ```
 
 * With pair-wise encryption
@@ -606,7 +615,7 @@ Open up to three terminal windows and in each type:
 
 All terminals should now be waiting for input, enter text in one terminal and press [return], after a few seconds, the message should be reflected in all or some of the terminals.
 
-Messages sent by player 1 are echoed on Player 2 and 3
+Messages sent by player 1 are echoed on Player 2 and 3, player 1 gets a copy of each message sent
 Messages sent by players 2 and 3 are only echoed on player 1
 
 ```
@@ -614,6 +623,15 @@ Messages sent by players 2 and 3 are only echoed on player 1
 ** Welcome to a simple HCS demo
 ** I am app: Player 1
 ****************************************
+Input these commands to interact with the application:
+new `thread_name` to create a new thread (note doesn't change current thread)
+select `thread_name` to switch to `thread_name`
+list to show a list of threads (current thread is highlighted in bold or **)
+show to list all messages for the current thread
+help to print this help
+exit to quit
+
+>
 ```
 
 #### with relay and queue

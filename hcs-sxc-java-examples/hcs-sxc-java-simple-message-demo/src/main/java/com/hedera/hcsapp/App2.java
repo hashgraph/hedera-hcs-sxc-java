@@ -1,5 +1,4 @@
-package com.hedera.hcsapp;
-
+package com.hedera  .hcsapp;
 /*-
  * ‌
  * hcs-sxc-java
@@ -55,7 +54,7 @@ import java.util.logging.Logger;
  *
  */
 @Log4j2
-public final class App {
+public final class App2 {
     
     public static void main(String[] args) throws Exception {
         

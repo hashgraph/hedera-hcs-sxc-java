@@ -252,7 +252,7 @@ public final class App {
             
             try  { Any any = Any.parseFrom(bpm); 
             if (any.is(RequestProof.class)){
-                System.out.print("Echo of request proof received. Awaiting replies. ");
+                System.out.println("Echo of request proof received. Awaiting replies. ");
 
             } else if (any.is(ConfirmProof.class)){
                 ConfirmProof cf = any.unpack(ConfirmProof.class);

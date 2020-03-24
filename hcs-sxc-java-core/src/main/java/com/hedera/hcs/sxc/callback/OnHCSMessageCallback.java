@@ -33,6 +33,7 @@ import com.hedera.hcs.sxc.commonobjects.EncryptedData;
 import com.hedera.hcs.sxc.commonobjects.HCSResponse;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.config.Topic;
+import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 import com.hedera.hcs.sxc.hashing.Hashing;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackFromMirror;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackToAppInterface;
@@ -202,6 +203,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                             // the ones that pass verification. Then test to see
                             // if you can decrypt
                             byte[] sharedKey = null;
+                            String originAppId = "";
                             
                             for(String appId : hcsCore.getPersistence().getAddressList().keySet() ){
                                 Map<String, String> keyMap = hcsCore.getPersistence().getAddressList().get(appId);
@@ -218,6 +220,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                     try { 
                                         String key = keyMap.get("sharedSymmetricEncryptionKey");
                                         sharedKey = StringUtils.hexStringToByteArray(key); 
+                                        originAppId = appId;
                                         log.debug("Decrypting message with key " + key.substring(key.length()-10, key.length()-1));
                                         EncryptedData encryptedData = new EncryptedData();
                                         encryptedData.setEncryptedData(appMessage.getBusinessProcessMessage().toByteArray());
@@ -363,7 +366,14 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                     } else if (any.is(RequestProof.class)) {    
                                         boolean isVerified = false;
                                         RequestProof requestProof = any.unpack(RequestProof.class);
-                                         // prove the message. if OK, send back an OK message (set the `appMessage`) , don't save this
+                                        // prove the message. if OK, send back an OK message (set the `appMessage`) , don't save this
+                                        /*
+                                        List<VerifiableMessage> verifiableMessageList = requestProof.getApplicationMessageList();
+                                        verifiableMessageList.forEach(vfm -> {
+                                        
+                                        });
+                                        */
+                                         
                                         VerifiableMessage verifiableMessage =  requestProof.getApplicationMessage(0);
                                         if (verifiableMessage.hasVerifiableApplicationMessage()){
                                             VerifiableApplicationMessage verifiableApplicationMessage = verifiableMessage.getVerifiableApplicationMessage();
@@ -381,8 +391,15 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                                 .build();
 
                                         Any anyPack = Any.pack(verifiedMessage);
+                                        
+                                        
                                        //send it back to whoever you got it from
-                                        EncryptedData encrypt = messageEncryptionPlugin.encrypt(sharedKey, anyPack.toByteArray());
+                                      
+                                       OutboundHCSMessage o =  new OutboundHCSMessage(hcsCore);
+                                       o.restrictTo(originAppId).sendMessage(0, anyPack.toByteArray());
+                                      
+                                       /*
+                                       EncryptedData encrypt = messageEncryptionPlugin.encrypt(sharedKey, anyPack.toByteArray());
                                         byte[] encryptedAnyPackedChunkBody = encrypt.getEncryptedData();
 
 
@@ -400,11 +417,12 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                                     .build()
                                             ).build();
 
-                                       byte [] hashOfUnencryptedBusinessMessage = Hashing.sha(
+                                        byte [] hashOfUnencryptedBusinessMessage = Hashing.sha(
                                                 StringUtils.byteArrayToHexString(
                                                         anyPack.toByteArray()
                                                 )
                                         );
+                                        
                                         ApplicationMessageChunk appChunk = ApplicationMessageChunk.newBuilder()
                                             .setApplicationMessageId(newAppId)
                                             .setChunkIndex(1)
@@ -446,6 +464,9 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                         } catch (Exception ex) {
                                                 log.error(ex);
                                         }
+                                    */    
+                                        
+                                        
                                     /*
                                     } else if (any.is(VerifiedMessage.class)) {
                                         ApplicationMessage decryptedAppmessage = ApplicationMessage.newBuilder()

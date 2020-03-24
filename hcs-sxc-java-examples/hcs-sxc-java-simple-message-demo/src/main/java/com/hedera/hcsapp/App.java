@@ -30,6 +30,8 @@ import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
+import com.hedera.hcs.sxc.proto.ConfirmProof;
+import com.hedera.hcs.sxc.proto.RequestProof;
 import com.hedera.hcs.sxc.proto.VerifiableApplicationMessage;
 import com.hedera.hcs.sxc.proto.VerifiedMessage;
 import com.hedera.hcs.sxc.signing.Signing;
@@ -94,8 +96,8 @@ public final class App {
         Ansi.print("****************************************");
         Ansi.print("** Welcome to a simple HCS demo");
         Ansi.print("** I am app: " + appId);
-        Ansi.print("** My signing key (private) is: " + hcsCore.getMessageSigningKey());
-        Ansi.print("** My signing key (public) is: " + hcsCore.getMessageSigningKey().publicKey);
+        Ansi.print("** My private signing key is: " + hcsCore.getMessageSigningKey());
+        Ansi.print("** My public signing key is: " + hcsCore.getMessageSigningKey().publicKey);
         Map<String, Map<String, String>> addressList = AddressListCrypto.INSTANCE.getAddressList();
         Ansi.print("** My buddies are: " + Joiner.on(",").withKeyValueSeparator("=").join(addressList));
         Ansi.print("****************************************");
@@ -249,14 +251,17 @@ public final class App {
             byte[] bpm = appMessage.getBusinessProcessMessage().toByteArray();
             
             try  { Any any = Any.parseFrom(bpm); 
-            if (any.is(VerifiableApplicationMessage.class)){
-                System.out.print("Echo of Verifiable Message received. Awaiting replies. ");
+            if (any.is(RequestProof.class)){
+                System.out.print("Echo of request proof received. Awaiting replies. ");
 
-            } else if (any.is(VerifiedMessage.class)){
-                VerifiedMessage unpack = any.unpack(VerifiedMessage.class);
-                System.out.printf("        Message verification result: %s \n",
-                        unpack.getProved()
-                );
+            } else if (any.is(ConfirmProof.class)){
+                ConfirmProof cf = any.unpack(ConfirmProof.class);
+                
+                cf.getProofList().forEach(verifiedMessage ->{
+                    System.out.printf("        Message verification result: %s \n",
+                            verifiedMessage.getProved());
+                
+                });
                 
             } else {
 

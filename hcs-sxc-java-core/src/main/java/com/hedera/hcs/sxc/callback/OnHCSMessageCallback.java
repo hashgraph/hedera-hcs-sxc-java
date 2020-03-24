@@ -59,6 +59,7 @@ import java.util.List;
 import java.util.Optional;
 import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
 import com.hedera.hcs.sxc.proto.AccountID;
+import com.hedera.hcs.sxc.proto.ConfirmProof;
 import com.hedera.hcs.sxc.proto.RequestProof;
 import com.hedera.hcs.sxc.proto.Timestamp;
 import com.hedera.hcs.sxc.proto.VerifiableApplicationMessage;
@@ -231,7 +232,6 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                                 StringUtils.byteArrayToHexString(decryptedBPM)
                                         );
                                         if (! Hashing.matchSHA(shaClrTxt, appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray())){
-
                                             log.error("Corrupt message detected.");
                                             throw new Exception("Corrupt message detected.");
                                         } 
@@ -364,33 +364,32 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
 
                                         }*/
                                     } else if (any.is(RequestProof.class)) {    
-                                        boolean isVerified = false;
+                                        
                                         RequestProof requestProof = any.unpack(RequestProof.class);
                                         // prove the message. if OK, send back an OK message (set the `appMessage`) , don't save this
-                                        /*
-                                        List<VerifiableMessage> verifiableMessageList = requestProof.getApplicationMessageList();
-                                        verifiableMessageList.forEach(vfm -> {
+                                        // prepare the return type
+                                        ConfirmProof.Builder proofResults = ConfirmProof.newBuilder();
                                         
-                                        });
-                                        */
-                                         
-                                        VerifiableMessage verifiableMessage =  requestProof.getApplicationMessage(0);
-                                        if (verifiableMessage.hasVerifiableApplicationMessage()){
-                                            VerifiableApplicationMessage verifiableApplicationMessage = verifiableMessage.getVerifiableApplicationMessage();
-                                            isVerified  =  prove(verifiableApplicationMessage);
-                                        } else {
-                                            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                                        }
-                                       
-                                       // prepare a response and send it to the network. 
-                                       
-                                        VerifiedMessage verifiedMessage = VerifiedMessage
+                                        List<VerifiableMessage> verifiableMessageList = requestProof.getApplicationMessageList();
+                                        
+                                        for (VerifiableMessage verifiableMessage :  verifiableMessageList ){
+                                            //VerifiableMessage verifiableMessage =  requestProof.getApplicationMessage(0);
+                                            if (verifiableMessage.hasVerifiableApplicationMessage()){
+                                                VerifiableApplicationMessage verifiableApplicationMessage = verifiableMessage.getVerifiableApplicationMessage();
+                                                 boolean isVerified  =  prove(verifiableApplicationMessage);
+                                                 VerifiedMessage verifiedMessage = VerifiedMessage
                                                 .newBuilder()
                                                 .setApplicationMessage(verifiableMessage)
                                                 .setProved(isVerified)
                                                 .build();
+                                                 proofResults.addProof(verifiedMessage);
+                                            } else {
+                                                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                                            }
+                                        }
+                                        ConfirmProof cf = proofResults.build();
 
-                                        Any anyPack = Any.pack(verifiedMessage);
+                                        Any anyPack = Any.pack(cf);
                                         
                                         
                                        //send it back to whoever you got it from

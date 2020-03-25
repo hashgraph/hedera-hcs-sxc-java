@@ -2,6 +2,14 @@
 
 Besides bug fixes, some features may have changed with this release which need your attention, these will be listed here.
 
+## March 25th 2020
+* Proof after the fact. Outbound messages provide a `prove (originalMessage, publicKey)` api call, which allows sending proof requests to all peers from the address-book. Peers can verify messages by inspecting their messages received from the mirror and verify messages even if the stored messages are in encrypted form; thus, no decryption key is required to verify a message. 
+
+* The simple demo demonstrates proof after the fact.  
+
+* The simple demo supports simple message thread creation, such that conversations are grouped by named threads. This demonstrates simple  state management and state replication across multiple App net participants.  
+
+
 ## March 6th 2020
 
 * Pair-wise encryption. Both demos support now address-book key-lookup to encrypt and sign messages destined to targeted recipients where communicating pairs use shared keys. In the simple-message-demo you may notice a message echoing back several times when the message is sent out to several recipients. Similarly, in the settlement demo you may notice repeated application messages, with distinct sequence numbers, in the audit log. 

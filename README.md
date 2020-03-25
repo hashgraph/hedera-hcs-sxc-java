@@ -67,7 +67,7 @@ The encryption scheme that HCS SCX uses is plugin based and users can define the
 
 
 ### Proof after the fact and verifying messages
-ApplicationMessages are signed using the sender's signing key; in particular, it is the hash of the unencrypted clear-text or business message that is signed.  The hash and the signature is included with a ApplicationMessage and is sent to communicating app-net participants where each can issue a verification request to the app-net by making an API call with parameters  ApplicationMessage id, the cleartext message, and the public key of the signer. A participant can verify the message by introspecting its own persistent state and if the message is found then verification can take place even if the persisted message is in encrypted form. 
+ApplicationMessages are signed using the sender's signing key; in particular, it is the hash of the unencrypted clear-text or business message that is signed.  The hash and the signature is included with an ApplicationMessage and is sent to communicating app-net participants where each can issue a verification request to the app-net by making an API call with parameters  ApplicationMessage id, the cleartext message, and the public key of the signer. A participant can verify the message by introspecting its own persistent state and if the message is found then verification can take place even if the persisted message is in encrypted form. 
 
 
 

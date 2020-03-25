@@ -599,15 +599,20 @@ All terminals should now be waiting for input, after a few seconds, the message 
 ```
 ****************************************
 ** Welcome to a simple HCS demo
-** I am app: Player 1
+** I am app: Player-0
+** My private signing key is: 302e020100300506032b65700422042095803b0d5f44f0fc4085faaf944c74373ad3e3549dca510f09a5339aae236fdc
+** My public signing key is: 302a300506032b657003210011ccdc3b4fa456254d9fec6abc015fa5512308d6a6e07d29754fadfd48f15227
+** My buddies are: Player-1={sharedSymmetricEncryptionKey=817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449, theirEd25519PubKeyForSigning=302a300506032b6570032100c969fbb7b67b36f5560aa59a754a38bd88fd53ff870dad33011bbe2f37f34396},Player-2={sharedSymmetricEncryptionKey=c4156919eaf37e140b646313ee9e9ba496577b16e68b4deda2ceb8e8df14a91a, theirEd25519PubKeyForSigning=302a300506032b6570032100ffc3f23232acd69f2db068722ab43c0ad4d08c26a4df73c42aebbf5b1c4f633a}
 ****************************************
 Input these commands to interact with the application:
-new `thread_name` to create a new thread (note doesn't change current thread)
-select `thread_name` to switch to `thread_name`
-list to show a list of threads (current thread is highlighted in bold or **)
+new thread_name to create a new thread (note doesn't change current thread)
+select thread_name to create a new thread (note doesn't change current thread)
+list to show a list of threads
 show to list all messages for the current thread
+prove  application_id  public_key  to prove message after the fact; you can generate a message first and copy its resulting application id. 
 help to print this help
 exit to quit
+
 
 >
 ```
@@ -627,21 +632,48 @@ All terminals should now be waiting for input, enter text in one terminal and pr
 Messages sent by player 1 are echoed on Player 2 and 3, player 1 gets a copy of each message sent
 Messages sent by players 2 and 3 are only echoed on player 1
 
+When a message is received it is displayed on the same output and extra details are shown such as consensus information and whether the message was from one self. For insnce, when player 0 creates a new thread then two messages are sent, one to player 1 and one to player 2.  Player 0 receives back his own message back twice. Such a message would look like this: 
+
 ```
-****************************************
-** Welcome to a simple HCS demo
-** I am app: Player 1
-****************************************
-Input these commands to interact with the application:
-new `thread_name` to create a new thread (note doesn't change current thread)
-select `thread_name` to switch to `thread_name`
-list to show a list of threads (current thread is highlighted in bold or **)
-show to list all messages for the current thread
-help to print this help
-exit to quit
+received thread creation notification from mirror: mt
+Details stored as applicationMessageEntity : 
+    applicationMessageId: 0.0.95518-1585056287-851629200 
+    last chrono chunk consensus sequenceNum: 614 
+    last chrono chunk consensus running hash: 565b24568af1b84976c70e8affe305ea72df787c90f46277e4617538b5ec37df0b03ed6d6f572dd7a08f8e376adab298 
+    ApplicationMessage: 
+        Id: 0.0.95518-1585056287-851629200 
+        Hash of unencrypted message: 4382f847e963728555c40d044b42b8ef8e15da69a0501cc1474ed81be06c43eb0ea75ab899a02225b8ec9ec0052befb6 
+        Signature on hash above: 085f8b819b603d2f67b48e4e28b3569e96f8db26f4c3b45f9904bd6c1346592a77794a9145f9303a1e3d72fcd29538175bd6cae48722d8e128b98fc9616fbe06 
+        Encryption random: 9791722faf59ca86cc0226f5e7179fea 
+        Is this a self message?: true 
 
 >
 ```
+
+** Verifying a message
+
+
+To verify a message type 
+`prove 0.0.95518-1585056287-851629200  302a300506032b657003210011ccdc3b4fa456254d9fec6abc015fa5512308d6a6e07d29754fadfd48f15227`  
+
+where the first parameter is an application id whose business process message exists in cleartext and the second argument is a public key.
+
+The hcs-core will extract the unencrypted clear text and send it to app participants for verification. These in  turn will automatically attempt to verify the message and will post the result of the verification back. 
+
+```
+    ...
+    applicationMessageId: 0.0.95518-1585056383-216111500 
+    last chrono chunk consensus sequenceNum: 620 
+    last chrono chunk consensus running hash: 017b0806ddef82a621b205f4d9d6704ad5cc1a1d4421f39463d6062e53c9f6f667315f5f9ad70d95494fa121863028c8 
+    ApplicationMessage: 
+        Id: 0.0.95518-1585056383-216111500 
+        Hash of unencrypted message: af0c3e954e0646922f26cef54fc1707e918e36c01515a2b68494fbfa0f937a684165fb7f13a7d464c09d9ac97468bb64 
+        Signature on hash above: 1f865937a4b7acf6cb3bb11d7f9b4d24bb8888652182a31dd6fc450bd5e63583daa6dccf503b5920c4497ddbde88658a9207f5187666906682bc6624cb177303 
+        Message verification result: true  
+        Encryption random:  
+        Is this a self message?: false 
+```
+
 
 #### with relay and queue
 

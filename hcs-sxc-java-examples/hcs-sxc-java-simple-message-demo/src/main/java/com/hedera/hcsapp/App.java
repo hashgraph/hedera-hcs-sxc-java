@@ -174,10 +174,16 @@ public final class App {
                             System.out.println("Invalid public key");
                         }
                     }
-                    
+                } else if (userInput.startsWith("send-restricted")) {
+                    String[] split = userInput.split("\\s+");
+                    if (split.length != 3) {
+                        System.out.println("Invalid number of argumets");
+                    } else { 
+                        sendMessageOnThread(hcsCore, messageThread, split[2], split[1]);
+                    }
                 } else {
                     // send message on thread
-                    sendMessageOnThread(hcsCore, messageThread, userInput);
+                    sendMessageOnThread(hcsCore, messageThread, userInput, null);
                 }
             }
         }            
@@ -279,7 +285,7 @@ public final class App {
                     )
             );
             
-            System.out.printf("        Is this a self message?: %s \n",
+            System.out.printf("        Is this an echo?: %s \n",
                     Signing.verify(
                             appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray()
                             , appMessage.getBusinessProcessSignatureOnHash().toByteArray()
@@ -314,7 +320,7 @@ public final class App {
         }
     }
     
-    private static void sendMessageOnThread(HCSCore hcsCore, String threadName, String message) {
+    private static void sendMessageOnThread(HCSCore hcsCore, String threadName, String message, String playerId) {
         Ansi.print("Sending... please wait.");
         // create a protobuf message to carry the message
         // note, we don't add the message to the thread until we receive notification from mirror
@@ -331,8 +337,9 @@ public final class App {
         
         try {
             // Send to HCS
-            new OutboundHCSMessage(hcsCore)
-                .sendMessage(topicIndex, simpleMessage.toByteArray());
+            OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(hcsCore);
+            if (playerId != null) outboundHCSMessage = outboundHCSMessage.restrictTo(playerId);
+            outboundHCSMessage.sendMessage(topicIndex, simpleMessage.toByteArray());
 
             Ansi.print("Message sent to HCS successfully.");
         } catch (Exception e) {

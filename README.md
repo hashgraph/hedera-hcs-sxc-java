@@ -632,7 +632,7 @@ All terminals should now be waiting for input, enter text in one terminal and pr
 Messages sent by player 1 are echoed on Player 2 and 3, player 1 gets a copy of each message sent
 Messages sent by players 2 and 3 are only echoed on player 1
 
-When a message is received it is displayed on the same output and extra details are shown such as consensus information and whether the message was from one self. For insnce, when player 0 creates a new thread then two messages are sent, one to player 1 and one to player 2.  Player 0 receives back his own message back twice. Such a message would look like this: 
+When a message is received it is displayed on the same output and extra details are shown such as consensus information and whether the message was from one self. For insnce, when player 0 creates a new thread then two messages are sent, one to player 1 and one to player 2.  Player 0 receives his own message back twice; such a message would look like this: 
 
 ```
 received thread creation notification from mirror: mt

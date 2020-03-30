@@ -609,7 +609,7 @@ new thread_name to create a new thread (note doesn't change current thread)
 select thread_name to create a new thread (note doesn't change current thread)
 list to show a list of threads
 show to list all messages for the current thread
-prove  application_id  public_key  to prove message after the fact; you can generate a message first and copy its resulting application id. 
+prove  app_id applicationMessage_id  public_key  to prove message after the fact; you can generate a message first and copy its resulting applicationMessage_id. 
 help to print this help
 exit to quit
 

@@ -650,15 +650,32 @@ Details stored as applicationMessageEntity :
 >
 ```
 
+The demo code demonstrates how to maintain a simple state across participants; a message thread is simply a conversation thread that aims to group messages by a thread name. To make a simple conversation load the supplied address book
+where Player-0 "talks" to 1 and 2, which means that player 0 has a shared key with player 1 and another shared key with player 2.
+
+To create a thread type
+`new  demo-conversation`
+
+and wait until two echo messages come back. Then type 
+`select demo-conversation`
+
+
+To send a message to all participants type any message in the prompt. If you send from player 0 then you should expect two echo messages, for each other Player's terminal you should expect one non-echo message. 
+
 ** Verifying a message
 
+To test proof after the fact you can send a sinble message where the shared key of Player-0 + Player-1 is used; from Player-0's terminal type:
+`send-restricted Player-1 Hello Future`
 
-To verify a message type 
-`prove 0.0.95518-1585056287-851629200  302a300506032b657003210011ccdc3b4fa456254d9fec6abc015fa5512308d6a6e07d29754fadfd48f15227`  
+and wait until a single echo message arrives; then copy the generated application message id. Observe Player-1's terminal to check if the message arrived.
 
-where the first parameter is an application id whose business process message exists in cleartext and the second argument is a public key.
+This message exchange is between Player-0 and Player-1, thus Player-2 has no way of decrypting the contents; however, Player-2 has a copy of the encrypted message. To validate the message Player-0 types:
 
-The hcs-core will extract the unencrypted clear text and send it to app participants for verification. These in  turn will automatically attempt to verify the message and will post the result of the verification back. 
+`prove Player-2 0.0.95518-1585566306-230801600 302a300506032b6570032100ffc3f23232acd69f2db068722ab43c0ad4d08c26a4df73c42aebbf5b1c4f633a`
+
+where the second argument is the copied application id and the third argument is Player-0's public signing key (you'll find the copy of the public key on the beginning of the terminal history when the application loads.
+
+A single validation request is sent (encrypted) to Player-2. If all works as expected then Player-2 should automatically validate the message and Player-0's prompt should show a success message.
 
 ```
     ...
@@ -669,7 +686,7 @@ The hcs-core will extract the unencrypted clear text and send it to app particip
         Id: 0.0.95518-1585056383-216111500 
         Hash of unencrypted message: af0c3e954e0646922f26cef54fc1707e918e36c01515a2b68494fbfa0f937a684165fb7f13a7d464c09d9ac97468bb64 
         Signature on hash above: 1f865937a4b7acf6cb3bb11d7f9b4d24bb8888652182a31dd6fc450bd5e63583daa6dccf503b5920c4497ddbde88658a9207f5187666906682bc6624cb177303 
-        Message verification result: true  
+        Message verification result: VALIDATION_OK  
         Encryption random:  
         Is this a self message?: false 
 ```

@@ -265,8 +265,8 @@ public final class App {
                 
                 cf.getProofList().forEach(verifiedMessage ->{
                     System.out.printf("        Message verification result: %s \n",
-                            verifiedMessage.getProved());
-                
+                            verifiedMessage.getVerificationOutcome().name()
+                    );
                 });
                 
             } else {
@@ -401,7 +401,8 @@ public final class App {
         Ansi.print("(cyan)select (yellow)thread_name(reset) to create a new thread (purple)(note doesn't change current thread)(reset)");
         Ansi.print("(cyan)list(reset) to show a list of threads");
         Ansi.print("(cyan)show(reset) to list all messages for the current thread");
-        Ansi.print("(cyan)prove (yellow) application_id (green) public_key (reset) to prove message after the fact; you can generate a message first and copy its resulting application id. ");
+        Ansi.print("(cyan)send-restricted (yellow) app_id (green) message (reset) to encrypt the message only with the paired appId's symetric key");
+        Ansi.print("(cyan)prove (yellow) app_id (purple) applicationMessageId (green) public_key (reset) to request from app_id to prove message a after the fact ; you can generate a message first and copy its resulting application message id. ");
         Ansi.print("(cyan)help(reset) to print this help");
         Ansi.print("(cyan)exit(reset) to quit");
     }

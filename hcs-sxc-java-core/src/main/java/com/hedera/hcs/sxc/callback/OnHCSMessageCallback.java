@@ -376,11 +376,10 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                             //VerifiableMessage verifiableMessage =  requestProof.getApplicationMessage(0);
                                             if (verifiableMessage.hasVerifiableApplicationMessage()){
                                                 VerifiableApplicationMessage verifiableApplicationMessage = verifiableMessage.getVerifiableApplicationMessage();
-                                                 boolean isVerified  =  prove(verifiableApplicationMessage);
                                                  VerifiedMessage verifiedMessage = VerifiedMessage
                                                 .newBuilder()
+                                                .setVerificationOutcome(prove(verifiableApplicationMessage))
                                                 .setApplicationMessage(verifiableMessage)
-                                                .setProved(isVerified)
                                                 .build();
                                                  proofResults.addProof(verifiedMessage);
                                             } else {
@@ -609,12 +608,17 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
         }
     }
    
-    private boolean prove(VerifiableApplicationMessage verifiableApplicationMessage) throws NoSuchAlgorithmException, InvalidProtocolBufferException {
+    private VerifiedMessage.VerificationOutcome prove(VerifiableApplicationMessage verifiableApplicationMessage) throws NoSuchAlgorithmException, InvalidProtocolBufferException {
         SxcApplicationMessageInterface applicationMessageEntity = hcsCore.getPersistence()
                 .getApplicationMessageEntity(
                     SxcPersistence.extractApplicationMessageStringId(verifiableApplicationMessage.getApplicationMessageId()
                 )
         );
+        
+        if (applicationMessageEntity == null){
+            return VerifiedMessage.VerificationOutcome.UNABLE_TO_VERIFY;
+        }
+        
         ByteString originalBusinessProcessMessage = verifiableApplicationMessage.getOriginalBusinessProcessMessage();
         byte[] hashOfVerifiable = Hashing.sha(
                                     StringUtils.byteArrayToHexString(
@@ -626,6 +630,8 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
         byte[] hashOfStored = appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray();
         byte[] signatureOfStored = appMessage.getBusinessProcessSignatureOnHash().toByteArray();
         Ed25519PublicKey publicKey = Ed25519PublicKey.fromBytes(verifiableApplicationMessage.getSenderPublicSigningKey().toByteArray());
-        return Hashing.matchSHA(hashOfStored, hashOfVerifiable) && Signing.verify(hashOfStored, signatureOfStored, publicKey);
+        if (! Hashing.matchSHA(hashOfStored, hashOfVerifiable))  {return VerifiedMessage.VerificationOutcome.HASH_DOES_NOT_MATCH;}
+        else if (! Signing.verify(hashOfStored, signatureOfStored, publicKey)) {return VerifiedMessage.VerificationOutcome.SIGNATURE_DOES_NOT_MATCH;}
+        else {return VerifiedMessage.VerificationOutcome.VERIFIED_OK;}
     }
 }

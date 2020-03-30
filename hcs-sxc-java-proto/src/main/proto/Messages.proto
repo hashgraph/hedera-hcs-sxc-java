@@ -53,8 +53,14 @@ message RequestProof {
 }
 
 message VerifiedMessage {
-   VerifiableMessage applicationMessage = 1;
-   bool proved = 2;
+    VerifiableMessage applicationMessage = 1;
+    enum VerificationOutcome {
+        UNABLE_TO_VERIFY = 0;
+        HASH_DOES_NOT_MATCH = 1;
+        SIGNATURE_DOES_NOT_MATCH = 2;
+        VERIFIED_OK = 3;
+    }
+    VerificationOutcome verificationOutcome = 2;
 }
 
 message VerifiableMessage {

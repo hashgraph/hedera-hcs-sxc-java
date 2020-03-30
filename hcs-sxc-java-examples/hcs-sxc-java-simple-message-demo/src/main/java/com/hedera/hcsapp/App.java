@@ -141,22 +141,23 @@ public final class App {
                 if (userInput.isEmpty()) {
                     Ansi.print("(red)Please input a message before pressing [RETURN].(reset)");
                 } else if (userInput.toUpperCase().startsWith("NEW")) {
-                    // create a new thread 
+                    // create a new thread  (sends message to HCS)
                     createNewThread(hcsCore, userInput);
                 } else if (userInput.toUpperCase().startsWith("SELECT")) {
-                    // selects a thread for messages to be sent
+                    // selects a thread for messages to be sent (does not send HCS message)
                     selectThread(userInput);
                 } else if (messageThread.isEmpty()) {
                     Ansi.print("(red)Please create or set a thread first(reset)");
                 } else if (userInput.startsWith("prove")) {
                     String[] split = userInput.split("\\s+");
-                    if (split.length != 3) {
+                    if (split.length != 4) {
                         System.out.println("Invalid number of argumets");
                     } else { 
-                        
-                        String applicationMessageId = split[1];
+                        String player = split[1];
+                        String applicationMessageId = split[2];
+                        String pubkey = split[3];
                         try {
-                            Ed25519PublicKey publicKey = Ed25519PublicKey.fromString(split[2]);
+                            Ed25519PublicKey publicKey = Ed25519PublicKey.fromString(pubkey);
                             SxcApplicationMessageInterface applicationMessageEntity = hcsCore.getPersistence().getApplicationMessageEntity(applicationMessageId);
                             if (applicationMessageEntity == null) {
                                 System.out.println("Message not available in local db.");
@@ -164,8 +165,9 @@ public final class App {
                                 ByteString businessProcessMessage = ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage()).getBusinessProcessMessage();
                                 try {
                                     new OutboundHCSMessage(hcsCore)
+                                            .restrictTo(player)
                                             .requestProof(0, applicationMessageEntity.getApplicationMessageId(),  businessProcessMessage.toStringUtf8(), publicKey);
-                                    System.out.println("proof request sent to ALL participants (in addressbook) awaiting their replies");
+                                    System.out.println("proof request sent to "+player+"   awaiting  reply");
                                 } catch (Exception e) {
                                     log.error(e);
                                 }
@@ -175,6 +177,7 @@ public final class App {
                         }
                     }
                 } else if (userInput.startsWith("send-restricted")) {
+                    // send a message so that only one buddy from addressbook can decrypt
                     String[] split = userInput.split("\\s+");
                     if (split.length != 3) {
                         System.out.println("Invalid number of argumets");
@@ -182,6 +185,7 @@ public final class App {
                         sendMessageOnThread(hcsCore, messageThread, split[2], split[1]);
                     }
                 } else {
+                    // send a message so that all buddies from addresbook can decrypt
                     // send message on thread
                     sendMessageOnThread(hcsCore, messageThread, userInput, null);
                 }
@@ -258,7 +262,7 @@ public final class App {
             
             try  { Any any = Any.parseFrom(bpm); 
             if (any.is(RequestProof.class)){
-                System.out.println("Echo of request proof received. Awaiting replies. ");
+                System.out.println("        Echo of  proof request received. Awaiting replies. ");
 
             } else if (any.is(ConfirmProof.class)){
                 ConfirmProof cf = any.unpack(ConfirmProof.class);

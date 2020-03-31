@@ -82,6 +82,7 @@ public final class OutboundHCSMessage {
     private Map<String,Map<String,String>> addressList = null;
     private HCSCore hcsCore;
 
+    
     public OutboundHCSMessage(HCSCore hcsCore) throws Exception {
         this.hcsCore = hcsCore;
         this.signMessages = hcsCore.getSignMessages();

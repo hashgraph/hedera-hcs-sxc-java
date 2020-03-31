@@ -56,13 +56,14 @@ import java.util.logging.Logger;
  */
 @Log4j2
 public final class App {
-    // eclipse plugin to render ANSI colors in console if needed: mihai-nita.net/2013/06/03/eclipse-plugin-ansi-in-console 
-    private static String messageThread = "";
+    private static String messageThread = ""; // used to group messages by an conversational id. 
     private static Map<String, List<String>> messageThreads = new HashMap<String, List<String>>();
     private static int topicIndex = 0; // refers to the first topic ID in the config.yaml
 
     public static void main(String[] args) throws Exception {
 
+       
+        
         String appId = "";
         
         if (args.length == 0) {
@@ -72,23 +73,18 @@ public final class App {
             appId = args[0];
         }
 
-        // 1 - Init the core with data from  .env and config.yaml 
-        //HCSCore hcsCore = HCSCore.INSTANCE.singletonInstance(appId);
+        //Init the core with data from  .env and config.yaml 
         HCSCore hcsCore = new HCSCore().builder(appId,
                 "./config/config.yaml",
                 "./config/.env"+appId
         );
 
         if (hcsCore.getEncryptMessages()) {
-            // 3 - Load the addressbook from address-list yaml and supply the core.
-            if (AddressListCrypto.INSTANCE.singletonInstance(appId).getAddressList() != null) {
-                AddressListCrypto
-                        .INSTANCE
-                        .singletonInstance(appId)
-                        .getAddressList()
-                        .forEach((k,v)->{
-                            hcsCore.addOrUpdateAppParticipant(k, v.get("theirEd25519PubKeyForSigning"), v.get("sharedSymmetricEncryptionKey"));
-                        });
+            // Load the addressbook from address-list yaml "./config/contact-list.yaml"  and supply the core.
+            AddressListCrypto addressBook = AddressListCrypto.INSTANCE.singletonInstance(appId);
+            if (addressBook.getAddressList() != null) {
+                // feed the core 
+                addressBook.supplyCore(hcsCore);
             }
         }        
         
@@ -149,19 +145,23 @@ public final class App {
                 } else if (messageThread.isEmpty()) {
                     Ansi.print("(red)Please create or set a thread first(reset)");
                 } else if (userInput.startsWith("prove")) {
+                    // make a message verification request to a particular participant
+                    
                     String[] split = userInput.split("\\s+");
                     if (split.length != 4) {
                         System.out.println("Invalid number of argumets");
                     } else { 
-                        String player = split[1];
-                        String applicationMessageId = split[2];
-                        String pubkey = split[3];
+                        String player = split[1]; // this participant will verify the message
+                        String applicationMessageId = split[2]; // this is the message to be verified - it's pulled from local db
+                        String pubkey = split[3]; // this is the public key whose private key signed the message
                         try {
+                            // find the message by ID in local database
                             Ed25519PublicKey publicKey = Ed25519PublicKey.fromString(pubkey);
                             SxcApplicationMessageInterface applicationMessageEntity = hcsCore.getPersistence().getApplicationMessageEntity(applicationMessageId);
                             if (applicationMessageEntity == null) {
                                 System.out.println("Message not available in local db.");
                             } else {
+                                // send the proof request to the network.
                                 ByteString businessProcessMessage = ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage()).getBusinessProcessMessage();
                                 try {
                                     new OutboundHCSMessage(hcsCore)

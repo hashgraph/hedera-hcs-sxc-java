@@ -61,6 +61,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import lombok.extern.log4j.Log4j2;
 
+/**
+ * Object used to invoke outbound creation message methods. See 
+ * constructor {@link #OutboundHCSMessage(com.hedera.hcs.sxc.HCSCore) } for details. 
+ */
 @Log4j2
 public final class OutboundHCSMessage {
 
@@ -82,7 +86,34 @@ public final class OutboundHCSMessage {
     private Map<String,Map<String,String>> addressList = null;
     private HCSCore hcsCore;
 
-    
+    /**
+     * Instantiates object to provide outbound message functionality to end-
+     * users. The objects requires and instance of {@link HCSCore} which
+     * provides the app with necessary configuration and initialisation
+     * parameters. End-users invoke the object's
+     * {@link #sendMessage(int, byte[])} to send the payload to the HCS network.
+     * The payload can be of any type and is wrapped in an
+     * {@link ApplicationMessage} and sent over to the network. The object also
+     * allows to make message verification requests with {@link #requestProof(int, java.lang.String, java.lang.String, com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey)
+     * }
+     * which sends special messages that receiving parties automatically
+     * recognize and handle appropriately.
+     * <p>
+     * Behind the scenes, a message is split and is sent in chunks if it is too big
+     * for the network to handle.
+     * <p>
+     * A builder pattern is used to to parameterize how messages (either
+     * standard of proof requests) are sent.
+     * <p>
+     * When a message is sent with encryption enabled (option held in
+     * HCSCore) then the message is encrypted with each shared key of every
+     * participant in the address-book, unless encryption is restricted with {@link #restrictTo(java.util.List) } to a
+     * single participant or a list of participants. Receiving parties can get all
+     * messages whether these are encrypted or cleartext.
+     *
+     * @param hcsCore instantiated core object that hold initialisation parameters, address-book etc. 
+     * @throws Exception
+     */
     public OutboundHCSMessage(HCSCore hcsCore) throws Exception {
         this.hcsCore = hcsCore;
         this.signMessages = hcsCore.getSignMessages();
@@ -209,7 +240,7 @@ public final class OutboundHCSMessage {
     }
     
      /**
-     * Sends a single cleartext message but doesn't sent to hedera 
+     * Sends a single cleartext message but doesn't send to HCS 
      * This is for testing purposes only
      *
      * @param topicIndex the index reference in one of {@link #topics}

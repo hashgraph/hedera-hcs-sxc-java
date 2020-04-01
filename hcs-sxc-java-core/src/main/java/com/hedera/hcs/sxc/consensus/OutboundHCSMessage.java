@@ -39,6 +39,7 @@ import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import com.hedera.hcs.sxc.HCSCore;
+import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
 import com.hedera.hcs.sxc.commonobjects.EncryptedData;
 import com.hedera.hcs.sxc.config.Topic;
 import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
@@ -109,7 +110,7 @@ public final class OutboundHCSMessage {
      * HCSCore) then the message is encrypted with each shared key of every
      * participant in the address-book, unless encryption is restricted with {@link #restrictTo(java.util.List) } to a
      * single participant or a list of participants. Receiving parties can get all
-     * messages whether these are encrypted or cleartext.
+     * messages whether these are encrypted or in clear-text.
      *
      * @param hcsCore instantiated core object that hold initialisation parameters, address-book etc. 
      * @throws Exception
@@ -253,7 +254,16 @@ public final class OutboundHCSMessage {
     }
 
      /**
-     * Sends a single cleartext message
+     * Sends a single message which is wrapped into the payload field of an {@link ApplicationMessage}
+     * Behind the scenes, large messages are split into chunks and sent to HCS - receiving parties assemble chunks
+     * transparently. 
+     * The message is sent encrypted
+     * if the flag {@link #encryptMessages} is set in HCSCore via configuration files or when 
+     * the {@link #overrideEncryptedMessages(boolean) } flag is sat during the builder construction. 
+     * When encryption is enabled then 
+     * multiple messages are sent, one for each participant with which an encryption key is shared. 
+     * To restrict encryption to a subset of address book participants use {@link #restrictTo(java.util.List) } 
+     * in the builder pattern of this objects constructor. 
      *
      * @param topicIndex the index reference in one of {@link #topics}
      * @param message
@@ -264,6 +274,22 @@ public final class OutboundHCSMessage {
         return sendMessage(topicIndex, message, false);
     }
      
+    /**
+     * Sends a proof request to the network. The request is handled automatically by app-net 
+     * participants where their own {@link OnHCSMessageCallback} proof request 
+     * handling procedure replies results back to this participant. This method 
+     * is using the same builder pattern as  {@link #sendMessage(int, byte[]) } where
+     * requests restricted to particular participants are issued by composing
+     * {@link  #restrictTo(java.util.List) } into the request. 
+     * @param topicIndex
+     * @param applicationMessageId The application message to be validated needs to reside
+     * in own database either in encrypted or decrypted form.
+     * @param cleartext The decrypted cleartext or business process message
+     * @param publicKey The key of the signer of the message being validated
+     * @return The transaction id's associated with the request. Notice that the verification 
+     * result is returned asynchronously and is handled in {@link OnHCSMessageCallback#prove(com.hedera.hcs.sxc.proto.VerifiableApplicationMessage) }
+     * @throws Exception 
+     */ 
     public List<TransactionId> requestProof(int topicIndex, String applicationMessageId, String cleartext, Ed25519PublicKey publicKey) throws Exception {
         
         RequestProof rp = RequestProof.newBuilder()
@@ -303,7 +329,6 @@ public final class OutboundHCSMessage {
             TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, null, byPassSending);
             txIdList.add(doSendMessageTxId);     
         }
-        
         return txIdList;
     }
 

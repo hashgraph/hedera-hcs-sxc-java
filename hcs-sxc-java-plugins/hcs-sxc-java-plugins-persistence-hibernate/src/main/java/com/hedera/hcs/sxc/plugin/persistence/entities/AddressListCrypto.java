@@ -20,6 +20,8 @@ package com.hedera.hcs.sxc.plugin.persistence.entities;
  * ‍
  */
 
+import com.hedera.hcs.sxc.interfaces.SxcAddressListItemCryptoInterface;
+import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -29,12 +31,12 @@ import javax.persistence.Column;
 @Data
 @Entity
 @Table(name = "addressListCrypto")
-public class AddressListCrypto {
+public class AddressListCrypto implements SxcAddressListItemCryptoInterface, Serializable {
 
     @Id
     private String appId;
     private String theirEd25519PubKeyForSigning; // HEX
     @Column(length=2500)
     private String sharedSymmetricEncryptionKey; // HEX
-
+    private String nextSharedSymmetricEncryptionKey;
 }

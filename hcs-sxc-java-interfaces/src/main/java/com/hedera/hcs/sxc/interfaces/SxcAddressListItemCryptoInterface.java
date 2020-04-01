@@ -28,5 +28,9 @@ package com.hedera.hcs.sxc.interfaces;
 public interface SxcAddressListItemCryptoInterface  {  
     public String getAppId();
     public String getTheirEd25519PubKeyForSigning();
+    // the current, active shared symetric encryption key
     public String getSharedSymmetricEncryptionKey();
+    // the prepared and queued up encryption key
+    public String getNextSharedSymmetricEncryptionKey();
+    
 }

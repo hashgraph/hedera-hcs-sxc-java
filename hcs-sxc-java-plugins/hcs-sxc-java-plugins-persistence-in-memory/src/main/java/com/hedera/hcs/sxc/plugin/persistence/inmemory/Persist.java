@@ -71,6 +71,8 @@ public class Persist
         String appId;
         String theirEd25519PubKeyForSigning;
         String sharedSymmetricEncryptionKey;
+        String nextSharedSymmetricEncryptionKey;
+         
     }
     
     private static boolean isInstantiated = false;

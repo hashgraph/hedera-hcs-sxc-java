@@ -73,9 +73,6 @@ public class HCSCore {
    
 
     
-//    private  HCSCore() throws  ExceptionInInitializerError {  
-//    }
-    
 
     public HCSCore() {  
     }
@@ -122,10 +119,16 @@ public class HCSCore {
         this.catchupHistory = appnet.getCatchupHistory();
         this.messagePersistenceLevel = appnet.getPersistenceLevel();
 
+        
+      
+       
+     
         if(this.rotateKeys && !this.encryptMessages){
             log.error(configFilePath + " has key rotation enabled, however encryption is disabled. Exiting...");
             System.exit(0);
         }
+        
+        
         
         // replace hibernate configuration {appid}
         yamlConfig.getCoreHibernate().forEach((key,value) -> this.hibernateConfig.put(key, value.replace("{appid}",  this.applicationId)));  
@@ -156,7 +159,7 @@ public class HCSCore {
     }
     /**
      * Init for HCS Core
-     * @param applicationId - unique value per app instance using the component, if the app generates this value and stops/starts,
+     * @param appId - unique value per app instance using the component, if the app generates this value and stops/starts,
      * it must reuse the same applicationId to ensure consistent message delivery
      * @throws java.io.FileNotFoundException
      */

@@ -28,7 +28,7 @@ message ApplicationMessage {
     bytes businessProcessMessage = 2;  // the payload
     bytes unencryptedBusinessProcessMessageHash  = 3;
     bytes businessProcessSignatureOnHash  = 4;
-    bytes encryptionRandom = 5;
+    bytes encryptionRandom = 5;  // random number used for ivspec. it doubles as a flag to test if message is encrypted
 }
 
 // parts of a complete message

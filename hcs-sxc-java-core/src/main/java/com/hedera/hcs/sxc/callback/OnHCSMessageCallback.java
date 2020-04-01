@@ -83,51 +83,55 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
 
     private final List<HCSCallBackToAppInterface> observers = new ArrayList<>();
     private HCSCore hcsCore;
-    private boolean signMessages;
-    private boolean encryptMessages;
-    private boolean rotateKeys;
+    private boolean signMessagesFromCore;
+    private boolean encryptMessagesFromCore;
+    private boolean rotateKeysFromCore;
     private Class<?> messageEncryptionClass;
     private SxcMessageEncryption messageEncryptionPlugin;
     private List<Topic> topics;
     private SxcKeyRotation keyRotationPlugin;
     
     /**
-     * Implements callback registration and notification capabilities; the used 
-     * to process messages received from the mirror. Users instantiate the object
-     * and register observer callback methods {@link #addObserver(com.hedera.hcs.sxc.interfaces.HCSCallBackToAppInterface) }
-     * to receive processed messages in their apps. 
-     * 
-     * End users should only register observers, the remaining public interface is
-     * used for low level and background message processing: when a message is received from the mirror then this object will decide how
-     * the low level message should be handled; it  either constructs an {@link ApplicationMessage}
-     * by composing message chunks with {@link #pushUntilCompleteMessage(com.hedera.hcs.sxc.proto.ApplicationMessageChunk, com.hedera.hcs.sxc.interfaces.SxcPersistence) }
-     * to be passed on registered observers or responds to low level instructions 
-     * that handle KeyRoatation or message verification  requests. Decryption and message
-     * integrity is handled automatically where the HCSCore address-book is consulted behind the scenes. 
-     * 
-     * @param hcsCore  the instantiated core object. {@see HCSCore}
-     * @throws Exception 
+     * Implements callback registration and notification capabilities; the used
+     * to process messages received from the mirror. Users instantiate the
+     * object and register observer callback methods {@link #addObserver(com.hedera.hcs.sxc.interfaces.HCSCallBackToAppInterface)
+     * }
+     * to receive processed messages in their apps.
+     *
+     * End users should only register observers, the remaining public interface
+     * is used for low level and background message processing: when a message
+     * is received from the mirror then this object will decide how the low
+     * level message should be handled; it either constructs an
+     * {@link ApplicationMessage} by composing message chunks with {@link #pushUntilCompleteMessage(com.hedera.hcs.sxc.proto.ApplicationMessageChunk, com.hedera.hcs.sxc.interfaces.SxcPersistence)
+     * }
+     * to be passed on registered observers or responds to low level
+     * instructions that handle KeyRoatation or message verification requests.
+     * Decryption and message integrity is handled automatically where the
+     * HCSCore address-book is consulted behind the scenes.
+     *
+     * @param hcsCore the instantiated core object. {
+     * @see HCSCore}
+     * @throws Exception
      */
     public OnHCSMessageCallback (HCSCore hcsCore) throws Exception {
         this.hcsCore = hcsCore;
         
-        this.signMessages = hcsCore.getSignMessages();
-        this.encryptMessages = hcsCore.getEncryptMessages();
-        this.rotateKeys = hcsCore.getRotateKeys();
+        this.signMessagesFromCore = hcsCore.getSignMessages();
+        this.encryptMessagesFromCore = hcsCore.getEncryptMessages();
+        this.rotateKeysFromCore = hcsCore.getRotateKeys();
         this.topics = hcsCore.getTopics();
         
-        if(this.signMessages){
+        if(this.signMessagesFromCore){
+            // test signature even if things not encrypted
             
         }
-        if (this.encryptMessages){
-            messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
-            this.messageEncryptionPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
-        }
-         if(this.rotateKeys){
+        
+        
+        if(this.rotateKeysFromCore){
             Class<?> messageKeyRotationClass = Plugins.find("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcKeyRotation", true);
             this.keyRotationPlugin = (SxcKeyRotation)messageKeyRotationClass.newInstance();
         }
-         
+        
         if (this.hcsCore.getCatchupHistory()) {
             log.debug("catching up with mirror history");
             Optional<Instant> lastConsensusTimestamp = Optional.of(this.hcsCore.getPersistence().getLastConsensusTimestamp());
@@ -143,14 +147,18 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
      * Adds an observer to the list of observers. An observer is a 
      * call-back function that listens and handles incoming high level
      * application messages. 
-     * @param listener callback method; a provided parameter to implement the
+     * @param listener callback method; a provided parameter that implements the
      * functional interface is {@link HCSResponse} and an example usage is
      * <pre>
         o.addObserver((HCSResponse hcsResponse) -&gt; {
            System.out.print(hcsResponse.getApplicationMessageID());
         });
      * </pre>
-     * which prints the id of the application message. 
+     * which prints the id of the application message. Notice that HCSResponse 
+     * does not return
+     * the entire {@link ApplicationMessage} or HCS information. Such information
+     * can be obtained from the local store using implementations of {@link 
+     * SxcPersistence#getApplicationMessageEntity(java.lang.String) 
      */
     @Override
     public void addObserver(HCSCallBackToAppInterface listener) {
@@ -163,12 +171,16 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
      * @param message
      * @param applicationMessageId
      */
+    @Override
     public void notifyObservers(byte[] message, ApplicationMessageID applicationMessageId) {
         HCSResponse hcsResponse = new HCSResponse();
         hcsResponse.setApplicationMessageID(applicationMessageId);
         hcsResponse.setMessage(message);
         observers.forEach(listener -> listener.onMessage(hcsResponse));
     }
+    
+    
+    @Override
     public void storeMirrorResponse(SxcConsensusMessage consensusMessage) {
         hcsCore.getPersistence().storeMirrorResponse(consensusMessage);
     }
@@ -184,9 +196,15 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
               
                 ApplicationMessage appMessage = messageEnvelopeOptional.get();
                 
-                if(this.encryptMessages){
-                   
+                if(this.encryptMessagesFromCore  // configuration wants encryption
+                   || appMessage.getEncryptionRandom() != null  // configuration may not want encryption but message can still be encrypted
+                ){
+                    
                     try {
+                    
+                        messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
+                        this.messageEncryptionPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
+        
                         
                         String applicationMessageId = 
                                 SxcPersistence.extractApplicationMessageStringId(appMessage.getApplicationMessageId());
@@ -574,8 +592,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                     } catch (Exception e){
                         e.printStackTrace();
                     }  
-                    
-                } else { // not encrypted
+                }else { // not encrypted
                     log.debug("Received clear text message");
                     this.hcsCore.getPersistence().storeApplicationMessage(
                             messageEnvelopeOptional.get(),

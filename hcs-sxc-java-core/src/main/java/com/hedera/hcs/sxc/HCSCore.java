@@ -235,8 +235,8 @@ public class HCSCore {
         this.operatorAccountId = operatorAccountId;
         return this;
     }
-    public HCSCore withOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
-        this.operatorKey = ed25519PrivateKey;
+    public HCSCore withOperatorKey(Ed25519PrivateKey operatorKey) {
+        this.operatorKey = operatorKey;
         return this;
     }
     public HCSCore withTopicList(List<Topic> topics) {
@@ -267,7 +267,7 @@ public class HCSCore {
     public AccountId getOperatorAccountId() {
         return this.operatorAccountId;
     } 
-    public Ed25519PrivateKey getEd25519PrivateKey() {
+    public Ed25519PrivateKey getOperatorKey() {
         return this.operatorKey;
     } 
     public List<Topic> getTopics() {

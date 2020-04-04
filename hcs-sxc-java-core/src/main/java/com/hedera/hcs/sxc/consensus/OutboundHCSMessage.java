@@ -72,13 +72,13 @@ public final class OutboundHCSMessage {
 
     private boolean signMessages = false;
     private boolean encryptMessages = false;
-    private byte[] overrideMessageEncryptionKey = null; 
+    private String overrideMessageEncryptionKey = null; 
     private boolean rotateKeys = false;
     private int rotationFrequency = 0;
-    private byte[] messageEncryptionKey = null;
+    //private byte[] messageEncryptionKey = null;
     private Map<AccountId, String> nodeMap = new HashMap<>();
     private AccountId operatorAccountId = new AccountId(0, 0, 0);
-    private Ed25519PrivateKey ed25519PrivateKey;
+    private Ed25519PrivateKey operatorKey;
     private long hcsTransactionFee = 0L;
     private List<Topic> topics;
     private TransactionId transactionId = null;
@@ -123,7 +123,7 @@ public final class OutboundHCSMessage {
         this.rotateKeys = hcsCore.getRotateKeys();
         this.nodeMap = hcsCore.getNodeMap();
         this.operatorAccountId = hcsCore.getOperatorAccountId();
-        this.ed25519PrivateKey = hcsCore.getEd25519PrivateKey();
+        this.operatorKey = hcsCore.getOperatorKey();
         this.topics = hcsCore.getTopics();
         this.hcsTransactionFee = hcsCore.getMaxTransactionFee();
         this.addressList = hcsCore.getPersistence().getAddressList();
@@ -160,7 +160,7 @@ public final class OutboundHCSMessage {
         return this.encryptMessages;
     }
  
-    public OutboundHCSMessage overrideEncryptedMessages(boolean encryptMessages) {
+   public OutboundHCSMessage overrideEncryptedMessages(boolean encryptMessages) {
         this.encryptMessages = encryptMessages;
         return this;
     }
@@ -198,11 +198,11 @@ public final class OutboundHCSMessage {
     }
 
     public Ed25519PrivateKey getOverrideOperatorKey() {
-        return this.ed25519PrivateKey;
+        return this.operatorKey;
     }
 
     public OutboundHCSMessage overrideOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
-        this.ed25519PrivateKey = ed25519PrivateKey;
+        this.operatorKey = ed25519PrivateKey;
         return this;
     }
     
@@ -211,12 +211,12 @@ public final class OutboundHCSMessage {
     }
 
     
-    public OutboundHCSMessage overrideMessageEncryptionKey (byte[] messageEncryptionKey){
+    public OutboundHCSMessage overrideMessageEncryptionKey (String messageEncryptionKey){
         this.overrideMessageEncryptionKey = messageEncryptionKey;
         return this;
     }
     
-    public byte[] getOverrideMessageEncryptionKey (){
+    public String getOverrideMessageEncryptionKey (){
         return this.overrideMessageEncryptionKey;
     }
 
@@ -311,19 +311,20 @@ public final class OutboundHCSMessage {
      
     public List<TransactionId> sendMessage(int topicIndex, byte[] message, boolean byPassSending) throws Exception {
         List<TransactionId> txIdList = new ArrayList<>();
-        
-        if (encryptMessages) { // send  so that specific users can decrypt 
+        if(encryptMessages && this.overrideMessageEncryptionKey!=null ){
+                log.debug("Override encryption");
+                TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, this.overrideMessageEncryptionKey, byPassSending);
+                txIdList.add(doSendMessageTxId);
+        }else if (encryptMessages) { // send  so that specific users can decrypt - flag needs addressbook
             enableMessageEncryptionPlugin();
-            if (this.addressList != null){ // get it from .env
+             if (this.addressList != null && this.addressList.size() > 0){ // get it from .env
                 for (String recipient : addressList.keySet()){
                     log.debug("Sending to " + recipient);
-                    TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, recipient, byPassSending);
+                    TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, this.addressList.get(recipient).get("sharedSymmetricEncryptionKey") , byPassSending);
                     txIdList.add(doSendMessageTxId);
                 }                
-                //   this.messageEncryptionKey = hcsCore.getMessageEncryptionKey();
-                //   message = messageEncryptionPlugin.encrypt(this.messageEncryptionKey, message);
             } else {
-                throw new NoSuchElementException("Encryption set to true, but keys not found in address book");
+                throw new NoSuchElementException("Encryption set to true, but no keys found in address book");
             }
         } else { // broadcast
             TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, null, byPassSending);
@@ -332,7 +333,7 @@ public final class OutboundHCSMessage {
         return txIdList;
     }
 
-    private TransactionId doSendMessage(byte[] message, int topicIndex, String recipient, boolean byPassSending) throws Exception {
+    private TransactionId doSendMessage(byte[] message, int topicIndex, String recipientSharedSymetricEncryptionKey, boolean byPassSending) throws Exception {
         // generate TXId for main and first message it not already set by caller
         TransactionId firstTransactionId = this.transactionId;
         if (firstTransactionId == null) {
@@ -343,16 +344,17 @@ public final class OutboundHCSMessage {
                 firstTransactionId,
                 message,
                 hcsCore.getMessageSigningKey(),  // null means don't sign
-                recipient==null
-                    ?null // don't encrypt
-                    :this.addressList.get(recipient).get("sharedSymmetricEncryptionKey") // encrypt
+                recipientSharedSymetricEncryptionKey == null
+                    ? null // don't encrypt
+                    : recipientSharedSymetricEncryptionKey // encrypt
         );  
         
         //break up 
         List<ApplicationMessageChunk> parts = chunk(applicationMessage);
         
-        // store the outgoing message unencrypted - null parameters because missing consensus data. 
-        // Consensus state is sored on inbound messages
+        // store the outgoing message unencrypted - use null parameters because 
+        // missing consensus data. 
+        // (consensus state is sored on inbound messages)
         // This one is needed to know if the message was sent by me
         // because I don't have a way to un-encrypt my own message and
         // I wouldn't know what encryption key I used.
@@ -373,13 +375,13 @@ public final class OutboundHCSMessage {
             
             if(this.operatorAccountId == null
                     ||
-                    this.ed25519PrivateKey == null){
+                    this.operatorKey == null){
                 log.error("Operator key or operator id not set. Exiting... ");
                 System.exit(0);
             }
             client.setOperator(
                     this.operatorAccountId,
-                    this.ed25519PrivateKey
+                    this.operatorKey
             );
 
             client.setMaxTransactionFee(this.hcsTransactionFee);
@@ -555,10 +557,10 @@ public final class OutboundHCSMessage {
 
                 // Signature (using sender’s private key) of hash (above) should also be included in application message
                
-                byte[] sign = Signing.sign(hashOfOriginalMessage, senderSigningKey);
-
-                applicationMessageBuilder.setBusinessProcessSignatureOnHash(ByteString.copyFrom(sign));
-
+                if(senderSigningKey!=null) { // signing may be turned off when override is used
+                    byte[] sign = Signing.sign(hashOfOriginalMessage, senderSigningKey);
+                    applicationMessageBuilder.setBusinessProcessSignatureOnHash(ByteString.copyFrom(sign));
+                }
 
                 // encrypt
                 //String encryptionKey = recipientKeys.get("sharedSymmetricEncryptionKey");

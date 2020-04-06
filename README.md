@@ -67,10 +67,7 @@ The encryption scheme that HCS SCX uses is plugin based and users can define the
 
 
 ### Proof after the fact and verifying messages
-ApplicationMessages are signed using the sender's signing key; in particular, it is the hash of the unencrypted clear-text or business message that is signed.  The hash and the signature is included with an ApplicationMessage and is sent to communicating app-net participants where each can issue a verification request to the app-net by making an API call with parameters  ApplicationMessage id, the cleartext message, and the public key of the signer. A participant can verify the message by introspecting its own persistent state and if the message is found then verification can take place even if the persisted message is in encrypted form.
-
-
-
+ApplicationMessages are signed using the sender's signing key; in particular, it is the hash of the unencrypted clear-text or business message that is signed.  The hash and the signature is included with an ApplicationMessage and is sent to communicating app-net participants where each can issue a verification request to the app-net by making an API call with parameters  ApplicationMessage id, the cleartext message, and the public key of the signer. A participant can verify the message by introspecting its own persistent state and if the message is found then verification can take place even if the persisted message is in encrypted form. 
 
 ### Persistence
 
@@ -80,9 +77,6 @@ It is fully expected that an application would need to persist some data itself,
 
 *Note: The settlement demo makes use of application level persistence, however it has been implemented such that a transaction sent to HCS is not considered part of state (it remains pending) until the transaction has been confirmed by mirror node at which point the state transition is confirmed.
 This is to ensure application state does not end up out of sync with other applications in the event of a transaction processing failure for example.*
-
-
-
 
 ## Components
 
@@ -609,8 +603,7 @@ new thread_name to create a new thread (note doesn't change current thread)
 select thread_name to create a new thread (note doesn't change current thread)
 list to show a list of threads
 show to list all messages for the current thread
-prove  app_id applicationMessage_id  public_key  to prove message after the fact; you can generate a message first and copy its resulting applicationMessage_id.
-
+prove  app_id applicationMessage_id  public_key  to prove message after the fact; you can generate a message first and copy its resulting applicationMessage_id. 
 help to print this help
 exit to quit
 
@@ -633,21 +626,20 @@ All terminals should now be waiting for input, enter text in one terminal and pr
 Messages sent by player 1 are echoed on Player 2 and 3, player 1 gets a copy of each message sent
 Messages sent by players 2 and 3 are only echoed on player 1
 
-When a message is received it is displayed on the same output and extra details are shown such as consensus information and whether the message was from one self. For insnce, when player 0 creates a new thread then two messages are sent, one to player 1 and one to player 2.  Player 0 receives his own message back twice; such a message would look like this:
+When a message is received it is displayed on the same output and extra details are shown such as consensus information and whether the message was from one self. For insnce, when player 0 creates a new thread then two messages are sent, one to player 1 and one to player 2.  Player 0 receives his own message back twice; such a message would look like this: 
 
 ```
 received thread creation notification from mirror: mt
-Details stored as applicationMessageEntity :
-    applicationMessageId: 0.0.95518-1585056287-851629200
-    last chrono chunk consensus sequenceNum: 614
-    last chrono chunk consensus running hash: 565b24568af1b84976c70e8affe305ea72df787c90f46277e4617538b5ec37df0b03ed6d6f572dd7a08f8e376adab298
-    ApplicationMessage:
-        Id: 0.0.95518-1585056287-851629200
-        Hash of unencrypted message: 4382f847e963728555c40d044b42b8ef8e15da69a0501cc1474ed81be06c43eb0ea75ab899a02225b8ec9ec0052befb6
-        Signature on hash above: 085f8b819b603d2f67b48e4e28b3569e96f8db26f4c3b45f9904bd6c1346592a77794a9145f9303a1e3d72fcd29538175bd6cae48722d8e128b98fc9616fbe06
-        Encryption random: 9791722faf59ca86cc0226f5e7179fea
-        Is this a self message?: true
-```
+Details stored as applicationMessageEntity : 
+    applicationMessageId: 0.0.95518-1585056287-851629200 
+    last chrono chunk consensus sequenceNum: 614 
+    last chrono chunk consensus running hash: 565b24568af1b84976c70e8affe305ea72df787c90f46277e4617538b5ec37df0b03ed6d6f572dd7a08f8e376adab298 
+    ApplicationMessage: 
+        Id: 0.0.95518-1585056287-851629200 
+        Hash of unencrypted message: 4382f847e963728555c40d044b42b8ef8e15da69a0501cc1474ed81be06c43eb0ea75ab899a02225b8ec9ec0052befb6 
+        Signature on hash above: 085f8b819b603d2f67b48e4e28b3569e96f8db26f4c3b45f9904bd6c1346592a77794a9145f9303a1e3d72fcd29538175bd6cae48722d8e128b98fc9616fbe06 
+        Encryption random: 9791722faf59ca86cc0226f5e7179fea 
+        Is this a self message?: true 
 
 The demo code demonstrates how to maintain a simple state across participants; a message thread is simply a conversation thread that aims to group messages by a thread name. To make a simple conversation load the supplied address book
 where Player-0 "talks" to 1 and 2, which means that player 0 has a shared key with player 1 and another shared key with player 2.
@@ -688,6 +680,48 @@ A single validation request is sent (encrypted) to Player-2. If all works as exp
         Message verification result: VALIDATION_OK  
         Encryption random:  
         Is this a self message?: false
+```
+
+
+The demo code demonstrates how to maintain a simple state across participants; a message thread is simply a conversation thread that aims to group messages by a thread name. To make a simple conversation load the supplied address book
+where Player-0 "talks" to 1 and 2, which means that player 0 has a shared key with player 1 and another shared key with player 2.
+
+To create a thread type
+`new  demo-conversation`
+
+and wait until two echo messages come back. Then type 
+`select demo-conversation`
+
+
+To send a message to all participants type any message in the prompt. If you send from player 0 then you should expect two echo messages, for each other Player's terminal you should expect one non-echo message. 
+
+** Verifying a message
+
+To test proof after the fact you can send a sinble message where the shared key of Player-0 + Player-1 is used; from Player-0's terminal type:
+`send-restricted Player-1 Hello Future`
+
+and wait until a single echo message arrives; then copy the generated application message id. Observe Player-1's terminal to check if the message arrived.
+
+This message exchange is between Player-0 and Player-1, thus Player-2 has no way of decrypting the contents; however, Player-2 has a copy of the encrypted message. To validate the message Player-0 types:
+
+`prove Player-2 0.0.95518-1585566306-230801600 302a300506032b6570032100ffc3f23232acd69f2db068722ab43c0ad4d08c26a4df73c42aebbf5b1c4f633a`
+
+where the second argument is the copied application id and the third argument is Player-0's public signing key (you'll find the copy of the public key on the beginning of the terminal history when the application loads.
+
+A single validation request is sent (encrypted) to Player-2. If all works as expected then Player-2 should automatically validate the message and Player-0's prompt should show a success message.
+
+```
+    ...
+    applicationMessageId: 0.0.95518-1585056383-216111500 
+    last chrono chunk consensus sequenceNum: 620 
+    last chrono chunk consensus running hash: 017b0806ddef82a621b205f4d9d6704ad5cc1a1d4421f39463d6062e53c9f6f667315f5f9ad70d95494fa121863028c8 
+    ApplicationMessage: 
+        Id: 0.0.95518-1585056383-216111500 
+        Hash of unencrypted message: af0c3e954e0646922f26cef54fc1707e918e36c01515a2b68494fbfa0f937a684165fb7f13a7d464c09d9ac97468bb64 
+        Signature on hash above: 1f865937a4b7acf6cb3bb11d7f9b4d24bb8888652182a31dd6fc450bd5e63583daa6dccf503b5920c4497ddbde88658a9207f5187666906682bc6624cb177303 
+        Message verification result: VALIDATION_OK  
+        Encryption random:  
+        Is this a self message?: false 
 ```
 
 

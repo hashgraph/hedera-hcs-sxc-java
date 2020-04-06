@@ -158,7 +158,7 @@ public enum AddressListCrypto {
     }
 
     /**
-     * Links this address book to HCSCore byt feeding this {@link #addressList} to it.
+     * Links this address book to HCSCore by feeding this {@link #addressList} to it.
      * @param hcsCore 
      */
     void supplyCore(HCSCore hcsCore) {

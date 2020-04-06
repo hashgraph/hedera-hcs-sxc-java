@@ -44,6 +44,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Hello world!
@@ -141,8 +143,7 @@ public final class App {
                     Ansi.print("(red)Please create or set a thread first(reset)");
                 } else if (userInput.startsWith("prove")) {
                     // make a message verification request to a particular participant
-
-                  String[] split = userInput.split("\\s+");
+                    String[] split = userInput.split("\\s+");
                     if (split.length != 4) {
                         System.out.println("Invalid number of argumets");
                     } else { 
@@ -267,6 +268,7 @@ public final class App {
                         );
                     });
                 }
+
             } catch (InvalidProtocolBufferException e){
                 System.out.println("why here");
             }

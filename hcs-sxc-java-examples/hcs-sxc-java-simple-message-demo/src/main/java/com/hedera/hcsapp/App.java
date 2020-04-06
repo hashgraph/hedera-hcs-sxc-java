@@ -146,8 +146,8 @@ public final class App {
                     Ansi.print("(red)Please create or set a thread first(reset)");
                 } else if (userInput.startsWith("prove")) {
                     // make a message verification request to a particular participant
-                    
-                    String[] split = userInput.split("\\s+");
+
+                  String[] split = userInput.split("\\s+");
                     if (split.length != 4) {
                         System.out.println("Invalid number of argumets");
                     } else { 
@@ -180,7 +180,7 @@ public final class App {
                     // send a message so that only one buddy from addressbook can decrypt
                     String[] split = userInput.split("\\s+");
                     if (split.length != 3) {
-                        System.out.println("Invalid number of argumets");
+                        System.out.println("Invalid number of arguments, note: message cannot contain spaces");
                     } else { 
                         sendMessageOnThread(hcsCore, messageThread, split[2], split[1]);
                     }
@@ -198,6 +198,7 @@ public final class App {
         try {
             // try to parse the notification into a proto
             SimpleMessage simpleMessage = SimpleMessage.parseFrom(hcsResponse.getMessage());
+            
             // check the incoming protobuf message for instructions
             if (simpleMessage.hasMessageOnThread()) {
                 // we have received a new message
@@ -226,8 +227,73 @@ public final class App {
                 
             }
         } catch (InvalidProtocolBufferException e) {
-            printVerboseDetails(hcsCore,hcsResponse);
+            // request proof in progress
+            System.out.println("        Echo of  proof request received. Awaiting replies. ");
         }
+    }
+    
+    private static void printVerboseDetails (HCSCore hcsCore, HCSResponse hcsResponse){
+        try  { 
+            SxcApplicationMessageInterface applicationMessageEntity =
+                    hcsCore
+                            .getPersistence()
+                            .getApplicationMessageEntity(
+                                    SxcPersistence.extractApplicationMessageStringId(
+                                            hcsResponse.getApplicationMessageId()
+                                    )
+                            );
+            System.out.println("Details stored as applicationMessageEntity : ");
+            System.out.printf ("    applicationMessageId: %s \n",applicationMessageEntity.getApplicationMessageId());
+            System.out.printf ("    last chrono chunk consensus sequenceNum: %s \n",applicationMessageEntity.getLastChronoPartSequenceNum());
+            System.out.printf ("    last chrono chunk consensus running hash: %s \n",applicationMessageEntity.getLastChronoPartRunningHashHEX());
+            System.out.println("    ApplicationMessage: ");
+            ApplicationMessage appMessage = ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage());
+            System.out.printf ("        Id: %s \n",SxcPersistence.extractApplicationMessageStringId(appMessage.getApplicationMessageId()));
+            System.out.printf ("        Hash of unencrypted message: %s \n",
+                    StringUtils.byteArrayToHexString(
+                            appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray()
+                    )
+            );
+            System.out.printf ("        Signature on hash above: %s \n",
+                    StringUtils.byteArrayToHexString(
+                            appMessage.getBusinessProcessSignatureOnHash().toByteArray()
+                    )
+            );
+            
+            byte[] bpm = appMessage.getBusinessProcessMessage().toByteArray();
+            
+            try  { Any any = Any.parseFrom(bpm); 
+                if (any.is(ConfirmProof.class)){
+                    ConfirmProof cf = any.unpack(ConfirmProof.class);
+                    
+                    cf.getProofList().forEach(verifiedMessage ->{
+                        System.out.printf("        Message verification result: %s \n",
+                                verifiedMessage.getVerificationOutcome().name()
+                        );
+                    });
+                }
+            } catch (InvalidProtocolBufferException e){
+                System.out.println("why here");
+            }
+            
+            System.out.printf("        Encryption random: %s \n",
+                    StringUtils.byteArrayToHexString(
+                            appMessage.getEncryptionRandom().toByteArray()
+                    )
+            );
+            
+            System.out.printf("        Is this an echo?: %s \n",
+                    Signing.verify(
+                            appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray()
+                            , appMessage.getBusinessProcessSignatureOnHash().toByteArray()
+                            , hcsCore.getMessageSigningKey().publicKey
+                    )
+            );
+            
+        } catch (InvalidProtocolBufferException ex){
+             log.error(ex.getStackTrace());
+        }
+                
     }
     
     private static void printVerboseDetails (HCSCore hcsCore, HCSResponse hcsResponse){
@@ -302,7 +368,6 @@ public final class App {
         }
                 
     }
-    
     
     private static void showThreadList() {
         Ansi.print("(cyan)Known threads(reset)");

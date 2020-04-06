@@ -7,12 +7,11 @@
         <artifactId>hcs-sxc-java-examples</artifactId>
         <version>0.0.3-SNAPSHOT</version>
     </parent>
-    
 
-    <artifactId>hcs-sxc-java-token-demo</artifactId>
-    <packaging>jar</packaging>
 
     <name>hcs-sxc-java-token-demo</name>
+    <artifactId>hcs-sxc-java-token-demo</artifactId>
+    <packaging>jar</packaging>
 
     <properties>
         <spring-boot.version>2.2.2.RELEASE</spring-boot.version>

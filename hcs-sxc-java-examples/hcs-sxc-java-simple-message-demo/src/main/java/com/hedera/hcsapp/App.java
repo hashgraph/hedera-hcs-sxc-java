@@ -31,9 +31,6 @@ import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ConfirmProof;
-import com.hedera.hcs.sxc.proto.RequestProof;
-import com.hedera.hcs.sxc.proto.VerifiableApplicationMessage;
-import com.hedera.hcs.sxc.proto.VerifiedMessage;
 import com.hedera.hcs.sxc.signing.Signing;
 import com.hedera.hcs.sxc.utils.StringUtils;
 
@@ -47,8 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Hello world!
@@ -275,79 +270,6 @@ public final class App {
             } catch (InvalidProtocolBufferException e){
                 System.out.println("why here");
             }
-            
-            System.out.printf("        Encryption random: %s \n",
-                    StringUtils.byteArrayToHexString(
-                            appMessage.getEncryptionRandom().toByteArray()
-                    )
-            );
-            
-            System.out.printf("        Is this an echo?: %s \n",
-                    Signing.verify(
-                            appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray()
-                            , appMessage.getBusinessProcessSignatureOnHash().toByteArray()
-                            , hcsCore.getMessageSigningKey().publicKey
-                    )
-            );
-            
-        } catch (InvalidProtocolBufferException ex){
-             log.error(ex.getStackTrace());
-        }
-                
-    }
-    
-    private static void printVerboseDetails (HCSCore hcsCore, HCSResponse hcsResponse){
-        try  { 
-            SxcApplicationMessageInterface applicationMessageEntity =
-                    hcsCore
-                            .getPersistence()
-                            .getApplicationMessageEntity(
-                                    SxcPersistence.extractApplicationMessageStringId(
-                                            hcsResponse.getApplicationMessageId()
-                                    )
-                            );
-            System.out.println("Details stored as applicationMessageEntity : ");
-            System.out.printf ("    applicationMessageId: %s \n",applicationMessageEntity.getApplicationMessageId());
-            System.out.printf ("    last chrono chunk consensus sequenceNum: %s \n",applicationMessageEntity.getLastChronoPartSequenceNum());
-            System.out.printf ("    last chrono chunk consensus running hash: %s \n",applicationMessageEntity.getLastChronoPartRunningHashHEX());
-            System.out.println("    ApplicationMessage: ");
-            ApplicationMessage appMessage = ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage());
-            System.out.printf ("        Id: %s \n",SxcPersistence.extractApplicationMessageStringId(appMessage.getApplicationMessageId()));
-            System.out.printf ("        Hash of unencrypted message: %s \n",
-                    StringUtils.byteArrayToHexString(
-                            appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray()
-                    )
-            );
-            System.out.printf ("        Signature on hash above: %s \n",
-                    StringUtils.byteArrayToHexString(
-                            appMessage.getBusinessProcessSignatureOnHash().toByteArray()
-                    )
-            );
-            
-            byte[] bpm = appMessage.getBusinessProcessMessage().toByteArray();
-            
-            try  { Any any = Any.parseFrom(bpm); 
-            if (any.is(RequestProof.class)){
-                System.out.println("        Echo of  proof request received. Awaiting replies. ");
-
-            } else if (any.is(ConfirmProof.class)){
-                ConfirmProof cf = any.unpack(ConfirmProof.class);
-                
-                cf.getProofList().forEach(verifiedMessage ->{
-                    System.out.printf("        Message verification result: %s \n",
-                            verifiedMessage.getVerificationOutcome().name()
-                    );
-                });
-                
-            } else {
-
-            }
-            
-            } catch (InvalidProtocolBufferException e){
-                System.out.println("why here");
-            }
-            
-            
             
             System.out.printf("        Encryption random: %s \n",
                     StringUtils.byteArrayToHexString(

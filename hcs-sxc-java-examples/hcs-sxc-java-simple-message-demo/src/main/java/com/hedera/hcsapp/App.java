@@ -1,4 +1,4 @@
-package main.java.com.hedera.hcsapp;
+package com.hedera.hcsapp;
 /*-
  * ‌
  * hcs-sxc-java
@@ -180,7 +180,7 @@ public final class App {
                     // send a message so that only one buddy from addressbook can decrypt
                     String[] split = userInput.split("\\s+");
                     if (split.length != 3) {
-                        System.out.println("Invalid number of argumets");
+                        System.out.println("Invalid number of arguments, note: message cannot contain spaces");
                     } else { 
                         sendMessageOnThread(hcsCore, messageThread, split[2], split[1]);
                     }
@@ -198,6 +198,7 @@ public final class App {
         try {
             // try to parse the notification into a proto
             SimpleMessage simpleMessage = SimpleMessage.parseFrom(hcsResponse.getMessage());
+            
             // check the incoming protobuf message for instructions
             if (simpleMessage.hasMessageOnThread()) {
                 // we have received a new message
@@ -226,7 +227,8 @@ public final class App {
                 
             }
         } catch (InvalidProtocolBufferException e) {
-            printVerboseDetails(hcsCore,hcsResponse);
+            // request proof in progress
+            System.out.println("        Echo of  proof request received. Awaiting replies. ");
         }
     }
     
@@ -261,27 +263,18 @@ public final class App {
             byte[] bpm = appMessage.getBusinessProcessMessage().toByteArray();
             
             try  { Any any = Any.parseFrom(bpm); 
-            if (any.is(RequestProof.class)){
-                System.out.println("        Echo of  proof request received. Awaiting replies. ");
-
-            } else if (any.is(ConfirmProof.class)){
-                ConfirmProof cf = any.unpack(ConfirmProof.class);
-                
-                cf.getProofList().forEach(verifiedMessage ->{
-                    System.out.printf("        Message verification result: %s \n",
-                            verifiedMessage.getVerificationOutcome().name()
-                    );
-                });
-                
-            } else {
-
-            }
-            
+                if (any.is(ConfirmProof.class)){
+                    ConfirmProof cf = any.unpack(ConfirmProof.class);
+                    
+                    cf.getProofList().forEach(verifiedMessage ->{
+                        System.out.printf("        Message verification result: %s \n",
+                                verifiedMessage.getVerificationOutcome().name()
+                        );
+                    });
+                }
             } catch (InvalidProtocolBufferException e){
                 System.out.println("why here");
             }
-            
-            
             
             System.out.printf("        Encryption random: %s \n",
                     StringUtils.byteArrayToHexString(

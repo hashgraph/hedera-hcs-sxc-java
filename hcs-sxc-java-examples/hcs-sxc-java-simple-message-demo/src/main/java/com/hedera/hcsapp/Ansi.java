@@ -1,4 +1,4 @@
-package main.java.com.hedera.hcsapp;
+package com.hedera.hcsapp;
 
 import java.util.HashMap;
 import java.util.Map;

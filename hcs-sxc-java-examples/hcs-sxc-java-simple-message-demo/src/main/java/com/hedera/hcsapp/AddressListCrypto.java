@@ -20,6 +20,7 @@ package com.hedera.hcsapp;
  * ‍
  */
 
+import com.hedera.hcs.sxc.HCSCore;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -32,13 +33,43 @@ import org.yaml.snakeyaml.Yaml;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * Manages configuration
+    * Singleton object to hold an address-book with details for communicating parties. 
+    * Participants
+    * are related by sharing secret keys; each related participant has a different
+    * shared key. The address list also contains the public signing key of each
+    * related participant, which is used to identify users and to verify messages.
+    * The file allows the creation of multiple address-books in a single
+    * file. A mapping from appId to address-list is used to select the active addressbook.
+    * Use {@link #singletonInstance(java.lang.String)} to load an address book at the 
+    * default location and {@link #getAddressList()} to get the map containing app-net
+    * participant details. 
+    * 
+    * Note: in order to link the address book with hcs-core, the core needs to be
+    * supplied with address book details using {@link  HCSCore.addOrUpdateAppParticipant}.
+    * A convenience function is implemented in {@link #supplyCore(com.hedera.hcs.sxc.HCSCore) }
+    * 
  */
 @Log4j2
 public enum AddressListCrypto {
     INSTANCE();
     
     private boolean isInitialised = false;
+    
+    /** A mapping of the form:
+     * * <pre>
+     * {  app-id-1:
+     *       { theirEd25519PubKeyForSigning:302A493..9E
+     *       , sharedSymmetricEncryptionKey:4837AE..F
+     *       }
+     *    , 
+     *    ... 
+     * ,  app-id-n:
+     *       { theirEd25519PubKeyForSigning:302B493..9F
+     *        ,sharedSymmetricEncryptionKey:6837AE..E
+     *       }
+     * }
+     * </pre>
+     */
     private Map<String,  // Bob | Carlos ...
             Map<String,  // sharedSymmetricEncryptionKey | theirEd25519PubKeyForSigning
                 String>
@@ -48,6 +79,19 @@ public enum AddressListCrypto {
     AddressListCrypto() throws ExceptionInInitializerError{
     }
     
+    /**
+     * Creates an address book instance from a file located in "./config/contact-list.yaml" 
+     * to hold related app-net participants. Participants
+     * are related by sharing secret keys; each related participant has a different
+     * shared key. The address list also contains the public signing key of each
+     * related participant, which is used to identify users and to verify messages.
+     * The file allows the creation of multiple address books in a single
+     * file. A mapping from appId to address-list is used to select the active address book.
+     * 
+     * @param appId selects the active address book in the file
+     * @return singleton instance of the address list. 
+     * @throws Exception 
+     */
     public AddressListCrypto singletonInstance(String appId) throws Exception{
         if( ! this.isInitialised) {
             this.init("./config/contact-list.yaml", appId);
@@ -55,6 +99,14 @@ public enum AddressListCrypto {
         return INSTANCE;
     }
     
+    /**
+     * Overrides default addressbook file location
+     * @see {@link #singletonInstance} 
+     * @param addressFilePath
+     * @param appId
+     * @return
+     * @throws Exception 
+     */
     public AddressListCrypto singletonInstance(String addressFilePath, String appId) throws Exception{
         if( ! this.isInitialised) {
             this.init(addressFilePath, appId);
@@ -84,8 +136,37 @@ public enum AddressListCrypto {
         }
     }
     
+    /**
+     * Returns participant details. The map has the following structure
+     * <pre>
+     * {  app-id-1:
+     *       { theirEd25519PubKeyForSigning:3023339..9E
+     *       , sharedSymmetricEncryptionKey:4837AE..F
+     *       }
+     *    , 
+     *    ... 
+     * ,  app-id-n:
+     *       { theirEd25519PubKeyForSigning:302A693..97
+     *        ,sharedSymmetricEncryptionKey:4837AF..E
+     *       }
+     * }
+     * </pre>
+     * @return the mapping.  
+     */
     public  Map<String, Map<String, String>> getAddressList(){
         return this.addressList;
+    }
+
+    /**
+     * Links this address book to HCSCore byt feeding this {@link #addressList} to it.
+     * @param hcsCore 
+     */
+    void supplyCore(HCSCore hcsCore) {
+        this
+        .getAddressList()
+        .forEach((k,v)->{
+            hcsCore.addOrUpdateAppParticipant(k, v.get("theirEd25519PubKeyForSigning"), v.get("sharedSymmetricEncryptionKey"));
+        });
     }
     
   

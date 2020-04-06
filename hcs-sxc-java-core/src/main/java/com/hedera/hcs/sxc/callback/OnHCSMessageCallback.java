@@ -75,6 +75,7 @@ import org.apache.commons.lang3.SerializationUtils;
 /**
  *
  * Implements callback registration and notification capabilities to support apps
+ * See constructor for additional details {@link #OnHCSMessageCallback(com.hedera.hcs.sxc.HCSCore) }
  *
  */
 @Log4j2
@@ -90,6 +91,23 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
     private List<Topic> topics;
     private SxcKeyRotation keyRotationPlugin;
     
+    /**
+     * Implements callback registration and notification capabilities; the used 
+     * to process messages received from the mirror. Users instantiate the object
+     * and register observer callback methods {@link #addObserver(com.hedera.hcs.sxc.interfaces.HCSCallBackToAppInterface) }
+     * to receive processed messages in their apps. 
+     * 
+     * End users should only register observers, the remaining public interface is
+     * used for low level and background message processing: when a message is received from the mirror then this object will decide how
+     * the low level message should be handled; it  either constructs an {@link ApplicationMessage}
+     * by composing message chunks with {@link #pushUntilCompleteMessage(com.hedera.hcs.sxc.proto.ApplicationMessageChunk, com.hedera.hcs.sxc.interfaces.SxcPersistence) }
+     * to be passed on registered observers or responds to low level instructions 
+     * that handle KeyRoatation or message verification  requests. Decryption and message
+     * integrity is handled automatically where the HCSCore address-book is consulted behind the scenes. 
+     * 
+     * @param hcsCore  the instantiated core object. {@see HCSCore}
+     * @throws Exception 
+     */
     public OnHCSMessageCallback (HCSCore hcsCore) throws Exception {
         this.hcsCore = hcsCore;
         
@@ -119,14 +137,27 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
             this.hcsCore.getMirrorSubscription().init(this, this.hcsCore.getApplicationId(), Optional.of(Instant.now()), this.hcsCore.getMirrorAddress(), this.hcsCore.getConsensusTopicIds());
         }
     }
+    
+    
     /**
-     * Adds an observer to the list of observers
-     * @param listener
+     * Adds an observer to the list of observers. An observer is a 
+     * call-back function that listens and handles incoming high level
+     * application messages. 
+     * @param listener callback method; a provided parameter to implement the
+     * functional interface is {@link HCSResponse} and an example usage is
+     * <pre>
+        o.addObserver((HCSResponse hcsResponse) -&gt; {
+           System.out.print(hcsResponse.getApplicationMessageID());
+        });
+     * </pre>
+     * which prints the id of the application message. 
      */
     @Override
     public void addObserver(HCSCallBackToAppInterface listener) {
        observers.add(listener);
     }
+    
+    
     /**
      * Notifies all observers with the supplied message
      * @param message

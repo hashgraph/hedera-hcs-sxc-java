@@ -24,9 +24,11 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
+import com.hedera.hcs.sxc.proto.AccountID;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 import com.hedera.hcs.sxc.proto.ApplicationMessageID;
+import com.hedera.hcs.sxc.proto.Timestamp;
 
 import java.time.Instant;
 import java.util.List;
@@ -88,6 +90,43 @@ public interface SxcPersistence {
     public Map<String,Map<String,String>> getAddressList();
     public void addOrUpdateAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey);
     public void removeAppParticipant(String appId);
-
+    
+    //extract primary key
+    public static String extractApplicationMessageStringId(ApplicationMessageID applicationMessageID){
+        // need to know if message was sent by me. I have to lookup
+        // in db to see if I placed it into it when I sent with OutboutHCS...
+        String applicationMessageId =
+                applicationMessageID.getAccountID().getShardNum()
+                + "." + applicationMessageID.getAccountID().getRealmNum()
+                + "." + applicationMessageID.getAccountID().getAccountNum()
+                + "-" + applicationMessageID.getValidStart().getSeconds()
+                + "-" + applicationMessageID.getValidStart().getNanos();
+        return applicationMessageId;
+    }
+    
+    //extract Timestamp
+    public static Instant getTimestampFromPrimaryKey(String applicationMessageId){
+        String[] s = applicationMessageId.split("[\\.\\-]");
+        return Instant.ofEpochSecond(Long.parseLong(s[3]), Long.parseLong(s[4]));
+    }
+    public static ApplicationMessageID getApplicationMessageIdIdFromPrimaryKey(String applicationMessageId){
+        String[] s = applicationMessageId.split("[\\.\\-]");
+        return ApplicationMessageID.newBuilder()
+                .setAccountID(
+                        AccountID.newBuilder()
+                            .setShardNum(Long.parseLong(s[0]))
+                            .setRealmNum(Long.parseLong(s[1]))
+                            .setAccountNum(Long.parseLong(s[2]))
+                        .build()   
+                )
+                .setValidStart(
+                        Timestamp.newBuilder()
+                        .setSeconds(Long.parseLong(s[3]))
+                        .setNanos(Integer.parseInt(s[4]))
+                        .build()
+                )
+                .build();
+    }
+    
 }
     

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+
 public class Ansi {
     private static boolean isWindows = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
     private static Map<String, String> colors = new HashMap<String, String>();

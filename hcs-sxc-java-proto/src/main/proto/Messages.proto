@@ -24,6 +24,7 @@ message ApplicationMessageID {
 // a complete message containing data provided by an app to the core component
 message ApplicationMessage {
     ApplicationMessageID applicationMessageId = 1;
+
     bytes businessProcessMessage = 2;  // the payload
     bytes unencryptedBusinessProcessMessageHash  = 3;
     bytes businessProcessSignatureOnHash  = 4;
@@ -45,3 +46,43 @@ message KeyRotationInitialise{
 message KeyRotationRespond {
     bytes responderPublicKeyEncoded = 1;
 }
+
+
+message RequestProof {
+    repeated VerifiableMessage applicationMessage = 1;
+}
+
+message VerifiedMessage {
+    VerifiableMessage applicationMessage = 1;
+    enum VerificationOutcome {
+        UNABLE_TO_VERIFY = 0;
+        HASH_DOES_NOT_MATCH = 1;
+        SIGNATURE_DOES_NOT_MATCH = 2;
+        VERIFIED_OK = 3;
+    }
+    VerificationOutcome verificationOutcome = 2;
+}
+
+message VerifiableMessage {
+    oneof oneOfVerifiableMessages {
+    	VerifiableMessageOfChunks verifiableMessageOfChunks = 1;
+    	VerifiableApplicationMessage verifiableApplicationMessage =2;
+    }
+}
+message VerifiableMessageOfChunks {
+    ApplicationMessageID applicationMessageId = 1; 
+    repeated Timestamp applicationMessageChunkTimestamp = 2; // all chunks that make up an application message
+    bytes originalBusinessProcessMessage = 3;
+    bytes senderPublicSigningKey = 4;	
+}
+message VerifiableApplicationMessage {
+    ApplicationMessageID applicationMessageId = 1; 
+    bytes originalBusinessProcessMessage = 2;
+    bytes senderPublicSigningKey = 3;	
+}  
+
+message ConfirmProof {
+    RequestProof messagesToProve = 1;
+    repeated VerifiedMessage proof = 2;
+}
+

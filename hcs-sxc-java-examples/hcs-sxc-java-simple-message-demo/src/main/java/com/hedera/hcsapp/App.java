@@ -1,6 +1,4 @@
 package com.hedera.hcsapp;
-
-import com.google.protobuf.InvalidProtocolBufferException;
 /*-
  * ‌
  * hcs-sxc-java
@@ -20,10 +18,24 @@ import com.google.protobuf.InvalidProtocolBufferException;
  * limitations under the License.
  * ‍
  */
+import com.google.common.base.Joiner;
+import com.google.protobuf.Any;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
 import com.hedera.hcs.sxc.commonobjects.HCSResponse;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
+import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
+import com.hedera.hcs.sxc.interfaces.SxcPersistence;
+import com.hedera.hcs.sxc.proto.ApplicationMessage;
+import com.hedera.hcs.sxc.proto.ConfirmProof;
+import com.hedera.hcs.sxc.proto.RequestProof;
+import com.hedera.hcs.sxc.proto.VerifiableApplicationMessage;
+import com.hedera.hcs.sxc.proto.VerifiedMessage;
+import com.hedera.hcs.sxc.signing.Signing;
+import com.hedera.hcs.sxc.utils.StringUtils;
 
 import lombok.extern.log4j.Log4j2;
 import proto.MessageOnThread;
@@ -35,6 +47,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Hello world!
@@ -77,10 +91,15 @@ public final class App {
                         });
             }
         }        
-
+        
+        
         Ansi.print("****************************************");
         Ansi.print("** Welcome to a simple HCS demo");
         Ansi.print("** I am app: " + appId);
+        Ansi.print("** My private signing key is: " + hcsCore.getMessageSigningKey());
+        Ansi.print("** My public signing key is: " + hcsCore.getMessageSigningKey().publicKey);
+        Map<String, Map<String, String>> addressList = AddressListCrypto.INSTANCE.getAddressList();
+        Ansi.print("** My buddies are: " + Joiner.on(",").withKeyValueSeparator("=").join(addressList));
         Ansi.print("****************************************");
         showHelp();
         
@@ -88,7 +107,7 @@ public final class App {
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsCore);
         onHCSMessageCallback.addObserver((HCSResponse hcsResponse) -> {
             // handle notification in mirrorNotification
-            mirrorNotification(hcsResponse);
+            mirrorNotification(hcsResponse, hcsCore);
         });
 
         // wait for user input
@@ -122,26 +141,64 @@ public final class App {
                 if (userInput.isEmpty()) {
                     Ansi.print("(red)Please input a message before pressing [RETURN].(reset)");
                 } else if (userInput.toUpperCase().startsWith("NEW")) {
-                    // create a new thread 
+                    // create a new thread  (sends message to HCS)
                     createNewThread(hcsCore, userInput);
                 } else if (userInput.toUpperCase().startsWith("SELECT")) {
-                    // selects a thread for messages to be sent
+                    // selects a thread for messages to be sent (does not send HCS message)
                     selectThread(userInput);
                 } else if (messageThread.isEmpty()) {
                     Ansi.print("(red)Please create or set a thread first(reset)");
+                } else if (userInput.startsWith("prove")) {
+                    String[] split = userInput.split("\\s+");
+                    if (split.length != 4) {
+                        System.out.println("Invalid number of argumets");
+                    } else { 
+                        String player = split[1];
+                        String applicationMessageId = split[2];
+                        String pubkey = split[3];
+                        try {
+                            Ed25519PublicKey publicKey = Ed25519PublicKey.fromString(pubkey);
+                            SxcApplicationMessageInterface applicationMessageEntity = hcsCore.getPersistence().getApplicationMessageEntity(applicationMessageId);
+                            if (applicationMessageEntity == null) {
+                                System.out.println("Message not available in local db.");
+                            } else {
+                                ByteString businessProcessMessage = ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage()).getBusinessProcessMessage();
+                                try {
+                                    new OutboundHCSMessage(hcsCore)
+                                            .restrictTo(player)
+                                            .requestProof(0, applicationMessageEntity.getApplicationMessageId(),  businessProcessMessage.toStringUtf8(), publicKey);
+                                    System.out.println("proof request sent to "+player+"   awaiting  reply");
+                                } catch (Exception e) {
+                                    log.error(e);
+                                }
+                            }
+                        } catch (Exception e){
+                            System.out.println("Invalid public key");
+                        }
+                    }
+                } else if (userInput.startsWith("send-restricted")) {
+                    // send a message so that only one buddy from addressbook can decrypt
+                    String[] split = userInput.split("\\s+");
+                    if (split.length != 3) {
+                        System.out.println("Invalid number of arguments, note: message cannot contain spaces");
+                    } else { 
+                        sendMessageOnThread(hcsCore, messageThread, split[2], split[1]);
+                    }
                 } else {
+                    // send a message so that all buddies from addresbook can decrypt
                     // send message on thread
-                    sendMessageOnThread(hcsCore, messageThread, userInput);
+                    sendMessageOnThread(hcsCore, messageThread, userInput, null);
                 }
             }
         }            
     }
     
-    private static void mirrorNotification(HCSResponse hcsResponse) {
+    private static  void mirrorNotification(HCSResponse hcsResponse, HCSCore hcsCore) {
         // we receive a notification from mirror via HCS core
         try {
             // try to parse the notification into a proto
             SimpleMessage simpleMessage = SimpleMessage.parseFrom(hcsResponse.getMessage());
+            
             // check the incoming protobuf message for instructions
             if (simpleMessage.hasMessageOnThread()) {
                 // we have received a new message
@@ -154,8 +211,10 @@ public final class App {
                 Ansi.print("(green)received new message notification from mirror on thread " 
                         + "(yellow)" + threadName 
                         + "(reset), message: " 
-                        + "(yellow)" + message 
+                        + "(yellow)" + message
                         + "(reset)");
+                
+                printVerboseDetails(hcsCore,hcsResponse);
             } else if (simpleMessage.hasNewMessageThread()) {
                 // creating a new thread
                 String newThreadName = simpleMessage.getNewMessageThread().getThreadName();
@@ -163,11 +222,80 @@ public final class App {
                 Ansi.print("(green)received thread creation notification from mirror: " 
                         + "(yellow)" + newThreadName 
                         + "(reset)");
+                printVerboseDetails(hcsCore,hcsResponse);
+                
+                
             }
         } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
+            // request proof in progress
+            System.out.println("        Echo of  proof request received. Awaiting replies. ");
         }
     }
+    
+    private static void printVerboseDetails (HCSCore hcsCore, HCSResponse hcsResponse){
+        try  { 
+            SxcApplicationMessageInterface applicationMessageEntity =
+                    hcsCore
+                            .getPersistence()
+                            .getApplicationMessageEntity(
+                                    SxcPersistence.extractApplicationMessageStringId(
+                                            hcsResponse.getApplicationMessageId()
+                                    )
+                            );
+            System.out.println("Details stored as applicationMessageEntity : ");
+            System.out.printf ("    applicationMessageId: %s \n",applicationMessageEntity.getApplicationMessageId());
+            System.out.printf ("    last chrono chunk consensus sequenceNum: %s \n",applicationMessageEntity.getLastChronoPartSequenceNum());
+            System.out.printf ("    last chrono chunk consensus running hash: %s \n",applicationMessageEntity.getLastChronoPartRunningHashHEX());
+            System.out.println("    ApplicationMessage: ");
+            ApplicationMessage appMessage = ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage());
+            System.out.printf ("        Id: %s \n",SxcPersistence.extractApplicationMessageStringId(appMessage.getApplicationMessageId()));
+            System.out.printf ("        Hash of unencrypted message: %s \n",
+                    StringUtils.byteArrayToHexString(
+                            appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray()
+                    )
+            );
+            System.out.printf ("        Signature on hash above: %s \n",
+                    StringUtils.byteArrayToHexString(
+                            appMessage.getBusinessProcessSignatureOnHash().toByteArray()
+                    )
+            );
+            
+            byte[] bpm = appMessage.getBusinessProcessMessage().toByteArray();
+            
+            try  { Any any = Any.parseFrom(bpm); 
+                if (any.is(ConfirmProof.class)){
+                    ConfirmProof cf = any.unpack(ConfirmProof.class);
+                    
+                    cf.getProofList().forEach(verifiedMessage ->{
+                        System.out.printf("        Message verification result: %s \n",
+                                verifiedMessage.getVerificationOutcome().name()
+                        );
+                    });
+                }
+            } catch (InvalidProtocolBufferException e){
+                System.out.println("why here");
+            }
+            
+            System.out.printf("        Encryption random: %s \n",
+                    StringUtils.byteArrayToHexString(
+                            appMessage.getEncryptionRandom().toByteArray()
+                    )
+            );
+            
+            System.out.printf("        Is this an echo?: %s \n",
+                    Signing.verify(
+                            appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray()
+                            , appMessage.getBusinessProcessSignatureOnHash().toByteArray()
+                            , hcsCore.getMessageSigningKey().publicKey
+                    )
+            );
+            
+        } catch (InvalidProtocolBufferException ex){
+             log.error(ex.getStackTrace());
+        }
+                
+    }
+    
     
     private static void showThreadList() {
         Ansi.print("(cyan)Known threads(reset)");
@@ -189,7 +317,7 @@ public final class App {
         }
     }
     
-    private static void sendMessageOnThread(HCSCore hcsCore, String threadName, String message) {
+    private static void sendMessageOnThread(HCSCore hcsCore, String threadName, String message, String playerId) {
         Ansi.print("Sending... please wait.");
         // create a protobuf message to carry the message
         // note, we don't add the message to the thread until we receive notification from mirror
@@ -206,8 +334,9 @@ public final class App {
         
         try {
             // Send to HCS
-            new OutboundHCSMessage(hcsCore)
-                .sendMessage(topicIndex, simpleMessage.toByteArray());
+            OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(hcsCore);
+            if (playerId != null) outboundHCSMessage = outboundHCSMessage.restrictTo(playerId);
+            outboundHCSMessage.sendMessage(topicIndex, simpleMessage.toByteArray());
 
             Ansi.print("Message sent to HCS successfully.");
         } catch (Exception e) {
@@ -269,6 +398,8 @@ public final class App {
         Ansi.print("(cyan)select (yellow)thread_name(reset) to create a new thread (purple)(note doesn't change current thread)(reset)");
         Ansi.print("(cyan)list(reset) to show a list of threads");
         Ansi.print("(cyan)show(reset) to list all messages for the current thread");
+        Ansi.print("(cyan)send-restricted (yellow) app_id (green) message (reset) to encrypt the message only with the paired appId's symetric key");
+        Ansi.print("(cyan)prove (yellow) app_id (purple) applicationMessageId (green) public_key (reset) to request from app_id to prove message a after the fact ; you can generate a message first and copy its resulting application message id. ");
         Ansi.print("(cyan)help(reset) to print this help");
         Ansi.print("(cyan)exit(reset) to quit");
     }

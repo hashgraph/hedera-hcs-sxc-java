@@ -11,6 +11,7 @@
         <version>0.0.3-SNAPSHOT</version>
     </parent>
 
+
     <artifactId>hcs-sxc-java-simple-message-demo</artifactId>
     <packaging>jar</packaging>
 
@@ -95,7 +96,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.hedera.hcsapp.App</mainClass>
+                            <mainClass>main.java.com.hedera.hcsapp.App</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

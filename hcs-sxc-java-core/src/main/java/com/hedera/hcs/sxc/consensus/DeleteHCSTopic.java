@@ -46,7 +46,7 @@ public final class DeleteHCSTopic {
     public DeleteHCSTopic(HCSCore hcsCore) {
         this.nodeMap = hcsCore.getNodeMap();
         this.operatorAccountId = hcsCore.getOperatorAccountId();
-        this.ed25519PrivateKey = hcsCore.getEd25519PrivateKey();
+        this.ed25519PrivateKey = hcsCore.getOperatorKey();
         this.tx.setMaxTransactionFee(hcsCore.getMaxTransactionFee());
     }
     

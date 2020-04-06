@@ -673,7 +673,7 @@ To send a message to all participants type any message in the prompt. If you sen
 ** Verifying a message
 
 To test proof after the fact you can send a sinble message where the shared key of Player-0 + Player-1 is used; from Player-0's terminal type:
-`send-restricted Player-1 Hello Future`
+`send-restricted Player-1 HelloFuture` (Note: Spaces aren't allowed in these messages)
 
 and wait until a single echo message arrives; then copy the generated application message id. Observe Player-1's terminal to check if the message arrived.
 

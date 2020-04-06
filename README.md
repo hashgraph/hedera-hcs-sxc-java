@@ -610,6 +610,7 @@ select thread_name to create a new thread (note doesn't change current thread)
 list to show a list of threads
 show to list all messages for the current thread
 prove  app_id applicationMessage_id  public_key  to prove message after the fact; you can generate a message first and copy its resulting applicationMessage_id.
+
 help to print this help
 exit to quit
 
@@ -646,8 +647,6 @@ Details stored as applicationMessageEntity :
         Signature on hash above: 085f8b819b603d2f67b48e4e28b3569e96f8db26f4c3b45f9904bd6c1346592a77794a9145f9303a1e3d72fcd29538175bd6cae48722d8e128b98fc9616fbe06
         Encryption random: 9791722faf59ca86cc0226f5e7179fea
         Is this a self message?: true
-
->
 ```
 
 The demo code demonstrates how to maintain a simple state across participants; a message thread is simply a conversation thread that aims to group messages by a thread name. To make a simple conversation load the supplied address book

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package uloyalty;
+
+import "artifacts/base/tokens.proto";
+
+option csharp_namespace = "TTI.TTF.TokenTemplates.ULoyalty";
+option java_package = "org.tti.ttf.TokenTemplates.uLoyalty";
+option java_multiple_files = true;

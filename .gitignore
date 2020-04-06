@@ -27,6 +27,51 @@ hs_err_pid*
 .project
 .settings
 
+# compiled output
+/dist
+/tmp
+/out-tsc
+# Only exists if Bazel was run
+/bazel-out
+
+# dependencies
+/node_modules
+
+# profiling files
+chrome-profiler-events*.json
+speed-measure-plugin*.json
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+
+# System Files
+.DS_Store
+Thumbs.db
+
 hcs-sxc-java-relay/target
 hcs-sxc-java-relay/bin
 hcs-sxc-java-relay/.project
@@ -92,3 +137,16 @@ hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/.envPlayer-2
 hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/contact-list.yaml
 hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/contact-list.yaml
 hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/contact-list.yaml
+
+hcs-sxc-java-examples/hcs-sxc-java-token-demo/.idea
+hcs-sxc-java-examples/hcs-sxc-java-token-demo/build.sh
+hcs-sxc-java-examples/hcs-sxc-java-token-demo/config/alice.env
+hcs-sxc-java-examples/hcs-sxc-java-token-demo/config/bob.env
+hcs-sxc-java-examples/hcs-sxc-java-token-demo/config/carlos.env
+hcs-sxc-java-examples/hcs-sxc-java-token-demo/config/config.yaml
+hcs-sxc-java-examples/hcs-sxc-java-token-demo/config/default.env
+hcs-sxc-java-examples/hcs-sxc-java-token-demo/h2data
+hcs-sxc-java-examples/hcs-sxc-java-token-demo/hcs-sxc-token-demo
+hcs-sxc-java-examples/hcs-sxc-java-token-demo/js/.editorconfig
+hcs-sxc-java-examples/hcs-sxc-java-token-demo/js/node_modules
+hcs-sxc-java-examples/hcs-sxc-java-token-demo/target

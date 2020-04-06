@@ -96,7 +96,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.hedera.hcsapp.App</mainClass>
+                            <mainClass>main.java.com.hedera.hcsapp.App</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

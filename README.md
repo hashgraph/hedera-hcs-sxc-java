@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
 
 # HCS-SXC-Java
-     
+
 The HCS SXC Java project (SDK eXtension Components) is a set of pre-built components that aim to provide additional functionality over and above the java SDK for HCS to make it easier and quicker to develop applications.
 
 These components use the Hedera Java SDK to communicate with Hedera's HCS service and add a number of features (Italicised still in development/planning) as follows:
@@ -69,9 +69,6 @@ The encryption scheme that HCS SCX uses is plugin based and users can define the
 ### Proof after the fact and verifying messages
 ApplicationMessages are signed using the sender's signing key; in particular, it is the hash of the unencrypted clear-text or business message that is signed.  The hash and the signature is included with an ApplicationMessage and is sent to communicating app-net participants where each can issue a verification request to the app-net by making an API call with parameters  ApplicationMessage id, the cleartext message, and the public key of the signer. A participant can verify the message by introspecting its own persistent state and if the message is found then verification can take place even if the persisted message is in encrypted form. 
 
-
-
-
 ### Persistence
 
 The HCS SXC Core component provides some level of persistence, however this is not meant to implement application-specific persistence. The persistence afforded by the HCS SXC Core component provides transaction and message level persistence.
@@ -80,9 +77,6 @@ It is fully expected that an application would need to persist some data itself,
 
 *Note: The settlement demo makes use of application level persistence, however it has been implemented such that a transaction sent to HCS is not considered part of state (it remains pending) until the transaction has been confirmed by mirror node at which point the state transition is confirmed.
 This is to ensure application state does not end up out of sync with other applications in the event of a transaction processing failure for example.*
-
-
-
 
 ## Components
 
@@ -184,7 +178,7 @@ coreHibernate:
 The list of configuration entries is variable, you may add or remove entries as necessary for your particular database.
 Also, if `{appid}` is found in any of the values, it will be swapped at run time for the id of the instance of the application being run.
 
-Further, to ensure the appropriate database vendors' dependencies are available when compiling, the `hcs-sxc-java-plugins-persistence-hibernate` project makes use of profiles in its `pom.xml`. 
+Further, to ensure the appropriate database vendors' dependencies are available when compiling, the `hcs-sxc-java-plugins-persistence-hibernate` project makes use of profiles in its `pom.xml`.
 
 For example:
 
@@ -647,8 +641,47 @@ Details stored as applicationMessageEntity :
         Encryption random: 9791722faf59ca86cc0226f5e7179fea 
         Is this a self message?: true 
 
->
+The demo code demonstrates how to maintain a simple state across participants; a message thread is simply a conversation thread that aims to group messages by a thread name. To make a simple conversation load the supplied address book
+where Player-0 "talks" to 1 and 2, which means that player 0 has a shared key with player 1 and another shared key with player 2.
+
+To create a thread type
+`new  demo-conversation`
+
+and wait until two echo messages come back. Then type
+`select demo-conversation`
+
+
+To send a message to all participants type any message in the prompt. If you send from player 0 then you should expect two echo messages, for each other Player's terminal you should expect one non-echo message.
+
+** Verifying a message
+
+To test proof after the fact you can send a sinble message where the shared key of Player-0 + Player-1 is used; from Player-0's terminal type:
+`send-restricted Player-1 HelloFuture` (Note: Spaces aren't allowed in these messages)
+
+and wait until a single echo message arrives; then copy the generated application message id. Observe Player-1's terminal to check if the message arrived.
+
+This message exchange is between Player-0 and Player-1, thus Player-2 has no way of decrypting the contents; however, Player-2 has a copy of the encrypted message. To validate the message Player-0 types:
+
+`prove Player-2 0.0.95518-1585566306-230801600 302a300506032b6570032100ffc3f23232acd69f2db068722ab43c0ad4d08c26a4df73c42aebbf5b1c4f633a`
+
+where the second argument is the copied application id and the third argument is Player-0's public signing key (you'll find the copy of the public key on the beginning of the terminal history when the application loads.
+
+A single validation request is sent (encrypted) to Player-2. If all works as expected then Player-2 should automatically validate the message and Player-0's prompt should show a success message.
+
 ```
+    ...
+    applicationMessageId: 0.0.95518-1585056383-216111500
+    last chrono chunk consensus sequenceNum: 620
+    last chrono chunk consensus running hash: 017b0806ddef82a621b205f4d9d6704ad5cc1a1d4421f39463d6062e53c9f6f667315f5f9ad70d95494fa121863028c8
+    ApplicationMessage:
+        Id: 0.0.95518-1585056383-216111500
+        Hash of unencrypted message: af0c3e954e0646922f26cef54fc1707e918e36c01515a2b68494fbfa0f937a684165fb7f13a7d464c09d9ac97468bb64
+        Signature on hash above: 1f865937a4b7acf6cb3bb11d7f9b4d24bb8888652182a31dd6fc450bd5e63583daa6dccf503b5920c4497ddbde88658a9207f5187666906682bc6624cb177303
+        Message verification result: VALIDATION_OK  
+        Encryption random:  
+        Is this a self message?: false
+```
+
 
 The demo code demonstrates how to maintain a simple state across participants; a message thread is simply a conversation thread that aims to group messages by a thread name. To make a simple conversation load the supplied address book
 where Player-0 "talks" to 1 and 2, which means that player 0 has a shared key with player 1 and another shared key with player 2.
@@ -708,7 +741,7 @@ This demo uses the queue and relay components. For the apps to connect to the qu
 127.0.0.1       hcs-sxc-java-queue
 ```
 
-Compile the project 
+Compile the project
 
 `mvnw clean install -Pqueue` This will invoke the `queue` profile which switches dependencies to include the queue instead of mirror for subscriptions.
 
@@ -751,7 +784,7 @@ APP_ID="Alice"
 ```
 
 
-If you want to use encryption then enable the relevant setting in `config.yaml`. The demo uses pairwise encryption and only parties that share a key can see each other's messages. The file  `contact-list.yaml` contains a sample configuration to kick start things: it has a list of participants and all parties with whom each of them can communicate. You may notice that the file does not specify the public key that corresponds to the private signing key. The public key resides in the `docker-compose.yml` file. If you want to specify custom communication relationships between participants then edit  the `contact-list.template.yaml` file  (see instruction in the file) and run `GenerateConfigurationFiles.java` to automatically generate both a `docker-compose.yml` and a `contact-list.yaml` file with all keys set. 
+If you want to use encryption then enable the relevant setting in `config.yaml`. The demo uses pairwise encryption and only parties that share a key can see each other's messages. The file  `contact-list.yaml` contains a sample configuration to kick start things: it has a list of participants and all parties with whom each of them can communicate. You may notice that the file does not specify the public key that corresponds to the private signing key. The public key resides in the `docker-compose.yml` file. If you want to specify custom communication relationships between participants then edit  the `contact-list.template.yaml` file  (see instruction in the file) and run `GenerateConfigurationFiles.java` to automatically generate both a `docker-compose.yml` and a `contact-list.yaml` file with all keys set.
 
 
 This demo does not use the queue and relay components, although it's possible to enable them by modifying the `pom.xml` file of the `hcs-sxc-java-settlement-demo` project to include them, they will also need to run as docker containers.
@@ -792,7 +825,7 @@ mvnw exec:java -Dexec.mainClass="com.hedera.hcsapp.Application"  -Pfatjar  -DAPP
 ```
 If you want to run multiple clients from the command line simultaneously then make sure the server ports are not occupied.
 
-Note that the  `docker-compose.yaml` file is consulted even when running from then command line. If you specify the `-DAPP_ID`  argument then the port mapping is selected from the `yaml` file. 
+Note that the  `docker-compose.yaml` file is consulted even when running from then command line. If you specify the `-DAPP_ID`  argument then the port mapping is selected from the `yaml` file.
 You can override the port by setting:
 
 ```-Dserver.port=8081```

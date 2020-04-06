@@ -9,9 +9,9 @@ package com.hedera.hcs.sxc.consensus;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;
@@ -63,21 +64,21 @@ import java.util.logging.Logger;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * Object used to invoke outbound creation message methods. See 
- * constructor {@link #OutboundHCSMessage(com.hedera.hcs.sxc.HCSCore) } for details. 
+ * Object used to invoke outbound creation message methods. See
+ * constructor {@link #OutboundHCSMessage(com.hedera.hcs.sxc.HCSCore) } for details.
  */
 @Log4j2
 public final class OutboundHCSMessage {
 
     private boolean signMessages = false;
     private boolean encryptMessages = false;
-    private byte[] overrideMessageEncryptionKey = null; 
+    private String overrideMessageEncryptionKey = null;
     private boolean rotateKeys = false;
     private int rotationFrequency = 0;
-    private byte[] messageEncryptionKey = null;
+    //private byte[] messageEncryptionKey = null;
     private Map<AccountId, String> nodeMap = new HashMap<>();
     private AccountId operatorAccountId = new AccountId(0, 0, 0);
-    private Ed25519PrivateKey ed25519PrivateKey;
+    private Ed25519PrivateKey operatorKey;
     private long hcsTransactionFee = 0L;
     private List<Topic> topics;
     private TransactionId transactionId = null;
@@ -112,7 +113,7 @@ public final class OutboundHCSMessage {
      * single participant or a list of participants. Receiving parties can get all
      * messages whether these are encrypted or in clear-text.
      *
-     * @param hcsCore instantiated core object that hold initialisation parameters, address-book etc. 
+     * @param hcsCore instantiated core object that hold initialisation parameters, address-book etc.
      * @throws Exception
      */
     public OutboundHCSMessage(HCSCore hcsCore) throws Exception {
@@ -122,7 +123,7 @@ public final class OutboundHCSMessage {
         this.rotateKeys = hcsCore.getRotateKeys();
         this.nodeMap = hcsCore.getNodeMap();
         this.operatorAccountId = hcsCore.getOperatorAccountId();
-        this.ed25519PrivateKey = hcsCore.getEd25519PrivateKey();
+        this.operatorKey = hcsCore.getOperatorKey();
         this.topics = hcsCore.getTopics();
         this.hcsTransactionFee = hcsCore.getMaxTransactionFee();
         this.addressList = hcsCore.getPersistence().getAddressList();
@@ -130,28 +131,26 @@ public final class OutboundHCSMessage {
         // load persistence implementation at runtime
         Class<?> persistenceClass = Plugins.find("com.hedera.hcs.sxc.plugin.persistence.*", "com.hedera.hcs.sxc.interfaces.SxcPersistence", true);
         this.persistencePlugin = (SxcPersistence)persistenceClass.newInstance();
-        
-        
-        if(this.encryptMessages){
-            getMessageEncryptionPlugin();
-        }
-        
+
+
+
+
         if(this.rotateKeys){
-            
+
             Class<?> messageKeyRotationClass = Plugins.find("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcKeyRotation", true);
             this.keyRotationPlugin = (SxcKeyRotation)messageKeyRotationClass.newInstance();
         }
     }
 
-    private void getMessageEncryptionPlugin() throws Exception {
+    private void enableMessageEncryptionPlugin() throws Exception {
         Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
         this.messageEncryptionPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
     }
-    
+
     public boolean getOverrideMessageSignature() {
         return this.signMessages;
     }
-    
+
     public OutboundHCSMessage overrideMessageSignature(boolean signMessages) {
         this.signMessages = signMessages;
         return this;
@@ -160,8 +159,8 @@ public final class OutboundHCSMessage {
     public boolean getOverrideEncryptedMessages() {
         return this.encryptMessages;
     }
- 
-    public OutboundHCSMessage overrideEncryptedMessages(boolean encryptMessages) {
+
+   public OutboundHCSMessage overrideEncryptedMessages(boolean encryptMessages) {
         this.encryptMessages = encryptMessages;
         return this;
     }
@@ -169,7 +168,7 @@ public final class OutboundHCSMessage {
     public boolean getOverrideKeyRotation() {
         return this.rotateKeys;
     }
- 
+
     public int getOverrideKeyRotationFrequency() {
         return this.rotationFrequency;
     }
@@ -199,25 +198,25 @@ public final class OutboundHCSMessage {
     }
 
     public Ed25519PrivateKey getOverrideOperatorKey() {
-        return this.ed25519PrivateKey;
+        return this.operatorKey;
     }
 
     public OutboundHCSMessage overrideOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
-        this.ed25519PrivateKey = ed25519PrivateKey;
+        this.operatorKey = ed25519PrivateKey;
         return this;
     }
-    
+
     public TransactionId getFirstTransactionId() {
         return this.transactionId;
     }
 
-    
-    public OutboundHCSMessage overrideMessageEncryptionKey (byte[] messageEncryptionKey){
+
+    public OutboundHCSMessage overrideMessageEncryptionKey (String messageEncryptionKey){
         this.overrideMessageEncryptionKey = messageEncryptionKey;
         return this;
     }
-    
-    public byte[] getOverrideMessageEncryptionKey (){
+
+    public String getOverrideMessageEncryptionKey (){
         return this.overrideMessageEncryptionKey;
     }
 
@@ -225,7 +224,7 @@ public final class OutboundHCSMessage {
         this.transactionId = transactionId;
         return this;
     }
-    
+
     public OutboundHCSMessage restrictTo(String... appIds){
        return restrictTo(List.of(appIds));
     }
@@ -239,9 +238,9 @@ public final class OutboundHCSMessage {
         this.addressList = newAddressList;
         return this;
     }
-    
+
      /**
-     * Sends a single cleartext message but doesn't send to HCS 
+     * Sends a single cleartext message but doesn't send to HCS
      * This is for testing purposes only
      *
      * @param topicIndex the index reference in one of {@link #topics}
@@ -256,14 +255,14 @@ public final class OutboundHCSMessage {
      /**
      * Sends a single message which is wrapped into the payload field of an {@link ApplicationMessage}
      * Behind the scenes, large messages are split into chunks and sent to HCS - receiving parties assemble chunks
-     * transparently. 
+     * transparently.
      * The message is sent encrypted
-     * if the flag {@link #encryptMessages} is set in HCSCore via configuration files or when 
-     * the {@link #overrideEncryptedMessages(boolean) } flag is sat during the builder construction. 
-     * When encryption is enabled then 
-     * multiple messages are sent, one for each participant with which an encryption key is shared. 
-     * To restrict encryption to a subset of address book participants use {@link #restrictTo(java.util.List) } 
-     * in the builder pattern of this objects constructor. 
+     * if the flag {@link #encryptMessages} is set in HCSCore via configuration files or when
+     * the {@link #overrideEncryptedMessages(boolean) } flag is sat during the builder construction.
+     * When encryption is enabled then
+     * multiple messages are sent, one for each participant with which an encryption key is shared.
+     * To restrict encryption to a subset of address book participants use {@link #restrictTo(java.util.List) }
+     * in the builder pattern of this objects constructor.
      *
      * @param topicIndex the index reference in one of {@link #topics}
      * @param message
@@ -273,25 +272,25 @@ public final class OutboundHCSMessage {
      public List<TransactionId> sendMessage(int topicIndex, byte[] message) throws Exception {
         return sendMessage(topicIndex, message, false);
     }
-     
+
     /**
-     * Sends a proof request to the network. The request is handled automatically by app-net 
-     * participants where their own {@link OnHCSMessageCallback} proof request 
-     * handling procedure replies results back to this participant. This method 
+     * Sends a proof request to the network. The request is handled automatically by app-net
+     * participants where their own {@link OnHCSMessageCallback} proof request
+     * handling procedure replies results back to this participant. This method
      * is using the same builder pattern as  {@link #sendMessage(int, byte[]) } where
      * requests restricted to particular participants are issued by composing
-     * {@link  #restrictTo(java.util.List) } into the request. 
+     * {@link  #restrictTo(java.util.List) } into the request.
      * @param topicIndex
      * @param applicationMessageId The application message to be validated needs to reside
      * in own database either in encrypted or decrypted form.
      * @param cleartext The decrypted cleartext or business process message
      * @param publicKey The key of the signer of the message being validated
-     * @return The transaction id's associated with the request. Notice that the verification 
+     * @return The transaction id's associated with the request. Notice that the verification
      * result is returned asynchronously and is handled in {@link OnHCSMessageCallback#prove(com.hedera.hcs.sxc.proto.VerifiableApplicationMessage) }
-     * @throws Exception 
-     */ 
+     * @throws Exception
+     */
     public List<TransactionId> requestProof(int topicIndex, String applicationMessageId, String cleartext, Ed25519PublicKey publicKey) throws Exception {
-        
+
         RequestProof rp = RequestProof.newBuilder()
                 .addApplicationMessage(
                         VerifiableMessage.newBuilder().
@@ -299,7 +298,7 @@ public final class OutboundHCSMessage {
                                         VerifiableApplicationMessage.newBuilder()
                                                 .setApplicationMessageId(
                                                     SxcPersistence.getApplicationMessageIdIdFromPrimaryKey(applicationMessageId)
-                                                )                      
+                                                )
                                         .setOriginalBusinessProcessMessage(ByteString.copyFrom(cleartext.getBytes()))
                                         .setSenderPublicSigningKey(ByteString.copyFrom(publicKey.toBytes()))
                                         .build()
@@ -308,55 +307,86 @@ public final class OutboundHCSMessage {
         Any pack = Any.pack(rp);
         return this.sendMessage(topicIndex,pack.toByteArray());
     }
-     
-     
+
+
     public List<TransactionId> sendMessage(int topicIndex, byte[] message, boolean byPassSending) throws Exception {
         List<TransactionId> txIdList = new ArrayList<>();
-        
-        if (encryptMessages) { // send  to specific users 
-            if (this.addressList != null){ // get it from .env
+        if(encryptMessages && this.overrideMessageEncryptionKey!=null ){
+                log.debug("Override encryption");
+                TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, this.overrideMessageEncryptionKey, byPassSending);
+                txIdList.add(doSendMessageTxId);
+        }else if (encryptMessages) { // send  so that specific users can decrypt - flag needs addressbook
+            enableMessageEncryptionPlugin();
+             if (this.addressList != null && this.addressList.size() > 0){ // get it from .env
                 for (String recipient : addressList.keySet()){
                     log.debug("Sending to " + recipient);
-                    TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, recipient, byPassSending);
+                    TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, this.addressList.get(recipient).get("sharedSymmetricEncryptionKey") , byPassSending);
                     txIdList.add(doSendMessageTxId);
-                }                
-                //   this.messageEncryptionKey = hcsCore.getMessageEncryptionKey();
-                //   message = messageEncryptionPlugin.encrypt(this.messageEncryptionKey, message);
+                }
             } else {
-                throw new NoSuchElementException("Encryption set to true, but keys not found in address book");
+                throw new NoSuchElementException("Encryption set to true, but no keys found in address book");
             }
         } else { // broadcast
             TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, null, byPassSending);
-            txIdList.add(doSendMessageTxId);     
+            txIdList.add(doSendMessageTxId);
         }
         return txIdList;
     }
 
-    private TransactionId doSendMessage(byte[] message, int topicIndex, String recipient, boolean byPassSending) throws Exception {
+    private TransactionId doSendMessage(byte[] message, int topicIndex, String recipientSharedSymetricEncryptionKey, boolean byPassSending) throws Exception {
         // generate TXId for main and first message it not already set by caller
         TransactionId firstTransactionId = this.transactionId;
         if (firstTransactionId == null) {
             firstTransactionId = new TransactionId(this.operatorAccountId);
         }
-        //break up  (and the whole encrypted messages
-        List<ApplicationMessageChunk> parts = chunk(firstTransactionId, hcsCore, message, this.addressList.get(recipient));
+
+        ApplicationMessage applicationMessage = OutboundHCSMessage.userMessageToApplicationMessage(
+                firstTransactionId,
+                message,
+                hcsCore.getMessageSigningKey(),  // null means don't sign
+                recipientSharedSymetricEncryptionKey == null
+                    ? null // don't encrypt
+                    : recipientSharedSymetricEncryptionKey // encrypt
+        );
+
+        //break up
+        List<ApplicationMessageChunk> parts = chunk(applicationMessage);
+
+        // store the outgoing message unencrypted - use null parameters because
+        // missing consensus data.
+        // (consensus state is sored on inbound messages)
+        // This one is needed to know if the message was sent by me
+        // because I don't have a way to un-encrypt my own message and
+        // I wouldn't know what encryption key I used.
+
+        ApplicationMessage tempUnencryptedAppMsg =  applicationMessage.toBuilder()
+            .setBusinessProcessMessage(ByteString.copyFrom(message))
+            .build();
+        hcsCore.getPersistence().storeApplicationMessage(
+                //add recipient
+                tempUnencryptedAppMsg,
+                null,
+                null, 0
+        );
+
+
         // send each part to the network
         try (Client client = new Client(this.nodeMap)) {
-            
+
             if(this.operatorAccountId == null
                     ||
-                    this.ed25519PrivateKey == null){
+                    this.operatorKey == null){
                 log.error("Operator key or operator id not set. Exiting... ");
                 System.exit(0);
             }
             client.setOperator(
                     this.operatorAccountId,
-                    this.ed25519PrivateKey
+                    this.operatorKey
             );
 
             client.setMaxTransactionFee(this.hcsTransactionFee);
 
-            TransactionId transactionId = firstTransactionId;
+            TransactionId transactionIdPrime = firstTransactionId;
             int count = 1;
             for (ApplicationMessageChunk messageChunk : parts) {
                 log.debug("Sending message part " + count + " of " + parts.size() + " to topic " + this.topics.get(topicIndex).toString());
@@ -364,23 +394,23 @@ public final class OutboundHCSMessage {
                 ConsensusMessageSubmitTransaction tx = new ConsensusMessageSubmitTransaction()
                         .setMessage(messageChunk.toByteArray())
                         .setTopicId(this.topics.get(topicIndex).getConsensusTopicId())
-                        .setTransactionId(transactionId);
-                
+                        .setTransactionId(transactionIdPrime);
+
                 if ((this.topics.get(topicIndex).getSubmitKey() != null) && (! this.topics.get(topicIndex).getSubmitKey().isEmpty())) {
                     // sign if we have a submit key
                     tx.build(client).sign(Ed25519PrivateKey.fromString(this.topics.get(topicIndex).getSubmitKey()));
                 }
 
                 // persist the transaction
-                this.persistencePlugin.storeTransaction(transactionId, tx);
+                this.persistencePlugin.storeTransaction(transactionIdPrime, tx);
 
                 log.debug("Executing transaction");
                 if ( ! byPassSending) {
                     TransactionId txId = tx.execute(client);
-                    
+
                     TransactionReceipt receipt = txId.getReceipt(client, Duration.ofSeconds(30));
-    
-                    transactionId = new TransactionId(this.operatorAccountId);
+
+                    transactionIdPrime = new TransactionId(this.operatorAccountId);
 
                     log.debug("Message receipt status is {} "
                             + "sequence no is {}"
@@ -389,23 +419,23 @@ public final class OutboundHCSMessage {
                     );
                 }
             } // end-for
-            
+
             // after sending all parts check if key rotation is due
             if (rotateKeys) {
-                
+
                 /** ROTATION CODE - UNCOMMENT TO ENABLE
-                
+
                 if (!this.encryptMessages) {
-                    throw new Exception("Trying to initiate key rotation but encryption is disabled");   
+                    throw new Exception("Trying to initiate key rotation but encryption is disabled");
                 }
-                   
+
                 int messageCount = -1; //TODO - keep track of messages pair-wise, not just here. ( per topic )
                 if (messageCount < rotationFrequency) { // TODO - Fires everytime
-                        
+
                     //1) Send initiate  Message so that his onHCSMessage can pick it up
                     //2) If onHCSMessage receives KR1 then update key and KR2
                     //3) If onHCSMessage receives KR2 then update key using stored KeyAgreement
-                    
+
                     Pair<KeyAgreement, byte[]> initiate = keyRotationPlugin.initiate();
                     //store the KeyAgreement to HCSCore to refetch when finalising
                     hcsCore.setTempKeyAgreement(initiate.getLeft());
@@ -415,8 +445,8 @@ public final class OutboundHCSMessage {
                             .build();
                     Any anyPack = Any.pack(kr1);
                     byte[] encryptedAnyPackedChunkBody = messageEncryptionPlugin.encrypt(this.messageEncryptionKey, anyPack.toByteArray());
-                    
-                    
+
+
                     TransactionId newTransactionId = new TransactionId(hcsCore.getOperatorAccountId());
                     ApplicationMessageID newAppId = ApplicationMessageID.newBuilder()
                             .setAccountID(AccountID.newBuilder()
@@ -430,7 +460,7 @@ public final class OutboundHCSMessage {
                                     .setNanos(newTransactionId.validStart.getNano())
                                     .build()
                             ).build();
-                    
+
                     ApplicationMessageChunk appChunk = ApplicationMessageChunk.newBuilder()
                             .setApplicationMessageId(newAppId)
                             .setChunkIndex(1)
@@ -444,20 +474,20 @@ public final class OutboundHCSMessage {
                                             //TODO: set hash
                                             .build()
                                             .toByteString()
-                            ).build();  
-                    
+                            ).build();
+
                     ConsensusMessageSubmitTransaction txRotation = new ConsensusMessageSubmitTransaction()
                             .setMessage(appChunk.toByteArray())
                             .setTopicId(this.topics.get(topicIndex).getConsensusTopicId())
                             .setTransactionId(newTransactionId);
-                        
+
                         // persist the transaction
                         this.persistencePlugin.storeTransaction(newTransactionId, txRotation);
                         if ( ! byPassSending) {
                             TransactionId txIdKR1 =  txRotation.execute(client);
-                            
+
                             TransactionReceipt receiptKR1 = txIdKR1.getReceipt(client, Duration.ofSeconds(30));
-                           
+
                             log.debug("Message receipt for KR1 status is {} "
                                     + "sequence no is {}"
                                     ,receiptKR1.status
@@ -477,13 +507,22 @@ public final class OutboundHCSMessage {
             log.error(e);
             throw (e);
         } finally {
-            
+
         }
         return firstTransactionId;
     }
 
-    public static List<ApplicationMessageChunk> chunk(TransactionId transactionId, HCSCore hcsCore, byte[] message, Map<String,String> recipientKeys) {
 
+    /**
+     * Wraps a user messages into an ApplicationMessage.
+     * @param message the user message
+     * @param senderSigningKey if set signs the hash of the message.
+     * @param recipientSharedEncryptionKey if set encrypts the message,
+     * hashes, and signs the hash, otherwise leaves un-encrypted and
+     * signs the hash  if the signature parameter @param senderSigningKey is not null
+     * @return ApplicationMessage
+     */
+    public static ApplicationMessage userMessageToApplicationMessage(TransactionId transactionId,  byte[] message,  Ed25519PrivateKey senderSigningKey, String recipientSharedEncryptionKey){
         ApplicationMessageID applicationMessageID = ApplicationMessageID.newBuilder()
                 .setAccountID(AccountID.newBuilder()
                         .setShardNum(transactionId.accountId.shard)
@@ -498,74 +537,60 @@ public final class OutboundHCSMessage {
                 ).build();
 
         byte[] originalMessage = Arrays.copyOf(message, message.length);
-        
+
         ApplicationMessage applicationMessage  = null;
         ApplicationMessage.Builder applicationMessageBuilder = ApplicationMessage
                 .newBuilder()
                 .setApplicationMessageId(applicationMessageID);
-        
-        if (hcsCore.getEncryptMessages()) {        
-            if(recipientKeys == null) {
-                log.error("No corresponding encryption key found, message not sent.");
-            } else {
-                try {
-                    // build one encrypted and one unecrypted message. Store the latter in the core db
-                    
-                    // Hash of unencrypted business message should be included in application message
-                    byte[] hashOfOriginalMessage = com.hedera.hcs.sxc.hashing.Hashing.sha(StringUtils.byteArrayToHexString(originalMessage));
-                    applicationMessageBuilder.setUnencryptedBusinessProcessMessageHash(ByteString.copyFrom(hashOfOriginalMessage));
 
-                    
-                    // Signature (using sender’s private key) of hash (above) should also be included in application message
-                    Ed25519PrivateKey messageSigningKey = hcsCore.getMessageSigningKey();
-                    
-                    byte[] sign = Signing.sign(hashOfOriginalMessage, messageSigningKey);
-
-                    applicationMessageBuilder.setBusinessProcessSignatureOnHash(ByteString.copyFrom(sign));
-
-                    
-                    // encrypt
-                    String encryptionKey = recipientKeys.get("sharedSymmetricEncryptionKey");
-                    Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
-                    SxcMessageEncryption encPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
-                    log.debug("Encrypting message with key " + encryptionKey.substring(encryptionKey.length()-10, encryptionKey.length()-1));
-                    EncryptedData encryptedData = encPlugin.encrypt(
-                            StringUtils.hexStringToByteArray(encryptionKey)
-                            , message);
-                    applicationMessageBuilder.setBusinessProcessMessage(
-                            ByteString.copyFrom(encryptedData.getEncryptedData())
-                    );
-                    applicationMessageBuilder.setEncryptionRandom(
-                            ByteString.copyFrom(encryptedData.getRandom())
-                    );
-                    
-                    applicationMessage = applicationMessageBuilder.build();
-                    
-                    // store the outgoing message unencrypted - null parameters because missing consensus data. 
-                    // Consensus state is sored on inbound messages
-                    // This one is needed to know if the message was sent by me
-                    // because I don't have a way to un-encrypt my own message
-                    // I wouldn't now know what encryption key I used
-                    
-                    applicationMessageBuilder.setBusinessProcessMessage(ByteString.copyFrom(message));
-                    ApplicationMessage tempUnencryptedAppMsg = applicationMessageBuilder.build();
-                    
-                    hcsCore.getPersistence().storeApplicationMessage(
-                            //add recipient
-                            tempUnencryptedAppMsg, 
-                            null, 
-                            null, 0
-                    );    
-                } catch (Exception ex) {
-                    Logger.getLogger(OutboundHCSMessage.class.getName()).log(Level.SEVERE, null, ex);
-                    System.exit(0);
-                }
-            }                
-        } else {
+        if(recipientSharedEncryptionKey == null) { // no encryption
             applicationMessageBuilder.setBusinessProcessMessage(ByteString.copyFrom(originalMessage));
             applicationMessage = applicationMessageBuilder.build();
+        } else {
+            try {
+                // build one encrypted and one unecrypted message. Store the latter in the core db
+
+                // Hash of unencrypted business message should be included in application message
+                byte[] hashOfOriginalMessage = com.hedera.hcs.sxc.hashing.Hashing.sha(StringUtils.byteArrayToHexString(originalMessage));
+                applicationMessageBuilder.setUnencryptedBusinessProcessMessageHash(ByteString.copyFrom(hashOfOriginalMessage));
+
+
+                // Signature (using sender’s private key) of hash (above) should also be included in application message
+
+                if(senderSigningKey!=null) { // signing may be turned off when override is used
+                    byte[] sign = Signing.sign(hashOfOriginalMessage, senderSigningKey);
+                    applicationMessageBuilder.setBusinessProcessSignatureOnHash(ByteString.copyFrom(sign));
+                }
+
+                // encrypt
+                //String encryptionKey = recipientKeys.get("sharedSymmetricEncryptionKey");
+                Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
+                SxcMessageEncryption encPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
+                log.debug("Encrypting message with key " + recipientSharedEncryptionKey.substring(recipientSharedEncryptionKey.length()-10, recipientSharedEncryptionKey.length()-1));
+                EncryptedData encryptedData = encPlugin.encrypt(
+                        StringUtils.hexStringToByteArray(recipientSharedEncryptionKey)
+                        , message);
+                applicationMessageBuilder.setBusinessProcessMessage(
+                        ByteString.copyFrom(encryptedData.getEncryptedData())
+                );
+                applicationMessageBuilder.setEncryptionRandom(
+                        ByteString.copyFrom(encryptedData.getRandom())
+                );
+
+                applicationMessage = applicationMessageBuilder.build();
+
+
+            } catch (Exception ex) {
+                log.error(ex);
+
+            }
         }
-        
+
+        return applicationMessage;
+    }
+
+
+    public static List<ApplicationMessageChunk> chunk(ApplicationMessage applicationMessage) {
         List<ApplicationMessageChunk> parts = new ArrayList<>();
         if (applicationMessage != null) {
             //TransactionID transactionID = messageEnvelope.getMessageEnvelopeId();
@@ -576,20 +601,20 @@ public final class OutboundHCSMessage {
             int totalParts = (int) Math.ceil((double) amByteArrayLength / chunkSize);
             // chunk and send to network
             for (int i = 0, partId = 1; i < amByteArrayLength; i += chunkSize, partId++) {
-    
+
                 byte[] amMessageChunk = Arrays.copyOfRange(
                         amByteArray,
                         i,
                         Math.min(amByteArrayLength, i + chunkSize)
                 );
-    
+
                 ApplicationMessageChunk applicationMessageChunk = ApplicationMessageChunk.newBuilder()
-                        .setApplicationMessageId(applicationMessageID)
+                        .setApplicationMessageId(applicationMessage.getApplicationMessageId())
                         .setChunkIndex(partId)
                         .setChunksCount(totalParts)
                         .setMessageChunk(ByteString.copyFrom(amMessageChunk))
                         .build();
-    
+
                 parts.add(applicationMessageChunk);
             }
         }

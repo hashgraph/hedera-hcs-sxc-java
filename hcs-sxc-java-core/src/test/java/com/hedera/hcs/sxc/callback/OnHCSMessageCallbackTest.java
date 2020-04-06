@@ -96,15 +96,8 @@ public class OnHCSMessageCallbackTest {
     @Test
     public void testSingleChunking() throws IOException {
         byte[] message = "Single Chunk Message".getBytes();
-        HCSCore hcsCore  = null;
-        try {
-            hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
-        } catch (Exception ex) {
-            fail("Core failed to init");
-        }
-
-        
-        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),hcsCore,message,null);
+        ApplicationMessage userMessageToApplicationMessage = OutboundHCSMessage.userMessageToApplicationMessage(new TransactionId(new AccountId(1234L)), message, null, null);
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(userMessageToApplicationMessage);
         assertTrue(chunks.size() == 1);
         SxcPersistence persistence = new Persist(); 
         Optional<ApplicationMessage> messageOptional
@@ -117,15 +110,10 @@ public class OnHCSMessageCallbackTest {
     
     @Test
     public void testMultiChunking() throws IOException {
-        HCSCore hcsCore  = null;
-        try {
-            hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
-        } catch (Exception ex) {
-            fail("Core failed to init");
-        }
-        
+  
         byte[] longString = RandomStringUtils.random(5000, true, true).getBytes();
-        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),hcsCore,longString,null);
+        ApplicationMessage userMessageToApplicationMessage = OutboundHCSMessage.userMessageToApplicationMessage(new TransactionId(new AccountId(1234L)), longString, null, null);
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(userMessageToApplicationMessage);
         assertTrue(chunks.size() == 2);
         
         Optional<ApplicationMessage> messageOptional = null;
@@ -153,8 +141,9 @@ public class OnHCSMessageCallbackTest {
         );
 
        
-        
-        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),hcsCore,message, Map.of("sharedSymmetricEncryptionKey","817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449")  );
+        ApplicationMessage userMessageToApplicationMessage = OutboundHCSMessage.userMessageToApplicationMessage(new TransactionId(new AccountId(1234L)), message, null, null);
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(userMessageToApplicationMessage);
+                
         assertTrue(chunks.size() == 1);
         
         ConsensusTopicId consensusTopicId = new ConsensusTopicId(1, 2, 3);
@@ -191,9 +180,15 @@ public class OnHCSMessageCallbackTest {
                 "817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449"
         );
 
-       
+        ApplicationMessage userMessageToApplicationMessage = OutboundHCSMessage.userMessageToApplicationMessage(
+                new TransactionId(new AccountId(1234L)),
+                message,
+                Ed25519PrivateKey.fromString("302e020100300506032b657004220420e1c09b75f52f7ba287fea66f2c4dcd316f9f1cba47020e760f3cc940ba516641"), 
+                "817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449");
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(userMessageToApplicationMessage);
         
-        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),hcsCore,message, Map.of("sharedSymmetricEncryptionKey","817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449")  );
+        
+        //List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),hcsCore,message, Map.of("sharedSymmetricEncryptionKey","817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449")  );
         assertTrue(chunks.size() == 1);
         
         ConsensusTopicId consensusTopicId = new ConsensusTopicId(1, 2, 3);
@@ -231,9 +226,15 @@ public class OnHCSMessageCallbackTest {
                 "123c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449"
         );
 
-       
+        ApplicationMessage userMessageToApplicationMessage = OutboundHCSMessage.userMessageToApplicationMessage(
+                new TransactionId(new AccountId(1234L)),
+                message,
+                Ed25519PrivateKey.fromString("302e020100300506032b657004220420e1c09b75f52f7ba287fea66f2c4dcd316f9f1cba47020e760f3cc940ba516641"), 
+                "817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449");
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(userMessageToApplicationMessage);
         
-        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),hcsCore,message, Map.of("sharedSymmetricEncryptionKey","817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449")  );
+        
+        //List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),hcsCore,message, Map.of("sharedSymmetricEncryptionKey","817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449")  );
         assertTrue(chunks.size() == 1);
         
         ConsensusTopicId consensusTopicId = new ConsensusTopicId(1, 2, 3);
@@ -285,7 +286,13 @@ public class OnHCSMessageCallbackTest {
 
        
         
-        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),hcsCore,message, Map.of("sharedSymmetricEncryptionKey","817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449")  );
+        ApplicationMessage userMessageToApplicationMessage = OutboundHCSMessage.userMessageToApplicationMessage(
+                new TransactionId(new AccountId(1234L)),
+                message,
+                Ed25519PrivateKey.fromString("302e020100300506032b657004220420e1c09b75f52f7ba287fea66f2c4dcd316f9f1cba47020e760f3cc940ba516641"), 
+                "817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449");
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(userMessageToApplicationMessage);
+        
         assertTrue(chunks.size() == 1);
         
         ConsensusTopicId consensusTopicId = new ConsensusTopicId(1, 2, 3);
@@ -339,7 +346,13 @@ public class OnHCSMessageCallbackTest {
 
        
         
-        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),hcsCore,message, Map.of("sharedSymmetricEncryptionKey","123c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449")  );
+        ApplicationMessage userMessageToApplicationMessage = OutboundHCSMessage.userMessageToApplicationMessage(
+                new TransactionId(new AccountId(1234L)),
+                message,
+                Ed25519PrivateKey.fromString("302e020100300506032b657004220420e1c09b75f52f7ba287fea66f2c4dcd316f9f1cba47020e760f3cc940ba516641"), 
+                "817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449");
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(userMessageToApplicationMessage);
+        
         assertTrue(chunks.size() == 1);
         
         ConsensusTopicId consensusTopicId = new ConsensusTopicId(1, 2, 3);

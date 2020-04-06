@@ -44,7 +44,7 @@ public final class GetTopicInfo {
     public GetTopicInfo(HCSCore hcsCore) {
         this.nodeMap = hcsCore.getNodeMap();
         this.operatorAccountId = hcsCore.getOperatorAccountId();
-        this.ed25519PrivateKey = hcsCore.getEd25519PrivateKey();
+        this.ed25519PrivateKey = hcsCore.getOperatorKey();
     }    
     public GetTopicInfo withNodeMap(Map<AccountId, String> nodeMap) {
         this.nodeMap = nodeMap;

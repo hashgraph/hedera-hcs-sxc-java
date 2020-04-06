@@ -225,10 +225,23 @@ public final class OutboundHCSMessage {
         return this;
     }
     
+    /**
+     * Filter addressbook to obtain a subset containing the supplied appIds. This
+     * is used too override the standard behaviour of encrypting with all shared
+     * keys in the address book. Instead, only encrypted messages with the restricted
+     * set are generated. 
+     * @param appIds 
+     * @return 
+     */
     public OutboundHCSMessage restrictTo(String... appIds){
        return restrictTo(List.of(appIds));
     }
 
+    /**
+     * @see {@link #restrictTo(java.lang.String...) }
+     * @param appIds
+     * @return 
+     */
     public OutboundHCSMessage restrictTo(List<String> appIds){
         // linked hashmap to preserve order
         Map<String, Map<String, String>> newAddressList = new LinkedHashMap<String, Map<String, String>>();
@@ -543,24 +556,29 @@ public final class OutboundHCSMessage {
                 .newBuilder()
                 .setApplicationMessageId(applicationMessageID);
         
+        
+                byte[] hashOfOriginalMessage  = null;
+                byte[] sign = null;
+                try {
+                    // Hash of unencrypted business message should be included in application message
+                    hashOfOriginalMessage = com.hedera.hcs.sxc.hashing.Hashing.sha(StringUtils.byteArrayToHexString(originalMessage));
+                    applicationMessageBuilder.setUnencryptedBusinessProcessMessageHash(ByteString.copyFrom(hashOfOriginalMessage));
+                    // Signature (using sender’s private key) of hash (above) should also be included in application message
+                    if(senderSigningKey!=null) { // signing may be turned off when override is used
+                        sign = Signing.sign(hashOfOriginalMessage, senderSigningKey);
+                        applicationMessageBuilder.setBusinessProcessSignatureOnHash(ByteString.copyFrom(sign));
+                    } 
+                } catch (Exception e){
+                    log.error(e);
+                }
+        
+        
         if(recipientSharedEncryptionKey == null) { // no encryption
             applicationMessageBuilder.setBusinessProcessMessage(ByteString.copyFrom(originalMessage));
             applicationMessage = applicationMessageBuilder.build();
         } else {
             try {
                 // build one encrypted and one unecrypted message. Store the latter in the core db
-
-                // Hash of unencrypted business message should be included in application message
-                byte[] hashOfOriginalMessage = com.hedera.hcs.sxc.hashing.Hashing.sha(StringUtils.byteArrayToHexString(originalMessage));
-                applicationMessageBuilder.setUnencryptedBusinessProcessMessageHash(ByteString.copyFrom(hashOfOriginalMessage));
-
-
-                // Signature (using sender’s private key) of hash (above) should also be included in application message
-               
-                if(senderSigningKey!=null) { // signing may be turned off when override is used
-                    byte[] sign = Signing.sign(hashOfOriginalMessage, senderSigningKey);
-                    applicationMessageBuilder.setBusinessProcessSignatureOnHash(ByteString.copyFrom(sign));
-                }
 
                 // encrypt
                 //String encryptionKey = recipientKeys.get("sharedSymmetricEncryptionKey");

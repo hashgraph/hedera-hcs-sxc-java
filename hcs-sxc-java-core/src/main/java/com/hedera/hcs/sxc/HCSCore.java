@@ -73,9 +73,6 @@ public class HCSCore {
    
 
     
-//    private  HCSCore() throws  ExceptionInInitializerError {  
-//    }
-    
 
     public HCSCore() {  
     }
@@ -122,10 +119,16 @@ public class HCSCore {
         this.catchupHistory = appnet.getCatchupHistory();
         this.messagePersistenceLevel = appnet.getPersistenceLevel();
 
+        
+      
+       
+     
         if(this.rotateKeys && !this.encryptMessages){
             log.error(configFilePath + " has key rotation enabled, however encryption is disabled. Exiting...");
             System.exit(0);
         }
+        
+        
         
         // replace hibernate configuration {appid}
         yamlConfig.getCoreHibernate().forEach((key,value) -> this.hibernateConfig.put(key, value.replace("{appid}",  this.applicationId)));  
@@ -156,7 +159,7 @@ public class HCSCore {
     }
     /**
      * Init for HCS Core
-     * @param applicationId - unique value per app instance using the component, if the app generates this value and stops/starts,
+     * @param appId - unique value per app instance using the component, if the app generates this value and stops/starts,
      * it must reuse the same applicationId to ensure consistent message delivery
      * @throws java.io.FileNotFoundException
      */
@@ -232,8 +235,8 @@ public class HCSCore {
         this.operatorAccountId = operatorAccountId;
         return this;
     }
-    public HCSCore withOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
-        this.operatorKey = ed25519PrivateKey;
+    public HCSCore withOperatorKey(Ed25519PrivateKey operatorKey) {
+        this.operatorKey = operatorKey;
         return this;
     }
     public HCSCore withTopicList(List<Topic> topics) {
@@ -264,7 +267,7 @@ public class HCSCore {
     public AccountId getOperatorAccountId() {
         return this.operatorAccountId;
     } 
-    public Ed25519PrivateKey getEd25519PrivateKey() {
+    public Ed25519PrivateKey getOperatorKey() {
         return this.operatorKey;
     } 
     public List<Topic> getTopics() {

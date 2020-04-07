@@ -26,6 +26,7 @@ import com.hedera.hashgraph.sdk.account.AccountId;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
+import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 
 import java.time.Instant;
@@ -44,7 +45,8 @@ public class OutboundHCSMessageTest {
     public void testSingleChunking() throws Exception {
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
 
-        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)),hcsCore,"Single Chunk Message".getBytes(),null);
+        ApplicationMessage userMessageToApplicationMessage = OutboundHCSMessage.userMessageToApplicationMessage(new TransactionId(new AccountId(1234L)), "Single Chunk Message".getBytes(), null, null);
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(userMessageToApplicationMessage);
         assertTrue(chunks.size() == 1);
         
     }        
@@ -54,7 +56,10 @@ public class OutboundHCSMessageTest {
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
 
         String longString = RandomStringUtils.random(5000, true, true);
-        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(new TransactionId(new AccountId(1234L)) ,hcsCore,longString.getBytes(),null);
+        ApplicationMessage userMessageToApplicationMessage = OutboundHCSMessage.userMessageToApplicationMessage(new TransactionId(new AccountId(1234L)), longString.getBytes(), null, null);
+        List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(userMessageToApplicationMessage);
+
+        
         assertTrue(chunks.size() == 2);
     }
     
@@ -82,7 +87,7 @@ public class OutboundHCSMessageTest {
             .overrideOperatorAccountId(AccountId.fromString("0.0.5"))
             .overrideOperatorKey(ed25519PrivateKey)
             .withFirstTransactionId(transactionId)
-            .overrideMessageEncryptionKey("key".getBytes());
+            .overrideMessageEncryptionKey("key");
         // test updated values
         assertTrue(outboundHCSMessage.getOverrideEncryptedMessages());
         assertTrue(outboundHCSMessage.getOverrideKeyRotation());
@@ -94,7 +99,7 @@ public class OutboundHCSMessageTest {
         assertArrayEquals(ed25519PrivateKey.toBytes(), outboundHCSMessage.getOverrideOperatorKey().toBytes());
         assertEquals(transactionId.accountId.toString(), outboundHCSMessage.getFirstTransactionId().accountId.toString());
         assertEquals(transactionId.validStart, outboundHCSMessage.getFirstTransactionId().validStart);
-        assertArrayEquals("key".getBytes(), outboundHCSMessage.getOverrideMessageEncryptionKey());
+        assertEquals("key", outboundHCSMessage.getOverrideMessageEncryptionKey());
     }
 
     @Test
@@ -108,11 +113,10 @@ public class OutboundHCSMessageTest {
         
     }
     @Test
-    public void testOutBoundMessageNoSendWithEncryption() throws Exception {
+    public void testOutBoundMessageNoSendWithOverrideEncryption() throws Exception {
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
-
         OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(hcsCore);
-        outboundHCSMessage.overrideMessageEncryptionKey(Ed25519PrivateKey.generate().toBytes());
+        outboundHCSMessage.overrideMessageEncryptionKey("817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449");
         outboundHCSMessage.overrideEncryptedMessages(true);
         // pretend we're sending
         List<TransactionId> transactionId = outboundHCSMessage.sendMessageForTest(0, "testMessage".getBytes());

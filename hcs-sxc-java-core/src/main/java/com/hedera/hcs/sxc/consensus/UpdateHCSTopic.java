@@ -42,13 +42,13 @@ import com.hedera.hcs.sxc.HCSCore;
 public final class UpdateHCSTopic {
     private Map<AccountId, String> nodeMap = new HashMap<AccountId, String>();
     private AccountId operatorAccountId = new AccountId(0, 0, 0); 
-    private Ed25519PrivateKey ed25519PrivateKey;
+    private Ed25519PrivateKey operatorKey;
     private ConsensusTopicUpdateTransaction tx = new ConsensusTopicUpdateTransaction();
     
     public UpdateHCSTopic(HCSCore hcsCore) {
         this.nodeMap = hcsCore.getNodeMap();
         this.operatorAccountId = hcsCore.getOperatorAccountId();
-        this.ed25519PrivateKey = hcsCore.getEd25519PrivateKey();
+        this.operatorKey = hcsCore.getOperatorKey();
         this.tx.setMaxTransactionFee(hcsCore.getMaxTransactionFee());
     }
     
@@ -67,11 +67,11 @@ public final class UpdateHCSTopic {
         return this.operatorAccountId;
     }
     public UpdateHCSTopic withOperatorKey(Ed25519PrivateKey ed25519PrivateKey) {
-        this.ed25519PrivateKey = ed25519PrivateKey;
+        this.operatorKey = ed25519PrivateKey;
         return this;
     }
     public Ed25519PrivateKey getOperatorKey() {
-        return this.ed25519PrivateKey;
+        return this.operatorKey;
     }
     public UpdateHCSTopic setMaxTransactionFee(Long maxTansactionFee) {
         this.tx.setMaxTransactionFee(maxTansactionFee);
@@ -151,7 +151,7 @@ public final class UpdateHCSTopic {
         Client client = new Client(this.nodeMap);
         client.setOperator(
             this.operatorAccountId
-            ,this.ed25519PrivateKey
+            ,this.operatorKey
         );
         
         TransactionId txId = tx.execute(client);

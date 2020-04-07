@@ -63,7 +63,7 @@ class HCSCoreTest {
         assertTrue(hcsCore.getCatchupHistory());
         assertEquals(1, hcsCore.getConsensusTopicIds().size());
         assertEquals(1, hcsCore.getTopics().size());
-        assertArrayEquals(operatorKey.toBytes(), hcsCore.getEd25519PrivateKey().toBytes());
+        assertArrayEquals(operatorKey.toBytes(), hcsCore.getOperatorKey().toBytes());
         assertTrue(hcsCore.getEncryptMessages());
         assertEquals(1, hcsCore.getHibernateConfig().size());
         assertEquals(100000000, hcsCore.getMaxTransactionFee());
@@ -90,7 +90,7 @@ class HCSCoreTest {
         System.setProperty("OPERATOR_ID", "0.0.2");
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenvempty.test");
         
-        assertEquals("302e020100300506032b657004220420abb9499694bad1f081cb2a55a08989303cbc3322fae657db1044fdbf3b9eed65", hcsCore.getEd25519PrivateKey().toString());
+        assertEquals("302e020100300506032b657004220420abb9499694bad1f081cb2a55a08989303cbc3322fae657db1044fdbf3b9eed65", hcsCore.getOperatorKey().toString());
         assertEquals("0.0.2", hcsCore.getOperatorAccountId().toString());
     }
 

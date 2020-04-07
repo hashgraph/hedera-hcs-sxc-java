@@ -112,7 +112,7 @@ public class MirrorSubscribe implements MirrorSubscriptionInterface {
                             // notify subscribed observer from App.java
                             if (messageFromJMS instanceof ActiveMQTextMessage) {
                                 log.debug("Got message from queue - notifying");
-                                onHCSMessageCallback.notifyObservers(((ActiveMQTextMessage)messageFromJMS).getText().getBytes(), null);
+                                onHCSMessageCallback.notifyObservers(null, ((ActiveMQTextMessage)messageFromJMS).getText().getBytes(), null);
                                 messageFromJMS.acknowledge();
                                 log.debug("Got message from queue - acknowledged");
                             } else if (messageFromJMS instanceof ActiveMQObjectMessage) {

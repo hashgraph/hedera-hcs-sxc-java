@@ -78,6 +78,14 @@
             <version>${junit.version}</version>
         </dependency>
     </dependencies>
+    <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+    </build>
     <profiles>
         <profile>
             <id>ci</id>

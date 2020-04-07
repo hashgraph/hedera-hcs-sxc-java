@@ -26,6 +26,7 @@ import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
 import com.hedera.hcs.sxc.commonobjects.HCSResponse;
+import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
@@ -98,9 +99,9 @@ public final class App {
 
         // create a callback object to receive the message
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsCore);
-        onHCSMessageCallback.addObserver((HCSResponse hcsResponse) -> {
+        onHCSMessageCallback.addObserver((SxcConsensusMessage sxcConsensusMessage, HCSResponse hcsResponse) -> {
             // handle notification in mirrorNotification
-            mirrorNotification(hcsResponse, hcsCore);
+            mirrorNotification(sxcConsensusMessage, hcsResponse, hcsCore);
         });
 
         // wait for user input
@@ -189,7 +190,7 @@ public final class App {
         }
     }
 
-    private static  void mirrorNotification(HCSResponse hcsResponse, HCSCore hcsCore) {
+    private static  void mirrorNotification(SxcConsensusMessage sxcConsensusMessage, HCSResponse hcsResponse, HCSCore hcsCore) {
         // we receive a notification from mirror via HCS core
         try {
             // try to parse the notification into a proto

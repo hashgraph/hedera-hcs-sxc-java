@@ -150,9 +150,9 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
      * @param listener callback method; a provided parameter that implements the
      * functional interface is {@link HCSResponse} and an example usage is
      * <pre>
-        o.addObserver((HCSResponse hcsResponse) -&gt; {
-           System.out.print(hcsResponse.getApplicationMessageID());
-        });
+    o.addObserver((HCSResponse hcsResponse) -&gt; {
+    System.out.print(hcsResponse.getApplicationMessageID());
+    });
      * </pre>
      * which prints the id of the application message. Notice that HCSResponse
      * does not return
@@ -162,7 +162,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
      */
     @Override
     public void addObserver(HCSCallBackToAppInterface listener) {
-       observers.add(listener);
+        observers.add(listener);
     }
 
 
@@ -172,11 +172,11 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
      * @param applicationMessageId
      */
     @Override
-    public void notifyObservers(byte[] message, ApplicationMessageID applicationMessageId) {
+    public void notifyObservers(SxcConsensusMessage sxcConsensusMessage, byte[] message, ApplicationMessageID applicationMessageId) {
         HCSResponse hcsResponse = new HCSResponse();
         hcsResponse.setApplicationMessageID(applicationMessageId);
         hcsResponse.setMessage(message);
-        observers.forEach(listener -> listener.onMessage(hcsResponse));
+        observers.forEach(listener -> listener.onMessage(sxcConsensusMessage, hcsResponse));
     }
 
 
@@ -197,7 +197,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                 ApplicationMessage appMessage = messageEnvelopeOptional.get();
 
                 if(this.encryptMessagesFromCore  // configuration wants encryption
-                   || appMessage.getEncryptionRandom() != null  // configuration may not want encryption but message can still be encrypted
+                        || appMessage.getEncryptionRandom() != null  // configuration may not want encryption but message can still be encrypted
                 ){
 
                     try {
@@ -233,17 +233,17 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                             } else {
                                 //message is `good` store it  back with consensus data applied to it.
                                 this.hcsCore.getPersistence().storeApplicationMessage(
-                                    //TODO Add addressee
-                                    ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage()) ,
-                                    sxcConsensusMesssage.consensusTimestamp,
-                                    StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),
-                                    sxcConsensusMesssage.sequenceNumber
+                                        //TODO Add addressee
+                                        ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage()) ,
+                                        sxcConsensusMesssage.consensusTimestamp,
+                                        StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),
+                                        sxcConsensusMesssage.sequenceNumber
                                 );
-                                notifyObservers( clearTextAppMessage.getBusinessProcessMessage().toByteArray(), clearTextAppMessage.getApplicationMessageId());
+                                notifyObservers(sxcConsensusMesssage, clearTextAppMessage.getBusinessProcessMessage().toByteArray(), clearTextAppMessage.getApplicationMessageId());
                             }
                         } else { // the message was not sent by me
-                                 // I need to loop through the addressbook and
-                                 // if the message was sent to me then I need to find who sent it to me  and find the shared key to decrypt it.
+                            // I need to loop through the addressbook and
+                            // if the message was sent to me then I need to find who sent it to me  and find the shared key to decrypt it.
                             log.debug("Mirror notification with message I didn't send");
 
                             boolean messageIsForMe = false;
@@ -260,11 +260,11 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                 Ed25519PublicKey theirPubKey = Ed25519PublicKey.fromString(
                                         keyMap.get("theirEd25519PubKeyForSigning"));
                                 if (
-                                    Signing.verify(
-                                            appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray(),
-                                            appMessage.getBusinessProcessSignatureOnHash().toByteArray(),
+                                        Signing.verify(
+                                                appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray(),
+                                                appMessage.getBusinessProcessSignatureOnHash().toByteArray(),
 
-                                            theirPubKey)
+                                                theirPubKey)
                                 ){
                                     log.debug("Signature verification on message passed with " + appId + ", message is from them.");
                                     try {
@@ -287,10 +287,10 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                         log.debug("Able to decrypt message");
                                         messageIsForMe = true;
                                         break;
-                                   } catch (Exception e){
-                                       log.debug("Unable to decrypt message");
-                                       continue;
-                                   }
+                                    } catch (Exception e){
+                                        log.debug("Unable to decrypt message");
+                                        continue;
+                                    }
                                 }
                             }
 
@@ -298,7 +298,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                             if (messageIsForMe){
                                 log.debug("Message is for me, parsing");
                                 try  { Any any = Any.parseFrom(decryptedBPM); // if fails goto catch block - TODO, use typing to avoid control flow
-                                                                              // if succeeds then it is
+                                    // if succeeds then it is
                                     if(any.is(KeyRotationInitialise.class)){  //======= KR1==========================================
                                         // an init message has arrived
                                         // check if it was me who's the initiator. Skip msg if so.
@@ -309,27 +309,19 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                             /* changed due to encryption taken from address book
                                             KeyRotationInitialise kr1 = any.unpack(KeyRotationInitialise.class);
                                             byte[] initiatorPublicKeyEncoded = kr1.getInitiatorPublicKeyEncoded().toByteArray();
-
                                             // create your own new key store it and respond
                                             Pair<byte[], byte[]> respond = keyRotationPlugin.respond(initiatorPublicKeyEncoded);
-
                                             byte[] newPublicKey =  respond.getLeft();
                                             byte[] newSecretKey = respond.getRight();
                                             byte[] oldSecretKey = hcsCore.getMessageEncryptionKey();
                                             hcsCore.updateSecretKey(newSecretKey);
                                             hcsCore.getPersistence().storeSecretKey(newSecretKey);
-
-
                                             KeyRotationRespond kr2 = KeyRotationRespond.newBuilder()
                                                 .setResponderPublicKeyEncoded(ByteString.copyFrom(newPublicKey))
                                                 .build();
-
                                             // prepare the response and send it over to the initiator
-
                                             Any anyPack = Any.pack(kr2);
                                             byte[] encryptedAnyPackedChunkBody = messageEncryptionPlugin.encrypt(oldSecretKey, anyPack.toByteArray());
-
-
                                             TransactionId transactionId = new TransactionId(hcsCore.getOperatorAccountId());
                                             ApplicationMessageID newAppId = ApplicationMessageID.newBuilder()
                                                 .setAccountID(AccountID.newBuilder()
@@ -343,8 +335,6 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                                         .setNanos(transactionId.validStart.getNano())
                                                         .build()
                                                 ).build();
-
-
                                             ApplicationMessageChunk appChunk = ApplicationMessageChunk.newBuilder()
                                                 .setApplicationMessageId(newAppId)
                                                 .setChunkIndex(1)
@@ -359,29 +349,21 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                                         .build()
                                                         .toByteString()
                                             ).build();
-
-
                                             ConsensusMessageSubmitTransaction txRotation = new ConsensusMessageSubmitTransaction()
                                                 .setMessage(appChunk.toByteArray())
                                                 .setTopicId(this.topics.get(
                                                         0 // TODO get the topic from the appMessage
                                                 ).getConsensusTopicId())
                                                 .setTransactionId(transactionId);
-
                                             // submit to network
-
                                             try (Client client = new Client(hcsCore.getNodeMap())) {
                                                 client.setOperator(
                                                         hcsCore.getOperatorAccountId(),
                                                          hcsCore.getEd25519PrivateKey()
                                                 );
-
                                                 client.setMaxTransactionFee(hcsCore.getMaxTransactionFee());
-
                                                 TransactionId txIdKR2 =  txRotation.execute(client);
-
                                                 TransactionReceipt receiptKR2 = txIdKR2.getReceipt(client, Duration.ofSeconds(30));
-
                                             } catch (HederaStatusException ex) {
                                                     log.error(ex);
                                             } catch (HederaNetworkException ex) {
@@ -397,12 +379,9 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                         // a respond message has arrived
                                         // check if it was me who sent respond message. Skip msg if so.
                                         boolean isMeResponder = hcsCore.getTempKeyAgreement() != null;
-
                                         if ( isMeResponder ) {
-
                                             KeyRotationRespond kr2 = any.unpack(KeyRotationRespond.class);
                                             byte[] responderPublicKeyEncoded = kr2.getResponderPublicKeyEncoded().toByteArray();
-
                                             // get the keyAgreement from core
                                             KeyAgreement keyAgreement = hcsCore.getTempKeyAgreement();
                                             hcsCore.setTempKeyAgreement(null);
@@ -410,7 +389,6 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                               // store new SecretKey in Database
                                            hcsCore.updateSecretKey(newSecretKey);
                                            hcsCore.getPersistence().storeSecretKey(newSecretKey);
-
                                         }*/
                                     } else if (any.is(RequestProof.class)) {
 
@@ -425,12 +403,12 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                             //VerifiableMessage verifiableMessage =  requestProof.getApplicationMessage(0);
                                             if (verifiableMessage.hasVerifiableApplicationMessage()){
                                                 VerifiableApplicationMessage verifiableApplicationMessage = verifiableMessage.getVerifiableApplicationMessage();
-                                                 VerifiedMessage verifiedMessage = VerifiedMessage
-                                                .newBuilder()
-                                                .setVerificationOutcome(prove(verifiableApplicationMessage))
-                                                .setApplicationMessage(verifiableMessage)
-                                                .build();
-                                                 proofResults.addProof(verifiedMessage);
+                                                VerifiedMessage verifiedMessage = VerifiedMessage
+                                                        .newBuilder()
+                                                        .setVerificationOutcome(prove(verifiableApplicationMessage))
+                                                        .setApplicationMessage(verifiableMessage)
+                                                        .build();
+                                                proofResults.addProof(verifiedMessage);
                                             } else {
                                                 throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
                                             }
@@ -440,16 +418,14 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                         Any anyPack = Any.pack(cf);
 
 
-                                       //send it back to whoever you got it from
+                                        //send it back to whoever you got it from
 
-                                       OutboundHCSMessage o =  new OutboundHCSMessage(hcsCore);
-                                       o.restrictTo(originAppId).sendMessage(0, anyPack.toByteArray());
+                                        OutboundHCSMessage o =  new OutboundHCSMessage(hcsCore);
+                                        o.restrictTo(originAppId).sendMessage(0, anyPack.toByteArray());
 
                                        /*
                                        EncryptedData encrypt = messageEncryptionPlugin.encrypt(sharedKey, anyPack.toByteArray());
                                         byte[] encryptedAnyPackedChunkBody = encrypt.getEncryptedData();
-
-
                                         TransactionId transactionId = new TransactionId(hcsCore.getOperatorAccountId());
                                         ApplicationMessageID newAppId = ApplicationMessageID.newBuilder()
                                             .setAccountID(AccountID.newBuilder()
@@ -463,13 +439,11 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                                     .setNanos(transactionId.validStart.getNano())
                                                     .build()
                                             ).build();
-
                                         byte [] hashOfUnencryptedBusinessMessage = Hashing.sha(
                                                 StringUtils.byteArrayToHexString(
                                                         anyPack.toByteArray()
                                                 )
                                         );
-
                                         ApplicationMessageChunk appChunk = ApplicationMessageChunk.newBuilder()
                                             .setApplicationMessageId(newAppId)
                                             .setChunkIndex(1)
@@ -485,29 +459,21 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                                     .build()
                                                     .toByteString()
                                         ).build();
-
-
                                         ConsensusMessageSubmitTransaction txVerifiedMessage = new ConsensusMessageSubmitTransaction()
                                             .setMessage(appChunk.toByteArray())
                                             .setTopicId(this.topics.get(
                                                     0 // TODO get the topic from the appMessage
                                             ).getConsensusTopicId())
                                             .setTransactionId(transactionId);
-
                                         // submit to network
-
                                         try (Client client = new Client(hcsCore.getNodeMap())) {
                                             client.setOperator(
                                                     hcsCore.getOperatorAccountId(),
                                                     hcsCore.getEd25519PrivateKey()
                                             );
-
                                             client.setMaxTransactionFee(hcsCore.getMaxTransactionFee());
-
                                             TransactionId txIdVMessage =  txVerifiedMessage.execute(client);
-
                                             TransactionReceipt receiptIdVMessage = txIdVMessage.getReceipt(client, Duration.ofSeconds(30));
-
                                         } catch (Exception ex) {
                                                 log.error(ex);
                                         }
@@ -533,16 +499,16 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                         ); */
 
                                     } else { // the message is not a KR or PROOF instruction. It is some other PROTO message
-                                               // send back the BPM; IF it's not a PROTO message then use the CATCH
-                                               // block. TODO, rewrite to avoid trycatch controll flow
+                                        // send back the BPM; IF it's not a PROTO message then use the CATCH
+                                        // block. TODO, rewrite to avoid trycatch controll flow
                                         ApplicationMessage decryptedAppmessage = ApplicationMessage.newBuilder()
-                                            .setApplicationMessageId(appMessage.getApplicationMessageId())
-                                            .setUnencryptedBusinessProcessMessageHash(appMessage.getUnencryptedBusinessProcessMessageHash())
-                                            .setBusinessProcessMessage(
-                                                    ByteString.copyFrom(decryptedBPM)
-                                             )
-                                            .setBusinessProcessSignatureOnHash(appMessage.getBusinessProcessSignatureOnHash())
-                                            .build();
+                                                .setApplicationMessageId(appMessage.getApplicationMessageId())
+                                                .setUnencryptedBusinessProcessMessageHash(appMessage.getUnencryptedBusinessProcessMessageHash())
+                                                .setBusinessProcessMessage(
+                                                        ByteString.copyFrom(decryptedBPM)
+                                                )
+                                                .setBusinessProcessSignatureOnHash(appMessage.getBusinessProcessSignatureOnHash())
+                                                .build();
                                         appMessage = decryptedAppmessage;
                                         this.hcsCore.getPersistence().storeApplicationMessage(
                                                 appMessage,
@@ -554,37 +520,38 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
 
                                 }
                                 catch(InvalidProtocolBufferException e){  // IF NOT PROTO: the message is not a PROTO message. It's sometihng else
-                                        ApplicationMessage decryptedAppmessage = ApplicationMessage.newBuilder()
+                                    ApplicationMessage decryptedAppmessage = ApplicationMessage.newBuilder()
                                             .setApplicationMessageId(appMessage.getApplicationMessageId())
                                             .setUnencryptedBusinessProcessMessageHash(appMessage.getUnencryptedBusinessProcessMessageHash())
                                             .setBusinessProcessMessage(
                                                     ByteString.copyFrom(decryptedBPM)
-                                             )
+                                            )
                                             .setBusinessProcessSignatureOnHash(appMessage.getBusinessProcessSignatureOnHash())
 
                                             .build();
-                                        appMessage = decryptedAppmessage;
-                                        this.hcsCore.getPersistence().storeApplicationMessage(
-                                                decryptedAppmessage,
-                                                sxcConsensusMesssage.consensusTimestamp,
-                                                StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),
-                                                sxcConsensusMesssage.sequenceNumber
-                                        );
-
-                                } finally {
-                                    notifyObservers(
-                                              appMessage.getBusinessProcessMessage().toByteArray()
-                                            , appMessage.getApplicationMessageId());
-                                }
-                            } else { // the message was encrypted and not sent to me.
-                                     // persist it encrypted, you may still need it in an proof request
-                                    log.debug("Received enrypted message but it's not for me");
+                                    appMessage = decryptedAppmessage;
                                     this.hcsCore.getPersistence().storeApplicationMessage(
-                                            messageEnvelopeOptional.get(),
+                                            decryptedAppmessage,
                                             sxcConsensusMesssage.consensusTimestamp,
                                             StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),
                                             sxcConsensusMesssage.sequenceNumber
                                     );
+
+                                } finally {
+                                    notifyObservers(
+                                            sxcConsensusMesssage
+                                            , appMessage.getBusinessProcessMessage().toByteArray()
+                                            , appMessage.getApplicationMessageId());
+                                }
+                            } else { // the message was encrypted and not sent to me.
+                                // persist it encrypted, you may still need it in an proof request
+                                log.debug("Received enrypted message but it's not for me");
+                                this.hcsCore.getPersistence().storeApplicationMessage(
+                                        messageEnvelopeOptional.get(),
+                                        sxcConsensusMesssage.consensusTimestamp,
+                                        StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),
+                                        sxcConsensusMesssage.sequenceNumber
+                                );
                             }
 
                         }
@@ -600,7 +567,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                             StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),
                             sxcConsensusMesssage.sequenceNumber
                     );
-                    notifyObservers( appMessage.getBusinessProcessMessage().toByteArray(), appMessage.getApplicationMessageId());
+                    notifyObservers(sxcConsensusMesssage, appMessage.getBusinessProcessMessage().toByteArray(), appMessage.getApplicationMessageId());
                 }
 
             } else { // message envelope not present
@@ -638,19 +605,19 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
         persistence.putParts(applicationMessageId, chunkList);
 
         if (messageChunk.getChunksCount() == 1){ // if it's only one then an entire ApplicationMessage did fit in the MessageChunk
-                ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(messageChunk.getMessageChunk());
-                return  Optional.of( applicationMessage);
+            ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(messageChunk.getMessageChunk());
+            return  Optional.of( applicationMessage);
         } else if (chunkList.size() == messageChunk.getChunksCount()) { // all parts received
-                // sort by part id
-                chunkList.sort(Comparator.comparingInt(ApplicationMessageChunk::getChunkIndex));
-                // merge down
-                ByteString merged =
-                        chunkList.stream()
-                                .map(ApplicationMessageChunk::getMessageChunk)
-                                .reduce(ByteUtil::merge).get();
-                // construct envelope from merged array. TODO: if fail
-                ApplicationMessage messageEnvelope = ApplicationMessage.parseFrom(merged);
-                return  Optional.of(messageEnvelope);
+            // sort by part id
+            chunkList.sort(Comparator.comparingInt(ApplicationMessageChunk::getChunkIndex));
+            // merge down
+            ByteString merged =
+                    chunkList.stream()
+                            .map(ApplicationMessageChunk::getMessageChunk)
+                            .reduce(ByteUtil::merge).get();
+            // construct envelope from merged array. TODO: if fail
+            ApplicationMessage messageEnvelope = ApplicationMessage.parseFrom(merged);
+            return  Optional.of(messageEnvelope);
         } else { // not all parts received yet
             return Optional.empty();
         }
@@ -659,9 +626,9 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
     private VerifiedMessage.VerificationOutcome prove(VerifiableApplicationMessage verifiableApplicationMessage) throws NoSuchAlgorithmException, InvalidProtocolBufferException {
         SxcApplicationMessageInterface applicationMessageEntity = hcsCore.getPersistence()
                 .getApplicationMessageEntity(
-                    SxcPersistence.extractApplicationMessageStringId(verifiableApplicationMessage.getApplicationMessageId()
-                )
-        );
+                        SxcPersistence.extractApplicationMessageStringId(verifiableApplicationMessage.getApplicationMessageId()
+                        )
+                );
 
         if (applicationMessageEntity == null){
             return VerifiedMessage.VerificationOutcome.UNABLE_TO_VERIFY;
@@ -669,10 +636,10 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
 
         ByteString originalBusinessProcessMessage = verifiableApplicationMessage.getOriginalBusinessProcessMessage();
         byte[] hashOfVerifiable = Hashing.sha(
-                                    StringUtils.byteArrayToHexString(
-                                            originalBusinessProcessMessage.toByteArray()
-                                    )
-                            );
+                StringUtils.byteArrayToHexString(
+                        originalBusinessProcessMessage.toByteArray()
+                )
+        );
         ApplicationMessage appMessage = ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage());
         byte[] messageOfStored = appMessage.getBusinessProcessMessage().toByteArray();
         byte[] hashOfStored = appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray();

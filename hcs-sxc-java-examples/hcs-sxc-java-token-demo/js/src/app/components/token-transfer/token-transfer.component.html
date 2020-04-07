@@ -1,0 +1,24 @@
+<div class="card my-6">
+  <div class="card-body">
+    <H1>Transferring token: {{ currentToken.name }}</H1>
+
+    <form (ngSubmit)="onSubmit()" #transferForm="ngForm">
+      <div class="form-group">
+        <label for="quantity">Quantity</label>
+        <input type="text" class="form-control" id="quantity" name="quantity" required [(ngModel)]="quantity" >
+      </div>
+      <div class="form-group">
+        <label for="whoTo">User to transfer to</label>
+        <select class="form-control" id="whoTo" required name="whoTo" [(ngModel)]="whoTo"  *ngIf="currentUser.name">
+          <ng-container *ngFor="let user of allUsers">
+            <option *ngIf="currentUser.name != user.name" value="{{ user.name }}" >{{ user.name }} ({{ user.userOf }})</option>
+          </ng-container>
+        </select>
+      </div>
+
+      <button type="submit" [disabled]="!transferForm.form.valid"
+              class="btn btn-success">Transfer</button>
+    </form>
+  </div>
+</div>
+

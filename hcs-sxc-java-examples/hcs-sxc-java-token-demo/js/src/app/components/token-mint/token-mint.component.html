@@ -1,0 +1,19 @@
+<div class="card my-6">
+  <div class="card-body">
+    <H1>Minting token: {{ currentToken.name }}</H1>
+    <form (ngSubmit)="onSubmit()" #tokenMint="ngForm">
+      <div class="form-group">
+        <label for="qty">Quantity to mint (0 to mint to cap)</label>
+        <input type="text" [(ngModel)]="quantity"
+               class="form-control"
+               id="qty"
+               name="quantity"
+               placeholder="Quantity to mint (0 to mint to cap)"
+               required #qty="ngModel">
+        <div [hidden]="!qty.pristine" class="alert alert-danger">Quantity is required</div>
+      </div>
+      <button type="submit" [disabled]="!tokenMint.form.valid"
+              class="btn btn-success">Mint</button>
+    </form>
+  </div>
+</div>

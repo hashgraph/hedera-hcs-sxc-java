@@ -19,6 +19,7 @@
     <modules>
       <module>hcs-sxc-java-simple-message-demo</module>
       <module>hcs-sxc-java-settlement-demo</module>
+      <module>hcs-sxc-java-token-demo</module>
 
     </modules>
 </project>

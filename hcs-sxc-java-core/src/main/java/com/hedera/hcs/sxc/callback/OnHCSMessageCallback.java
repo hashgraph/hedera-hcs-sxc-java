@@ -22,17 +22,11 @@ package com.hedera.hcs.sxc.callback;
 import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.HederaStatusException;
-import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
-import com.hedera.hashgraph.sdk.consensus.ConsensusMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PublicKey;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.commonobjects.EncryptedData;
 import com.hedera.hcs.sxc.commonobjects.HCSResponse;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
-import com.hedera.hcs.sxc.config.Topic;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 import com.hedera.hcs.sxc.hashing.Hashing;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackFromMirror;
@@ -58,19 +52,15 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
-import com.hedera.hcs.sxc.proto.AccountID;
 import com.hedera.hcs.sxc.proto.ConfirmProof;
 import com.hedera.hcs.sxc.proto.RequestProof;
-import com.hedera.hcs.sxc.proto.Timestamp;
 import com.hedera.hcs.sxc.proto.VerifiableApplicationMessage;
 import com.hedera.hcs.sxc.proto.VerifiableMessage;
 import com.hedera.hcs.sxc.proto.VerifiedMessage;
 import com.hedera.hcs.sxc.signing.Signing;
 import java.security.NoSuchAlgorithmException;
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
-import org.apache.commons.lang3.SerializationUtils;
 
 /**
  *
@@ -83,14 +73,9 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
 
     private final List<HCSCallBackToAppInterface> observers = new ArrayList<>();
     private HCSCore hcsCore;
-    private boolean signMessages;
     private boolean encryptMessages;
-    private boolean rotateKeys;
-    private Class<?> messageEncryptionClass;
     private SxcMessageEncryption messageEncryptionPlugin;
-    private List<Topic> topics;
-    private SxcKeyRotation keyRotationPlugin;
-    
+
     /**
      * Implements callback registration and notification capabilities; the used 
      * to process messages received from the mirror. Users instantiate the object
@@ -106,26 +91,25 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
      * integrity is handled automatically where the HCSCore address-book is consulted behind the scenes. 
      * 
      * @param hcsCore  the instantiated core object. {@see HCSCore}
-     * @throws Exception 
+     * @throws Exception in the event of an error
      */
     public OnHCSMessageCallback (HCSCore hcsCore) throws Exception {
         this.hcsCore = hcsCore;
-        
-        this.signMessages = hcsCore.getSignMessages();
+
+        boolean signMessages = hcsCore.getSignMessages();
         this.encryptMessages = hcsCore.getEncryptMessages();
-        this.rotateKeys = hcsCore.getRotateKeys();
-        this.topics = hcsCore.getTopics();
-        
-        if(this.signMessages){
+        boolean rotateKeys = hcsCore.getRotateKeys();
+
+        if(signMessages){
             
         }
         if (this.encryptMessages){
-            messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
-            this.messageEncryptionPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
+            Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
+            this.messageEncryptionPlugin = (SxcMessageEncryption) messageEncryptionClass.newInstance();
         }
-         if(this.rotateKeys){
+         if(rotateKeys){
             Class<?> messageKeyRotationClass = Plugins.find("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcKeyRotation", true);
-            this.keyRotationPlugin = (SxcKeyRotation)messageKeyRotationClass.newInstance();
+             SxcKeyRotation keyRotationPlugin = (SxcKeyRotation) messageKeyRotationClass.newInstance();
         }
          
         if (this.hcsCore.getCatchupHistory()) {
@@ -163,11 +147,11 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
      * @param message
      * @param applicationMessageId
      */
-    public void notifyObservers(byte[] message, ApplicationMessageID applicationMessageId) {
+    public void notifyObservers(SxcConsensusMessage sxcConsensusMessage, byte[] message, ApplicationMessageID applicationMessageId) {
         HCSResponse hcsResponse = new HCSResponse();
         hcsResponse.setApplicationMessageID(applicationMessageId);
         hcsResponse.setMessage(message);
-        observers.forEach(listener -> listener.onMessage(hcsResponse));
+        observers.forEach(listener -> listener.onMessage(sxcConsensusMessage, hcsResponse));
     }
     public void storeMirrorResponse(SxcConsensusMessage consensusMessage) {
         hcsCore.getPersistence().storeMirrorResponse(consensusMessage);
@@ -221,7 +205,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                     StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),
                                     sxcConsensusMesssage.sequenceNumber
                                 );
-                                notifyObservers( clearTextAppMessage.getBusinessProcessMessage().toByteArray(), clearTextAppMessage.getApplicationMessageId());
+                                notifyObservers( sxcConsensusMesssage, clearTextAppMessage.getBusinessProcessMessage().toByteArray(), clearTextAppMessage.getApplicationMessageId());
                             }                            
                         } else { // the message was not sent by me 
                                  // I need to loop through the addressbook and 
@@ -271,7 +255,6 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                         break;
                                    } catch (Exception e){
                                        log.debug("Unable to decrypt message");
-                                       continue;
                                    }
                                 }
                             }
@@ -554,8 +537,9 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                         );
 
                                 } finally {
-                                    notifyObservers( 
-                                              appMessage.getBusinessProcessMessage().toByteArray()
+                                    notifyObservers(
+                                            sxcConsensusMesssage
+                                            , appMessage.getBusinessProcessMessage().toByteArray()
                                             , appMessage.getApplicationMessageId());
                                 }
                             } else { // the message was encrypted and not sent to me.  
@@ -583,7 +567,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                             StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),
                             sxcConsensusMesssage.sequenceNumber
                     );
-                    notifyObservers( appMessage.getBusinessProcessMessage().toByteArray(), appMessage.getApplicationMessageId());
+                    notifyObservers(sxcConsensusMesssage, appMessage.getBusinessProcessMessage().toByteArray(), appMessage.getApplicationMessageId());
                 }
                 
             } else { // message envelope not present

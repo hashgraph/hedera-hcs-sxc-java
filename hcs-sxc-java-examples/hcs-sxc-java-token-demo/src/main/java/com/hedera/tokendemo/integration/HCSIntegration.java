@@ -22,6 +22,7 @@ package com.hedera.tokendemo.integration;
 
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
 import com.hedera.hcs.sxc.commonobjects.HCSResponse;
+import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.tokendemo.config.AppData;
 import com.hedera.tokendemo.service.TokenServiceProto;
 import lombok.extern.log4j.Log4j2;
@@ -45,12 +46,12 @@ public class HCSIntegration {
             throw new Exception("HCS Core is null");
         }
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(appData.getHCSCore());
-        onHCSMessageCallback.addObserver(hcsMessage -> {
-            processHCSMessage(hcsMessage);
+        onHCSMessageCallback.addObserver((sxcConsensusMesssage, hcsResponse) ->  {
+            processHCSMessage(sxcConsensusMesssage, hcsResponse);
         });
     }
 
-    public void processHCSMessage(HCSResponse hcsResponse) {
+    public void processHCSMessage(SxcConsensusMessage sxcConsensusMessage, HCSResponse hcsResponse) {
         try {
             HCSToken hcsToken = HCSToken.parseFrom(hcsResponse.getMessage());
             if (hcsToken.hasNewArtifactRequest()) {

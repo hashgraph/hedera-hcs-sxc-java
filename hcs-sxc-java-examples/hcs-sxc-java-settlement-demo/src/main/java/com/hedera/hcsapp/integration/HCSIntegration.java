@@ -22,6 +22,7 @@ package com.hedera.hcsapp.integration;
 
 import java.util.concurrent.ExecutionException;
 
+import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompSession;
@@ -87,12 +88,12 @@ public class HCSIntegration {
         this.appData = Statics.getAppData();
         // create a callback object to receive the message
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(this.appData.getHCSCore());
-        onHCSMessageCallback.addObserver(hcsMessage -> {
-            processHCSMessage(hcsMessage);
+        onHCSMessageCallback.addObserver((sxcConsensusMessage, hcsMessage) -> {
+            processHCSMessage(sxcConsensusMessage, hcsMessage);
         });
     }
 
-    public void processHCSMessage(HCSResponse hcsResponse) {
+    public void processHCSMessage(SxcConsensusMessage sxcConsensusMessage, HCSResponse hcsResponse) {
         try {
             //ApplicationMessage applicationMessage = ApplicationMessage.parseFrom(hcsResponse.getMessage());
             SettlementBPM settlementBPM = SettlementBPM.parseFrom(hcsResponse.getMessage());

@@ -160,4 +160,23 @@ public class OutboundHCSMessageTest {
         
     }
     
+    /* TODO: complete this test
+    @Test
+    public void testOutBoundMessageNoSendWithEncryptionFromAddressBook() throws Exception {
+        HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test")
+            //.withMessageEncryptionKey(Ed25519PrivateKey.generate().toBytes())
+            .withEncryptedMessages(true)
+            .withMessageSigningKey(Ed25519PrivateKey.generate())
+            .addOrUpdateAppParticipant("test-participant-1", theirEd25519PubKeyForSigning, sharedSymmetricEncryptionKey)
+            ;
+
+        OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(hcsCore);
+        // pretend we're sending
+        List<TransactionId> transactionId = outboundHCSMessage
+                .restrictTo(appIds).
+                sendMessageForTest(0, "testMessage".getBytes());
+        assertNotNull(transactionId);
+        
+    }
+    */
 }

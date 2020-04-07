@@ -32,6 +32,9 @@ import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ConfirmProof;
+import com.hedera.hcs.sxc.proto.RequestProof;
+import com.hedera.hcs.sxc.proto.VerifiableApplicationMessage;
+import com.hedera.hcs.sxc.proto.VerifiedMessage;
 import com.hedera.hcs.sxc.signing.Signing;
 import com.hedera.hcs.sxc.utils.StringUtils;
 
@@ -144,6 +147,7 @@ public final class App {
                     Ansi.print("(red)Please create or set a thread first(reset)");
                 } else if (userInput.startsWith("prove")) {
                     // make a message verification request to a particular participant
+
                     String[] split = userInput.split("\\s+");
                     if (split.length != 4) {
                         System.out.println("Invalid number of argumets");
@@ -177,7 +181,7 @@ public final class App {
                     // send a message so that only one buddy from addressbook can decrypt
                     String[] split = userInput.split("\\s+");
                     if (split.length != 3) {
-                        System.out.println("Invalid number of arguments, note: message cannot contain spaces");
+                        System.out.println("Invalid number of argumets");
                     } else {
                         sendMessageOnThread(hcsCore, messageThread, split[2], split[1]);
                     }
@@ -195,7 +199,6 @@ public final class App {
         try {
             // try to parse the notification into a proto
             SimpleMessage simpleMessage = SimpleMessage.parseFrom(hcsResponse.getMessage());
-
             // check the incoming protobuf message for instructions
             if (simpleMessage.hasMessageOnThread()) {
                 // we have received a new message
@@ -224,8 +227,7 @@ public final class App {
 
             }
         } catch (InvalidProtocolBufferException e) {
-            // request proof in progress
-            System.out.println("        Echo of  proof request received. Awaiting replies. ");
+            printVerboseDetails(hcsCore,hcsResponse);
         }
     }
 
@@ -243,6 +245,8 @@ public final class App {
             System.out.printf ("    applicationMessageId: %s \n",applicationMessageEntity.getApplicationMessageId());
             System.out.printf ("    last chrono chunk consensus sequenceNum: %s \n",applicationMessageEntity.getLastChronoPartSequenceNum());
             System.out.printf ("    last chrono chunk consensus running hash: %s \n",applicationMessageEntity.getLastChronoPartRunningHashHEX());
+             System.out.printf("    last chrono chunk consensus timestamp: %s \n", applicationMessageEntity.getLastChronoPartConsensusTimestamp());
+
             System.out.println("    ApplicationMessage: ");
             ApplicationMessage appMessage = ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage());
             System.out.printf ("        Id: %s \n",SxcPersistence.extractApplicationMessageStringId(appMessage.getApplicationMessageId()));
@@ -260,19 +264,27 @@ public final class App {
             byte[] bpm = appMessage.getBusinessProcessMessage().toByteArray();
 
             try  { Any any = Any.parseFrom(bpm);
-                if (any.is(ConfirmProof.class)){
-                    ConfirmProof cf = any.unpack(ConfirmProof.class);
+            if (any.is(RequestProof.class)){
+                System.out.println("        Echo of  proof request received. Awaiting replies. ");
 
-                    cf.getProofList().forEach(verifiedMessage ->{
-                        System.out.printf("        Message verification result: %s \n",
-                                verifiedMessage.getVerificationOutcome().name()
-                        );
-                    });
-                }
+            } else if (any.is(ConfirmProof.class)){
+                ConfirmProof cf = any.unpack(ConfirmProof.class);
+
+                cf.getProofList().forEach(verifiedMessage ->{
+                    System.out.printf("        Message verification result: %s \n",
+                            verifiedMessage.getVerificationOutcome().name()
+                    );
+                });
+
+            } else {
+
+            }
 
             } catch (InvalidProtocolBufferException e){
                 System.out.println("why here");
             }
+
+
 
             System.out.printf("        Encryption random: %s \n",
                     StringUtils.byteArrayToHexString(
@@ -293,6 +305,7 @@ public final class App {
         }
 
     }
+
 
     private static void showThreadList() {
         Ansi.print("(cyan)Known threads(reset)");

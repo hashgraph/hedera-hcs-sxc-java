@@ -40,7 +40,7 @@
 
     </dependencies>
     <build>
-        <sourceDirectory>src</sourceDirectory>
+        <sourceDirectory>src/main/java</sourceDirectory>
         <extensions>
             <extension>
                 <groupId>kr.motd.maven</groupId>

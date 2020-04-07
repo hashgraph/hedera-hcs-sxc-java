@@ -28,7 +28,9 @@ hs_err_pid*
 .settings
 
 # compiled output
-/dist
+dist/
+target/
+bin/
 /tmp
 /out-tsc
 # Only exists if Bazel was run
@@ -42,13 +44,19 @@ chrome-profiler-events*.json
 speed-measure-plugin*.json
 
 # IDEs and editors
-/.idea
-.project
+.idea/
+*.iml
 .classpath
 .c9/
 *.launch
 .settings/
 *.sublime-workspace
+.editorconfig
+nbproject/
+.project/
+nb-configuration.xml
+org.eclipse.jdt.core.prefs
+nbactions.xml
 
 # IDE - VSCode
 .vscode/*
@@ -72,81 +80,24 @@ testem.log
 .DS_Store
 Thumbs.db
 
-hcs-sxc-java-relay/target
-hcs-sxc-java-relay/bin
-hcs-sxc-java-relay/.project
-hcs-sxc-java-relay/.settings
 
-hcs-sxc-java-core/.idea/
-hcs-sxc-java-core/target/
-hcs-sxc-java-core/hcslib.iml
-hcs-sxc-java-core/hcscore.iml
-hcs-sxc-java-core/.classpath
-hcs-sxc-java-core/.project
-hcs-sxc-java-core/.settings
-hcs-sxc-java-core/bin
-hcs-sxc-java-core/nbproject/
-hcs-sxc-java-core/nb-configuration.xml
-
-nb-configuration.xml
-org.eclipse.jdt.core.prefs
-/hcs-sxc-java-proto/.settings
-/nbactions.xml
-
-/hcs-sxc-java-plugins/hcs-sxc-java-plugins-persistence-in-memory/.settings
-hcs-sxc-java-plugins/hcs-sxc-java-plugins-mirror-direct/target
-hcs-sxc-java-plugins/hcs-sxc-java-plugins-mirror-queue-artemis/target
-hcs-sxc-java-plugins/hcs-sxc-java-plugins-persistence-hibernate/target
-hcs-sxc-java-plugins/hcs-sxc-java-plugins-persistence-in-memory/target
-hcs-sxc-java-plugins/.settings/org.eclipse.core.resources.prefs
-
-hcs-sxc-java-interfaces/target
-
-hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/nbactions-fatjar.xml
-hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/nbactions.xml
-hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/src/main/resources/config.yaml
-hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/target
-hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/h2data
-
-hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/target
-hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/.settings
-hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/.project
-hcs-sxc-java-examples/.settings
-
-hcs-sxc-java-proto/target
-hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/src/main/resources/config.yaml
-hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/config.yaml
-hcs-sxc-java-relay/config/relay-config.yaml
-hcs-sxc-java-queue/config/queue-config.yaml
-hcs-sxc-java-plugins/hcs-sxc-java-plugins-mirror-queue-artemis/config/queue-config.yaml
-hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/config.yaml
-hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/queue-config.yaml
-hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/relay-config.yaml
-hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/apps.yaml
+nbactions-fatjar.xml
+config.yaml
+queue-config.yaml
+relay-config.yaml
+apps.yaml
 hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/docker-compose.yml
-hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/lastConsensusTime.txt
+lastConsensusTime.txt
 hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/docker-compose.yml
 hcs-sxc-java-basics
-hcs-sxc-java-coverage/target
-/hcs-sxc-java-plugins/hcs-sxc-java-plugins-cryptography/nbproject/
-/hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/nbproject/
-/hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/nbproject/
+.envPlayer-0
 .envPlayer-1
-hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/.envPlayer-0
-hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/.envPlayer-2
-hcs-sxc-java-examples/hcs-sxc-java-simple-message-demo/config/contact-list.yaml
-hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/contact-list.yaml
-hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/contact-list.yaml
+.envPlayer-2
+contact-list.yaml
 
-hcs-sxc-java-examples/hcs-sxc-java-token-demo/.idea
+.idea
 hcs-sxc-java-examples/hcs-sxc-java-token-demo/build.sh
-hcs-sxc-java-examples/hcs-sxc-java-token-demo/config/alice.env
-hcs-sxc-java-examples/hcs-sxc-java-token-demo/config/bob.env
-hcs-sxc-java-examples/hcs-sxc-java-token-demo/config/carlos.env
-hcs-sxc-java-examples/hcs-sxc-java-token-demo/config/config.yaml
-hcs-sxc-java-examples/hcs-sxc-java-token-demo/config/default.env
-hcs-sxc-java-examples/hcs-sxc-java-token-demo/h2data
+*.env
+config.yaml
+h2data/
 hcs-sxc-java-examples/hcs-sxc-java-token-demo/hcs-sxc-token-demo
-hcs-sxc-java-examples/hcs-sxc-java-token-demo/js/.editorconfig
-hcs-sxc-java-examples/hcs-sxc-java-token-demo/js/node_modules
-hcs-sxc-java-examples/hcs-sxc-java-token-demo/target

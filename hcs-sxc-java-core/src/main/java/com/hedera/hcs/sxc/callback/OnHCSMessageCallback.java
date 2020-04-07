@@ -539,7 +539,8 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
 
                                 } finally {
                                     notifyObservers(
-                                              appMessage.getBusinessProcessMessage().toByteArray()
+                                            sxcConsensusMesssage
+                                            ,  appMessage.getBusinessProcessMessage().toByteArray()
                                             , appMessage.getApplicationMessageId());
                                 }
                             } else { // the message was encrypted and not sent to me.

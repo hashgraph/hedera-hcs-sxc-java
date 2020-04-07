@@ -244,6 +244,8 @@ public final class App {
             System.out.printf ("    applicationMessageId: %s \n",applicationMessageEntity.getApplicationMessageId());
             System.out.printf ("    last chrono chunk consensus sequenceNum: %s \n",applicationMessageEntity.getLastChronoPartSequenceNum());
             System.out.printf ("    last chrono chunk consensus running hash: %s \n",applicationMessageEntity.getLastChronoPartRunningHashHEX());
+             System.out.printf("    last chrono chunk consensus timestamp: %s \n", applicationMessageEntity.getLastChronoPartConsensusTimestamp());
+           
             System.out.println("    ApplicationMessage: ");
             ApplicationMessage appMessage = ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage());
             System.out.printf ("        Id: %s \n",SxcPersistence.extractApplicationMessageStringId(appMessage.getApplicationMessageId()));

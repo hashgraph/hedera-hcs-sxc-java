@@ -4,7 +4,11 @@ Besides bug fixes, some features may have changed with this release which need y
 
 ## April 6th 2020
 
-* It is now possible to override encryption in code (this is not longer entirely dictated by the config.yaml flag)
+* Addition of a tokenization demo
+
+## March 28th 2020
+
+* It is now possible to override configured encryption in code when sending a message to HCS via HCS-SXC.
 
 ## March 25th 2020
 

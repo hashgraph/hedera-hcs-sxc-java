@@ -1,0 +1,78 @@
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="card my-4">
+        <div class="card-body">
+          <a class="btn btn-info" (click)="refresh()">Reload</a>
+            <table class="table">
+              <tbody>
+              <tr (click)="chooseToken(token.id)" *ngFor="let token of tokens">
+                <td>{{ token.name }}</td>
+              </tr>
+            </table>
+        </div>
+      </div>
+    </div>
+    <div class="col" *ngIf="currentToken.name">
+      <div class="card my-4">
+        <div class="card-body">
+          <div>
+            <H2>{{ currentToken.name }}</H2>
+            <table class="table">
+              <tbody>
+              <tr>
+                <td>Symbol:</td><td>{{ currentToken.symbol }}</td>
+              </tr>
+              <tr>
+                <td>Owner:</td><td>{{ currentToken.owner }}</td>
+              </tr>
+              <tr>
+                <td>Balance:</td><td>{{ currentToken.balance }}</td>
+              </tr>
+              <tr>
+                <td>Cap:</td><td>{{ currentToken.cap }}</td>
+              </tr>
+              <tr>
+                <td>Quantity:</td><td>{{ currentToken.quantity }}</td>
+              </tr>
+              <tr>
+                <td>Decimals:</td><td>{{ currentToken.decimals }}</td>
+              </tr>
+              <tr>
+                <td>Paused:</td><td>{{ currentToken.paused ? 'Yes' :'No' }}</td>
+              </tr>
+              <tr>
+                <td>isTransferable:</td><td>{{ currentToken.transferable ? 'Yes' :'No' }}</td>
+              </tr>
+              <tr>
+                <td>Burnable:</td><td>{{ currentToken.burnable ? 'Yes' :'No' }}</td>
+              </tr>
+              <tr>
+                <td>Mintable:</td><td>{{ currentToken.mintable ? 'Yes' :'No' }}</td>
+              </tr>
+              <tr>
+                <td>Divisible:</td><td>{{ currentToken.divisible ? 'Yes' :'No' }}</td>
+              </tr>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="col" *ngIf="currentToken.name">
+      <div class="card my-4">
+        <div class="card-body">
+          <div>
+            <H2>Balances</H2>
+            <table class="table">
+              <tbody>
+              <tr *ngFor="let balanceItem of balances">
+                <td>{{ balanceItem.user }}</td><td>{{ balanceItem.balance }}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+</div>

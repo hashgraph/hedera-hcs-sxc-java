@@ -26,7 +26,7 @@ import com.hedera.hcs.sxc.proto.ApplicationMessageID;
 
 public interface HCSCallBackFromMirror {
     public void addObserver(HCSCallBackToAppInterface listener);
-    public void notifyObservers(byte[] message, ApplicationMessageID applicationMessageId);
+    public void notifyObservers(SxcConsensusMessage sxcConsensusMessage, byte[] message, ApplicationMessageID applicationMessageId);
     public void storeMirrorResponse(SxcConsensusMessage consensusMessage);
     public void partialMessage(ApplicationMessageChunk messagePart, SxcConsensusMessage sxcConsensusMessage); 
 }

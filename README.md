@@ -96,6 +96,7 @@ Looking through the java project, we have the following Maven components/artifac
     * hcs-sxc-java-examples
         * hcs-sxc-java-simple-message-demo
         * hcs-sxc-java-settlement-demo
+        * hcs-sxc-java-token-demo
     * hcs-sxc-java-proto
     * hcs-sxc-java-plugins
         * hcs-sxc-java-plugins-encryption-diffie-hellman
@@ -557,7 +558,7 @@ You may need to setup environment variables to match those in the `.env` and `do
 
 ## Examples
 
-The project comes with two examples to get you started, these are fully functional examples. The first `hcs-sxc-java-simple-message-demo` is a simple command line example where running two instances of the application side by side, you can witness that a message sent from one app is reflected in the other. The first app sends the message to Hedera and the second receives it via a subscription to a mirror node. The opposite also works. The second example `hcs-sxc-java-settlement-demo` is a more complex application which is based on spring boot with a web UI. Each instance of the application represents a participant in a settlement use case where participants can issue credit notes to each other, approve them, group them to reach a settlement amount, employ a third party to effect the payment and finally both original parties confirm the payment was completed. In addition to this, an audit log is provided so that the full history of messages between participants can be consulted.
+The project comes with two examples to get you started, these are fully functional examples. The first `hcs-sxc-java-simple-message-demo` is a simple command line example where running two instances of the application side by side, you can witness that a message sent from one app is reflected in the other. The first app sends the message to Hedera and the second receives it via a subscription to a mirror node. The opposite also works. The second example `hcs-sxc-java-settlement-demo` is a more complex application which is based on spring boot with a web UI. Each instance of the application represents a participant in a settlement use case where participants can issue credit notes to each other, approve them, group them to reach a settlement amount, employ a third party to effect the payment and finally both original parties confirm the payment was completed. In addition to this, an audit log is provided so that the full history of messages between participants can be consulted. The third example is a token on HCS demo.
 
 ### hcs-sxc-java-simple-message-demo
 
@@ -853,6 +854,11 @@ You can override the port by setting:
 The demo provides helper functions to delete save and restore the local demo database however, these have undefined behavior when `hcs-sxc-plugins-persistence-in-memory` is chosen.
 
 You can also specify these `-D` input values in your IDE so that you can run several instances of the application in the IDE, this can help when debugging. To enable the debugger use the `-Djpda.listen=maven` flag.
+
+### hcs-sxc-java-token-demo
+
+This is a token demonstration showing how a token can be modeled in an HCS app net. It includes a java back end for the app net nodes, and a UI (Angular) for user interaction.
+Please refer to the README.md file in the sub-project for details.
 
 ## Contributing
 

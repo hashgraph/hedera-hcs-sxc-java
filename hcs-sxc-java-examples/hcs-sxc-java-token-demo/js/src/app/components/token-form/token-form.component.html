@@ -1,0 +1,48 @@
+<div class="card my-6">
+  <div class="card-body">
+    <form (ngSubmit)="onSubmit()" #tokenForm="ngForm">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" [(ngModel)]="token.name"
+               class="form-control"
+               id="name"
+               name="name"
+               placeholder="Enter token name"
+               required #name="ngModel">
+        <div [hidden]="!name.pristine" class="alert alert-danger">Name is required</div>
+
+        <label for="symbol">Symbol</label>
+        <input type="text" [(ngModel)]="token.symbol"
+             class="form-control"
+             id="symbol"
+             name="symbol"
+             placeholder="Enter token symbol"
+             required #symbol="ngModel">
+        <div [hidden]="!symbol.pristine" class="alert alert-danger">Symbol is required</div>
+
+        <label for="cap">Cap</label>
+        <input type="text" [(ngModel)]="token.cap"
+             class="form-control"
+             id="cap"
+             name="cap"
+             placeholder="Enter token cap"
+             required #cap="ngModel">
+        <div [hidden]="!cap.pristine" class="alert alert-danger">Cap is required</div>
+
+        <label for="decimals">Decimals</label>
+        <input type="text" [(ngModel)]="token.decimals"
+             class="form-control"
+             id="decimals"
+             name="decimals"
+             placeholder="Enter token decimals"
+             required #decimals="ngModel">
+        <div [hidden]="!decimals.pristine" class="alert alert-danger">Decimals are required</div>
+
+        <div>Owner: {{ currentUser.name }}</div>
+        <div>Template: Demo Token Template</div>
+      </div>
+      <button type="submit" [disabled]="!tokenForm.form.valid"
+              class="btn btn-success">Create</button>
+    </form>
+  </div>
+</div>

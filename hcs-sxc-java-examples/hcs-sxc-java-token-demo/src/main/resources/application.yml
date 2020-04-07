@@ -1,0 +1,57 @@
+hedera:
+  db:
+    name: hcs-token-demo
+    password: password
+  app:
+    configFile: ./config/config.yaml
+    environmentFilePath: ./config/
+logging:
+  level:
+    root: error
+    #io.grpc: info
+    #org.apache: info
+    #org.flywaydb.core.internal.command.DbMigrate: info
+    #com.hedera.hcs.sxc: debug
+    #org.hibernate.SQL: info
+    org.springframework.jdbc.core.JdbcTemplate: off
+    org.springframework.jdbc.core.StatementCreatorUtils: off
+    #org.hibernate.type.BasicTypeRegistry: info
+    #org.hibernate.type.descriptor.sql.BasicBinder: trace
+    #org.springframework: error
+    #com.zaxxer.hikari: error
+spring:
+  main:
+    web-environment: true
+  application:
+    name: hedera-hcs-token-demo
+    version: 0.0.3
+    licenceYear: 2020
+  database:
+     driverClassName: ${hedera.db.driver}
+  datasource:
+    name: ${hedera.db.name}
+    username: ${app.user}
+    password: ${hedera.db.password}
+    url: jdbc:h2:./h2data/${hedera.db.name}:${app.user}
+  h2:
+    console:
+      enabled: true       
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    connectRetries: 10
+    baselineOnMigrate: true
+    baselineVersion: 0
+    ignoreMissingMigrations: true
+  jpa:
+    database: H2
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+# -- contextual colors ----------------------------------------
+shell:
+  out:
+    info: CYAN
+    success: GREEN
+    warning: YELLOW
+    error: RED

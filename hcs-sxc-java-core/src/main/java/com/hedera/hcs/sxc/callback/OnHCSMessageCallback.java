@@ -196,8 +196,9 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
 
                 ApplicationMessage appMessage = messageEnvelopeOptional.get();
 
+                System.out.println(appMessage.getEncryptionRandom());
                 if(this.encryptMessagesFromCore  // configuration wants encryption
-                        || appMessage.getEncryptionRandom() != null  // configuration may not want encryption but message can still be encrypted
+                        || ( ! appMessage.getEncryptionRandom().isEmpty())  // configuration may not want encryption but message can still be encrypted
                 ){
 
                     try {

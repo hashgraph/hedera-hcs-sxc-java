@@ -2,12 +2,9 @@ package com.hedera.hcs.sxc.mq.generator;
 
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
-import org.apache.commons.codec.digest.DigestUtils;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import static org.apache.commons.codec.digest.MessageDigestAlgorithms.SHA_384;
 
 public class Data {
     private static final Lorem lorem = LoremIpsum.getInstance();

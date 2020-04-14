@@ -6,3 +6,5 @@ queue:
   host: localhost
   user: guest
   password: guest
+  iterations: 10 # 0 for infinite
+  delayMillis: 1000 # delay between each message

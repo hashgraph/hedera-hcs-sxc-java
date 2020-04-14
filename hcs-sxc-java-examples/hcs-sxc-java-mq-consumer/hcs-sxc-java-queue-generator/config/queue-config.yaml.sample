@@ -2,10 +2,9 @@
 queue:
   exchangeName: testExchange
   consumerTag: myConsumerTag
-  producerTag: myProducerTag
+  producerTag: myProducerTag # leave blank to prevent republishing to a queue
   host: localhost
   user: guest
   password: guest
-  port: 5672
   iterations: 10 # 0 for infinite
   delayMillis: 1000 # delay between each message

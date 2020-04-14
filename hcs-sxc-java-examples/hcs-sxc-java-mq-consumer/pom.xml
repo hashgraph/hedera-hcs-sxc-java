@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.hedera</groupId>
+        <artifactId>hcs-sxc-java-examples</artifactId>
+        <version>0.0.3-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>hcs-sxc-java-mq-consumer</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>hcs-sxc-java-queue-listener</module>
+        <module>hcs-sxc-java-queue-generator</module>
+    </modules>
+
+    <organization>
+        <name>Hedera Hashgraph, LLC</name>
+        <url>https://hedera.com</url>
+    </organization>
+
+    <properties>
+        <amqp-client.version>5.8.0</amqp-client.version>
+        <lorem.version>2.1</lorem.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.thedeanda</groupId>
+            <artifactId>lorem</artifactId>
+            <version>${lorem.version}</version>
+        </dependency>
+
+        <!-- PLUGINS -->
+        <dependency>
+            <groupId>com.hedera</groupId>
+            <artifactId>hcs-sxc-java-plugins-persistence-in-memory</artifactId>
+            <version>0.0.3-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hedera</groupId>
+            <artifactId>hcs-sxc-java-plugins-mirror-direct</artifactId>
+            <version>0.0.3-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
+            <version>${amqp-client.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hedera</groupId>
+            <artifactId>hcs-sxc-java-plugins-encryption-diffie-hellman
+            </artifactId>
+            <version>0.0.3-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+</project>

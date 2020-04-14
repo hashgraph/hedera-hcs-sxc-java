@@ -127,6 +127,8 @@
                             <sources>
                                 <source>src/main/proto</source>
                                 <source>src/main/java</source>
+                                <source>target/generated-sources/protobuf/java</source>
+                                <path>static</path>
                             </sources>
                         </configuration>
                     </execution>
@@ -138,24 +140,15 @@
                 <version>${spring-boot.version}</version>
                 <configuration>
                     <executable>true</executable>
-                </configuration>                
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
+                </configuration>
                 <executions>
                     <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
                         <configuration>
-                            <sources>
-                                <source>src/main/proto</source>
-                                <source>target/generated-sources/protobuf/java</source>
-                                <path>static</path>
-                            </sources>
+                            <mainClass>com.hedera.tokendemo.Application</mainClass>
                         </configuration>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -171,21 +164,6 @@
                     <execution>
                         <goals>
                             <goal>compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot.version}</version>
-                <configuration>
-                    <mainClass>com.hedera.tokendemo.Application</mainClass>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
                         </goals>
                     </execution>
                 </executions>

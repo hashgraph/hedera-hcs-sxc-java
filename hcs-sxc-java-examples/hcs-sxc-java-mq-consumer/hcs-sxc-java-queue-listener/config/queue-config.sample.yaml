@@ -1,0 +1,8 @@
+# Connection details to the MQ component
+queue:
+  exchangeName: testExchange
+  consumerTag: myConsumerTag
+  producerTag: myProducerTag
+  host: localhost
+  user: guest
+  password: guest

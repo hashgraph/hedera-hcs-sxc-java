@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <groupId>com.hedera</groupId>
+    <artifactId>hcs-sxc-java-mq-consumer</artifactId>
+    <version>0.0.3-SNAPSHOT</version>
+    <description>HCS SDK eXtension Components</description>
+    <inceptionYear>2019</inceptionYear>
+    <modelVersion>4.0.0</modelVersion>
+    <name>hcs-sxc-java-mq-consumer</name>
+    <packaging>pom</packaging>
+    <url>https://github.com/hashgraph/hedera-hcs-sxc-java</url>
+
+    <ciManagement>
+        <system>CircleCI</system>
+        <url>https://circleci.com/gh/hashgraph/hedera-hcs-sxc</url>
+    </ciManagement>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/hashgraph/hedera-hcs-sxc/issues</url>
+    </issueManagement>
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <modules>
+        <module>hcs-sxc-java-queue-listener</module>
+        <module>hcs-sxc-java-queue-generator</module>
+    </modules>
+
+    <organization>
+        <name>Hedera Hashgraph, LLC</name>
+        <url>https://hedera.com</url>
+    </organization>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>10</maven.compiler.source>
+        <maven.compiler.target>10</maven.compiler.target>
+        <java.version>10</java.version>
+
+        <jib.version>1.7.0</jib.version>
+        <lombok.version>1.18.10</lombok.version>
+        <snakeyaml.version>1.23</snakeyaml.version>
+        <amqp-client.version>5.8.0</amqp-client.version>
+        <log4j.version>2.12.1</log4j.version>
+        <lorem.version>2.1</lorem.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <org.ow2.asm.version>7.3.1</org.ow2.asm.version>
+        <maven-shade-plugin.version>3.2.0</maven-shade-plugin.version>
+        <maven-jar-plugin.version>3.1.2</maven-jar-plugin.version>
+    </properties>
+
+    <scm>
+        <connection>https://github.com/hashgraph/hedera-hcs-sxc.git</connection>
+        <tag>master</tag>
+        <url>https://github.com/hashgraph/hedera-hcs-sxc/tree/master</url>
+    </scm>
+
+    <dependencies>
+    <dependency>
+        <groupId>com.thedeanda</groupId>
+        <artifactId>lorem</artifactId>
+        <version>${lorem.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <scope>provided</scope>
+        <version>${lombok.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.yaml</groupId>
+        <artifactId>snakeyaml</artifactId>
+        <version>${snakeyaml.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>${log4j.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>com.hedera</groupId>
+        <artifactId>hcs-sxc-java-core</artifactId>
+        <version>0.0.3-SNAPSHOT</version>
+    </dependency>
+
+        <!-- PLUGINS -->
+    <dependency>
+        <groupId>com.hedera</groupId>
+        <artifactId>hcs-sxc-java-plugins-persistence-in-memory</artifactId>
+        <version>0.0.3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+        <groupId>com.hedera</groupId>
+        <artifactId>hcs-sxc-java-plugins-mirror-direct</artifactId>
+        <version>0.0.3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+        <groupId>com.rabbitmq</groupId>
+        <artifactId>amqp-client</artifactId>
+        <version>${amqp-client.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.ow2.asm</groupId>
+        <artifactId>asm</artifactId>
+        <version>${org.ow2.asm.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>com.hedera</groupId>
+        <artifactId>hcs-sxc-java-plugins-encryption-diffie-hellman
+        </artifactId>
+        <version>0.0.3-SNAPSHOT</version>
+    </dependency>
+    </dependencies>
+</project>

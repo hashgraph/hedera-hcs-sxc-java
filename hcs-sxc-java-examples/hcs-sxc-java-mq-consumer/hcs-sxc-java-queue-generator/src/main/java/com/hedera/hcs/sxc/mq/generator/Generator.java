@@ -5,12 +5,10 @@ import com.hedera.hcs.sxc.mq.generator.config.Queue;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-@Log4j2
 public final class Generator {
 
     public static void main(String[] args) throws InterruptedException, IOException {
@@ -23,7 +21,6 @@ public final class Generator {
 
             ConnectionFactory factory = new ConnectionFactory();
             factory.setHost(queueConfig.getHost());
-            factory.setPort(queueConfig.getPort());
             if ( ! queueConfig.getUser().isEmpty()) {
                 factory.setUsername(queueConfig.getUser());
             }
@@ -33,7 +30,6 @@ public final class Generator {
 
             try (Connection connection = factory.newConnection();
                 Channel channel = connection.createChannel()) {
-                //channel.queueDeclare(queueConfig.getName(), false, false, false, null);
                 channel.exchangeDeclare(queueConfig.getExchangeName(), "topic");
 
                 do {

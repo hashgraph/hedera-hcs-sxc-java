@@ -7,7 +7,6 @@ public final class Queue {
     private String host = "";
     private String user = "";
     private String password = "";
-    private int port = 0;
     private int iterations = 0;
     private int delayMillis = 2;
 
@@ -53,12 +52,6 @@ public final class Queue {
     }
     public void setPassword(String password) {
         this.password = password;
-    }
-    public int getPort() {
-        return this.port;
-    }
-    public void setPort(int port) {
-        this.port = port;
     }
     public int getIterations() {
         return this.iterations;

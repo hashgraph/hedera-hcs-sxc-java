@@ -89,7 +89,7 @@
                         <image>gcr.io/distroless/java:11</image>
                     </from>
                     <to>
-                        <image>hederahashgraph/hcs-sxc-java-queue-generator:latest</image>
+                        <image>${docker.push.repository}/hcs-sxc-java-queue-generator:latest</image>
                         <tags>
                             <tag>${project.version}</tag>
                         </tags>

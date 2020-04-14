@@ -33,7 +33,7 @@
                     <dependency>
                         <groupId>org.ow2.asm</groupId>
                         <artifactId>asm</artifactId>
-                        <version>${org.ow2.asm.version}</version>
+                        <version>${asm.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>

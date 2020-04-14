@@ -56,7 +56,7 @@
 
         <!-- dependencies -->
         <artemis-jms-client-all.version>2.10.1</artemis-jms-client-all.version>
-        <asm.version>6.2</asm.version>
+        <asm.version>7.3.1</asm.version>
 
         <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
 
@@ -267,7 +267,7 @@
                         <dependency>
                             <groupId>org.ow2.asm</groupId>
                             <artifactId>asm</artifactId>
-                            <version>${asm.version}</version> <!-- Use newer version of ASM -->
+                            <version>${asm.version}</version>
                         </dependency>
                     </dependencies>
                 </plugin>

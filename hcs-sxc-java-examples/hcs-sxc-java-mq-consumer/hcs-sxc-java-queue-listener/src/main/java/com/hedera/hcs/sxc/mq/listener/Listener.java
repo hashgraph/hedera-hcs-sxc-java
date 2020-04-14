@@ -6,6 +6,7 @@ import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
 import com.hedera.hcs.sxc.commonobjects.HCSResponse;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
+import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcs.sxc.mq.listener.config.AppData;
 import com.hedera.hcs.sxc.mq.listener.config.Config;
@@ -51,7 +52,7 @@ public class Listener {
         
         // create a callback object to receive the message
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(AppData.getHCSCore());
-        onHCSMessageCallback.addObserver((HCSResponse hcsResponse) -> {
+        onHCSMessageCallback.addObserver((SxcConsensusMessage sxcConsensusMesssage, HCSResponse hcsResponse) -> {
             // handle notification in mirrorNotification
             System.out.println("got hcs response - feeding back to out queue");
             //printVerboseDetails(hcsCore, hcsResponse);

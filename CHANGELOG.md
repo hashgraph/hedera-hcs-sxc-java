@@ -2,6 +2,10 @@
 
 Besides bug fixes, some features may have changed with this release which need your attention, these will be listed here.
 
+## April 14th 2020
+
+* Addition of an MQ Consumer demo
+
 ## April 6th 2020
 
 * Addition of a tokenization demo

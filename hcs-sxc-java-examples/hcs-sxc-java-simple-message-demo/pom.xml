@@ -40,7 +40,7 @@
 
     </dependencies>
     <build>
-        <sourceDirectory>src</sourceDirectory>
+        <sourceDirectory>src/main/java</sourceDirectory>
         <extensions>
             <extension>
                 <groupId>kr.motd.maven</groupId>
@@ -96,7 +96,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>main.java.com.hedera.hcsapp.App</mainClass>
+                            <mainClass>com.hedera.hcsapp.App</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

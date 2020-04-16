@@ -1,0 +1,19 @@
+<div class="card my-6">
+  <div class="card-body">
+    <H1>Burning token: {{ currentToken.name }}</H1>
+    <form (ngSubmit)="onSubmit()" #tokenBurn="ngForm">
+      <div class="form-group">
+        <label for="qty">Quantity to burn (0 to burn all available)</label>
+        <input type="text" [(ngModel)]="quantity"
+               class="form-control"
+               id="qty"
+               name="quantity"
+               placeholder="Quantity to burn (0 to burn all available)"
+               required #qty="ngModel">
+        <div [hidden]="!qty.pristine" class="alert alert-danger">Quantity is required</div>
+      </div>
+      <button type="submit" [disabled]="!tokenBurn.form.valid"
+              class="btn btn-success">Burn</button>
+    </form>
+  </div>
+</div>

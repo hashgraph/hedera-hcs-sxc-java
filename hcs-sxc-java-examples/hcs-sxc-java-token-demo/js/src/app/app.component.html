@@ -1,0 +1,54 @@
+<div class="card bg-dark my-6" *ngIf="currentUser">
+
+  <div class="card-body">
+    <div class="text-center text-white">
+      <h3 class="card-title text-center text-white py-3">Hi {{currentUser.name}}. {{ title }}</h3>
+    </div>
+    <ul class="text-center list-inline py-3">
+      <li class="list-inline-item">
+        <a routerLink="/tokens" class="btn btn-info">List Tokens</a>
+      </li>
+      <li class="list-inline-item" *ngIf="currentUser.name=='Controller'">
+        <a routerLink="/addtoken" class="btn btn-info">Add Token</a>
+      </li>
+      <li class="list-inline-item" *ngIf="currentUser.name=='Controller' && currentToken.name">
+        <a routerLink="/mintToken" class="btn btn-info">Mint Token</a>
+      </li>
+      <li class="list-inline-item" *ngIf="currentUser.name=='Controller' && currentToken.name">
+        <a routerLink="/burnToken" class="btn btn-info">Burn Token</a>
+      </li>
+      <li class="list-inline-item" *ngIf="currentUser.name.includes('Controller') && currentToken.name">
+        <a routerLink="/transfer" class="btn btn-info">Transfer Tokens from Treasury</a>
+      </li>
+      <li class="list-inline-item" *ngIf="!(currentUser.name.includes('Controller')) && currentToken.name">
+        <a routerLink="/transferFrom" class="btn btn-info">Transfer Tokens from your account</a>
+      </li>
+      <li class="list-inline-item">
+        <a routerLink="/operations" class="btn btn-info">Operations History</a>
+      </li>
+
+
+      <li class="list-inline-item">
+        <a class="btn btn-info" (click)="logout()">Logout</a>
+      </li>
+    </ul>
+  </div>
+  <div class="text-center text-white">
+    <a class="text-white" href="https://explorer.kabuto.sh/testnet/id/{{ topicId }}" target="_blank">Mirror Explorer for Topic Id {{ topicId }}</a>
+    -
+    <a class="text-white" href="https://github.com/hashgraph" target="_blank">Hedera Hashgraph GitHub</a>
+  </div>
+
+</div>
+
+<!-- main app container -->
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-9 offset-sm-1">
+        <alert></alert>
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </div>
+</div>

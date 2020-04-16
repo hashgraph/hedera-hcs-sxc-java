@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package FixedWholeFungible;
+
+import "artifacts/base/tokens.proto";
+import "google/protobuf/any.proto";
+
+option csharp_namespace = "TTI.TTF.TokenTemplates.FixedWholeFungible";
+option java_package = "org.tti.ttf.TokenTemplates.FixedWholeFungible";
+option java_multiple_files = true;

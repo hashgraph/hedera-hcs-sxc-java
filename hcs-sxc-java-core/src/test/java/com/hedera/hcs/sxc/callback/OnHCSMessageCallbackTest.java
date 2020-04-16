@@ -71,8 +71,8 @@ public class OnHCSMessageCallbackTest {
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
         
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(hcsCore);
-        onHCSMessageCallback.addObserver(hcsMessage -> {
-            processHCSMessage(hcsMessage);
+        onHCSMessageCallback.addObserver((sxcConsensusMesssage, hcsResponse) ->  {
+            processHCSMessage(sxcConsensusMesssage, hcsResponse);
         });
         ApplicationMessageID applicationMessageID = ApplicationMessageID.newBuilder()
                 .setAccountID(AccountID.newBuilder()
@@ -87,10 +87,10 @@ public class OnHCSMessageCallbackTest {
                         .build()
                 ).build();        
         
-        onHCSMessageCallback.notifyObservers("notification".getBytes(), applicationMessageID);
+        onHCSMessageCallback.notifyObservers(null, "notification".getBytes(), applicationMessageID);
     }
     
-    public void processHCSMessage(HCSResponse hcsResponse) {
+    public void processHCSMessage(SxcConsensusMessage sxcConsensusMessage, HCSResponse hcsResponse) {
     }
     
     @Test

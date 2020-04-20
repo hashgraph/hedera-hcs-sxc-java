@@ -779,7 +779,7 @@ Now refer to the `without relay and queue` instructions for running the player a
 
 This example connects a listener to a Rabbit MQ server and messages arrive on the queue, they are sent to HCS as a Consensus Submit transaction. Optionally, the listener can publish the resulting mirror node notification back to another queue.
 
-Refer to the example's own README.md for additional details.
+Refer to the example's own  [README.md](./hcs-sxc-java-examples/hcs-sxc-java-mq-consumer/README.md) for additional details.
 
 ### hcs-sxc-java-settlement-demo
 

@@ -1,0 +1,148 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Hello Hedera HCS <--> RabbitMQ</title>
+    <link rel="stylesheet" href="index.css"></link>
+  	<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  	<script src="stomp.js"></script>
+  	<script src="config.js"></script>
+  </head>
+  <body>
+    <div class="chat">
+      <div class="side-panel">
+        <h1 id="title">HCS RabbitMQ Demo ⚡️</h1>
+        <ul>
+          <li><a class="panel-link" href="http://localhost:9090" target="_blank">RabbitMQ Management Console</a></li>
+          <li><a class="panel-link" href="alice.html" target="_blank">Alice Chat</a></li>
+          <li><a class="panel-link" href="bob.html" target="_blank">Bob Chat</a></li>
+          <li><a class="panel-link" href="carol.html" target="_blank">Carol HCS Monitor</a></li>
+          <div style="border-top: 1px solid #ccc; margin:10px;"></div>
+          <li><a class="panel-link" href="https://docs.hedera.com/">Hedera  Docs</a></li>
+          <li><a class="panel-link"href="https://github.com/hashgraph/">GitHub</a></li>
+          <li><a class="panel-link"href="https://github.com/hashgraph/hedera-hcs-sxc-java">HCS-SXC Repo</a></li>
+          
+
+        </ul>
+      </div>
+      <div class="main-panel">
+        <div class="content">
+          <div class="header">
+            <div class="chat-details">
+              <h3 id="topic-id">Rabbitmq HCS Output Queue</h3>
+              <h4 id="sequence-number">Carol </h4>
+            </div>
+          </div>
+          <ul id="messages" style="margin-bottom: -10px;">
+          	<!--
+          	<li class="new-message">
+          		<div class="message">
+          			<p class="client">
+          				Guy1
+          				<div class="message-body">
+          					<div class="message-content">def</div>
+          					<div class="message-timestamp">received by MQ at</div>
+          				</div>
+          			</p>
+          		</div>
+          		<div class="meta">
+          			<p class="details">a</p>
+          			<p class="details">b</p>
+          			<p class="details">c</p>
+          		</div>
+          	</li>
+          -->
+          </ul>
+         
+        </div>
+      </div>
+      <div class="log-panel">
+      	
+          <div id="second" class="box" >
+		      <h2 style="padding:25px 0px 40px 0px">RabbitMQ STOMP Log</h2>
+		      <div></div>
+		  </div>
+     
+      </div>
+     
+    
+
+    <script>
+        var has_had_focus = false;
+        var pipeMessage = function(el_name, send) {
+        	var div  = $(el_name + ' ul');
+            var inp  = $(el_name + ' input');
+            var form = $(el_name + ' form');
+            var print = function(m, p) {
+                p = (p === undefined) ? '' : JSON.stringify(p);
+				div.append(
+			      $("<li>").addClass("new-message").append(
+			        $("<div>").addClass("message").append( 
+			          $("<p>").text(m.split("|")[3]).addClass("client")).append(
+			            $("<div>").addClass("message-body").append( 
+			              $("<div>").text(m.split("|")[4]).addClass("message-content")).append(
+			              $("<div>").text("received from mq: "+new Date().toLocaleString("en-UK")).addClass("message-timestamp")))).append(
+			        $("<div>").addClass("meta").append( 
+			          $("<p>").text("sequence no: " + m.split("|")[1]).addClass("details")).append(
+			          $("<p>").text("consensus time: \n"+ m.split("|")[2] ).addClass("details")).append(
+			          $("<a>").text("view transaction").addClass("details")
+			            .attr("target", "_blank")
+			            .attr("href", `https://explorer.kabuto.sh/testnet/topic/`+m.split("|")[0]+`/message/`+m.split("|")[1]))
+
+			           ) );
+			  		
+                div.scrollTop(div.scrollTop() + 10000);
+            };
+
+            return print;
+        	
+        }
+
+
+        var pipeLog = function(el_name, send) {
+            var div  = $(el_name + ' div');
+            var inp  = $(el_name + ' input');
+            var form = $(el_name + ' form');
+
+            var print = function(m, p) {
+                p = (p === undefined) ? '' : JSON.stringify(p);
+                div.append($("<code>").text(m + ' ' + p));
+                div.scrollTop(div.scrollTop() + 10000);
+            };
+
+            if (send) {
+                form.submit(function() {
+                    send(inp.val());
+                    inp.val('');
+                    return false;
+                });
+            }
+            return print;
+        };
+
+      // Stomp.js boilerplate
+      var client = Stomp.client('ws://localhost:15674/ws');
+      client.debug = pipeLog('#second');
+
+      var print_first = pipeMessage('.content', function(data) {
+          client.send('/exchange/'+exchange+'/'+producerTag, {"content-type":"text/plain"}, data);
+      });
+      var on_connect = function(x) {
+          id = client.subscribe('/exchange/'+exchange+'/'+producerTag, function(d) {
+               print_first(d.body);
+          });
+      };
+      var on_error =  function(e) {
+        console.log(e);
+      };
+      client.connect(username, password, on_connect, on_error, '/');
+
+      $('#m').focus(function() {
+          if (!has_had_focus) {
+              has_had_focus = true;
+              $(this).val("");
+          }
+      });
+    </script>
+
+  </body>
+</html>

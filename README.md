@@ -27,6 +27,14 @@ These components use the Hedera Java SDK to communicate with Hedera's HCS servic
     - Token example
     - MQ consumer example
 
+There are several demo included in this repository:
+
+- [Simple messaging between participants](#hcs-sxc-java-simple-message-demo) 
+- [Financial Settlement](#hcs-sxc-java-settlement-demo) 
+- [Listening and timestamping of RabbitMQ messages](#hcs-sxc-java-mq-consumer)
+- [Token demo](#hcs-sxc-java-token-demo)
+
+
 ## Terms and conditions
 
 Please review the [Hedera Terms and Conditions](https://www.hedera.com/terms) prior to using this software.
@@ -556,7 +564,7 @@ You may need to setup environment variables to match those in the `.env` and `do
 
 The project comes with two examples to get you started, these are fully functional examples. The first `hcs-sxc-java-simple-message-demo` is a simple command line example where running two instances of the application side by side, you can witness that a message sent from one app is reflected in the other. The first app sends the message to Hedera and the second receives it via a subscription to a mirror node. The opposite also works. The second example `hcs-sxc-java-settlement-demo` is a more complex application which is based on spring boot with a web UI. Each instance of the application represents a participant in a settlement use case where participants can issue credit notes to each other, approve them, group them to reach a settlement amount, employ a third party to effect the payment and finally both original parties confirm the payment was completed. In addition to this, an audit log is provided so that the full history of messages between participants can be consulted. The third example is a token on HCS demo.
 
-### hcs-sxc-java-simple-message-demo
+### hcs-sxc-java-simple-message-demo 
 
 This is a simple messaging demo between three participants. All messages sent from one participant are sent to the Hedera HCS service and each participant subscribes to a mirror node to receive the consensus messages.
 
@@ -771,7 +779,7 @@ Now refer to the `without relay and queue` instructions for running the player a
 
 This example connects a listener to a Rabbit MQ server and messages arrive on the queue, they are sent to HCS as a Consensus Submit transaction. Optionally, the listener can publish the resulting mirror node notification back to another queue.
 
-Refer to the example's own README.md for additional details.
+Refer to the example's own  [README.md](./hcs-sxc-java-examples/hcs-sxc-java-mq-consumer/README.md) for additional details.
 
 ### hcs-sxc-java-settlement-demo
 

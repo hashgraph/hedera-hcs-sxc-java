@@ -122,8 +122,9 @@ public class Listener {
             SxcApplicationMessageInterface applicationMessageEntity = hcsCore.getPersistence()
                     .getApplicationMessageEntity(
                             SxcPersistence.extractApplicationMessageStringId(hcsResponse.getApplicationMessageId()));
-            ret = "S:" + applicationMessageEntity.getLastChronoPartSequenceNum() + "T:"
-                    + applicationMessageEntity.getLastChronoPartConsensusTimestamp() + "M:"
+            ret =   hcsCore.getTopics().get(0).getTopic() + "|"
+                    + applicationMessageEntity.getLastChronoPartSequenceNum() + "|"
+                    + applicationMessageEntity.getLastChronoPartConsensusTimestamp() + "|"
                     + ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage())
                             .getBusinessProcessMessage().toString("UTF-8");
             ;

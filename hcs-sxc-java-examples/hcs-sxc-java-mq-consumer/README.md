@@ -107,4 +107,5 @@ When running `docker-compose up` the accompanied `Dockerfile` is consulted to bu
 See local README.md for instructions on how to run rabbit-mq without `docker-compose`.
 
 ## Web STOMP clients
-copy `webapp/config.js.sample` to `webapp/config.js` and click on `index.html` and `index2.html`. The files will be served from disk and should open in a browser automaticaly . Messages entered in `index.html` will be sent to HCS and the resulting HCS output will appear in `index2.html`.
+copy `webapp/config.js.sample` to `webapp/config.js` and click on `alice.html`, `bob.html` and `carol.html`. 
+The files will be served from disk and should open in a browser automaticaly . Messages entered in `alice.html` or `bob.html`  will be sent to each other, via the MQ, and to HCS for timestamping. The resulting HCS output will appear in `carol.html`.

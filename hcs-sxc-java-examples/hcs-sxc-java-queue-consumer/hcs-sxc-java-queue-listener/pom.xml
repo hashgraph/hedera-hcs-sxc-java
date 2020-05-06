@@ -69,7 +69,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>com.hedera.hcs.sxc.mq.listener.Application</mainClass>
+                    <mainClass>com.hedera.hcs.sxc.queue.Application</mainClass>
                 </configuration>
                 <executions>
                     <execution>
@@ -99,7 +99,7 @@
                         </paths>
                     </extraDirectories>
                     <container>
-                        <mainClass>com.hedera.hcs.sxc.mq.listener.Application</mainClass>
+                        <mainClass>com.hedera.hcs.sxc.queue.Application</mainClass>
                     </container>
                 </configuration>
                 <executions>

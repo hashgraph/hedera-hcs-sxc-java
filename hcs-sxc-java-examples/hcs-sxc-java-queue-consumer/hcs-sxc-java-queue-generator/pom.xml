@@ -86,7 +86,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.hedera.hcs.sxc.mq.generator.Generator</mainClass>
+                            <mainClass>com.hedera.hcs.sxc.queue.generator.Generator</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -110,7 +110,7 @@
                             <path>src/main/resources</path>
                         </paths>
                     </extraDirectories>
-                    <mainClass>com.hedera.hcs.sxc.mq.generator.Generator</mainClass>
+                    <mainClass>com.hedera.hcs.sxc.queue.generator.Generator</mainClass>
                 </configuration>
                 <executions>
                     <execution>

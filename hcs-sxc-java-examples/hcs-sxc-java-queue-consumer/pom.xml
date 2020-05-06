@@ -10,7 +10,7 @@
         <version>0.0.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>hcs-sxc-java-mq-consumer</artifactId>
+    <artifactId>hcs-sxc-java-queue-consumer</artifactId>
     <packaging>pom</packaging>
 
     <modules>

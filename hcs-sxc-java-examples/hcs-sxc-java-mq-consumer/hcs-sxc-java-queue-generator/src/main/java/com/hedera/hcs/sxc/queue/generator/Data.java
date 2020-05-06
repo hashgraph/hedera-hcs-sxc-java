@@ -1,4 +1,4 @@
-package com.hedera.hcs.sxc.mq.generator;
+package com.hedera.hcs.sxc.queue.generator;
 
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;

@@ -1,4 +1,4 @@
-package com.hedera.hcs.sxc.mq.generator.config;
+package com.hedera.hcs.sxc.queue.generator.config;
 
 import java.io.File;
 import java.io.FileInputStream;

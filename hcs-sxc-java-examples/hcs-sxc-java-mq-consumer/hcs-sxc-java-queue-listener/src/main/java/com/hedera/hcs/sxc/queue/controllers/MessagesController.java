@@ -1,11 +1,9 @@
-package com.hedera.hcs.sxc.mq.listener.controllers;
+package com.hedera.hcs.sxc.queue.controllers;
 
 import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
-import com.hedera.hcs.sxc.mq.listener.config.AppData;
+import com.hedera.hcs.sxc.queue.config.AppData;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
-import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
-
 import lombok.Data;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;

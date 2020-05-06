@@ -1,4 +1,4 @@
-package com.hedera.hcs.sxc.mq.generator.config;
+package com.hedera.hcs.sxc.queue.config;
 
 public final class YAMLConfig {
 

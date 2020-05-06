@@ -1,4 +1,4 @@
-package com.hedera.hcs.sxc.mq.generator.config;
+package com.hedera.hcs.sxc.queue.config;
 
 public final class Queue {
     private String exchangeName = "";
@@ -9,14 +9,15 @@ public final class Queue {
     private String password = "";
     private int iterations = 0;
     private int delayMillis = 2;
-
-
+    private int port = 5672;
+    private String provider = "";
+    
     public String getExchangeName() {
         return exchangeName;
     }
 
-    public void setExchangeName(String echangeName) {
-        this.exchangeName = echangeName;
+    public void setExchangeName(String exchangeName) {
+        this.exchangeName = exchangeName;
     }
 
     public String getConsumerTag() {
@@ -34,7 +35,7 @@ public final class Queue {
     public void setProducerTag(String producerTag) {
         this.producerTag = producerTag;
     }
-    
+
     public String getHost() {
         return this.host;
     }
@@ -62,5 +63,19 @@ public final class Queue {
     public int getDelayMillis() {
         return this.delayMillis;
     }
-    public void setDelayMillis(int delayMillis) { this.delayMillis = delayMillis; }
+    public void setDelayMillis(int delayMillis) { 
+        this.delayMillis = delayMillis; 
+    }
+    public int getPort() { 
+        return this.port;
+    }
+    public void setPort(int port) { 
+        this.port = port; 
+    }
+    public String getProvider() {
+        return this.provider;
+    }
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
 }

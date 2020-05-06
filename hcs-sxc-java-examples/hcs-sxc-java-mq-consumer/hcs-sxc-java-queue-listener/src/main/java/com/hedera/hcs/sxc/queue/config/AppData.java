@@ -1,4 +1,4 @@
-package com.hedera.hcs.sxc.mq.listener.config;
+package com.hedera.hcs.sxc.queue.config;
 
 import com.hedera.hcs.sxc.HCSCore;
 

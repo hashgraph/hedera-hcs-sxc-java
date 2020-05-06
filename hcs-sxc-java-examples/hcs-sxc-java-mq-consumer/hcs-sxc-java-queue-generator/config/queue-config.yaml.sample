@@ -1,10 +1,26 @@
 # Connection details to the MQ component
 queue:
-  exchangeName: testExchange
+  # provider can be google, amazon, azure or mq
+  provider: google 
+  exchangeName: metal-cable-247011
   consumerTag: myConsumerTag
   producerTag: myProducerTag # leave blank to prevent republishing to a queue
   host: localhost
+  port: 5672
   user: guest
   password: guest
-  iterations: 10 # 0 for infinite
+  iterations: 5 # 0 for infinite
   delayMillis: 1000 # delay between each message
+  
+#queue:
+  # provider can be google, amazon or mq
+#  provider: mq 
+#  exchangeName: testExchange
+#  consumerTag: myConsumerTag
+#  producerTag: myProducerTag
+#  host: localhost
+#  port: 5672
+#  user: guest
+#  password: guest
+#  iterations: 5 # 0 for infinite
+#  delayMillis: 1000 # delay between each message

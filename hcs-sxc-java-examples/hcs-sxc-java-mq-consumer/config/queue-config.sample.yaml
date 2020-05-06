@@ -4,6 +4,7 @@ queue:
   consumerTag: myConsumerTag
   producerTag: myProducerTag
   host: localhost
+  port: 5672
   user: guest
   password: guest
   iterations: 10 # 0 for infinite

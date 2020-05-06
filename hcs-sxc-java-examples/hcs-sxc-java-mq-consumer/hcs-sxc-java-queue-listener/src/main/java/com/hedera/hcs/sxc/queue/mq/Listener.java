@@ -1,4 +1,4 @@
-package com.hedera.hcs.sxc.mq.listener;
+package com.hedera.hcs.sxc.queue.mq;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcs.sxc.HCSCore;
@@ -8,9 +8,9 @@ import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
 import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
-import com.hedera.hcs.sxc.mq.listener.config.AppData;
-import com.hedera.hcs.sxc.mq.listener.config.Config;
-import com.hedera.hcs.sxc.mq.listener.config.Queue;
+import com.hedera.hcs.sxc.queue.config.AppData;
+import com.hedera.hcs.sxc.queue.config.Config;
+import com.hedera.hcs.sxc.queue.config.Queue;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.rabbitmq.client.*;
 import lombok.extern.log4j.Log4j2;
@@ -32,9 +32,14 @@ public class Listener {
             queueConfig = new Config().getConfig().getQueue();
         } catch (IOException ex) {
             log.error(ex);
+            return;
         }
 
         final Queue queueConfigFinal = queueConfig;
+
+        if ( ! queueConfigFinal.getProvider().equals("mq")) {
+            return;
+        }
 
         // create a callback object to receive the message
         OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(AppData.getHCSCore());
@@ -55,6 +60,7 @@ public class Listener {
                 factory.setHost(queueConfigFinal.getHost());
                 factory.setUsername(queueConfigFinal.getUser());
                 factory.setPassword(queueConfigFinal.getPassword());
+                factory.setPort(queueConfigFinal.getPort());
 
                 try (Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {
                     channel.exchangeDeclare(queueConfigFinal.getExchangeName(), "topic");
@@ -77,16 +83,16 @@ public class Listener {
         Runnable runnable;
         runnable = () -> {
             ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost("localhost");
-            factory.setUsername("guest");
-            factory.setPassword("guest");
-            factory.setPort(5672);
+            factory.setHost(queueConfigFinal.getHost());
+            factory.setUsername(queueConfigFinal.getUser());
+            factory.setPassword(queueConfigFinal.getPassword());
+            factory.setPort(queueConfigFinal.getPort());
 
             try (Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {
-                channel.exchangeDeclare("testExchange", "topic");
-                String consumerTag = "myConsumerTag";
+                channel.exchangeDeclare(queueConfigFinal.getExchangeName(), "topic");
+                String consumerTag = queueConfigFinal.getConsumerTag();
                 String queueName = channel.queueDeclare().getQueue();
-                channel.queueBind(queueName, "testExchange", consumerTag);
+                channel.queueBind(queueName, queueConfigFinal.getExchangeName(), consumerTag);
                 System.out.println("Connected");
 
                 DeliverCallback deliverCallback = (consumerTagPrime, delivery) -> {

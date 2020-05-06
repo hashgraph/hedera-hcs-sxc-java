@@ -1,6 +1,6 @@
-# hcs-sxc-java-mq-consumer
+# hcs-sxc-java-queue-consumer
 
-Consumes messages from an MQ message queue (Rabbit MQ) and pushes the messages to HCS.
+Consumes messages from a variety of message queues (MQ, Google, ...)) and pushes the messages to HCS.
 A generator is included in this project for testing purposes.
 
 ## Build
@@ -18,12 +18,19 @@ edit the file to specify your topic id
 
 copy `config/queue-config.yaml.sample` to `config/queue-config.yaml`
 
-edit the file to match your rabbit mq configuration (defaults as they are will work out of the box)
+edit the file to match your message queue configuration
 Also specify message `iterations` and `delayMillis` between messages.
 
 copy `config/dotenv.sample` to `config/.env`
 
 edit the file to include your `OPERATOR_ID` and `OPERATOR_KEY`
+
+### Google PubSub configuration
+
+The necessary credentials for Google PubSub must be stored in a JSON file and the location of the file specified in the `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
+If you're using Google PubSub, edit the `docker-compose.yml` file to specify the location of the file. It is recommended you place the file in the `config` folder and reference the file as `./config/credentials.json` since the `config` folder is mounted on the docker containers.
+
+## Docker
 
 Then run the docker images `docker-compose up --remove-orphans`
 
@@ -56,6 +63,13 @@ Ensure a Rabbit MQ instance is available and running and that you have the neces
 copy `config/config.yaml.sample` to `config/config.yaml`
 
 edit `config/config.yaml` to match your requirements
+
+### Google PubSub configuration
+
+The necessary credentials for Google PubSub must be stored in a JSON file and the location of the file specified in the `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
+If you're using Google PubSub, specify the location of the credentials file in this environment variable before running the application.
+
+### Execute
 
 run `java -jar hcs-sxc-java-queue-generator-0.0.3-SNAPSHOT-run.jar`
 
@@ -93,6 +107,13 @@ edit the file to match your rabbit mq configuration (defaults as they are will w
 copy `config/dotenv.sample` to `config/.env`
 
 edit the file to include your `OPERATOR_ID` and `OPERATOR_KEY`
+
+### Google PubSub configuration
+
+The necessary credentials for Google PubSub must be stored in a JSON file and the location of the file specified in the `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
+If you're using Google PubSub, specify the location of the credentials file in this environment variable before running the application.
+
+### Execute
 
 run `java -jar target/hcs-sxc-java-queue-listener-0.0.3-SNAPSHOT-run.jar`
 

@@ -13,6 +13,8 @@ services:
 
   hcs-sxc-java-queue_generator:
     container_name: hcs-sxc-java-queue_generator
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=
     depends_on:
       - rabbit-mq
     image: hederahashgraph/hcs-sxc-java-queue-generator:latest
@@ -24,6 +26,8 @@ services:
 
   hcs-sxc-java-queue_listener:
     container_name: hcs-sxc-java-queue_listener
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=
     depends_on:
       - rabbit-mq
     image: hederahashgraph/hcs-sxc-java-queue-listener:latest

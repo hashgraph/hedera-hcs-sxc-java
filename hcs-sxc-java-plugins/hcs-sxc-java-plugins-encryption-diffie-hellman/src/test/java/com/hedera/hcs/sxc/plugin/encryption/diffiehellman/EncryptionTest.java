@@ -1,4 +1,4 @@
-package com.hedera.hcs.sxc.plugin.encryption;
+package com.hedera.hcs.sxc.plugin.encryption.diffiehellman;
 
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;

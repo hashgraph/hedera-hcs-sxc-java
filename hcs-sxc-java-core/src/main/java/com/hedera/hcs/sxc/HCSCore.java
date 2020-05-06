@@ -65,7 +65,7 @@ public class HCSCore {
     private byte[] messageEncryptionKey = new byte[0];
     private Ed25519PrivateKey messageSigningKey = null;
     private YAMLConfig yamlConfig;
-    private KeyAgreement tempKeyAgreement = null; // if set, user is KR initiator. 
+    private Map<String, KeyAgreement> tempKeyAgreement = null; // for rotation {appId, KeyAgreement}
     private Config config;
     private boolean initialised = false;
     private Dotenv dotEnv;
@@ -144,7 +144,7 @@ public class HCSCore {
         Class<?> callbackClass = Plugins.find("com.hedera.hcs.sxc.plugin.mirror.*", "com.hedera.hcs.sxc.interfaces.MirrorSubscriptionInterface", true);
         this.mirrorSubscription = ((MirrorSubscriptionInterface)callbackClass.newInstance());
 
-        
+        this.tempKeyAgreement = new HashMap<>();
         
         this.initialised = true;
     }
@@ -308,12 +308,12 @@ public class HCSCore {
         return consensusTopicIds;
     }
 
-    public KeyAgreement getTempKeyAgreement() {
-        return tempKeyAgreement;
+    public KeyAgreement getTempKeyAgreement(String appId) {
+        return tempKeyAgreement.get(appId);
     }
 
-    public void setTempKeyAgreement(KeyAgreement tempKeyAgreement) {
-        this.tempKeyAgreement = tempKeyAgreement;
+    public void setTempKeyAgreement(String appId, KeyAgreement tempKeyAgreement) {
+        this.tempKeyAgreement.put(appId, tempKeyAgreement);
     }
 
     //public void updateSecretKey(byte[] newSecretKey){

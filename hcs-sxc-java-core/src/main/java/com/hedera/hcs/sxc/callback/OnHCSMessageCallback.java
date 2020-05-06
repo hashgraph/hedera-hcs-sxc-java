@@ -65,7 +65,9 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
+import javax.crypto.KeyAgreement;
 import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  *
@@ -191,7 +193,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
 
                 ApplicationMessage appMessage = messageEnvelopeOptional.get();
 
-                System.out.println(appMessage.getEncryptionRandom());
+                //System.out.println(appMessage.getEncryptionRandom());
                 if(this.encryptMessagesFromCore  // configuration wants encryption
                         || ( ! appMessage.getEncryptionRandom().isEmpty())  // configuration may not want encryption but message can still be encrypted
                 ){
@@ -291,103 +293,90 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                             }
 
 
-                            if (messageIsForMe){
+                            if (messageIsForMe){  // and not sent by me
                                 log.debug("Message is for me, parsing");
                                 try  { Any any = Any.parseFrom(decryptedBPM); // if fails goto catch block - TODO, use typing to avoid control flow
                                     // if succeeds then it is
                                     if(any.is(KeyRotationInitialise.class)){  //======= KR1==========================================
-                                        // an init message has arrived
-                                        // check if it was me who's the initiator. Skip msg if so.
-                                        boolean isMeInitiator = hcsCore.getTempKeyAgreement() != null;
-
-                                        if ( ! isMeInitiator ) {
-                                            // do not remove commented section
-                                            /* changed due to encryption taken from address book
+                                        
                                             KeyRotationInitialise kr1 = any.unpack(KeyRotationInitialise.class);
                                             byte[] initiatorPublicKeyEncoded = kr1.getInitiatorPublicKeyEncoded().toByteArray();
-                                            // create your own new key store it and respond
                                             Pair<byte[], byte[]> respond = keyRotationPlugin.respond(initiatorPublicKeyEncoded);
                                             byte[] newPublicKey =  respond.getLeft();
                                             byte[] newSecretKey = respond.getRight();
-                                            byte[] oldSecretKey = hcsCore.getMessageEncryptionKey();
-                                            hcsCore.updateSecretKey(newSecretKey);
-                                            hcsCore.getPersistence().storeSecretKey(newSecretKey);
+                                            
                                             KeyRotationRespond kr2 = KeyRotationRespond.newBuilder()
                                                 .setResponderPublicKeyEncoded(ByteString.copyFrom(newPublicKey))
                                                 .build();
                                             // prepare the response and send it over to the initiator
                                             Any anyPack = Any.pack(kr2);
-                                            byte[] encryptedAnyPackedChunkBody = messageEncryptionPlugin.encrypt(oldSecretKey, anyPack.toByteArray());
-                                            TransactionId transactionId = new TransactionId(hcsCore.getOperatorAccountId());
-                                            ApplicationMessageID newAppId = ApplicationMessageID.newBuilder()
-                                                .setAccountID(AccountID.newBuilder()
-                                                        .setShardNum(transactionId.accountId.shard)
-                                                        .setRealmNum(transactionId.accountId.realm)
-                                                        .setAccountNum(transactionId.accountId.account)
-                                                        .build()
-                                                )
-                                                .setValidStart(Timestamp.newBuilder()
-                                                        .setSeconds(transactionId.validStart.getEpochSecond())
-                                                        .setNanos(transactionId.validStart.getNano())
-                                                        .build()
-                                                ).build();
-                                            ApplicationMessageChunk appChunk = ApplicationMessageChunk.newBuilder()
-                                                .setApplicationMessageId(newAppId)
-                                                .setChunkIndex(1)
-                                                .setChunksCount(1)
-                                                .setMessageChunk(
-                                                    //fit an antire ApplicationMessage in the chunk and set body message to the encrypted stuff
-                                                    ApplicationMessage.newBuilder()
-                                                        .setApplicationMessageId(newAppId)
-                                                        //TODO: set signature
-                                                        .setBusinessProcessMessage(ByteString.copyFrom(encryptedAnyPackedChunkBody))
-                                                        //TODO: set hash
-                                                        .build()
-                                                        .toByteString()
-                                            ).build();
-                                            ConsensusMessageSubmitTransaction txRotation = new ConsensusMessageSubmitTransaction()
-                                                .setMessage(appChunk.toByteArray())
-                                                .setTopicId(this.topics.get(
-                                                        0 // TODO get the topic from the appMessage
-                                                ).getConsensusTopicId())
-                                                .setTransactionId(transactionId);
-                                            // submit to network
-                                            try (Client client = new Client(hcsCore.getNodeMap())) {
-                                                client.setOperator(
-                                                        hcsCore.getOperatorAccountId(),
-                                                         hcsCore.getEd25519PrivateKey()
-                                                );
-                                                client.setMaxTransactionFee(hcsCore.getMaxTransactionFee());
-                                                TransactionId txIdKR2 =  txRotation.execute(client);
-                                                TransactionReceipt receiptKR2 = txIdKR2.getReceipt(client, Duration.ofSeconds(30));
-                                            } catch (HederaStatusException ex) {
-                                                    log.error(ex);
-                                            } catch (HederaNetworkException ex) {
-                                                log.error(ex);
-                                            }
-                                            */
-                                        } // test checking if initiator
+                                            
+                                            //send it back to whoever you got it from
+
+                                            OutboundHCSMessage o =  new OutboundHCSMessage(hcsCore);
+                                            o.restrictTo(originAppId).sendMessage(0, anyPack.toByteArray());
+                                          
+                                            // update your addressbook with new shared key
+                                            
+                                            Map<String,String> buddy = hcsCore.getPersistence().getAddressList().get(originAppId);
+                                            hcsCore.getPersistence()
+                                                    .addOrUpdateAppParticipant(
+                                                            originAppId,
+                                                            buddy.get("theirEd25519PubKeyForSigning"),
+                                                            StringUtils.byteArrayToHexString(newSecretKey));
+                                            
+                                            ApplicationMessage decryptedAppmessage = ApplicationMessage.newBuilder()
+                                                .setApplicationMessageId(appMessage.getApplicationMessageId())
+                                                .setUnencryptedBusinessProcessMessageHash(appMessage.getUnencryptedBusinessProcessMessageHash())
+                                                .setBusinessProcessMessage(
+                                                        ByteString.copyFrom(decryptedBPM)
+                                                 )
+                                                .setBusinessProcessSignatureOnHash(appMessage.getBusinessProcessSignatureOnHash())
+                                                .build();
+                                            
+                                        appMessage = decryptedAppmessage;
+                                        this.hcsCore.getPersistence().storeApplicationMessage(
+                                                appMessage,
+                                                sxcConsensusMesssage.consensusTimestamp,
+                                                StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),
+                                                sxcConsensusMesssage.sequenceNumber
+                                        );
+                                        
                                     } // end any test initialise
 
                                     else if(any.is(KeyRotationRespond.class)){ // ============ KR2 =====================================================
-                                        // do not remove commented section
-                                        /*
-                                        // a respond message has arrived
-                                        // check if it was me who sent respond message. Skip msg if so.
-                                        boolean isMeResponder = hcsCore.getTempKeyAgreement() != null;
-                                        if ( isMeResponder ) {
-                                            KeyRotationRespond kr2 = any.unpack(KeyRotationRespond.class);
-                                            byte[] responderPublicKeyEncoded = kr2.getResponderPublicKeyEncoded().toByteArray();
-                                            // get the keyAgreement from core
-                                            KeyAgreement keyAgreement = hcsCore.getTempKeyAgreement();
-                                            hcsCore.setTempKeyAgreement(null);
-                                            byte[] newSecretKey = keyRotationPlugin.finalise(responderPublicKeyEncoded, keyAgreement);
-                                              // store new SecretKey in Database
-                                           hcsCore.updateSecretKey(newSecretKey);
-                                           hcsCore.getPersistence().storeSecretKey(newSecretKey);
-                                        }*/
-                                    } else if (any.is(RequestProof.class)) {
 
+                                        KeyRotationRespond kr2 = any.unpack(KeyRotationRespond.class);
+                                        byte[] responderPublicKeyEncoded = kr2.getResponderPublicKeyEncoded().toByteArray();
+                                        // get the keyAgreement from core
+                                        KeyAgreement keyAgreement = hcsCore.getTempKeyAgreement(StringUtils.byteArrayToHexString(sharedKey));
+                                        //hcsCore.setTempKeyAgreement(null);
+                                        byte[] newSecretKey = keyRotationPlugin.finalise(responderPublicKeyEncoded, keyAgreement);
+                                        // store new SecretKey in Database
+                                        Map<String,String> buddy = hcsCore.getPersistence().getAddressList().get(originAppId);
+                                        hcsCore.getPersistence()
+                                                .addOrUpdateAppParticipant(
+                                                        originAppId,
+                                                        buddy.get("theirEd25519PubKeyForSigning"),
+                                                        StringUtils.byteArrayToHexString(newSecretKey));
+
+                                        ApplicationMessage decryptedAppmessage = ApplicationMessage.newBuilder()
+                                            .setApplicationMessageId(appMessage.getApplicationMessageId())
+                                            .setUnencryptedBusinessProcessMessageHash(appMessage.getUnencryptedBusinessProcessMessageHash())
+                                            .setBusinessProcessMessage(
+                                                    ByteString.copyFrom(decryptedBPM)
+                                             )
+                                            .setBusinessProcessSignatureOnHash(appMessage.getBusinessProcessSignatureOnHash())
+                                            .build();
+                                        appMessage = decryptedAppmessage;
+                                        this.hcsCore.getPersistence().storeApplicationMessage(
+                                                appMessage,
+                                                sxcConsensusMesssage.consensusTimestamp,
+                                                StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),
+                                                sxcConsensusMesssage.sequenceNumber
+                                        );
+                                        
+                                    } else if (any.is(RequestProof.class)) {
                                         RequestProof requestProof = any.unpack(RequestProof.class);
                                         // prove the message. if OK, send back an OK message (set the `appMessage`) , don't save this
                                         // prepare the return type
@@ -419,81 +408,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                        OutboundHCSMessage o =  new OutboundHCSMessage(hcsCore);
                                        o.restrictTo(originAppId).sendMessage(0, anyPack.toByteArray());
 
-                                       /*
-                                       EncryptedData encrypt = messageEncryptionPlugin.encrypt(sharedKey, anyPack.toByteArray());
-                                        byte[] encryptedAnyPackedChunkBody = encrypt.getEncryptedData();
-                                        TransactionId transactionId = new TransactionId(hcsCore.getOperatorAccountId());
-                                        ApplicationMessageID newAppId = ApplicationMessageID.newBuilder()
-                                            .setAccountID(AccountID.newBuilder()
-                                                    .setShardNum(transactionId.accountId.shard)
-                                                    .setRealmNum(transactionId.accountId.realm)
-                                                    .setAccountNum(transactionId.accountId.account)
-                                                    .build()
-                                            )
-                                            .setValidStart(Timestamp.newBuilder()
-                                                    .setSeconds(transactionId.validStart.getEpochSecond())
-                                                    .setNanos(transactionId.validStart.getNano())
-                                                    .build()
-                                            ).build();
-                                        byte [] hashOfUnencryptedBusinessMessage = Hashing.sha(
-                                                StringUtils.byteArrayToHexString(
-                                                        anyPack.toByteArray()
-                                                )
-                                        );
-                                        ApplicationMessageChunk appChunk = ApplicationMessageChunk.newBuilder()
-                                            .setApplicationMessageId(newAppId)
-                                            .setChunkIndex(1)
-                                            .setChunksCount(1)
-                                            .setMessageChunk(
-                                                //fit an antire ApplicationMessage in the chunk and set body message to the encrypted stuff
-                                                ApplicationMessage.newBuilder()
-                                                    .setApplicationMessageId(newAppId)
-                                                    .setBusinessProcessMessage(ByteString.copyFrom(encryptedAnyPackedChunkBody))
-                                                    .setUnencryptedBusinessProcessMessageHash(ByteString.copyFrom(hashOfUnencryptedBusinessMessage))
-                                                    .setBusinessProcessSignatureOnHash(ByteString.copyFrom(Signing.sign(hashOfUnencryptedBusinessMessage, hcsCore.getMessageSigningKey())))
-                                                    .setEncryptionRandom(ByteString.copyFrom(encrypt.getRandom()))
-                                                    .build()
-                                                    .toByteString()
-                                        ).build();
-                                        ConsensusMessageSubmitTransaction txVerifiedMessage = new ConsensusMessageSubmitTransaction()
-                                            .setMessage(appChunk.toByteArray())
-                                            .setTopicId(this.topics.get(
-                                                    0 // TODO get the topic from the appMessage
-                                            ).getConsensusTopicId())
-                                            .setTransactionId(transactionId);
-                                        // submit to network
-                                        try (Client client = new Client(hcsCore.getNodeMap())) {
-                                            client.setOperator(
-                                                    hcsCore.getOperatorAccountId(),
-                                                    hcsCore.getEd25519PrivateKey()
-                                            );
-                                            client.setMaxTransactionFee(hcsCore.getMaxTransactionFee());
-                                            TransactionId txIdVMessage =  txVerifiedMessage.execute(client);
-                                            TransactionReceipt receiptIdVMessage = txIdVMessage.getReceipt(client, Duration.ofSeconds(30));
-                                        } catch (Exception ex) {
-                                                log.error(ex);
-                                        }
-                                    */
-
-
-                                    /*
-                                    } else if (any.is(VerifiedMessage.class)) {
-                                        ApplicationMessage decryptedAppmessage = ApplicationMessage.newBuilder()
-                                            .setApplicationMessageId(appMessage.getApplicationMessageId())
-                                            .setUnencryptedBusinessProcessMessageHash(appMessage.getUnencryptedBusinessProcessMessageHash())
-                                            .setBusinessProcessMessage(
-                                                    ByteString.copyFrom(decryptedBPM)
-                                             )
-                                            .setBusinessProcessSignatureOnHash(appMessage.getBusinessProcessSignatureOnHash())
-                                            .build();
-                                        appMessage = decryptedAppmessage;
-                                        this.hcsCore.getPersistence().storeApplicationMessage(
-                                                appMessage,
-                                                sxcConsensusMesssage.consensusTimestamp,
-                                                StringUtils.byteArrayToHexString(sxcConsensusMesssage.runningHash),
-                                                sxcConsensusMesssage.sequenceNumber
-                                        ); */
-
+                                       
                                     } else { // the message is not a KR or PROOF instruction. It is some other PROTO message
                                                // send back the BPM; IF it's not a PROTO message then use the CATCH
                                                // block. TODO, rewrite to avoid trycatch controll flow

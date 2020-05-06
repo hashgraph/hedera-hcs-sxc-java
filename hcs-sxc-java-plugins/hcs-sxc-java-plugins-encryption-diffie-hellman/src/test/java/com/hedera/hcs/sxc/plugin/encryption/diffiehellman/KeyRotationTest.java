@@ -1,4 +1,4 @@
-package com.hedera.hcs.sxc.plugin.encryption;
+package com.hedera.hcs.sxc.plugin.encryption.diffiehellman;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -24,5 +24,6 @@ public class KeyRotationTest {
         byte[] aliceSharedSecret = keyRotation.finalise(bobPubSecret.getLeft(), keyAgreement);
         byte[] bobSharedSecret = bobPubSecret.getRight();
         assertTrue(Arrays.equals(aliceSharedSecret, bobSharedSecret));
+        assertTrue(aliceSharedSecret.length == 32);
     }
 }

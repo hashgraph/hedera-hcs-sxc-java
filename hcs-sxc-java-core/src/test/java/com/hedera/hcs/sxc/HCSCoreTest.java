@@ -75,7 +75,7 @@ class HCSCoreTest {
         assertTrue(hcsCore.getRotateKeys());
         assertEquals(5, hcsCore.getRotationFrequency());
         assertTrue(hcsCore.getSignMessages());
-        assertNull(hcsCore.getTempKeyAgreement());
+        
     }
     
     @Test

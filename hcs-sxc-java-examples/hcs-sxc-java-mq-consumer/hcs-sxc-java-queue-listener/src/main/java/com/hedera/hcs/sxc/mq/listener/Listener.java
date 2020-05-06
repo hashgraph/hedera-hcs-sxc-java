@@ -101,7 +101,7 @@ public class Listener {
                     }
                 };
                 channel.basicConsume(queueName, true, deliverCallback, consumerTagPrime -> {
-                    System.out.println("woot");
+                    System.out.println("test");
                 });
 
                 Object lock = new Object();

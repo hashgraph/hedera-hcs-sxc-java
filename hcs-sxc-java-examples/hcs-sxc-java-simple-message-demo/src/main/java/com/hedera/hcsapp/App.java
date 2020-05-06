@@ -32,6 +32,8 @@ import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ConfirmProof;
+import com.hedera.hcs.sxc.proto.KeyRotationInitialise;
+import com.hedera.hcs.sxc.proto.KeyRotationRespond;
 import com.hedera.hcs.sxc.proto.RequestProof;
 import com.hedera.hcs.sxc.proto.VerifiableApplicationMessage;
 import com.hedera.hcs.sxc.proto.VerifiedMessage;
@@ -96,7 +98,7 @@ public final class App {
         Ansi.print("** My private signing key is: " + hcsCore.getMessageSigningKey());
         Ansi.print("** My public signing key is: " + hcsCore.getMessageSigningKey().publicKey);
         Map<String, Map<String, String>> addressList = AddressListCrypto.INSTANCE.getAddressList();
-        Ansi.print("** My buddies are: " + Joiner.on(",").withKeyValueSeparator("=").join(addressList));
+        Ansi.print("** My initial buddy keys are: " + Joiner.on(",").withKeyValueSeparator("=").join(addressList));
         Ansi.print("****************************************");
         showHelp();
 
@@ -263,22 +265,35 @@ public final class App {
 
             byte[] bpm = appMessage.getBusinessProcessMessage().toByteArray();
 
+            Map<String, Map<String, String>> addressList = hcsCore.getPersistence().getAddressList();
+        
             try  { Any any = Any.parseFrom(bpm);
-            if (any.is(RequestProof.class)){
-                System.out.println("        Echo of  proof request received. Awaiting replies. ");
+                if (any.is(RequestProof.class)){
+                    System.out.println("        Echo of  proof request received. Awaiting replies. ");
 
-            } else if (any.is(ConfirmProof.class)){
-                ConfirmProof cf = any.unpack(ConfirmProof.class);
+                } else if (any.is(ConfirmProof.class)){
+                    ConfirmProof cf = any.unpack(ConfirmProof.class);
 
-                cf.getProofList().forEach(verifiedMessage ->{
-                    System.out.printf("        Message verification result: %s \n",
-                            verifiedMessage.getVerificationOutcome().name()
-                    );
-                });
+                    cf.getProofList().forEach(verifiedMessage ->{
+                        System.out.printf("        Message verification result: %s \n",
+                                verifiedMessage.getVerificationOutcome().name()
+                        );
+                    });
+                } else if (any.is(KeyRotationInitialise.class)){
+                    System.out.println("        KR Initialisation. ");
+                    Ansi.print("** My current buddy keys are: " + Joiner.on(",").withKeyValueSeparator("=").join(addressList));
+        
 
-            } else {
+                } else if (any.is(KeyRotationRespond.class)){
+                    System.out.println("        KR Response. Finalising ");
+                    Ansi.print("** My current buddy keys are: " + Joiner.on(",").withKeyValueSeparator("=").join(addressList));
+        
 
-            }
+
+                
+                } else {
+
+                }
 
             } catch (InvalidProtocolBufferException e){
                 System.out.println("why here");
@@ -286,11 +301,7 @@ public final class App {
 
 
 
-            System.out.printf("        Encryption random: %s \n",
-                    StringUtils.byteArrayToHexString(
-                            appMessage.getEncryptionRandom().toByteArray()
-                    )
-            );
+           
 
             System.out.printf("        Is this an echo?: %s \n",
                     Signing.verify(

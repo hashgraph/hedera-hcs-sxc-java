@@ -22,6 +22,7 @@ package com.hedera.hcs.sxc.consensus;
 
 import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
 import com.hedera.hcs.sxc.commonobjects.EncryptedData;
 import com.hedera.hcs.sxc.config.Topic;
+import com.hedera.hcs.sxc.hashing.Hashing;
 import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
 import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
@@ -51,6 +53,8 @@ import com.hedera.hcs.sxc.proto.AccountID;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 import com.hedera.hcs.sxc.proto.ApplicationMessageID;
+import com.hedera.hcs.sxc.proto.KeyRotationInitialise;
+import com.hedera.hcs.sxc.proto.KeyRotationRespond;
 import com.hedera.hcs.sxc.proto.RequestProof;
 import com.hedera.hcs.sxc.proto.Timestamp;
 import com.hedera.hcs.sxc.proto.VerifiableApplicationMessage;
@@ -61,7 +65,9 @@ import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.crypto.KeyAgreement;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * Object used to invoke outbound creation message methods. See 
@@ -127,7 +133,7 @@ public final class OutboundHCSMessage {
         this.topics = hcsCore.getTopics();
         this.hcsTransactionFee = hcsCore.getMaxTransactionFee();
         this.addressList = hcsCore.getPersistence().getAddressList();
-
+       
         // load persistence implementation at runtime
         Class<?> persistenceClass = Plugins.find("com.hedera.hcs.sxc.plugin.persistence.*", "com.hedera.hcs.sxc.interfaces.SxcPersistence", true);
         this.persistencePlugin = (SxcPersistence)persistenceClass.newInstance();
@@ -324,20 +330,22 @@ public final class OutboundHCSMessage {
      
     public List<TransactionId> sendMessage(int topicIndex, byte[] message, boolean byPassSending) throws Exception {
         List<TransactionId> txIdList = new ArrayList<>();
-        if(encryptMessages && this.overrideMessageEncryptionKey!=null ){
-                log.debug("Override encryption");
-                TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, this.overrideMessageEncryptionKey, byPassSending);
-                txIdList.add(doSendMessageTxId);
+        if(this.overrideMessageEncryptionKey!=null ){
+            enableMessageEncryptionPlugin();
+            log.debug("Override encryption");
+            if(rotateKeys){throw new Exception("You can not override the key when key rotation is enabled");}
+            TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, this.overrideMessageEncryptionKey, byPassSending);
+            txIdList.add(doSendMessageTxId);
         }else if (encryptMessages) { // send  so that specific users can decrypt - flag needs addressbook
             enableMessageEncryptionPlugin();
-             if (this.addressList != null && this.addressList.size() > 0){ // get it from .env
+            if (this.addressList != null && this.addressList.size() > 0){ // get it from .env
                 for (String recipient : addressList.keySet()){
                     log.debug("Sending to " + recipient);
                     TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, this.addressList.get(recipient).get("sharedSymmetricEncryptionKey") , byPassSending);
                     txIdList.add(doSendMessageTxId);
                 }                
             } else {
-                throw new NoSuchElementException("Encryption set to true, but no keys found in address book");
+                throw new NoSuchElementException("Encryption set to true, but no keys found in address book or in an override");
             }
         } else { // broadcast
             TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, null, byPassSending);
@@ -433,10 +441,11 @@ public final class OutboundHCSMessage {
                 }
             } // end-for
             
-            // after sending all parts check if key rotation is due
-            if (rotateKeys) {
+            // after sending all parts check if key rotation is due and send a KR INIT
+            // this block invokes a recursive call and the second part of the conjunction
+            // sets the termination condition
+            if (rotateKeys && ! this.isKrMessage(message)) {
                 
-                /** ROTATION CODE - UNCOMMENT TO ENABLE
                 
                 if (!this.encryptMessages) {
                     throw new Exception("Trying to initiate key rotation but encryption is disabled");   
@@ -449,68 +458,21 @@ public final class OutboundHCSMessage {
                     //2) If onHCSMessage receives KR1 then update key and KR2
                     //3) If onHCSMessage receives KR2 then update key using stored KeyAgreement
                     
+                    
+                    
                     Pair<KeyAgreement, byte[]> initiate = keyRotationPlugin.initiate();
                     //store the KeyAgreement to HCSCore to refetch when finalising
-                    hcsCore.setTempKeyAgreement(initiate.getLeft());
+                    
+                    //==== need to store tempKeyAgreement for each player. add it in addressbook per player
+                    hcsCore.setTempKeyAgreement( recipientSharedSymetricEncryptionKey, initiate.getLeft());
                     //prepare yielded PK and send to network
                     KeyRotationInitialise kr1 = KeyRotationInitialise.newBuilder()
                             .setInitiatorPublicKeyEncoded(ByteString.copyFrom(initiate.getRight()))
                             .build();
-                    Any anyPack = Any.pack(kr1);
-                    byte[] encryptedAnyPackedChunkBody = messageEncryptionPlugin.encrypt(this.messageEncryptionKey, anyPack.toByteArray());
-                    
-                    
-                    TransactionId newTransactionId = new TransactionId(hcsCore.getOperatorAccountId());
-                    ApplicationMessageID newAppId = ApplicationMessageID.newBuilder()
-                            .setAccountID(AccountID.newBuilder()
-                                    .setShardNum(newTransactionId.accountId.shard)
-                                    .setRealmNum(newTransactionId.accountId.realm)
-                                    .setAccountNum(newTransactionId.accountId.account)
-                                    .build()
-                            )
-                            .setValidStart(Timestamp.newBuilder()
-                                    .setSeconds(newTransactionId.validStart.getEpochSecond())
-                                    .setNanos(newTransactionId.validStart.getNano())
-                                    .build()
-                            ).build();
-                    
-                    ApplicationMessageChunk appChunk = ApplicationMessageChunk.newBuilder()
-                            .setApplicationMessageId(newAppId)
-                            .setChunkIndex(1)
-                            .setChunksCount(1)
-                            .setMessageChunk(
-                                    //fit an antire ApplicationMessage in the chunk and set body message to the encrypted stuff
-                                    ApplicationMessage.newBuilder()
-                                            .setApplicationMessageId(newAppId)
-                                            //TODO: set signature
-                                            .setBusinessProcessMessage(ByteString.copyFrom(encryptedAnyPackedChunkBody))
-                                            //TODO: set hash
-                                            .build()
-                                            .toByteString()
-                            ).build();  
-                    
-                    ConsensusMessageSubmitTransaction txRotation = new ConsensusMessageSubmitTransaction()
-                            .setMessage(appChunk.toByteArray())
-                            .setTopicId(this.topics.get(topicIndex).getConsensusTopicId())
-                            .setTransactionId(newTransactionId);
-                        
-                        // persist the transaction
-                        this.persistencePlugin.storeTransaction(newTransactionId, txRotation);
-                        if ( ! byPassSending) {
-                            TransactionId txIdKR1 =  txRotation.execute(client);
-                            
-                            TransactionReceipt receiptKR1 = txIdKR1.getReceipt(client, Duration.ofSeconds(30));
-                           
-                            log.debug("Message receipt for KR1 status is {} "
-                                    + "sequence no is {}"
-                                    ,receiptKR1.status
-                                    ,receiptKR1.getConsensusTopicSequenceNumber()
-                            );
-                        } else {
-                            log.warn("Not sending, bypassing sending for testing");
-                        }
-                    }
-                ROTATION CODE - UNCOMMENT TO ENABLE */
+                    Any krAnyPack = Any.pack(kr1);
+                    this.doSendMessage(krAnyPack.toByteArray(), topicIndex, recipientSharedSymetricEncryptionKey, byPassSending);
+                }
+                
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -637,5 +599,13 @@ public final class OutboundHCSMessage {
             }
         }
         return parts;
+    }
+    private boolean isKrMessage(byte[] message){
+         try  { Any any = Any.parseFrom(message); // if fails goto catch block - TODO, use typing to avoid control flow
+             // if succeeds then it is
+             return any.is(KeyRotationInitialise.class) || any.is(KeyRotationRespond.class) ; //======= KR1==========================================
+         } catch (InvalidProtocolBufferException ex) {
+             return false;
+         }
     }
 }

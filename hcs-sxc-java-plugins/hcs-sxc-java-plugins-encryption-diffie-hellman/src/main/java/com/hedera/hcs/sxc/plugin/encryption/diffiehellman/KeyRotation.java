@@ -1,4 +1,5 @@
 package com.hedera.hcs.sxc.plugin.encryption.diffiehellman;
+import com.google.common.hash.Hashing;
 import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
 /*-
  * ‌
@@ -23,6 +24,7 @@ import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import javax.crypto.KeyAgreement;
@@ -95,7 +97,7 @@ public class KeyRotation implements SxcKeyRotation{
         responderKeyAgree.doPhase(initiatorPubKey, true);
         responderSecret = responderKeyAgree.generateSecret();
 
-        return Pair.of(responderPubKeyEnc, responderSecret);
+        return Pair.of(responderPubKeyEnc, MessageDigest.getInstance("SHA-256").digest(responderSecret));
     }
 
      /**
@@ -108,7 +110,6 @@ public class KeyRotation implements SxcKeyRotation{
      * @return the shared secret. 
      */
  
-    
     @Override
     public byte[] finalise(byte[] responderPubKeyEnc, KeyAgreement keyAgreement) throws Exception {
 
@@ -117,6 +118,6 @@ public class KeyRotation implements SxcKeyRotation{
         PublicKey responderPubKey = initiatorKeyFac.generatePublic(x509KeySpec);
         keyAgreement.doPhase(responderPubKey, true);
             
-        return keyAgreement.generateSecret();
+        return MessageDigest.getInstance("SHA-256").digest(keyAgreement.generateSecret()) ;
     }
  }

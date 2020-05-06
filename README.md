@@ -777,7 +777,7 @@ Now refer to the `without relay and queue` instructions for running the player a
 
 ### hcs-sxc-java-queue-consumer
 
-This example connects a listener to a message queue (MQ, Google and others) and messages arrive on the queue, they are sent to HCS as a Consensus Submit transaction. Optionally, the listener can publish the resulting mirror node notification back to another queue.
+This example connects a listener to a message queue (MQ, Google or Amazon SQS) and messages arrive on the queue, they are sent to HCS as a Consensus Submit transaction. Optionally, the listener can publish the resulting mirror node notification back to another queue.
 
 Refer to the example's own  [README.md](./hcs-sxc-java-examples/hcs-sxc-java-queue-consumer/README.md) for additional details.
 

@@ -1,6 +1,7 @@
 # hcs-sxc-java-queue-consumer
 
-Consumes messages from a variety of message queues (MQ, Google, ...)) and pushes the messages to HCS.
+Consumes messages from a variety of message queues (MQ, Google or Amazon SQS) and pushes the messages to HCS. Upon receipt of a notification from HCS, the HCS response can optionally be sent to another queue.
+
 A generator is included in this project for testing purposes.
 
 ## Build
@@ -28,7 +29,19 @@ edit the file to include your `OPERATOR_ID` and `OPERATOR_KEY`
 ### Google PubSub configuration
 
 The necessary credentials for Google PubSub must be stored in a JSON file and the location of the file specified in the `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
-If you're using Google PubSub, edit the `docker-compose.yml` file to specify the location of the file. It is recommended you place the file in the `config` folder and reference the file as `./config/credentials.json` since the `config` folder is mounted on the docker containers.
+If you're using Google PubSub, edit the `docker-compose.yml` file to specify the location of the file (for both the listener and generator). It is recommended you place the file in the `config` folder and reference the file as `./config/credentials.json` since the `config` folder is mounted on the docker containers.
+
+### Amazon SQS configuration
+
+The necessary credentials for Amazon SQS must be provided via environment variables as follows:
+
+```
+AWS_ACCESS_KEY_ID
+AWS_REGION
+AWS_SECRET_ACCESS_KEY
+```
+
+If you're using Amazon SQS, edit the `docker-compose.yml` file to specify the environment variables for both the listener and the generator.
 
 ## Docker
 
@@ -68,6 +81,18 @@ edit `config/config.yaml` to match your requirements
 
 The necessary credentials for Google PubSub must be stored in a JSON file and the location of the file specified in the `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
 If you're using Google PubSub, specify the location of the credentials file in this environment variable before running the application.
+
+### Amazon SQS configuration
+
+The necessary credentials for Amazon SQS must be provided via environment variables as follows:
+
+```
+AWS_ACCESS_KEY_ID
+AWS_REGION
+AWS_SECRET_ACCESS_KEY
+```
+
+If you're using Amazon SQS, be sure to set the environment variables to the appropriate values.
 
 ### Execute
 

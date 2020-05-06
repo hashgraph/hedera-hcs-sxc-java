@@ -16,6 +16,7 @@ public final class Generator {
             MqGenerator.generate(queueConfig);
             break;
         case "amazon":
+            AmazonGenerator.generate(queueConfig);
             break;
         }
         System.out.println("Done");

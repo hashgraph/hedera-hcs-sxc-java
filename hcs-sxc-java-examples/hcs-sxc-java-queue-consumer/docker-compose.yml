@@ -1,0 +1,50 @@
+version: '3.3'
+services:
+  rabbit-mq:
+    container_name: rabbit-mq
+    build: .
+    restart: on-failure
+    ports:
+      - "9090:15672"
+      - "5672:5672"
+      - "15674:15674"
+    networks:
+      - backing-services
+
+  hcs-sxc-java-queue_generator:
+    container_name: hcs-sxc-java-queue_generator
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=
+      - AWS_ACCESS_KEY_ID=
+      - AWS_REGION=
+      - AWS_SECRET_ACCESS_KEY=
+    depends_on:
+      - rabbit-mq
+    image: hederahashgraph/hcs-sxc-java-queue-generator:latest
+    restart: on-failure
+    networks:
+      - backing-services
+    volumes:
+      - ./config:/config
+
+  hcs-sxc-java-queue_listener:
+    container_name: hcs-sxc-java-queue_listener
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=
+      - AWS_ACCESS_KEY_ID=
+      - AWS_REGION=
+      - AWS_SECRET_ACCESS_KEY=
+    depends_on:
+      - rabbit-mq
+    image: hederahashgraph/hcs-sxc-java-queue-listener:latest
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    networks:
+      - backing-services
+    volumes:
+      - ./config:/config
+
+networks:
+  backing-services:
+    driver: bridge

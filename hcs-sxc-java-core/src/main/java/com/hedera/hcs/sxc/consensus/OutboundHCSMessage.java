@@ -33,7 +33,8 @@ import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Transaction;
+import com.hedera.hashgraph.sdk.HederaNetworkException;
+import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;
@@ -44,10 +45,13 @@ import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
 import com.hedera.hcs.sxc.commonobjects.EncryptedData;
 import com.hedera.hcs.sxc.config.Topic;
-import com.hedera.hcs.sxc.hashing.Hashing;
+import com.hedera.hcs.sxc.exceptions.HederaNetworkCommunicationException;
+import com.hedera.hcs.sxc.exceptions.KeyRotationException;
 import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
 import com.hedera.hcs.sxc.interfaces.SxcMessageEncryption;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
+import com.hedera.hcs.sxc.exceptions.PluginNotLoadingException;
+import com.hedera.hcs.sxc.exceptions.SCXCryptographyException;
 import com.hedera.hcs.sxc.plugins.Plugins;
 import com.hedera.hcs.sxc.proto.AccountID;
 import com.hedera.hcs.sxc.proto.ApplicationMessage;
@@ -61,10 +65,9 @@ import com.hedera.hcs.sxc.proto.VerifiableApplicationMessage;
 import com.hedera.hcs.sxc.proto.VerifiableMessage;
 import com.hedera.hcs.sxc.signing.Signing;
 import com.hedera.hcs.sxc.utils.StringUtils;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.crypto.KeyAgreement;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.tuple.Pair;
@@ -110,7 +113,7 @@ public final class OutboundHCSMessage {
      * Behind the scenes, a message is split and is sent in chunks if it is too big
      * for the network to handle.
      * <p>
-     * A builder pattern is used to to parameterize how messages (either
+     * A quasi builder pattern is used to to parameterize how messages (either
      * standard of proof requests) are sent.
      * <p>
      * When a message is sent with encryption enabled (option held in
@@ -122,7 +125,8 @@ public final class OutboundHCSMessage {
      * @param hcsCore instantiated core object that hold initialisation parameters, address-book etc. 
      * @throws Exception
      */
-    public OutboundHCSMessage(HCSCore hcsCore) throws Exception {
+    public OutboundHCSMessage(HCSCore hcsCore) 
+            throws PluginNotLoadingException{
         this.hcsCore = hcsCore;
         this.signMessages = hcsCore.getSignMessages();
         this.encryptMessages = hcsCore.getEncryptMessages();
@@ -135,22 +139,21 @@ public final class OutboundHCSMessage {
         this.addressList = hcsCore.getPersistence().getAddressList();
        
         // load persistence implementation at runtime
-        Class<?> persistenceClass = Plugins.find("com.hedera.hcs.sxc.plugin.persistence.*", "com.hedera.hcs.sxc.interfaces.SxcPersistence", true);
-        this.persistencePlugin = (SxcPersistence)persistenceClass.newInstance();
+        this.persistencePlugin = (SxcPersistence)Plugins.loadPlugin("com.hedera.hcs.sxc.plugin.persistence.*", "com.hedera.hcs.sxc.interfaces.SxcPersistence", true);
+        
         
         
        
         
         if(this.rotateKeys){
             
-            Class<?> messageKeyRotationClass = Plugins.find("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcKeyRotation", true);
-            this.keyRotationPlugin = (SxcKeyRotation)messageKeyRotationClass.newInstance();
+            this.keyRotationPlugin = (SxcKeyRotation)Plugins.loadPlugin("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcKeyRotation", true);
+            
         }
     }
 
-    private void enableMessageEncryptionPlugin() throws Exception {
-        Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
-        this.messageEncryptionPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
+    private void enableMessageEncryptionPlugin() throws PluginNotLoadingException {
+        this.messageEncryptionPlugin = (SxcMessageEncryption)Plugins.loadPlugin("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
     }
     
     public boolean getOverrideMessageSignature() {
@@ -288,7 +291,8 @@ public final class OutboundHCSMessage {
      * @throws Exception
      * @return TransactionId
      */
-     public List<TransactionId> sendMessage(int topicIndex, byte[] message) throws Exception {
+     public List<TransactionId> sendMessage(int topicIndex, byte[] message) 
+             throws KeyRotationException, PluginNotLoadingException, HederaNetworkCommunicationException, SCXCryptographyException {
         return sendMessage(topicIndex, message, false);
     }
      
@@ -328,12 +332,17 @@ public final class OutboundHCSMessage {
     }
      
      
-    public List<TransactionId> sendMessage(int topicIndex, byte[] message, boolean byPassSending) throws Exception {
+    public List<TransactionId> sendMessage(int topicIndex, byte[] message, boolean byPassSending) 
+            throws KeyRotationException, 
+            PluginNotLoadingException,  
+            HederaNetworkCommunicationException,  
+            SCXCryptographyException  
+            {
         List<TransactionId> txIdList = new ArrayList<>();
         if(this.overrideMessageEncryptionKey!=null ){
             enableMessageEncryptionPlugin();
             log.debug("Override encryption");
-            if(rotateKeys){throw new Exception("You can not override the key when key rotation is enabled");}
+            if(rotateKeys){throw new KeyRotationException("You can not override the key when key rotation is enabled");}
             TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, this.overrideMessageEncryptionKey, byPassSending);
             txIdList.add(doSendMessageTxId);
         }else if (encryptMessages) { // send  so that specific users can decrypt - flag needs addressbook
@@ -345,7 +354,7 @@ public final class OutboundHCSMessage {
                     txIdList.add(doSendMessageTxId);
                 }                
             } else {
-                throw new NoSuchElementException("Encryption set to true, but no keys found in address book or in an override");
+                throw new KeyRotationException("Encryption set to true, but no keys found in address book or in an override");
             }
         } else { // broadcast
             TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, null, byPassSending);
@@ -354,7 +363,9 @@ public final class OutboundHCSMessage {
         return txIdList;
     }
 
-    private TransactionId doSendMessage(byte[] message, int topicIndex, String recipientSharedSymetricEncryptionKey, boolean byPassSending) throws Exception {
+    private TransactionId doSendMessage(byte[] message, int topicIndex, String recipientSharedSymetricEncryptionKey, boolean byPassSending) 
+            throws KeyRotationException, PluginNotLoadingException, HederaNetworkCommunicationException, SCXCryptographyException
+             {
         // generate TXId for main and first message it not already set by caller
         TransactionId firstTransactionId = this.transactionId;
         if (firstTransactionId == null) {
@@ -448,7 +459,7 @@ public final class OutboundHCSMessage {
                 
                 
                 if (!this.encryptMessages) {
-                    throw new Exception("Trying to initiate key rotation but encryption is disabled");   
+                    throw new KeyRotationException("Trying to initiate key rotation but encryption is disabled");   
                 }
                    
                 int messageCount = -1; //TODO - keep track of messages pair-wise, not just here. ( per topic )
@@ -474,16 +485,10 @@ public final class OutboundHCSMessage {
                 }
                 
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        } catch (TimeoutException e) {
-            // do nothing
-        } catch (Exception e) {
-            log.error(e);
-            throw (e);
-        } finally {
-            
+        }  catch (Exception e){
+            throw new HederaNetworkCommunicationException("Failed to communicate with HH network");
         }
+        
         return firstTransactionId;
     }
     
@@ -497,7 +502,10 @@ public final class OutboundHCSMessage {
      * signs the hash  if the signature parameter @param senderSigningKey is not null
      * @return ApplicationMessage
      */
-    public static ApplicationMessage userMessageToApplicationMessage(TransactionId transactionId,  byte[] message,  Ed25519PrivateKey senderSigningKey, String recipientSharedEncryptionKey){
+    public static ApplicationMessage userMessageToApplicationMessage(TransactionId transactionId,  byte[] message,  Ed25519PrivateKey senderSigningKey, String recipientSharedEncryptionKey) 
+            throws PluginNotLoadingException, SCXCryptographyException
+           
+    {
         ApplicationMessageID applicationMessageID = ApplicationMessageID.newBuilder()
                 .setAccountID(AccountID.newBuilder()
                         .setShardNum(transactionId.accountId.shard)
@@ -521,31 +529,28 @@ public final class OutboundHCSMessage {
         
                 byte[] hashOfOriginalMessage  = null;
                 byte[] sign = null;
-                try {
-                    // Hash of unencrypted business message should be included in application message
-                    hashOfOriginalMessage = com.hedera.hcs.sxc.hashing.Hashing.sha(StringUtils.byteArrayToHexString(originalMessage));
-                    applicationMessageBuilder.setUnencryptedBusinessProcessMessageHash(ByteString.copyFrom(hashOfOriginalMessage));
-                    // Signature (using sender’s private key) of hash (above) should also be included in application message
-                    if(senderSigningKey!=null) { // signing may be turned off when override is used
-                        sign = Signing.sign(hashOfOriginalMessage, senderSigningKey);
-                        applicationMessageBuilder.setBusinessProcessSignatureOnHash(ByteString.copyFrom(sign));
-                    } 
-                } catch (Exception e){
-                    log.error(e);
-                }
+                // Hash of unencrypted business message should be included in application message
+                hashOfOriginalMessage = com.hedera.hcs.sxc.hashing.Hashing.sha(StringUtils.byteArrayToHexString(originalMessage));
+                applicationMessageBuilder.setUnencryptedBusinessProcessMessageHash(ByteString.copyFrom(hashOfOriginalMessage));
+                // Signature (using sender’s private key) of hash (above) should also be included in application message
+                if(senderSigningKey!=null) { // signing may be turned off when override is used
+                    sign = Signing.sign(hashOfOriginalMessage, senderSigningKey);
+                    applicationMessageBuilder.setBusinessProcessSignatureOnHash(ByteString.copyFrom(sign));
+                } 
+
         
         
         if(recipientSharedEncryptionKey == null) { // no encryption
             applicationMessageBuilder.setBusinessProcessMessage(ByteString.copyFrom(originalMessage));
             applicationMessage = applicationMessageBuilder.build();
         } else {
-            try {
+            
                 // build one encrypted and one unecrypted message. Store the latter in the core db
 
                 // encrypt
                 //String encryptionKey = recipientKeys.get("sharedSymmetricEncryptionKey");
-                Class<?> messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
-                SxcMessageEncryption encPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
+                SxcMessageEncryption encPlugin = (SxcMessageEncryption)Plugins.loadPlugin("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
+                
                 log.debug("Encrypting message with key " + recipientSharedEncryptionKey.substring(recipientSharedEncryptionKey.length()-10, recipientSharedEncryptionKey.length()-1));
                 EncryptedData encryptedData = encPlugin.encrypt(
                         StringUtils.hexStringToByteArray(recipientSharedEncryptionKey)
@@ -560,10 +565,7 @@ public final class OutboundHCSMessage {
                 applicationMessage = applicationMessageBuilder.build();
 
                 
-            } catch (Exception ex) {
-                log.error(ex);
-                
-            }
+           
         }                
        
         return applicationMessage;

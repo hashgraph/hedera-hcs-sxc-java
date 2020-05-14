@@ -1,6 +1,9 @@
 package com.hedera.hcs.sxc.plugin.encryption.diffiehellman;
 import com.google.common.hash.Hashing;
+import com.hedera.hcs.sxc.exceptions.KeyRotationException;
 import com.hedera.hcs.sxc.interfaces.SxcKeyRotation;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 /*-
  * ‌
  * hcs-sxc-java
@@ -25,13 +28,17 @@ import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import javax.crypto.KeyAgreement;
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.DHParameterSpec;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.tuple.Pair;
 
+@Log4j2
 public class KeyRotation implements SxcKeyRotation{
 
     public KeyRotation() {
@@ -50,20 +57,23 @@ public class KeyRotation implements SxcKeyRotation{
      */
     
     @Override
-    public Pair<KeyAgreement, byte[]> initiate() throws Exception {
+    public Pair<KeyAgreement, byte[]> initiate() throws KeyRotationException {
        
         KeyAgreement initiatorKeyAgree = null;
         byte[] initiatorPubKeyEnc  = null;    
-
-        KeyPairGenerator initiatorKeypairGen = KeyPairGenerator.getInstance("DH");
-        initiatorKeypairGen.initialize(2048);// 256 byte keys
-        KeyPair initiatorKeypair = initiatorKeypairGen.generateKeyPair();
-        // keep the agreement in memory to reuse when responder sends its public key back to initiator
-        initiatorKeyAgree = KeyAgreement.getInstance("DH");
-        initiatorKeyAgree.init(initiatorKeypair.getPrivate());
-        // encode public key and give it to the responder.
-        initiatorPubKeyEnc = initiatorKeypair.getPublic().getEncoded();
-        
+        try {
+            KeyPairGenerator initiatorKeypairGen = KeyPairGenerator.getInstance("DH");
+            initiatorKeypairGen.initialize(2048);// 256 byte keys
+            KeyPair initiatorKeypair = initiatorKeypairGen.generateKeyPair();
+            // keep the agreement in memory to reuse when responder sends its public key back to initiator
+            initiatorKeyAgree = KeyAgreement.getInstance("DH");
+            initiatorKeyAgree.init(initiatorKeypair.getPrivate());
+            // encode public key and give it to the responder.
+            initiatorPubKeyEnc = initiatorKeypair.getPublic().getEncoded();
+        } catch (Exception e){
+            log.error(e);
+            throw new KeyRotationException("KR Initialisation algorithm problem");
+        }
         return Pair.of(initiatorKeyAgree, initiatorPubKeyEnc);
     }
 
@@ -77,10 +87,11 @@ public class KeyRotation implements SxcKeyRotation{
      * @return Pair.of(responder's public key, shared secret)
      */
     @Override
-    public Pair<byte[], byte[]> respond(byte[] initiatorPubKeyEnc) throws Exception {
+    public Pair<byte[], byte[]> respond(byte[] initiatorPubKeyEnc) throws KeyRotationException {
         byte[] responderPubKeyEnc = null;
-        byte[] responderSecret  = null;
-
+        
+        byte[] digest = null;
+        try {
         KeyFactory responderKeyFac = KeyFactory.getInstance("DH");
         X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(initiatorPubKeyEnc);
         PublicKey initiatorPubKey = responderKeyFac.generatePublic(x509KeySpec);
@@ -95,9 +106,13 @@ public class KeyRotation implements SxcKeyRotation{
         responderKeyAgree.init(responderKeypair.getPrivate());
         responderPubKeyEnc = responderKeypair.getPublic().getEncoded();
         responderKeyAgree.doPhase(initiatorPubKey, true);
-        responderSecret = responderKeyAgree.generateSecret();
-
-        return Pair.of(responderPubKeyEnc, MessageDigest.getInstance("SHA-256").digest(responderSecret));
+        byte[] responderSecret = responderKeyAgree.generateSecret();
+        digest = MessageDigest.getInstance("SHA-256").digest(responderSecret);
+        } catch (IllegalStateException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException e ){
+            log.error(e);
+            throw new KeyRotationException("KR Respond could not be executed");
+        }
+        return Pair.of(responderPubKeyEnc,digest);
     }
 
      /**
@@ -111,13 +126,18 @@ public class KeyRotation implements SxcKeyRotation{
      */
  
     @Override
-    public byte[] finalise(byte[] responderPubKeyEnc, KeyAgreement keyAgreement) throws Exception {
-
-        KeyFactory initiatorKeyFac = KeyFactory.getInstance("DH");
-        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(responderPubKeyEnc);
-        PublicKey responderPubKey = initiatorKeyFac.generatePublic(x509KeySpec);
-        keyAgreement.doPhase(responderPubKey, true);
-            
-        return MessageDigest.getInstance("SHA-256").digest(keyAgreement.generateSecret()) ;
+    public byte[] finalise(byte[] responderPubKeyEnc, KeyAgreement keyAgreement) throws KeyRotationException {
+        byte[] digest = null;
+        try {
+            KeyFactory initiatorKeyFac = KeyFactory.getInstance("DH");
+            X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(responderPubKeyEnc);
+            PublicKey responderPubKey = initiatorKeyFac.generatePublic(x509KeySpec);
+            keyAgreement.doPhase(responderPubKey, true);
+            digest = MessageDigest.getInstance("SHA-256").digest(keyAgreement.generateSecret());
+        } catch (Exception e){
+            log.error(e);
+            throw new KeyRotationException("KR Finalisation does not work");
+        }
+        return digest ;
     }
  }

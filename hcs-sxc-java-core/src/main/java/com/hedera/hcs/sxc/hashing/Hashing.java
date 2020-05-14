@@ -20,19 +20,28 @@ package com.hedera.hcs.sxc.hashing;
  * ‍
  */
 
+import com.hedera.hcs.sxc.exceptions.HashingException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class Hashing {
 
-   public static byte[] sha(String plaintext) throws NoSuchAlgorithmException{
-       byte[] encodedhash = null; 
-        MessageDigest digest = MessageDigest.getInstance("SHA-384");
-        encodedhash = digest.digest(
-                plaintext.getBytes(StandardCharsets.UTF_8));
-        return encodedhash;
+   public static byte[] sha(String plaintext){
+       byte[] encodedhash = null;
+       try {
+           MessageDigest digest = MessageDigest.getInstance("SHA-384");
+           encodedhash = digest.digest(
+                   plaintext.getBytes(StandardCharsets.UTF_8));
+           
+       } catch (NoSuchAlgorithmException ex) {
+           log.error("SHA-384 not supported, exiting application");
+           System.exit(0);
+       }
+       return encodedhash;
     }
    
    public static boolean matchSHA(byte[] sha1, byte[] sha2){

@@ -46,11 +46,17 @@ import com.hedera.hashgraph.proto.Timestamp;
 import com.hedera.hashgraph.proto.mirror.ConsensusTopicResponse;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
+import com.hedera.hcs.sxc.exceptions.HashingException;
+import com.hedera.hcs.sxc.exceptions.HederaNetworkCommunicationException;
+import com.hedera.hcs.sxc.exceptions.KeyRotationException;
+import com.hedera.hcs.sxc.exceptions.PluginNotLoadingException;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackFromMirror;
 import com.hedera.hcs.sxc.interfaces.HCSRelayMessage;
 import com.hedera.hcs.sxc.interfaces.MirrorSubscriptionInterface;
 import com.hedera.hcs.sxc.plugin.mirror.config.Config;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -139,9 +145,7 @@ public class MirrorSubscribe implements MirrorSubscriptionInterface {
                                 log.debug("Got message from queue - acknowledged");
                             }
                             
-                        } catch (JMSException ex) {
-                            log.error(ex);
-                        } catch (InvalidProtocolBufferException ex) {
+                        } catch (JMSException | InvalidProtocolBufferException | PluginNotLoadingException | KeyRotationException | HederaNetworkCommunicationException | HashingException ex) {
                             log.error(ex);
                         } 
                     }

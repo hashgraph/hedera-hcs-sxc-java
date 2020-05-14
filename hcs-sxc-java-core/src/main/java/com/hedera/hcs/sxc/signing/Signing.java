@@ -31,11 +31,11 @@ import lombok.extern.log4j.Log4j2;
 
 public class Signing {
  
-    public static byte[] sign(String messageToSign, Ed25519PrivateKey privateKey) throws Exception {
+    public static byte[] sign(String messageToSign, Ed25519PrivateKey privateKey) {
         return sign(messageToSign.getBytes(), privateKey);
     }
 
-    public static byte[] sign(byte[] messageToSign, Ed25519PrivateKey privateKey) throws Exception {
+    public static byte[] sign(byte[] messageToSign, Ed25519PrivateKey privateKey) {
         return privateKey.sign(messageToSign);
     }
     

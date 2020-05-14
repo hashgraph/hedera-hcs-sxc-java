@@ -41,7 +41,13 @@ import com.hedera.hashgraph.sdk.mirror.MirrorConsensusTopicResponse;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackFromMirror;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
+import com.hedera.hcs.sxc.exceptions.HashingException;
+import com.hedera.hcs.sxc.exceptions.HederaNetworkCommunicationException;
+import com.hedera.hcs.sxc.exceptions.KeyRotationException;
+import com.hedera.hcs.sxc.exceptions.PluginNotLoadingException;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * 
@@ -71,14 +77,24 @@ public final class MirrorTopicSubscriber extends Thread {
     }
     
     public void run() {
-        subscribe();
+        try {
+            subscribe();
+        } catch (PluginNotLoadingException ex) {
+            log.error(ex);
+            //System.exit(1);
+        }
     }
     
     void subscribeForTest() {
-        subscribe();
+        try {
+            subscribe();
+        } catch (PluginNotLoadingException ex) {
+            log.error(ex);
+            //System.exit(1);
+        }
     }
     
-    private void subscribe() {
+    private void subscribe() throws PluginNotLoadingException{
         final MirrorClient mirrorClient = new MirrorClient(this.mirrorAddress+ ":" + this.mirrorPort);
         try {
             MirrorConsensusTopicQuery mirrorConsensusTopicQuery = new MirrorConsensusTopicQuery()
@@ -102,8 +118,9 @@ public final class MirrorTopicSubscriber extends Thread {
                     this.subscribeFrom = Optional.of(resp.consensusTimestamp.plusNanos(1));
                     try {
                         onMirrorMessage(resp, this.onHCSMessageCallback, this.topicId);
-                    } catch (InvalidProtocolBufferException e) {
+                    } catch (HederaNetworkCommunicationException | HashingException | InvalidProtocolBufferException | PluginNotLoadingException | KeyRotationException e) {
                         log.error(e);
+                        //System.exit(1);
                     }   
                 },(error) -> {
                     // On gRPC error, print the stack trace
@@ -111,7 +128,12 @@ public final class MirrorTopicSubscriber extends Thread {
                     log.debug("Sleeping 11s before attempting connection again");
                     Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(11));
                     log.debug("Attempting to reconnect");
-                    subscribe();
+                    try {
+                        subscribe();
+                    } catch (PluginNotLoadingException ex) {
+                        log.error(ex);
+                        //System.exit(1);
+                    }
                 }
                 );
             }        
@@ -122,7 +144,7 @@ public final class MirrorTopicSubscriber extends Thread {
         }
     }
 
-    void onMirrorMessage(MirrorConsensusTopicResponse resp, HCSCallBackFromMirror onHCSMessageCallback, ConsensusTopicId topicId) throws InvalidProtocolBufferException {
+    void onMirrorMessage(MirrorConsensusTopicResponse resp, HCSCallBackFromMirror onHCSMessageCallback, ConsensusTopicId topicId) throws PluginNotLoadingException, InvalidProtocolBufferException, KeyRotationException, HederaNetworkCommunicationException, HashingException  {
         log.debug("Got message from mirror - persisting");
         ConsensusTopicResponse consensusTopicResponse = ConsensusTopicResponse.newBuilder()
                 .setConsensusTimestamp(Timestamp.newBuilder().setSeconds(resp.consensusTimestamp.getEpochSecond())

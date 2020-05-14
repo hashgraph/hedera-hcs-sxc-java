@@ -29,6 +29,9 @@ import com.hedera.hcs.sxc.commonobjects.HCSResponse;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.config.Topic;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
+import com.hedera.hcs.sxc.exceptions.HashingException;
+import com.hedera.hcs.sxc.exceptions.HederaNetworkCommunicationException;
+import com.hedera.hcs.sxc.exceptions.KeyRotationException;
 import com.hedera.hcs.sxc.hashing.Hashing;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackFromMirror;
 import com.hedera.hcs.sxc.interfaces.HCSCallBackToAppInterface;
@@ -53,6 +56,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
+import com.hedera.hcs.sxc.exceptions.PluginNotLoadingException;
+import com.hedera.hcs.sxc.exceptions.SCXCryptographyException;
 import com.hedera.hcs.sxc.proto.AccountID;
 import com.hedera.hcs.sxc.proto.ConfirmProof;
 import com.hedera.hcs.sxc.proto.RequestProof;
@@ -65,6 +70,8 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.crypto.KeyAgreement;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -183,9 +190,16 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
     }
 
     @Override
-    public void partialMessage(ApplicationMessageChunk messagePart, SxcConsensusMessage sxcConsensusMesssage) {
+    public void partialMessage(ApplicationMessageChunk messagePart, SxcConsensusMessage sxcConsensusMesssage)
+         throws PluginNotLoadingException, 
+            InvalidProtocolBufferException,
+            KeyRotationException,
+            HederaNetworkCommunicationException,
+            HashingException
+  
+    {
 
-        try {
+        
             Optional<ApplicationMessage> messageEnvelopeOptional =
                     pushUntilCompleteMessage(messagePart, this.hcsCore.getPersistence());
 
@@ -198,10 +212,9 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                         || ( ! appMessage.getEncryptionRandom().isEmpty())  // configuration may not want encryption but message can still be encrypted
                 ){
 
-                    try {
+                   // try {
 
-                        messageEncryptionClass = Plugins.find("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
-                        this.messageEncryptionPlugin = (SxcMessageEncryption)messageEncryptionClass.newInstance();
+                        this.messageEncryptionPlugin = (SxcMessageEncryption)Plugins.loadPlugin("com.hedera.hcs.sxc.plugin.encryption.*", "com.hedera.hcs.sxc.interfaces.SxcMessageEncryption", true);
 
 
                         String applicationMessageId =
@@ -249,7 +262,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                             byte[] decryptedBPM  = null;
                             // loop through signatures in address book and keep
                             // the ones that pass verification. Then test to see
-                            // if you can decrypt
+                            // if you can decrypt. TODO, find a way to test without try catch
                             byte[] sharedKey = null;
                             String originAppId = "";
 
@@ -280,12 +293,12 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                         );
                                         if (! Hashing.matchSHA(shaClrTxt, appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray())){
                                             log.error("Corrupt message detected.");
-                                            throw new Exception("Corrupt message detected.");
+                                            throw new HashingException("Corrupt message detected.");
                                         }
                                         log.debug("Able to decrypt message");
                                         messageIsForMe = true;
                                         break;
-                                    } catch (Exception e){
+                                    } catch (SCXCryptographyException e){
                                         log.debug("Unable to decrypt message");
                                         continue;
                                     }
@@ -297,7 +310,9 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                 log.debug("Message is for me, parsing");
                                 try  { Any any = Any.parseFrom(decryptedBPM); // if fails goto catch block - TODO, use typing to avoid control flow
                                     // if succeeds then it is
-                                    if(any.is(KeyRotationInitialise.class)){  //======= KR1==========================================
+                                    if(any.is(KeyRotationInitialise.class) 
+                                            && // test if I have initiated KR myself and if so ignore request
+                                            hcsCore.getTempKeyAgreement(originAppId) == null  ){  //======= KR1==========================================
                                         
                                             KeyRotationInitialise kr1 = any.unpack(KeyRotationInitialise.class);
                                             byte[] initiatorPublicKeyEncoded = kr1.getInitiatorPublicKeyEncoded().toByteArray();
@@ -350,8 +365,10 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                         byte[] responderPublicKeyEncoded = kr2.getResponderPublicKeyEncoded().toByteArray();
                                         // get the keyAgreement from core
                                         KeyAgreement keyAgreement = hcsCore.getTempKeyAgreement(StringUtils.byteArrayToHexString(sharedKey));
-                                        //hcsCore.setTempKeyAgreement(null);
+                                        
                                         byte[] newSecretKey = keyRotationPlugin.finalise(responderPublicKeyEncoded, keyAgreement);
+                                        
+                                        hcsCore.setTempKeyAgreement(originAppId,null);
                                         // store new SecretKey in Database
                                         Map<String,String> buddy = hcsCore.getPersistence().getAddressList().get(originAppId);
                                         hcsCore.getPersistence()
@@ -448,6 +465,9 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                                 sxcConsensusMesssage.sequenceNumber
                                         );
 
+                                } catch (SCXCryptographyException ex) {
+                                    log.error(ex);
+                                    //System.exit(1);
                                 } finally {
                                     notifyObservers(
                                             sxcConsensusMesssage
@@ -467,9 +487,9 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
 
                         }
 
-                    } catch (Exception e){
-                        e.printStackTrace();
-                    }
+                    //} catch (Exception e){
+                     //   e.printStackTrace();
+                    //}
                 }else { // not encrypted
                     log.debug("Received clear text message");
                     this.hcsCore.getPersistence().storeApplicationMessage(
@@ -485,9 +505,9 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                 // do nothing - there are still parts that need to be collected.
             }
 
-        } catch (InvalidProtocolBufferException ex) {
-            log.error(ex);
-        }
+        //} catch (InvalidProtocolBufferException ex) {
+        //    log.error(ex);
+        //}
     }
 
 
@@ -534,7 +554,7 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
         }
     }
 
-    private VerifiedMessage.VerificationOutcome prove(VerifiableApplicationMessage verifiableApplicationMessage) throws NoSuchAlgorithmException, InvalidProtocolBufferException {
+    private VerifiedMessage.VerificationOutcome prove(VerifiableApplicationMessage verifiableApplicationMessage) throws InvalidProtocolBufferException  {
         SxcApplicationMessageInterface applicationMessageEntity = hcsCore.getPersistence()
                 .getApplicationMessageEntity(
                     SxcPersistence.extractApplicationMessageStringId(verifiableApplicationMessage.getApplicationMessageId()

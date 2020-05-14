@@ -18,8 +18,9 @@
 
     <modules>
         <module>hcs-sxc-java-simple-message-demo</module>
-        <module>hcs-sxc-java-settlement-demo</module>
+        <!--<module>hcs-sxc-java-settlement-demo</module>
         <module>hcs-sxc-java-token-demo</module>
         <module>hcs-sxc-java-mq-consumer</module>
+        <module>hcs-sxc-java-pdf-signature-demo</module>-->
     </modules>
 </project>

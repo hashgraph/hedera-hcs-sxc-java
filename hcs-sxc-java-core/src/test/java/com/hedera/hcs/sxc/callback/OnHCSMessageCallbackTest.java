@@ -29,6 +29,8 @@ import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.commonobjects.HCSResponse;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
+import com.hedera.hcs.sxc.exceptions.PluginNotLoadingException;
+import com.hedera.hcs.sxc.exceptions.SCXCryptographyException;
 import com.hedera.hcs.sxc.interfaces.SxcPersistence;
 import com.hedera.hcs.sxc.plugin.persistence.inmemory.Persist;
 import com.hedera.hcs.sxc.proto.AccountID;
@@ -94,7 +96,7 @@ public class OnHCSMessageCallbackTest {
     }
     
     @Test
-    public void testSingleChunking() throws IOException {
+    public void testSingleChunking() throws IOException, PluginNotLoadingException, SCXCryptographyException {
         byte[] message = "Single Chunk Message".getBytes();
         ApplicationMessage userMessageToApplicationMessage = OutboundHCSMessage.userMessageToApplicationMessage(new TransactionId(new AccountId(1234L)), message, null, null);
         List<ApplicationMessageChunk> chunks = OutboundHCSMessage.chunk(userMessageToApplicationMessage);
@@ -109,7 +111,7 @@ public class OnHCSMessageCallbackTest {
     }
     
     @Test
-    public void testMultiChunking() throws IOException {
+    public void testMultiChunking() throws IOException, PluginNotLoadingException, SCXCryptographyException {
   
         byte[] longString = RandomStringUtils.random(5000, true, true).getBytes();
         ApplicationMessage userMessageToApplicationMessage = OutboundHCSMessage.userMessageToApplicationMessage(new TransactionId(new AccountId(1234L)), longString, null, null);

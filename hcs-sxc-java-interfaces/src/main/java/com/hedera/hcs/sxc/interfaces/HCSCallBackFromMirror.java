@@ -20,7 +20,12 @@ package com.hedera.hcs.sxc.interfaces;
  * ‍
  */
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
+import com.hedera.hcs.sxc.exceptions.HashingException;
+import com.hedera.hcs.sxc.exceptions.HederaNetworkCommunicationException;
+import com.hedera.hcs.sxc.exceptions.KeyRotationException;
+import com.hedera.hcs.sxc.exceptions.PluginNotLoadingException;
 import com.hedera.hcs.sxc.proto.ApplicationMessageChunk;
 import com.hedera.hcs.sxc.proto.ApplicationMessageID;
 
@@ -28,5 +33,11 @@ public interface HCSCallBackFromMirror {
     public void addObserver(HCSCallBackToAppInterface listener);
     public void notifyObservers(SxcConsensusMessage sxcConsensusMessage, byte[] message, ApplicationMessageID applicationMessageId);
     public void storeMirrorResponse(SxcConsensusMessage consensusMessage);
-    public void partialMessage(ApplicationMessageChunk messagePart, SxcConsensusMessage sxcConsensusMessage); 
+    public void partialMessage(ApplicationMessageChunk messagePart, SxcConsensusMessage sxcConsensusMessage)
+            throws PluginNotLoadingException, // problems with plugin loading
+            InvalidProtocolBufferException, // message format problems
+            KeyRotationException, 
+            HederaNetworkCommunicationException,
+            HashingException // corrupt messages
+            ; 
 }

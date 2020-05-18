@@ -485,9 +485,16 @@ public final class OutboundHCSMessage {
                 }
                 
             }
-        }  catch (Exception e){
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); //TODO: this is part of logic
+        } catch (TimeoutException e) { 
+            // do nothing
+        } catch (Exception e) {
+            log.error(e);
             throw new HederaNetworkCommunicationException("Failed to communicate with HH network");
-        }
+        } finally {
+            
+         }
         
         return firstTransactionId;
     }

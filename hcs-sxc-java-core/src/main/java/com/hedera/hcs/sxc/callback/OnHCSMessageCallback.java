@@ -367,8 +367,6 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                         KeyAgreement keyAgreement = hcsCore.getTempKeyAgreement(StringUtils.byteArrayToHexString(sharedKey));
                                         
                                         byte[] newSecretKey = keyRotationPlugin.finalise(responderPublicKeyEncoded, keyAgreement);
-                                        
-                                        hcsCore.setTempKeyAgreement(originAppId,null);
                                         // store new SecretKey in Database
                                         Map<String,String> buddy = hcsCore.getPersistence().getAddressList().get(originAppId);
                                         hcsCore.getPersistence()

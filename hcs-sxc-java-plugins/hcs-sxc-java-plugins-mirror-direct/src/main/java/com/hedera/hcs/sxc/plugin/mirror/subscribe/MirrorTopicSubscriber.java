@@ -50,22 +50,23 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * 
- * Class to manage Mirror node topic subscribers
- * the subscription is a blocking gRPC process which requires its own thread
- * if multiple topics are to be subscribed to
+ *
+ * Class to manage Mirror node topic subscribers the subscription is a blocking
+ * gRPC process which requires its own thread if multiple topics are to be
+ * subscribed to
  */
 @Log4j2
 @Getter
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public final class MirrorTopicSubscriber extends Thread {
-    
+
     private String mirrorAddress = "";
     private int mirrorPort = 0;
     private ConsensusTopicId topicId;
     private Optional<Instant> subscribeFrom;
     private HCSCallBackFromMirror onHCSMessageCallback;
     private boolean testMode = false;
+    private MirrorClient mirrorClient = null;
     
     public MirrorTopicSubscriber(String mirrorAddress, int mirrorPort, ConsensusTopicId topicId, Optional<Instant> subscribeFrom, HCSCallBackFromMirror onHCSMessageCallback, boolean testMode) {
         this.mirrorAddress = mirrorAddress;
@@ -75,68 +76,100 @@ public final class MirrorTopicSubscriber extends Thread {
         this.onHCSMessageCallback = onHCSMessageCallback;
         this.testMode = testMode;
     }
-    
+
     public void run() {
         try {
             subscribe();
-        } catch (PluginNotLoadingException ex) {
+        } catch (PluginNotLoadingException | HederaNetworkCommunicationException ex) {
             log.error(ex);
             //System.exit(1);
+
+        } catch (Throwable t) {
+        } finally {
         }
+
     }
-    
+
     void subscribeForTest() {
         try {
             subscribe();
-        } catch (PluginNotLoadingException ex) {
+        } catch (PluginNotLoadingException | HederaNetworkCommunicationException ex) {
             log.error(ex);
             //System.exit(1);
         }
     }
+
+    private void subscribe() throws PluginNotLoadingException, HederaNetworkCommunicationException {
+        Logger.getLogger("com.hedera.hashgraph.sdk.mirror").setLevel(Level.OFF);
     
-    private void subscribe() throws PluginNotLoadingException{
-        final MirrorClient mirrorClient = new MirrorClient(this.mirrorAddress+ ":" + this.mirrorPort);
+        if(mirrorClient==null)
+            mirrorClient = new MirrorClient(this.mirrorAddress + ":" + this.mirrorPort);
+
         try {
             MirrorConsensusTopicQuery mirrorConsensusTopicQuery = new MirrorConsensusTopicQuery()
                     .setTopicId(topicId);
-    
+
             log.debug("App Subscribing to topic number " + this.topicId.toString() + " on mirror node: " + this.mirrorAddress + ":" + this.mirrorPort);
-    
+
             if (this.subscribeFrom.isPresent()) {
                 this.subscribeFrom = Optional.of(this.subscribeFrom.get().plusNanos(1));
             } else {
                 this.subscribeFrom = Optional.of(Instant.now());
             }
-            
+
             log.debug("subscribing from " + this.subscribeFrom.get().getEpochSecond() + " seconds, " + this.subscribeFrom.get().getNano() + " nanos.");
-    
+
             mirrorConsensusTopicQuery.setStartTime(this.subscribeFrom.get());
-            
-            if ( ! this.testMode) {
-                mirrorConsensusTopicQuery.subscribe(mirrorClient, resp -> {
-                    log.debug("Got mirror message, calling handler");
-                    this.subscribeFrom = Optional.of(resp.consensusTimestamp.plusNanos(1));
-                    try {
-                        onMirrorMessage(resp, this.onHCSMessageCallback, this.topicId);
-                    } catch (HederaNetworkCommunicationException | HashingException | InvalidProtocolBufferException | PluginNotLoadingException | KeyRotationException e) {
-                        log.error(e);
-                        //System.exit(1);
-                    }   
-                },(error) -> {
-                    // On gRPC error, print the stack trace
-                    log.error(error);
-                    log.debug("Sleeping 11s before attempting connection again");
-                    Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(11));
-                    log.debug("Attempting to reconnect");
-                    try {
-                        subscribe();
-                    } catch (PluginNotLoadingException ex) {
-                        log.error(ex);
-                        //System.exit(1);
-                    }
-                }
+
+            if (!this.testMode) {
+                mirrorConsensusTopicQuery.subscribe(
+                        mirrorClient,
+                        resp -> {
+                            log.debug("Got mirror message, calling handler");
+                            this.subscribeFrom = Optional.of(resp.consensusTimestamp.plusNanos(1));
+                            try {
+                                onMirrorMessage(resp, this.onHCSMessageCallback, this.topicId);
+                            } catch (HederaNetworkCommunicationException | HashingException | InvalidProtocolBufferException | PluginNotLoadingException | KeyRotationException e) {
+                                log.error(e);
+                                try {
+                                    mirrorClient.close();
+                                    //System.exit(1);
+                                } catch (InterruptedException ex) {
+                                    Logger.getLogger(MirrorTopicSubscriber.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            }
+                        }, (error) -> {
+                            // On gRPC error, print the stack trace
+                            log.debug(error);
+                            log.debug("Sleeping 11s before attempting connection again");
+                            Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(11));
+                            log.debug("Attempting to reconnect");
+                            try {
+                               
+                                subscribe();
+
+                            } catch (PluginNotLoadingException | HederaNetworkCommunicationException ex) {
+                                log.error(ex);
+                                //System.exit(1);
+                            } catch (RuntimeException e) {
+
+                                log.debug("Unhanled runtime exception thown by mirror client - can be ingored atm");
+                            } 
+                            
+                            //catch (InterruptedException ex) {
+                                /*
+                                on WARNING: Increased keepalive time nanos to 240,000,000,000
+                                ERROR MirrorTopicSubscriber:138 - io.grpc.StatusRuntimeException: RESOURCE_EXHAUSTED: Bandwidth exhausted
+                                HTTP/2 error code: ENHANCE_YOUR_CALM
+                                Received Goaway
+                                too_many_pings
+                                */
+                               // Logger.getLogger(MirrorTopicSubscriber.class.getName()).log(Level.SEVERE, null, ex);
+                            //}
+
+                        }
                 );
-            }        
+            }
         } catch (Exception e1) {
             log.error(e1);
             log.debug("Sleeping 11s before attempting connection again");
@@ -144,7 +177,7 @@ public final class MirrorTopicSubscriber extends Thread {
         }
     }
 
-    void onMirrorMessage(MirrorConsensusTopicResponse resp, HCSCallBackFromMirror onHCSMessageCallback, ConsensusTopicId topicId) throws PluginNotLoadingException, InvalidProtocolBufferException, KeyRotationException, HederaNetworkCommunicationException, HashingException  {
+    void onMirrorMessage(MirrorConsensusTopicResponse resp, HCSCallBackFromMirror onHCSMessageCallback, ConsensusTopicId topicId) throws PluginNotLoadingException, InvalidProtocolBufferException, KeyRotationException, HederaNetworkCommunicationException, HashingException {
         log.debug("Got message from mirror - persisting");
         ConsensusTopicResponse consensusTopicResponse = ConsensusTopicResponse.newBuilder()
                 .setConsensusTimestamp(Timestamp.newBuilder().setSeconds(resp.consensusTimestamp.getEpochSecond())

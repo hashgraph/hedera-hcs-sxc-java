@@ -274,34 +274,47 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                     Signing.verify(
                                             appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray(),
                                             appMessage.getBusinessProcessSignatureOnHash().toByteArray(),
-
-                                                theirPubKey)
+                                            theirPubKey)
                                 ){
                                     log.debug("Signature verification on message passed with " + appId + ", message is from them.");
-                                    try {
-                                        String key = keyMap.get("sharedSymmetricEncryptionKey");
-                                        sharedKey = StringUtils.hexStringToByteArray(key);
-                                        originAppId = appId;
-                                        log.debug("Decrypting message with key " + key.substring(key.length()-10, key.length()-1));
-                                        EncryptedData encryptedData = new EncryptedData();
-                                        encryptedData.setEncryptedData(appMessage.getBusinessProcessMessage().toByteArray());
-                                        encryptedData.setRandom(appMessage.getEncryptionRandom().toByteArray());
-                                        decryptedBPM = this.messageEncryptionPlugin.decrypt(sharedKey, encryptedData);
-                                        //test if the message is illegal
-                                        byte[] shaClrTxt = Hashing.sha(
-                                                StringUtils.byteArrayToHexString(decryptedBPM)
-                                        );
-                                        if (! Hashing.matchSHA(shaClrTxt, appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray())){
-                                            log.error("Corrupt message detected.");
-                                            throw new HashingException("Corrupt message detected.");
-                                        }
-                                        log.debug("Able to decrypt message");
-                                        messageIsForMe = true;
-                                        break;
-                                    } catch (SCXCryptographyException e){
-                                        log.debug("Unable to decrypt message");
-                                        continue;
+                                    for (String key: List.of(keyMap.get("nextSharedSymmetricEncryptionKey"),keyMap.get("sharedSymmetricEncryptionKey"))){
+                                        // try to decrypt with the next key, if that fails try with the current key and if it succeeds update current to next
+                                        // normaly, the next key should be able to decrypt but parties can come out of sync while communicated during KR 
+                                        // in progress 
+                                        try {
+                                            //String key = keyMap.get("nextSharedSymmetricEncryptionKey");
+                                            sharedKey = StringUtils.hexStringToByteArray(key);
+                                            originAppId = appId;
+                                            log.debug("Decrypting message with key ending in" + key.substring(key.length()-10, key.length()-1));
+                                            EncryptedData encryptedData = new EncryptedData();
+                                            encryptedData.setEncryptedData(appMessage.getBusinessProcessMessage().toByteArray());
+                                            encryptedData.setRandom(appMessage.getEncryptionRandom().toByteArray());
+                                            decryptedBPM = this.messageEncryptionPlugin.decrypt(sharedKey, encryptedData);
+                                            //test if the message is illegal
+                                            byte[] shaClrTxt = Hashing.sha(
+                                                    StringUtils.byteArrayToHexString(decryptedBPM)
+                                            );
+                                            if (! Hashing.matchSHA(shaClrTxt, appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray())){
+                                                log.error("Corrupt message detected.");
+                                                throw new HashingException("Corrupt message detected.");
+                                            }
+                                            log.debug("Able to decrypt message");
+                                            messageIsForMe = true;
+                                            //update both keys to be the same.
+                                            hcsCore.getPersistence()
+                                                    .addOrUpdateAppParticipant(
+                                                            appId,
+                                                            keyMap.get("theirEd25519PubKeyForSigning"),
+                                                            key,
+                                                            key); // update next krey
+                                            
+                                            break; // stops the key loop
+                                        } catch (SCXCryptographyException e){
+                                            log.debug("Unable to decrypt message");
+                                            break; // stops the key loop
+                                        }   
                                     }
+                                    if(messageIsForMe) break; // stops the addreslist search
                                 }
                             }
 
@@ -338,7 +351,8 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                                     .addOrUpdateAppParticipant(
                                                             originAppId,
                                                             buddy.get("theirEd25519PubKeyForSigning"),
-                                                            StringUtils.byteArrayToHexString(newSecretKey));
+                                                            buddy.get("sharedSymmetricEncryptionKey"), // keep current key
+                                                            StringUtils.byteArrayToHexString(newSecretKey)); // update next krey
                                             
                                             ApplicationMessage decryptedAppmessage = ApplicationMessage.newBuilder()
                                                 .setApplicationMessageId(appMessage.getApplicationMessageId())
@@ -373,7 +387,10 @@ public final class OnHCSMessageCallback implements HCSCallBackFromMirror {
                                                 .addOrUpdateAppParticipant(
                                                         originAppId,
                                                         buddy.get("theirEd25519PubKeyForSigning"),
-                                                        StringUtils.byteArrayToHexString(newSecretKey));
+                                                        buddy.get("sharedSymmetricEncryptionKey"), // keep current key
+                                                        StringUtils.byteArrayToHexString(newSecretKey) // update next
+                                                
+                                                );
 
                                         ApplicationMessage decryptedAppmessage = ApplicationMessage.newBuilder()
                                             .setApplicationMessageId(appMessage.getApplicationMessageId())

@@ -575,11 +575,12 @@ implements SxcPersistence{
     }
 
     @Override
-    public void addOrUpdateAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey) {
+    public void addOrUpdateAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey, String nextSharedSymmetricEncryptionKey) {
         Session session = HibernateUtil.getHibernateSession(this.hibernateProperties);
         AddressListCrypto addressListCrypto = new AddressListCrypto();
         addressListCrypto.setAppId(appId);
         addressListCrypto.setSharedSymmetricEncryptionKey(sharedSymmetricEncryptionKey);
+        addressListCrypto.setNextSharedSymmetricEncryptionKey(nextSharedSymmetricEncryptionKey);
         addressListCrypto.setTheirEd25519PubKeyForSigning(theirEd25519PubKeyForSigning);
 
         // start a transaction

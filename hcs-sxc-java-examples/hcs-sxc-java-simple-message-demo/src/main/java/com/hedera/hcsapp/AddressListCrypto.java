@@ -165,7 +165,7 @@ public enum AddressListCrypto {
         this
         .getAddressList()
         .forEach((k,v)->{
-            hcsCore.addOrUpdateAppParticipant(k, v.get("theirEd25519PubKeyForSigning"), v.get("sharedSymmetricEncryptionKey"));
+            hcsCore.addOrUpdateAppParticipant(k, v.get("theirEd25519PubKeyForSigning"), v.get("sharedSymmetricEncryptionKey"),v.get("sharedSymmetricEncryptionKey") );
         });
     }
     

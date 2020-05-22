@@ -149,6 +149,7 @@ public class OutboundHCSMessageTest {
             ;
         hcsCore.addOrUpdateAppParticipant("1", 
                 "302a300506032b6570032100c969fbb7b67b36f5560aa59a754a38bd88fd53ff870dad33011bbe2f37f34396", 
+                "817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449",
                 "817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449"
         );
    

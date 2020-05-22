@@ -145,14 +145,11 @@ public final class MirrorTopicSubscriber extends Thread {
                             Uninterruptibles.sleepUninterruptibly(Duration.ofSeconds(11));
                             log.debug("Attempting to reconnect");
                             try {
-                               
                                 subscribe();
-
                             } catch (PluginNotLoadingException | HederaNetworkCommunicationException ex) {
                                 log.error(ex);
                                 //System.exit(1);
                             } catch (RuntimeException e) {
-
                                 log.debug("Unhanled runtime exception thown by mirror client - can be ingored atm");
                             } 
                             

@@ -325,8 +325,8 @@ public class PersistTest {
         Persist persist = new Persist();
         persist.setHibernateProperties(getHibernateProperties("testAddressList"));
         
-        assertDoesNotThrow( () -> {persist.addOrUpdateAppParticipant("0", "theirEd25519PubKeyForSigning0", "sharedSymmetricEncryptionKey0");});
-        assertDoesNotThrow( () -> {persist.addOrUpdateAppParticipant("1", "theirEd25519PubKeyForSigning1", "sharedSymmetricEncryptionKey1");});
+        assertDoesNotThrow( () -> {persist.addOrUpdateAppParticipant("0", "theirEd25519PubKeyForSigning0", "sharedSymmetricEncryptionKey0","nextSharedSymmetricEncryptionKey0" );});
+        assertDoesNotThrow( () -> {persist.addOrUpdateAppParticipant("1", "theirEd25519PubKeyForSigning1", "sharedSymmetricEncryptionKey1","nextSharedSymmetricEncryptionKey1");});
         
         Map<String, Map<String, String>> gotAddressList = persist.getAddressList();
         

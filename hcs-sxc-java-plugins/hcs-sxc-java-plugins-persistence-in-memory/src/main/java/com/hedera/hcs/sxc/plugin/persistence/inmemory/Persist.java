@@ -299,8 +299,12 @@ public class Persist
     }
     
     @Override
-    public void addOrUpdateAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey) {
-        Persist.addressList.put(appId, Map.of("theirEd25519PubKeyForSigning", theirEd25519PubKeyForSigning, "sharedSymmetricEncryptionKey", sharedSymmetricEncryptionKey));
+    public void addOrUpdateAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey, String nextSharedSymmetricEncryptionKey) {
+        Persist.addressList.put(appId, Map.of(
+                "theirEd25519PubKeyForSigning", theirEd25519PubKeyForSigning, 
+                "sharedSymmetricEncryptionKey", sharedSymmetricEncryptionKey,
+                "nextSharedSymmetricEncryptionKey",nextSharedSymmetricEncryptionKey)
+        );
     }
     @Override
     public void removeAppParticipant(String appId) {

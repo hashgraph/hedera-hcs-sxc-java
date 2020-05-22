@@ -350,7 +350,7 @@ public final class OutboundHCSMessage {
             if (this.addressList != null && this.addressList.size() > 0){ // get it from .env
                 for (String recipient : addressList.keySet()){
                     log.debug("Sending to " + recipient);
-                    TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, this.addressList.get(recipient).get("sharedSymmetricEncryptionKey") , byPassSending);
+                    TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, this.addressList.get(recipient).get("nextSharedSymmetricEncryptionKey") , byPassSending);
                     txIdList.add(doSendMessageTxId);
                 }                
             } else {

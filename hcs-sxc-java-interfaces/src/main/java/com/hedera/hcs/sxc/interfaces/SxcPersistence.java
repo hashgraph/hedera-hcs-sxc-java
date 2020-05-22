@@ -88,7 +88,7 @@ public interface SxcPersistence {
 
     // AddressBook Persistence
     public Map<String,Map<String,String>> getAddressList();
-    public void addOrUpdateAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey);
+    public void addOrUpdateAppParticipant(String appId, String theirEd25519PubKeyForSigning, String sharedSymmetricEncryptionKey, String nextSharedSymmetricEncryptionKey);
     public void removeAppParticipant(String appId);
     
     //extract primary key

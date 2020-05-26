@@ -9,14 +9,18 @@ import com.google.cloud.pubsub.v1.Publisher;
 import com.google.protobuf.ByteString;
 import com.google.pubsub.v1.ProjectTopicName;
 import com.google.pubsub.v1.PubsubMessage;
-import com.hedera.hcs.sxc.queue.generator.config.Queue;
+import com.hedera.hcs.sxc.queue.config.Queue;
 
 public class GoogleGenerator {
     public static void generate(Queue queueConfig) throws Exception {
         int iterations = queueConfig.getIterations();
 
-        final String G_PROJECT_ID = queueConfig.getExchangeName();
-        final String G_TOPIC_ID = queueConfig.getConsumerTag();
+        if ( ! queueConfig.getPubSub().getEnabled()) {
+            return;
+        }
+
+        final String G_PROJECT_ID = queueConfig.getPubSub().getExchangeName();
+        final String G_TOPIC_ID = queueConfig.getPubSub().getConsumerTag();
         GoogleTopic.Create(G_PROJECT_ID, G_TOPIC_ID);
 
         ProjectTopicName pubTopicName = ProjectTopicName.of(G_PROJECT_ID, G_TOPIC_ID);

@@ -16,19 +16,10 @@
     <description>Sends random messages to a Message Queue</description>
     <dependencies>
         <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-pubsub</artifactId>
-            <version>1.105.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-core</artifactId>
-            <version>1.93.4</version>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk</artifactId>
-            <version>1.11.775</version>
+            <groupId>com.hedera</groupId>
+            <artifactId>hcs-sxc-java-queue-config</artifactId>
+            <version>${hcs-sxc.version}</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
     <build>

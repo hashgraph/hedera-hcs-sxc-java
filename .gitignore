@@ -44,6 +44,9 @@ chrome-profiler-events*.json
 speed-measure-plugin*.json
 
 # IDEs and editors
+*.njsproj
+*.sln
+*.ntvs*
 .idea/
 *.iml
 .classpath
@@ -60,6 +63,7 @@ nbactions.xml
 
 # IDE - VSCode
 .vscode/*
+.vscode
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
@@ -101,3 +105,12 @@ hcs-sxc-java-examples/hcs-sxc-java-token-demo/build.sh
 config.yaml
 h2data/
 hcs-sxc-java-examples/hcs-sxc-java-token-demo/hcs-sxc-token-demo
+hcs-sxc-java-examples/hcs-sxc-java-cloudwatch/run.sh
+
+# Javascript
+.DS_Store
+node_modules/
+/dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

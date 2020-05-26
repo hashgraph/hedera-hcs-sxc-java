@@ -27,12 +27,4 @@ queue:
      consumerTag: myMQConsumerTag
      producerTag: myMQProducerTag
      topicId: 0.0.900
-  kafka:     
-     # set to false if you do not wish to use this service  
-     enabled: false
-     host: localhost
-     port: 9092
-     consumerTag: myMQConsumerTag
-     producerTag: myMQProducerTag
-     topicId: 0.0.700
   

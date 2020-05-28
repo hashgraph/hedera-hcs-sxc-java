@@ -115,7 +115,10 @@ public class HCSCore {
         this.signMessages = appnet.getSignMessages();
         this.encryptMessages = appnet.getEncryptMessages();
         this.rotateKeys = appnet.getRotateKeys();
-        this.topics = appnet.getTopics();
+        if (this.topics.size() == 0) {
+            // if size == 0, the list of topics has not beeen overridden with `withTopicList`
+            this.topics = appnet.getTopics();
+        }
         this.catchupHistory = appnet.getCatchupHistory();
         this.messagePersistenceLevel = appnet.getPersistenceLevel();
 
@@ -237,6 +240,16 @@ public class HCSCore {
     }
     public HCSCore withOperatorKey(Ed25519PrivateKey operatorKey) {
         this.operatorKey = operatorKey;
+        return this;
+    }
+    public HCSCore withTopic(Topic topic) {
+        this.topics.add(topic);
+        return this;
+    }
+    public HCSCore withTopic(String topic) {
+        Topic topicId = new Topic();
+        topicId.setTopic(topic);
+        this.topics.add(topicId);
         return this;
     }
     public HCSCore withTopicList(List<Topic> topics) {

@@ -1,4 +1,5 @@
-package com.hedera.hcs.sxc.queue.generator.config;
+package com.hedera.hcs.sxc.cloudwatch.config;
+
 
 import java.io.File;
 import java.io.FileInputStream;

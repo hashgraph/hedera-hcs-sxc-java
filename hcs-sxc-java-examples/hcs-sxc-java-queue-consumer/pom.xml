@@ -16,6 +16,7 @@
     <modules>
         <module>hcs-sxc-java-queue-listener</module>
         <module>hcs-sxc-java-queue-generator</module>
+        <module>hcs-sxc-java-queue-config</module>
     </modules>
 
     <organization>
@@ -51,6 +52,26 @@
             <artifactId>amqp-client</artifactId>
             <version>${amqp-client.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-pubsub</artifactId>
+            <version>1.105.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-core</artifactId>
+            <version>1.93.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk</artifactId>
+            <version>1.11.775</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>2.5.0</version>
+        </dependency>        
         <dependency>
             <groupId>com.hedera</groupId>
             <artifactId>hcs-sxc-java-plugins-encryption-diffie-hellman

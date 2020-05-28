@@ -1,0 +1,4 @@
+cloudwatch:
+  logStreamName: ""
+  logGroupName: ""
+  batchSize: 10

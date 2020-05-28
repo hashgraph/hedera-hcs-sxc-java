@@ -2,7 +2,7 @@ package com.hedera.hcs.sxc.queue.generator;
 
 import java.util.concurrent.TimeUnit;
 
-import com.hedera.hcs.sxc.queue.generator.config.Queue;
+import com.hedera.hcs.sxc.queue.config.Queue;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -11,23 +11,26 @@ public class MqGenerator {
     public static void generate(Queue queueConfig) {
         int iterations = queueConfig.getIterations();
 
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(queueConfig.getHost());
-        if ( ! queueConfig.getUser().isEmpty()) {
-            factory.setUsername(queueConfig.getUser());
+        if ( ! queueConfig.getMq().getEnabled()) {
+            return;
         }
-        if ( ! queueConfig.getPassword().isEmpty()) {
-            factory.setPassword(queueConfig.getPassword());
+        ConnectionFactory factory = new ConnectionFactory();
+        factory.setHost(queueConfig.getMq().getHost());
+        if ( ! queueConfig.getMq().getUser().isEmpty()) {
+            factory.setUsername(queueConfig.getMq().getUser());
+        }
+        if ( ! queueConfig.getMq().getPassword().isEmpty()) {
+            factory.setPassword(queueConfig.getMq().getPassword());
         }
 
         try (Connection connection = factory.newConnection();
             Channel channel = connection.createChannel()) {
-            channel.exchangeDeclare(queueConfig.getExchangeName(), "topic");
+            channel.exchangeDeclare(queueConfig.getMq().getExchangeName(), "topic");
 
             do {
                 String message = Data.getRandomData();
                 //channel.basicPublish("", queueConfig.getName(), null, message.getBytes());
-                channel.basicPublish(queueConfig.getExchangeName(), queueConfig.getConsumerTag(), null, message.getBytes());
+                channel.basicPublish(queueConfig.getMq().getExchangeName(), queueConfig.getMq().getConsumerTag(), null, message.getBytes());
                
                 System.out.println(" Sent '" + message + "'");
 

@@ -1,29 +1,31 @@
 package com.hedera.hcs.sxc.queue.mq;
 
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.callback.OnHCSMessageCallback;
 import com.hedera.hcs.sxc.commonobjects.HCSResponse;
 import com.hedera.hcs.sxc.consensus.OutboundHCSMessage;
-import com.hedera.hcs.sxc.interfaces.SxcApplicationMessageInterface;
 import com.hedera.hcs.sxc.commonobjects.SxcConsensusMessage;
-import com.hedera.hcs.sxc.interfaces.SxcPersistence;
-import com.hedera.hcs.sxc.queue.config.AppData;
+import com.hedera.hcs.sxc.queue.HCSMessageRest;
+import com.hedera.hcs.sxc.queue.Utils;
 import com.hedera.hcs.sxc.queue.config.Config;
+import com.hedera.hcs.sxc.queue.config.Mq;
 import com.hedera.hcs.sxc.queue.config.Queue;
-import com.hedera.hcs.sxc.proto.ApplicationMessage;
 import com.rabbitmq.client.*;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.stereotype.Component;
-
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 @Log4j2
-@Component
-public class Listener {
+@RestController
+public class MQListener {
+    
+    private HCSCore hcsCore;
+
     @PostConstruct
     public void init() throws Exception {
 
@@ -35,21 +37,28 @@ public class Listener {
             return;
         }
 
-        final Queue queueConfigFinal = queueConfig;
+        final Mq queueConfigFinal = queueConfig.getMq();
 
-        if ( ! queueConfigFinal.getProvider().equals("mq")) {
+        if ( ! queueConfigFinal.getEnabled()) {
             return;
         }
 
+        this.hcsCore = new HCSCore()
+                .withTopic(queueConfigFinal.getTopicId())
+                .builder("pubsub",
+                        "./config/config.yaml",
+                        "./config/.env"
+                );
+        
         // create a callback object to receive the message
-        OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(AppData.getHCSCore());
+        OnHCSMessageCallback onHCSMessageCallback = new OnHCSMessageCallback(this.hcsCore);
         onHCSMessageCallback.addObserver((SxcConsensusMessage sxcConsensusMesssage, HCSResponse hcsResponse) -> {
             // handle notification in mirrorNotification
             if (queueConfigFinal.getProducerTag() == null) {
                 System.out.println("got hcs response");
                 try {
                     System.out.println(" [x] Received '" + queueConfigFinal.getConsumerTag() + "':'"
-                            + getSimpleDetails(AppData.getHCSCore(), hcsResponse) + "'");
+                            + Utils.getSimpleDetails(this.hcsCore, hcsResponse) + "'");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -64,10 +73,13 @@ public class Listener {
 
                 try (Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {
                     channel.exchangeDeclare(queueConfigFinal.getExchangeName(), "topic");
+
+                    String response = Utils.JSONPublishMessage(sxcConsensusMesssage, hcsResponse);
+
                     channel.basicPublish(queueConfigFinal.getExchangeName(), queueConfigFinal.getProducerTag(), null,
-                            getSimpleDetails(AppData.getHCSCore(), hcsResponse).getBytes());
+                            response.getBytes());
                     System.out.println(" [x] Sent '" + queueConfigFinal.getProducerTag() + "':'"
-                            + getSimpleDetails(AppData.getHCSCore(), hcsResponse) + "'");
+                            + Utils.getSimpleDetails(this.hcsCore, hcsResponse) + "'");
                 } catch (IOException ex) {
                     log.error(ex);
                 } catch (TimeoutException ex) {
@@ -78,7 +90,7 @@ public class Listener {
             }
         });
 
-        System.out.println("Loaded APP_ID:" + AppData.getHCSCore().getApplicationId());
+        System.out.println("Loaded APP_ID:" + this.hcsCore.getApplicationId());
 
         Runnable runnable;
         runnable = () -> {
@@ -100,7 +112,7 @@ public class Listener {
                     System.out.println(" [x] Received '" + delivery.getEnvelope().getRoutingKey() + "':'" + message
                             + "'" + "on " + consumerTagPrime);
                     try {
-                        OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(AppData.getHCSCore());
+                        OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(this.hcsCore);
                         outboundHCSMessage.sendMessage(0, message.getBytes());
                     } catch (Exception ex) {
                         log.error(ex);
@@ -122,24 +134,8 @@ public class Listener {
         thread.start();
     }
 
-    private static String getSimpleDetails(HCSCore hcsCore, HCSResponse hcsResponse) {
-        String ret = null;
-        try {
-            SxcApplicationMessageInterface applicationMessageEntity = hcsCore.getPersistence()
-                    .getApplicationMessageEntity(
-                            SxcPersistence.extractApplicationMessageStringId(hcsResponse.getApplicationMessageId()));
-            ret =   hcsCore.getTopics().get(0).getTopic() + "|"
-                    + applicationMessageEntity.getLastChronoPartSequenceNum() + "|"
-                    + applicationMessageEntity.getLastChronoPartConsensusTimestamp() + "|"
-                    + ApplicationMessage.parseFrom(applicationMessageEntity.getApplicationMessage())
-                            .getBusinessProcessMessage().toString("UTF-8");
-            ;
-
-        } catch (UnsupportedEncodingException ex) {
-            log.error(ex);
-        } catch (InvalidProtocolBufferException ex) {
-            log.error(ex);
-        }
-        return ret;
+    @GetMapping(value = "/mq", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<HCSMessageRest> hcsMessages() throws Exception {
+        return Utils.restResponse(this.hcsCore);
     }
 }

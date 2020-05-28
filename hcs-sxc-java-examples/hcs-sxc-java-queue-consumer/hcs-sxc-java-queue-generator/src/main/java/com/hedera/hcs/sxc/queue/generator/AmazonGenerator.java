@@ -6,13 +6,16 @@ import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.amazonaws.services.sqs.model.AmazonSQSException;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
-import com.hedera.hcs.sxc.queue.generator.config.Queue;
+import com.hedera.hcs.sxc.queue.config.Queue;
 
 public class AmazonGenerator {
     public static void generate(Queue queueConfig) throws Exception {
         
+        if ( ! queueConfig.getSqs().getEnabled()) {
+            return;
+        }
         int iterations = queueConfig.getIterations();
-        final String QUEUE_NAME = queueConfig.getConsumerTag();
+        final String QUEUE_NAME = queueConfig.getSqs().getConsumerTag();
         final AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
 
         try {

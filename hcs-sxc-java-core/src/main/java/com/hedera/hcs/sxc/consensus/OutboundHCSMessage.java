@@ -33,8 +33,6 @@ import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.HederaNetworkException;
-import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.account.AccountId;
@@ -65,9 +63,8 @@ import com.hedera.hcs.sxc.proto.VerifiableApplicationMessage;
 import com.hedera.hcs.sxc.proto.VerifiableMessage;
 import com.hedera.hcs.sxc.signing.Signing;
 import com.hedera.hcs.sxc.utils.StringUtils;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.NoSuchElementException;
+import java.util.Hashtable;
 import javax.crypto.KeyAgreement;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.tuple.Pair;
@@ -131,6 +128,7 @@ public final class OutboundHCSMessage {
         this.signMessages = hcsCore.getSignMessages();
         this.encryptMessages = hcsCore.getEncryptMessages();
         this.rotateKeys = hcsCore.getRotateKeys();
+        this.rotationFrequency  = hcsCore.getRotationFrequency();
         this.nodeMap = hcsCore.getNodeMap();
         this.operatorAccountId = hcsCore.getOperatorAccountId();
         this.operatorKey = hcsCore.getOperatorKey();
@@ -343,27 +341,50 @@ public final class OutboundHCSMessage {
             enableMessageEncryptionPlugin();
             log.debug("Override encryption");
             if(rotateKeys){throw new KeyRotationException("You can not override the key when key rotation is enabled");}
-            TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, this.overrideMessageEncryptionKey, byPassSending);
+            TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, this.overrideMessageEncryptionKey, false,byPassSending);
             txIdList.add(doSendMessageTxId);
         }else if (encryptMessages) { // send  so that specific users can decrypt - flag needs addressbook
+            if(rotateKeys && rotationFrequency == 0){throw new KeyRotationException("You have enabled key rotation but the frequency was set 0");}
+            
             enableMessageEncryptionPlugin();
             if (this.addressList != null && this.addressList.size() > 0){ // get it from .env
                 for (String recipient : addressList.keySet()){
                     log.debug("Sending to " + recipient);
-                    TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, this.addressList.get(recipient).get("nextSharedSymmetricEncryptionKey") , byPassSending);
+                     String getRC = hcsCore.getPersistence()
+                        .getAddressList()
+                        .get(recipient)
+                        .get("rotationMessageCount");
+                
+                    int rotationMessageCount =  getRC == null? 0 : Integer.parseInt(getRC); 
+                    
+                    rotationMessageCount++;
+                    TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, this.addressList.get(recipient).get("nextSharedSymmetricEncryptionKey") , this.rotateKeys ?  rotationMessageCount % rotationFrequency == 0 : false, byPassSending);
                     txIdList.add(doSendMessageTxId);
+                    
+                    Map<String, String> v = hcsCore.getPersistence()
+                        .getAddressList()
+                        .get(recipient);
+                        
+                
+                    Map newMap = new HashMap();
+                    newMap.putAll(v);
+                    newMap.put("rotationMessageCount", rotationMessageCount+"");
+                    hcsCore.getPersistence()
+                            .getAddressList().replace(recipient, newMap);
+
+                    
                 }                
             } else {
                 throw new KeyRotationException("Encryption set to true, but no keys found in address book or in an override");
             }
         } else { // broadcast
-            TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, null, byPassSending);
+            TransactionId doSendMessageTxId = doSendMessage(message, topicIndex, null, false, byPassSending);
             txIdList.add(doSendMessageTxId);     
         }
         return txIdList;
     }
 
-    private TransactionId doSendMessage(byte[] message, int topicIndex, String recipientSharedSymetricEncryptionKey, boolean byPassSending) 
+    private TransactionId doSendMessage(byte[] message, int topicIndex, String recipientSharedSymetricEncryptionKey, boolean triggerRotationAfterMessage, boolean byPassSending) 
             throws KeyRotationException, PluginNotLoadingException, HederaNetworkCommunicationException, SCXCryptographyException
              {
         // generate TXId for main and first message it not already set by caller
@@ -437,7 +458,7 @@ public final class OutboundHCSMessage {
                 this.persistencePlugin.storeTransaction(transactionIdPrime, tx);
 
                 log.debug("Executing transaction");
-                if ( ! byPassSending) {
+                if (! byPassSending) {
                     TransactionId txId = tx.execute(client);
                     
                     TransactionReceipt receipt = txId.getReceipt(client, Duration.ofSeconds(30));
@@ -461,10 +482,25 @@ public final class OutboundHCSMessage {
                 if (!this.encryptMessages) {
                     throw new KeyRotationException("Trying to initiate key rotation but encryption is disabled");   
                 }
-                   
-                int messageCount = -1; //TODO - keep track of messages pair-wise, not just here. ( per topic )
-                if (messageCount < rotationFrequency) { // TODO - Fires everytime
+             
+                /*
+                String getRC = hcsCore.getPersistence()
+                        .getAddressList()
+                        .get(recipientApId)
+                        .get("rotationMessageCount");
+                
+                int rotationMessageCount =  getRC == null? 0 : Integer.parseInt(getRC); 
                         
+                
+                rotationMessageCount++;   
+                */
+                if (triggerRotationAfterMessage) { // TODO - Fires everytime
+                    /*hcsCore.getPersistence()
+                        .getAddressList()
+                        .get(sy)
+                        .put("rotationMessageCount","0");
+                    */
+                    
                     //1) Send initiate  Message so that his onHCSMessage can pick it up
                     //2) If onHCSMessage receives KR1 then update key and KR2
                     //3) If onHCSMessage receives KR2 then update key using stored KeyAgreement
@@ -481,17 +517,29 @@ public final class OutboundHCSMessage {
                             .setInitiatorPublicKeyEncoded(ByteString.copyFrom(initiate.getRight()))
                             .build();
                     Any krAnyPack = Any.pack(kr1);
-                    this.doSendMessage(krAnyPack.toByteArray(), topicIndex, recipientSharedSymetricEncryptionKey, byPassSending);
+                    this.doSendMessage(krAnyPack.toByteArray(), topicIndex, recipientSharedSymetricEncryptionKey, false, byPassSending);
                 }
+                /*
+                Map<String, String> v = hcsCore.getPersistence()
+                        .getAddressList()
+                        .get(recipientApId);
+                        
                 
+                Map newMap = new HashMap();
+                newMap.putAll(v);
+                newMap.put("rotationMessageCount", rotationMessageCount+"");
+                hcsCore.getPersistence()
+                        .getAddressList().replace(recipientApId,newMap );
+                       
+              */  
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt(); //TODO: this is part of logic
         } catch (TimeoutException e) { 
             // do nothing
         } catch (Exception e) {
-            log.error(e);
-            throw new HederaNetworkCommunicationException("Failed to communicate with HH network");
+            HederaNetworkCommunicationException hederaNetworkCommunicationException = new HederaNetworkCommunicationException("Failed to communicate with HH network");
+            hederaNetworkCommunicationException.initCause(e.getCause());
         } finally {
             
          }

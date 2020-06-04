@@ -104,28 +104,37 @@ public class OutboundHCSMessageTest {
 
     @Test
     public void testOutBoundMessageNoSendNoEncryption() throws Exception {
-        HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+        try {
+            HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
 
-        OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(hcsCore);
-        // pretend we're sending
-        List<TransactionId> transactionId = outboundHCSMessage.sendMessageForTest(0, "testMessage".getBytes());
-        assertNotNull(transactionId);
-        
+            OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(hcsCore);
+            // pretend we're sending
+            List<TransactionId> transactionId = outboundHCSMessage.sendMessageForTest(0, "testMessage".getBytes());
+            assertNotNull(transactionId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
     }
     @Test
     public void testOutBoundMessageNoSendWithOverrideEncryption() throws Exception {
-        HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
-        OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(hcsCore);
-        outboundHCSMessage.overrideMessageEncryptionKey("817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449");
-        outboundHCSMessage.overrideEncryptedMessages(true);
-        // pretend we're sending
-        List<TransactionId> transactionId = outboundHCSMessage.sendMessageForTest(0, "testMessage".getBytes());
-        assertNotNull(transactionId);
-        
+        try {
+            HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test");
+            OutboundHCSMessage outboundHCSMessage = new OutboundHCSMessage(hcsCore);
+            outboundHCSMessage.overrideMessageEncryptionKey("817c2d3fc1188a7007bce96d5760dd06d3635f378322c98085b4bb37d63c2449");
+            outboundHCSMessage.overrideEncryptedMessages(true);
+            // pretend we're sending
+            List<TransactionId> transactionId = outboundHCSMessage.sendMessageForTest(0, "testMessage".getBytes());
+            assertNotNull(transactionId);
+        } catch (Exception e){
+          e.printStackTrace();
+          fail();
+        }
     }
   
     @Test
     public void testOutBoundMessageNoSendWithEncryptionAndRotation() throws Exception {
+        try {
         HCSCore hcsCore = new HCSCore().builder("0", "./src/test/resources/config.yaml", "./src/test/resources/dotenv.test")
             .withMessageEncryptionKey(Ed25519PrivateKey.generate().toBytes())
             .withEncryptedMessages(true)
@@ -136,7 +145,10 @@ public class OutboundHCSMessageTest {
         // pretend we're sending
         List<TransactionId> transactionId = outboundHCSMessage.sendMessageForTest(0, "testMessage".getBytes());
         assertNotNull(transactionId);
-        
+        } catch (Exception e){
+            e.printStackTrace();
+            fail();
+        }
     }
     
     @Test

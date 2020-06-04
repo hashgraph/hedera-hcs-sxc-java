@@ -24,10 +24,7 @@ import com.hedera.hcs.sxc.exceptions.PluginNotLoadingException;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lombok.extern.log4j.Log4j2;
-import org.apache.logging.log4j.core.tools.picocli.CommandLine;
 
 @Log4j2
 public final class Plugins {

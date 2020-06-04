@@ -49,7 +49,7 @@ public class HCSCore {
     private boolean signMessages = false;
     private boolean encryptMessages = false;
     private boolean rotateKeys = false;
-    private int rotationFrequency = 0;
+    private int rotationFrequency = 1;
    
     private Map<AccountId, String> nodeMap = new HashMap<>();
     private AccountId operatorAccountId = new AccountId(0, 0, 0); 
@@ -115,6 +115,7 @@ public class HCSCore {
         this.signMessages = appnet.getSignMessages();
         this.encryptMessages = appnet.getEncryptMessages();
         this.rotateKeys = appnet.getRotateKeys();
+        this.rotationFrequency = appnet.getRotateKeyFrequency();
         this.topics = appnet.getTopics();
         this.catchupHistory = appnet.getCatchupHistory();
         this.messagePersistenceLevel = appnet.getPersistenceLevel();

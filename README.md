@@ -56,9 +56,8 @@ SXC components use the Hedera Java SDK to communicate with Hedera's HCS service 
   - Multiple user roles with complex state machine management
   - Building HCS app nets with  REST and WebSocket endpoints
 - [Listening Message Queues with logging and  timestamping](./hcs-sxc-java-examples/hcs-sxc-java-mq-consumer)
-  - RabbitMQ
-  - Kafka
-  - Google Clloud PubSub
+  - Support for RabbitMQ
+  - MQ Instant messenger demo with UI
 - [Token demo](./hcs-sxc-java-examples/hcs-sxc-java-token-demo)
 
 ## Compiling the project

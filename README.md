@@ -37,7 +37,7 @@ SXC components use the Hedera Java SDK to communicate with Hedera's HCS service 
 - Mirror node topic subscription
     - Via relay
     - Direct to mirror node
-- Plugin based architecture ([read more about plugins here](.\hcs-sxc-java-plugins\README.md))
+- Plugin based architecture ([read more about plugins](.\hcs-sxc-java-plugins\README.md))
     - hcs-sxc-java-plugins-encryption-diffie-hellman - plugin to encrypt messages and manage key rotation using Diffie Hellman
     - hcs-sxc-java-plugins-mirror-direct - plugin to enable the `hcs-sxc-java-core` to subscribe to mirror notifications directly
     - hcs-sxc-java-plugins-mirror-queue-artemis - plugin to enable the `hcs-sxc-java-core` to subscribe to mirror notifications via an Artemis Message Queue (which receives messages via the `hcs-sxc-java-relay` component)
@@ -57,26 +57,25 @@ SXC components use the Hedera Java SDK to communicate with Hedera's HCS service 
   - Building HCS app nets with  REST and WebSocket endpoints
 - [Listening Message Queues with logging and  timestamping](./hcs-sxc-java-examples/hcs-sxc-java-mq-consumer)
   - Support for RabbitMQ
+  - Support for Kafka
   - MQ Instant messenger demo with UI
+- Listening and logging Cloudwatch events
+
 - [Token demo](./hcs-sxc-java-examples/hcs-sxc-java-token-demo)
 
 ## Compiling the project
 
 The project consists of several components each of which is a separate maven project with its own `pom.xml` that you can compile individually.   [Read a brief description of all components](./README-COMPONENTS.md). 
 
-We have bundled all components in a parent `pom.xml` which you can find a the project root folder. Compiling the parent project will **compile all sub-modules** including the [bundled examples](./hcs-sxc-java-examples). For the examples to work you need to make sure that [runtime configuration files](#runtime-configuration-files) of each example are complete and accurate. Configuration files are consulted only at runtime and are available in each example project.
+We have bundled all components in a parent `pom.xml` which you can find at the project root folder. Compiling the parent project will **compile all sub-modules** including the [bundled examples](./hcs-sxc-java-examples). For the examples to work you need to make sure that runtime configuration files of each example are complete and accurate. Configuration files are consulted only at runtime and are available in each example project. Consult the documentation of each example for setting up configuration files. 
 
 *Note: The project uses [lombok](https://projectlombok.org/) which is "a java library that automatically plugs into your editor and build tools, spicing up your java". Some IDEs require that a plug in is installed in order for lombok to work.*
 
 ###### Pre-requisites
 
 - The project is built on java 10.
-
 - [Protobuf compiler](https://github.com/protocolbuffers/protobuf) version 3.11.2. (check with `protoc --version` in a command prompt).
-
-- Some examples require Docker and Docker-Compose
-
-  
+- Some examples require Docker and Docker-Compos
 
 At the root of the project issue
 
@@ -114,6 +113,11 @@ mvnw clean install -Pfatjar
 
 *Note: a `mvnw` executable is provided in the project in the event you don't have maven installed* 
 
+From here, to get an app running jump to 
+
++ App from scratch [Hello App Participant - your first HCS SXC project](#Hello-App-Participant---your-first-HCS-SXC-project) 
++ App from example project [Example Projects](./hcs-sxc-java-examples/README.md)
+
 ## The anatomy of an app 
 
 An HCS SXC **app participant** is part of an **AppNet**, a network of applications, which share the same code. They communicate messages with each other via the Hedera Consensus Service rather than in a peer to peer or other fashion.
@@ -123,8 +127,8 @@ An app participant is a Java program that sends, receives, and processes message
 - APP_ID:  A name that identifies the app in the network
 - OPERATOR_KEY: A Hedera Hashgraph *private key* with sufficient balance to sign and submit Hedera Hashgraph transactions. 
 - SIGNING_KEY: Optional, an independently generated *private key* to sign Business Process Messages. Receiving parties are assumed to possess the corresponding public key to identify originators of messages.  
--  ADDRESS LIST: Optional, a *buddy list* where each item is a known app participant (APP_ID) along with his public signing key and a shared symmetric private key 
-- Configuration parameters that define the TOPIC_ID, node addresses, mirror addresses, how to handle encryption and key rotation and setting up the Java Persistence API parameters for storing messages in an apps internal database. 
+-  Address list: Optional, a *buddy list* where each item is a known app participant (APP_ID) along with his public signing key and a shared symmetric private key 
+- Configuration parameters that define the TOPIC_ID, node addresses, mirror addresses, how to handle encryption and key rotation and setting up the Java Persistence API parameters for storing messages in the **core's internal database**. 
 
 An **Application Message** is a message packet sent between AppNet participants using a standard envelope (the message itself may be broken up into several HCS transactions if too large). 
 
@@ -145,7 +149,7 @@ On a high level,  the relationship between these two is laid out below. This is 
     
     ReservedInstruction := KeyRotationInit | KeyRotationRespond | RequestProof | ConfirmProof
 
-When a BPM is wrapped into an Application Message then the hash of that cleartext BPM is calculated and placed in the relevant field even if the BPM is setup to be sent encrypted. Subsequently,  that hash is signed (when signing is enable) with the operator's *signing key*. Receiving parties are then able to identify whether a message belongs to a *known party* and if so attempt to decrypt it.  This is essentially the mechanism that allows secure  and private communication between designated parties on a non peer to peer network.
+When a BPM is wrapped into an Application Message then the hash of that <u>cleartext</u> BPM is calculated and placed in the relevant field even if the BPM is setup to be sent encrypted. Subsequently,  that hash is signed (when signing is enable) with the operator's *signing key*. Receiving parties are then able to identify whether a message belongs to a *known party* and if so attempt to decrypt it.  This is essentially the mechanism that allows secure  and private communication between designated parties on a non peer to peer network.
 
 The BMP can be an arbitrary byte array or a *reserved instruction*. A reserved instruction is placed in an Application Message by the  SXC core in response to API calls such as requesting validation of a message or in response to conditions that trigger key exchange and rotation.   The user generated BPM can be a plain text message that will be timestamped by the network or could be application code, or op-codes, which is likely to be akin to a state machine which responds to user inputs and generates HCS transactions as a result. 
 
@@ -157,20 +161,26 @@ All things being equal and making sure applications do not behave in an unpredic
 
 Application messages can be signed and encrypted. HCS-SCX also uses ed25519 keys to sign such messages. Such signing-keys are private keys and the library provides various methods to set them up: the simplest setup is via an .env file where this private ed25519 key is identified as a SIGNING_KEY.
 
-When an application message is encrypted then it is the `BusinessProcessMessage` field that is encrypted. The `UnencryptedBusinessProcessMessageHash` is used to store the hash of the cleartext message, before encryption was applied. This way, it is possible to verify integrity of messages after decrypting. That hash can further be signed using a private singing key and the signature is then stored in `BusinessProcessSignatureOnHash`.  This mechanism allows the core component to determine origin, without passing recipient information into the envelope, but also apply proof after the fact where a participant can verify a cleartext message against an encrypted application message without possessing the encryption/decryption key. 
+When an application message is encrypted then it is  only the `BusinessProcessMessage` field that is encrypted. The `UnencryptedBusinessProcessMessageHash` is used to store the hash of the cleartext message, before encryption was applied. This way, it is possible to verify integrity of messages after decrypting. That hash can further be signed using a private singing key and the signature is then stored in `BusinessProcessSignatureOnHash`.  As mentioned above, this mechanism allows the core component to determine origin, without passing recipient information into the envelope, but also apply proof after the fact where a participant can verify a cleartext message against an encrypted application message without possessing the encryption/decryption key. 
+
+**Chunking and explorers**. When a message is sent to the network it is sent as an HCS Message; The ApplicationMessage is converted into a byte stream which in turn is wrapped into one or several `ApplicationMessageChunk` packets.  It is that chunk that is placed to the HCS Message and sent to the network. Thus, when you observe the messages in one of the available Hedera Hashgraph exploreres then you will fine extra information such as chunk sequence numbers that help the core collect and reassemble chunks into ApplicationMessages. 
+
+**Persistence**. The HCS SXC Core component provides some level of persistence,  however this is not meant to implement application-specific persistence. The persistence afforded by the HCS SXC Core component provides  transaction and message level persistence.
+
+It is fully expected that an application would need to persist some  data itself, data from messages exchanges with HCS for example, or data  created as a result of HCS transactions (e.g. Bob bought this token from Alice). This application-level persisted data would constitute the  application's state and will depend on each and every application rather than being common to all.
 
 ## Hello App Participant - your first HCS SXC project
 
-The central piece of HCS-SXC is an `HCSCore` object  which requires a number of parameters to initialise; these parameters can be issued  to `HCSCore` directly or via configuration files or issued via environment variables and command line parameters.  The order of precedence is below for all components:
+The central piece of HCS-SXC is an `HCSCore` object  which requires a number of parameters for it to initialise; these parameters can be issued  to `HCSCore` directly or via configuration files or issued via environment variables and command line parameters.  The order of precedence is 
 
 - command line parameters
 - host environment variables
 - environment variables found in `./config/.env` file
 - `./config` folder for other configuration files
 
-All variables as well as the location of the configuration files can be overridden with API calls in the core component.
+All variables as well as the location of the configuration files can be overridden using API methods of the core component.
 
-**To create your own project** compile the the entire project and omit the examples with `mvnw -pl -hcs-sxc-java-examples install`. This will install the maven artefact to your mvn library.   Then create a new maven project with your `pom.xml` at the root of the project  and create a folder `.config`  and  also place it at the root . Place in the configuration  folder a `.env` file and a `config.yaml` file.
+**To create your own project** compile the the entire project and omit the examples with `mvnw -pl -hcs-sxc-java-examples install`. This will install the maven artefact to your local mvn repository.   Then create a new maven project put a  `pom.xml` at the root of the project  and create a folder `.config`  and  also place it at the root . Place in the configuration  folder a `.env` file and a `config.yaml` file.
 
 **`.\.config\.env`** 
 
@@ -180,9 +190,8 @@ OPERATOR_KEY= 302...          # Hedera Hashgraph private payer key
 ```
 
 The `OPERATOR_KEY` is the HH private key of the account identified by `OPERATOR_ID`.
-The `ENCRYPTION_KEY` is used only if message encryption is enabled in in `config.yaml`
 
-**`.\.config\.config.yaml`**  The sample configuration file defines an app participant on the test-net.  Make sure to  update the `topic` id to a topic that you can submit to. Note, in this example we will use a in-memory persistence plugin - if you want to use the supplied database persistence plugin then you must add a `coreHibernate` section as shown in the [persistence plugin documentation](.\hcs-sxc-java-plugins\README.md) and modify your pom.xml  to select the plugin. 
+**`.\.config\.config.yaml`**  This sample configuration  defines an app participant on the test-net.  Make sure to  update the `topic` id to a topic that you can submit to. Note, in this example we will use a in-memory persistence plugin - if you want to use the supplied database persistence plugin then you must add a `coreHibernate` section as shown in the [persistence plugin documentation](.\hcs-sxc-java-plugins\README.md) and modify your pom.xml  to select the plugin. 
 
 ```yaml
 appNet:
@@ -230,7 +239,7 @@ Minimal POM
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.hedera</groupId>
-    <artifactId>basix-sxc-example</artifactId>
+    <artifactId>basic-sxc-example</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <properties>
@@ -300,7 +309,7 @@ new OutboundHCSMessage(hcsCore)
 
 #### Subscribing to a topic 
 
-To setup call back in the need to add observers and parse the feedback.  
+To setup call back you need to add observers and parse the feedback.  
 
 ```java
  // create a callback object to receive the message
@@ -331,9 +340,15 @@ void mirrorNotification(
 }
 ```
 
-> NOTE:  The call back is **asynchronous**; to prevent your main method thread from terminating prematurely you can ask fort user input at the end of the method, otherwise the tread will terminate before the call-back is handled. 
+> NOTE:  The call back is **asynchronous**; to prevent your main method thread from terminating prematurely you can ask fort user input at the end of the main thread, otherwise the thread  will terminate before the call-back is handled. 
 
-Sometimes you need to bring low level consensus information to the app level. The core stores all information to the persistence layer which you can access by supplying the application message id.	
+Sometimes you need to bring low level consensus information to the app level. The core stores  information to the persistence layer which you can access by supplying an application message id. The level of detail stored is controlled by the configuration variable 
+
+```  persistenceLevel: "FULL"
+  persistenceLevel: "FULL"
+```
+
+that we used in the `config.yaml` above. 
 
 ```java
 void mirrorNotification(
@@ -362,9 +377,32 @@ void mirrorNotification(
 
 }
 ```
-Note tat an application message can exceed the HCS transaction limit and hence will be chunked into several transactions each of which will have their own timestamp. When the core reassembles messages, it applies an overall timestamp and consensus information to the combined application message; the convention is to use consensus information of the the last part received. 
 
-When you send a message then you expect all other participants to receive it but you should also receive your own message back.
+
+Note tat an application message can exceed the HCS transactions size limit and hence will be chunked into several transactions each of which will have their own timestamp. When the core reassembles messages, it applies an overall timestamp and consensus information to the combined application message; the convention is to use the timestamp of the chunk that has the chronologically latest timestamp. 
+
+**Echo and logging**: When you send a message then you expect all other participants to receive it but you should also receive your own message back. Thus, if your run this example with only one participant then you will still see feedback indeed, in which case it is akin to an echo message with consensus information attached.  Such single app networks can be sometimes useful to setup logging and monitoring services. 
+
+**Signing**. In a multiparty setup, it is possible to distinguish your own messages and message origin by enabling message signing.  To do so, enable  signing in `config.yaml` and add
+
+```
+# Message signing key (HEX)
+SIGNING_KEY=302..    		
+```
+
+to your `.env` file.
+
+To test if the message was sent by you (echo) or from someone else do
+
+```java
+ boolean isEcho = Signing.verify(
+      appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray()
+      , appMessage.getBusinessProcessSignatureOnHash().toByteArray()
+      , hcsCore.getMessageSigningKey().publicKey // test against own public key
+ );
+```
+
+The core component allows you to define an address book to store public signing keys as well as shared encryption keys of other apps. It is more natural to use such an address book in an encrypted communication setup. 
 
 #### Sending and receiving encrypted messages
 
@@ -414,9 +452,9 @@ OPERATOR_KEY=302...          # Hedera Hashgraph private payer key
 ENCRYPTION_KEY=424..         #shared key used for encrypting a BMP
 ```
 
-You send messages in the usual way and encryption / decryption is handled in the background. One way to ensure that messages have been encrypted indeed is to check the output in a mirror explorer.  
+You send messages in the usual way and encryption / decryption is handled in the background. One way to ensure that messages have been encrypted indeed is to check the output in a mirror explorer. As in the unencrypted case,  you can distinguish origin of messages by enabling signing. 
 
-To use **pairwise encryption** you and all other participants will need unique private signing key.  HCS-SCX signing keys are used to identify message-origin and this is done in conjunction with an address-book that lists all ed25519 public keys of participants an APP is communicating with. Such public ed25519 keys are identified as `theirPublicSigningKey`.  It is assumed that each participant has a unique signing key and it is not shared across participants. In this encryption scheme,  pairs of communicating entities share a common encryption key.  Amend the `.env` file to include
+To use **pairwise encryption** you and all other participants will need unique private signing key.  HCS-SCX signing keys are used to identify message-origin and this is done in conjunction with an address-book that lists all ed25519 public keys of participants an APP is communicating with. Such public ed25519 keys are identified as `theirPublicSigningKey`.  It is assumed that each participant has a unique signing key and it is not shared across participants. In this encryption scheme,  pairs of communicating entities share a common encryption key.  Amend the `.env` file to include your signing key
 
 ```
 APP_ID=Player-0				 # App ID defined at env level
@@ -428,13 +466,15 @@ SIGNING_KEY=302..    		 # private signing key. the public key part
 							 # pair.
 ```
 
-You may notice that `.env` files don't specify encryption keys anymore and this is because an App needs a different encryption key for each other entity it communicates with. For each communicating pair you need to know the pairs 
+You may notice that `.env` files don't specify encryption keys anymore and this is because an App needs a different encryption key for each other entity it communicates with. For each communicating pair you need to know the pair`s 
 
 - application id
 - `sharedSymmetricEncryptionKey` 
 - `theirPublicSigningKey`
 
-In an app net with three apps you may have the following communicating pairs where app with id Player-0 communicates with Player 1 and Player 2
+In an app net with three apps you may have the following communicating pairs
+
+ Player-0 communicates with Player 1 and Player 2
 
 ```yaml
 Player-0 :
@@ -466,10 +506,10 @@ Player-2 :
 
 ```
 
-It is worth studying this example to observe how keys relate and what keys are shared. Each participant needs to supply his communicating parties to his own `hcsCore` component. Player 0 from this example would need to supply two entries, one for Player 1 and one for Player 2.
+It is worth studying this example to observe how keys relate and what keys are shared. Each participant needs to supply the core with his own communicating parties. Player-0 from this example would need to supply two entries, one for Player 1 and one for Player 2.
 
 ```java
-Map<String,<Map<String,String>>>addressList = ...  // load Player 0 firends into a map
+Map<String,<Map<String,String>>>addressList = ...  // load Player-0 firends into a map
  
 addresslist.forEach((k,v)->{
             hcsCore.addOrUpdateAppParticipant(
@@ -482,9 +522,9 @@ addresslist.forEach((k,v)->{
     }
 ```
 
-You then send messages as usual and the core will take care of testing for signatures and  decrypting transparently in the background.  Specifically, the core will test first if an incoming messages is from a friends and will discard if otherwise. If the message is from a known party then decryption. Decryption may still fail if the message was not intended for that app participant (which can happen, even if the sender is a know entity).
+You then send messages as usual and the core will take care of testing for signatures and  decrypting transparently in the background.  Specifically, the core will test first if an incoming message is from a friend and will discard if otherwise. If the message is from a known party then decryption is attempted; decryption may still fail if the message was not intended for that app participant (which can happen, even if the sender is a know entity).
 
-When Player 0 sends a message then all participants in his list will receive a message encrypted with their shared key. That is, Player 0 has to **send twice**; this is automatically handled by the core component. There are situations where  we wish to encrypt only with one participant. In that case the API provides an override to restrict encryption to a single or a list of participants. For example:
+When Player 0 sends a message then all participants in his list will receive a message encrypted with their shared key. That is, Player 0 from this example has to **send twice**; this is automatically handled by the core component. There are situations where  we wish to encrypt only with one participant. In that case the API provides an override to restrict encryption to a single or a list of participants. For example:
 
 ```java
 new OutboundHCSMessage(hcsCore)
@@ -494,13 +534,13 @@ new OutboundHCSMessage(hcsCore)
 
 In this situation the message is sent **only once**. While Player 2 will still receive a message from the mirror subscription, it will not be possible to decrypt it even though Player 2 shares keys with Player 0. 
 
-You can manually test origin of a message in the message call back handler. To test if a message is an echo message use 
+You can manually test origin of a message in the message call back handler. 
 
 ```java
-boolean isEcho = Signing.verify(
+boolean isFromPlayer2 = Signing.verify(
        appMessage.getUnencryptedBusinessProcessMessageHash().toByteArray()
      , appMessage.getBusinessProcessSignatureOnHash().toByteArray()
-     , hcsCore.getMessageSigningKey().publicKey // test against own public key
+     , publicKeyOfPlayer2FromAddressBook // test against own public key or use a public key from the address book
 ));
 ```
 
@@ -521,7 +561,7 @@ new OutboundHCSMessage(hcsCore)
 
 with
 
-`applicationMessageId` - The application message to be  validated needs to reside in own database either in encrypted or   decrypted form.
+`applicationMessageId` - The application message to be  validated needs to reside in own database either in encrypted or  decrypted form.
 `cleartext` - The decrypted cleartext or  business process message
 `publicSigningKeyOfPlayer1` - The key of the   signer of the message being validated    
 
@@ -546,7 +586,7 @@ if (any.is(RequestProof.class)){
 
 #### Key rotation
 
-Further, an encrypted message is only truly safe if the key used to decrypt it isn't known to the public, but only to the intended recipient of the message. One solution is to implement key rotation, whereby the keys used to encrypt and decrypt messages are rotated more or less frequently. Assuming rotated keys are discarded, it should not be possible to subsequently decrypt messages. To enable rotation set the necessary parameters in `config.yaml`
+An encrypted message is only truly safe if the key used to decrypt it isn't known to the public, but only to the intended recipient of the message. One solution is to implement key rotation, whereby the keys used to encrypt and decrypt messages are rotated more or less frequently. Assuming rotated keys are discarded, it should not be possible to subsequently decrypt messages. To enable rotation set the necessary parameters in `config.yaml`
 
 ```yaml
 appNet:
@@ -559,11 +599,11 @@ appNet:
   rotateKeyFrequency: 2
 ```
 
-Note that encryption must be enabled for rotation to work. 
+Encryption can  be either be static where the same key is used throughout the life time of a communicating pair or rotating. The encryption plugin loaded earlier implements [Diffie Hellmann key exchange DHKE](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange) 
 
-Encryption can  either be static where the same key is used throughout the life time of a communicating pair or rotating. The encryption plugin loaded earlier implements Diffie Hellmann key exchange (DHKE). Notice that when key rotation is enabled then the initial secret generated is replaced by the shared secret that is generated by the key rotation implementation; however,  encryption remains to be AES. Thus, the  symmetric key is used until rotation is triggered. This is permissible because the AES standard does not specify a structure on the key used, but it is important too ensure that the size of the key generated they key rotation scheme is the same as the size required by the encryption plugin.
+Notice that when key rotation is enabled then the initial secret generated is replaced by the shared secret that is generated by the key rotation implementation; however,  encryption remains to be AES. Thus, the  symmetric key is used until rotation is triggered. This is permissible because the AES standard does not specify a structure on the key used, but it is important too ensure that the size of the key generated they key rotation scheme is the same as the size required by the encryption plugin.
 
-Key rotation is a background process and is only enabled when pairwise encryption is used and not universal encryption.  The special instruction in the BPM can be parsed in the call-back as follows.
+Key rotation is a background process and is only enabled when pairwise encryption is used and will not work as intended when universal encryption is used.  The special instructions in the BPM can be parsed in the call-back as follows.
 
 ```java
 Any any = Any.parseFrom(bpmFromCallback);
@@ -577,8 +617,6 @@ if (any.is(KeyRotationInitialise.class)){
 
 There is very little reason to introspect rotation messages other than for debugging purposes. 
 
-
-
 ## Contributing
 
 Contributions are welcome. Please see the [contributing](CONTRIBUTING.md) guide to see how you can get
@@ -587,7 +625,7 @@ involved.
 ## Code of Conduct
 
 This project is governed by the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are
-expected to uphold this code of conduct. Please report unacceptable behavior to [oss@hedera.com](mailto:oss@hedera.com)
+expected to uphold this code of conduct. Please report unacceptable behaviour to [oss@hedera.com](mailto:oss@hedera.com)
 
 ## License
 

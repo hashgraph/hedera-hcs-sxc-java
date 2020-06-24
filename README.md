@@ -31,13 +31,13 @@ SXC components use the Hedera Java SDK to communicate with Hedera's HCS service 
 - Pairwise symmetric key encryption between participants
 - Key rotation with secure key exchange. 
 - Proof after the fact: allow third a third party to verify an encrypted message without sharing encryption keys
-- Protobuf application message structure ([see all protobuf definitions](.\hcs-sxc-java-proto\src\main\proto\Messages.proto))
+- Protobuf application message structure ([see all protobuf definitions](./hcs-sxc-java-proto\src\main\proto\Messages.proto))
 - Persistence of transactions sent and messages sent/received
     - In memory or in database via plugins and JPA compatible. All messages are automatically persisted and made available to the application through an interface such that it can perform audit for example.
 - Mirror node topic subscription
     - Via relay
     - Direct to mirror node
-- Plugin based architecture ([read more about plugins](.\hcs-sxc-java-plugins\README.md))
+- Plugin based architecture ([read more about plugins](./hcs-sxc-java-plugins\README.md))
     - hcs-sxc-java-plugins-encryption-diffie-hellman - plugin to encrypt messages and manage key rotation using Diffie Hellman
     - hcs-sxc-java-plugins-mirror-direct - plugin to enable the `hcs-sxc-java-core` to subscribe to mirror notifications directly
     - hcs-sxc-java-plugins-mirror-queue-artemis - plugin to enable the `hcs-sxc-java-core` to subscribe to mirror notifications via an Artemis Message Queue (which receives messages via the `hcs-sxc-java-relay` component)
@@ -191,7 +191,7 @@ OPERATOR_KEY= 302...          # Hedera Hashgraph private payer key
 
 The `OPERATOR_KEY` is the HH private key of the account identified by `OPERATOR_ID`.
 
-**`.\.config\.config.yaml`**  This sample configuration  defines an app participant on the test-net.  Make sure to  update the `topic` id to a topic that you can submit to. Note, in this example we will use a in-memory persistence plugin - if you want to use the supplied database persistence plugin then you must add a `coreHibernate` section as shown in the [persistence plugin documentation](.\hcs-sxc-java-plugins\README.md) and modify your pom.xml  to select the plugin. 
+**`.\.config\.config.yaml`**  This sample configuration  defines an app participant on the test-net.  Make sure to  update the `topic` id to a topic that you can submit to. Note, in this example we will use a in-memory persistence plugin - if you want to use the supplied database persistence plugin then you must add a `coreHibernate` section as shown in the [persistence plugin documentation](./hcs-sxc-java-plugins\README.md) and modify your pom.xml  to select the plugin. 
 
 ```yaml
 appNet:

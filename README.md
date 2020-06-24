@@ -37,7 +37,7 @@ SXC components use the Hedera Java SDK to communicate with Hedera's HCS service 
 - Mirror node topic subscription
     - Via relay
     - Direct to mirror node
-- Plugin based architecture ([read more about plugins](./hcs-sxc-java-plugins\README.md))
+- Plugin based architecture ([read more about plugins](./hcs-sxc-java-plugins/README.md))
     - hcs-sxc-java-plugins-encryption-diffie-hellman - plugin to encrypt messages and manage key rotation using Diffie Hellman
     - hcs-sxc-java-plugins-mirror-direct - plugin to enable the `hcs-sxc-java-core` to subscribe to mirror notifications directly
     - hcs-sxc-java-plugins-mirror-queue-artemis - plugin to enable the `hcs-sxc-java-core` to subscribe to mirror notifications via an Artemis Message Queue (which receives messages via the `hcs-sxc-java-relay` component)

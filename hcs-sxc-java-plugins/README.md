@@ -44,7 +44,21 @@ coreHibernate:
 
 Modify this example to use your connection values, however keep the `{appid}`  string unmodified.
 
-The list of configuration entries is variable, you may add or remove entries as necessary for your particular database. Also, if `{appid}` is found in any of the values, it will be swapped at run time for the id of the instance of the application being run.
+The list of configuration entries is variable, you may add or remove entries as necessary for your particular database requirements. Also, if `{appid}` is found in any of the values, it will be swapped at run time for the id of the instance of the application being run.
+
+You cann also select the level of persitence in the `appNet` section of `config.yaml` point. 
+
+```yaml
+appNet:
+  ...
+  # Which level of persistence should be used
+  persistenceLevel: "FULL"
+  ...
+```
++ NONE  : no message persistence
++ MESSAGE_ONLY :  only persist message
++ MESSAGE_AND_PARTS : persist message and message parts
++ FULL : persist all communications with Hedera (HCS and Mirror Node)
 
 Further, to ensure the appropriate database vendors' dependencies are available when compiling, the `hcs-sxc-java-plugins-persistence-hibernate` project makes use of profiles in its `pom.xml`. The default profile is `h2` which also downloads the `h2` database server - in any other setting you would need to load and run the respective database server and amend the configuration entries in the yaml above. 
 
@@ -95,6 +109,8 @@ Example:
 ```xml
 mvnw clean install -Pdocker -Ppostgres
 ```
+
+
 
 ### Mirror subscription method
 

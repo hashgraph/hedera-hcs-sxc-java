@@ -58,8 +58,8 @@ SXC components use the Hedera Java SDK to communicate with Hedera's HCS service 
 - [Listening Message Queues with logging and  timestamping](./hcs-sxc-java-examples/hcs-sxc-java-mq-consumer)
   - Support for RabbitMQ
   - Support for Kafka
-  - MQ Instant messenger demo with UI
-- Listening and logging Cloudwatch events
+  - MQ Instant messenger demo with Web UI
+- [Listening and logging Amazon Cloudwatch events](./hcs-sxc-java-examples/hcs-sxc-java-cloudwatch)
 
 - [Token demo](./hcs-sxc-java-examples/hcs-sxc-java-token-demo)
 
@@ -230,6 +230,8 @@ nodes:
     account: 0.0.6
 ```
 
+Note: you will need to update the topic id to the one your appnet will use. If you don't have one then you can continue and you'll be able to generate a new topic once the core initialise. You'll have to come back to the configuration file to update the topic. 
+
 **`.\pom.xml`**  The library is plugin based  and plugins are selected in the `pom.xml` file. Here we demonstrate a minimal pom.xml where we select an `in-memory-database`  a `direct-mirror-subscription` and will omit encryption.  Consult the [plugin documentation](.\hcs-sxc-java-plugins\README.md) on how to select available plugins.  
 
 Minimal POM
@@ -291,6 +293,16 @@ HCSCore hcsCore = new HCSCore().builder(
 );
 ```
 
+If you have not used your own topic id in the configuration file then you can create a new id by issuing
+
+````java
+CreateHCSTopic createHCSTopic = new CreateHCSTopic(hcsCore);
+ConsensusTopicId topicId = createHCSTopic.execute();
+System.out.println("New topic Id " + topicId.topic);
+````
+
+You then have to edit your configuration file to reflect the new topic id. 
+
 #### Sending a HCS message via the core component
 
 The most basic option for sending messages with HCS SXC Core is to send a non-encrypted message. This however will mean anyone with access to a mirror node will be able to read the messages that are being exchanged between app net participants on a given topic id.
@@ -348,7 +360,7 @@ Sometimes you need to bring low level consensus information to the app level. Th
   persistenceLevel: "FULL"
 ```
 
-that we used in the `config.yaml` above. 
+that we used in the `config.yaml` above.  Read  the persistence plugin documentation for more details on persistence levels.  To pull persistence info use:
 
 ```java
 void mirrorNotification(

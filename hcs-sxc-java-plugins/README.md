@@ -1,12 +1,14 @@
 # Plugin architecture
 
-HCS SXC allows you to plug your own implementations fin or persistence, cryptography, and mirror feedback handling. This will allow you do use your own database vendor or write your own encryption algorithms.   Plugins are maven artefacts,  which you include in your project's `pom.xml`.  These plugins implement common `interfaces` that are found in the `hcs-sxc-java-interfaces` module. 
+HCS SXC allows you to plug your own implementations fot or persistence, cryptography, and mirror feedback handling. This will allow you do use your own database vendor or write your own encryption algorithms.   Plugins are maven artefacts,  which you include in your project's `pom.xml`.  These plugins implement common `interfaces` that are found in the [hcs-sxc-java-interfaces](../hcs-sxc-java-interfaces)  module. 
 
 ## Choosing which plugins to use
 
 ### Persistence
 
-To choose whether to use the `in memory` or `in database` persistence plug in, include either the first or second dependency below in your application's `pom.xml`
+To implement your own persistence plugin you need to implement the `com.hedera.hcs.sxc.interfaces.SxcPersistence` interface.
+
+This project comes with two plugin implementation. To choose whether to use the `in memory` or `in database` persistence plug in, include either the first or second dependency below in your application's `pom.xml`
 
 for in memory
 
@@ -114,7 +116,7 @@ mvnw clean install -Pdocker -Ppostgres
 
 ### Mirror subscription method
 
-To choose whether to use the `direct` or `hcs-sxc-java-relay+activeMQ` subscription method, include either the first or second dependency below in your application's `pom.xml`
+To choose whether to use the `direct` or `queue-artemis`  subscription method, include either the first or second dependency below in your application's `pom.xml`
 
 for **direct subscriptions** where the app downloads directly from a mirror
 
@@ -148,7 +150,7 @@ queue:
 
 ### Encryption and key rotation
 
-Encryption and key rotation is optional. You can implement own encryption mechanism and provide your own Diffie Hellman key rotation implementation. To use the supplied implementation use. 
+Encryption and key rotation is optional. You can implement you own encryption mechanism and provide your own Diffie Hellman key rotation implementation. To use the supplied plugin use. 
 
 ```yaml
 <groupId>com.hedera</groupId>

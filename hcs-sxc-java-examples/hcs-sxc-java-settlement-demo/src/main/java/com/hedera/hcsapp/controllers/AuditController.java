@@ -147,26 +147,29 @@ public class AuditController {
         HCSCore hcsCore = Statics.getAppData().getHCSCore();
         SxcPersistence persistence = hcsCore.getPersistence();
 
-
         List<? extends SxcApplicationMessageInterface> scxApplicationMessages = persistence.getSXCApplicationMessages();
         for (SxcApplicationMessageInterface m : scxApplicationMessages){
             //ApplicationMessage  = ApplicationMessage.parseFrom(m.getBusinessProcessMessage());
-            SettlementBPM settlementBPM = SettlementBPM.parseFrom(
-                ApplicationMessage.parseFrom(m.getApplicationMessage())
-                .getBusinessProcessMessage()
-            );
-            if (settlementBPM.getThreadID().equals(threadId)) {
+            try {
+                SettlementBPM settlementBPM = SettlementBPM.parseFrom(
+                        ApplicationMessage.parseFrom(m.getApplicationMessage())
+                                .getBusinessProcessMessage()
+                );
+                if (settlementBPM.getThreadID().equals(threadId)) {
 
-                AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(Statics.getAppData());
-                auditApplicationMessage.setApplicationMessageId(m.getApplicationMessageId());
-                if (m.getLastChronoPartConsensusTimestamp() == null) {
-                    auditApplicationMessage.setLastChronoPartConsensusTimestamp("Pending");
-                } else {
-                    auditApplicationMessage.setLastChronoPartConsensusTimestamp(m.getLastChronoPartConsensusTimestamp().toString());
+                    AuditApplicationMessage auditApplicationMessage = new AuditApplicationMessage(Statics.getAppData());
+                    auditApplicationMessage.setApplicationMessageId(m.getApplicationMessageId());
+                    if (m.getLastChronoPartConsensusTimestamp() == null) {
+                        auditApplicationMessage.setLastChronoPartConsensusTimestamp("Pending");
+                    } else {
+                        auditApplicationMessage.setLastChronoPartConsensusTimestamp(m.getLastChronoPartConsensusTimestamp().toString());
+                    }
+                    auditApplicationMessage.setLastChronoPartSequenceNum(m.getLastChronoPartSequenceNum());
+                    auditApplicationMessage.setMessage(settlementBPM.toString());
+                    auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
                 }
-                auditApplicationMessage.setLastChronoPartSequenceNum(m.getLastChronoPartSequenceNum());
-                auditApplicationMessage.setMessage(settlementBPM.toString());
-                auditApplicationMessages.getAuditApplicationMessages().add(auditApplicationMessage);
+            } catch (Exception e) {
+                log.atError().log(e);
             }
         };
 

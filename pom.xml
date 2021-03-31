@@ -69,7 +69,7 @@
         <failsafe.version>2.22.0</failsafe.version>
 
         <grpc-netty.version>1.24.0</grpc-netty.version>
-        <guava.version>28.1-jre</guava.version>
+        <guava.version>29.0-jre</guava.version>
 
         <hamcrest-core.version>1.3</hamcrest-core.version>
         <hcs-sxc.version>0.0.3-SNAPSHOT</hcs-sxc.version>

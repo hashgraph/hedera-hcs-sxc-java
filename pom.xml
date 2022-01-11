@@ -95,7 +95,7 @@
         <operadriver.version>1.5</operadriver.version>
         <os-maven-plugin.version>1.6.1</os-maven-plugin.version>
 
-        <protobuf-java.version>3.11.1</protobuf-java.version>
+        <protobuf-java.version>3.16.1</protobuf-java.version>
         <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
         <protoc.version>3.11.2</protoc.version>
 

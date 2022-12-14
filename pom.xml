@@ -100,7 +100,7 @@
         <protoc.version>3.11.2</protoc.version>
 
         <selenium-java.version>2.44.0</selenium-java.version>
-        <snakeyaml.version>1.26</snakeyaml.version>
+        <snakeyaml.version>1.32</snakeyaml.version>
         <surefire.version>3.0.0-M4</surefire.version>
     </properties>
 

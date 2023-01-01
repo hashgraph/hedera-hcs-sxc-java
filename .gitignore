@@ -117,3 +117,4 @@ yarn-error.log*
 hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/config.yaml.bak
 hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/contact-list.yaml.bak
 hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config/docker-compose.yml.bak
+.git/

@@ -42,7 +42,7 @@ public class Application {
         if ((args.length > 0) && (args[0].contentEquals("generateconfig"))) {
             GenerateConfigurationFiles.generateConfig();
         } else if ((args.length > 0) && (args[0].contentEquals("createTopic"))) {
-            CreateTopic.main();
+            CreateTopic.createTopic();
         } else {
             SpringApplication app = new SpringApplication(Application.class);
             app.run(args);

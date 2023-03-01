@@ -26,7 +26,7 @@ import com.hedera.hcs.sxc.consensus.CreateHCSTopic;
 
 public class CreateTopic {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Throwable {
         createTopic();
     }
 

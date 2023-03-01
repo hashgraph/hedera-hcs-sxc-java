@@ -20,17 +20,19 @@ package com.hedera.hcsapp;
  * ‍
  */
 
+import com.hedera.hashgraph.sdk.HederaNetworkException;
+import com.hedera.hashgraph.sdk.HederaStatusException;
 import com.hedera.hashgraph.sdk.consensus.ConsensusTopicId;
 import com.hedera.hcs.sxc.HCSCore;
 import com.hedera.hcs.sxc.consensus.CreateHCSTopic;
 
 public class CreateTopic {
 
-    public static void main(String[] args) throws Throwable {
+    public static void main(String[] args) throws HederaStatusException, HederaNetworkException {
         createTopic();
     }
 
-    public static void createTopic() {
+    public static void createTopic() throws HederaStatusException, HederaNetworkException {
         HCSCore hcsCore = new HCSCore().builder();
         // create topics on HCS
         ConsensusTopicId topicId = new CreateHCSTopic(hcsCore)

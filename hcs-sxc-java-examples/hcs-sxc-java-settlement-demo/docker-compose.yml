@@ -1,0 +1,122 @@
+version: '3.3'
+services:
+  Alice:
+    container_name: Alice
+    image: settlement-demo:latest
+    restart: on-failure
+    environment:
+      APP_ID: Alice
+      PUBKEY: 302a300506032b657003210066bbc13b9d4c343633a64201e97bf7eb2ee3f7c6d281a2ffba0d36d46de9cd48
+      ROLES: BUYER,SELLER
+      PAYMENT_ACCOUNT_DETAILS: 10-11-12 80640665
+      COLOR: 1D5AAB
+      SIGNKEY: 302e020100300506032b657004220420713db171b4888da911d956275e1951d3a9ef13c559095d8e048beec59c258a97
+    ports:
+      - 8081:8081
+    volumes:
+      - ./config:/hedera-hcs-sxc-java/hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config
+  Bob:
+    container_name: Bob
+    image: settlement-demo:latest
+    restart: on-failure
+    environment:
+      APP_ID: Bob
+      PUBKEY: 302a300506032b657003210039689103e4db0219df5102442d7e5b4452e75a64c2d0428f2bceb9715248ead8
+      ROLES: BUYER,SELLER
+      PAYMENT_ACCOUNT_DETAILS: 13-01-32 79832564
+      COLOR: 218041
+      SIGNKEY: 302e020100300506032b657004220420a6fdbd96de2eb500481fc01cbd1460bfe678f4298806436b88922ce3e47e0290
+    ports:
+      - 8082:8082
+    volumes:
+      - ./config:/hedera-hcs-sxc-java/hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config
+  #  Carlos:
+  #    container_name: Carlos
+  #    image: settlement-demo:latest
+  #    restart: on-failure
+  #    environment:
+  #      APP_ID: Carlos
+  #      PUBKEY: 302a300506032b65700321008c587c14d8d040c28a84e54593d91cf35588e57b9df240d3596cae45c889874a
+  #      ROLES: BUYER,SELLER
+  #      PAYMENT_ACCOUNT_DETAILS: 22-11-14 70925098
+  #      COLOR: 73FCD6
+  #      SIGNKEY: 302e020100300506032b6570042204201acaa3b29ba9e9e44bf1c32a73fa5a7ac7cdf3a44814ce954fc419bdcd98c3c7
+  #    ports:
+  #    - 8083:8083
+  #    volumes:
+  #    - ./config:/hedera-hcs-sxc-java/hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config
+  Diana:
+    container_name: Diana
+    image: settlement-demo:latest
+    restart: on-failure
+    environment:
+      APP_ID: Diana
+      PUBKEY: 302a300506032b6570032100530ed78c70513e1b1cc2142c34d4577e4f16d6d2b87ebae44d622842ae16d7f9
+      ROLES: PAYCHANNEL
+      PAYMENT_ACCOUNT_DETAILS: 12-52-23 26789524
+      COLOR: 8C7C22
+      SIGNKEY: 302e020100300506032b65700422042083366ad550ef1ba158d9c235ad014c8bc9773042899e5505a270f452142fee50
+    ports:
+      - 8084:8084
+    volumes:
+      - ./config:/hedera-hcs-sxc-java/hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config
+  #  Erica:
+  #    container_name: Erica
+  #    image: settlement-demo:latest
+  #    restart: on-failure
+  #    environment:
+  #      APP_ID: Erica
+  #      PUBKEY: 302a300506032b65700321008119ed669151c8622fcf9b180fe1594252d4b50cfc72441c08bb58db46d5d2bb
+  #      ROLES: BUYER,SELLER
+  #      PAYMENT_ACCOUNT_DETAILS: 09-34-21 46324354
+  #      COLOR: 984A27
+  #      SIGNKEY: 302e020100300506032b65700422042010664dff6673907c08410e56e40cb66803fa4e3ad38f8438562b26621edd8891
+  #    ports:
+  #    - 8085:8085
+  #    volumes:
+  #    - ./config:/hedera-hcs-sxc-java/hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config
+  #  Farouk:
+  #    container_name: Farouk
+  #    image: settlement-demo:latest
+  #    restart: on-failure
+  #    environment:
+  #      APP_ID: Farouk
+  #      PUBKEY: 302a300506032b6570032100f08f36f07b3f5d8ba4c1de3dea055cc766895f1cb9925868be3ebd9f5f61dce8
+  #      ROLES: ARBITER
+  #      PAYMENT_ACCOUNT_DETAILS: 10-69-43 86535765
+  #      COLOR: 632AA5
+  #      SIGNKEY: 302e020100300506032b657004220420531ed0e9e0bfc93cf3711f654cba8728e475406faaf2776af503c4032e6623ed
+  #    ports:
+  #    - 8086:8086
+  #    volumes:
+  #    - ./config:/hedera-hcs-sxc-java/hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config
+  Grace:
+    container_name: Grace
+    image: settlement-demo:latest
+    restart: on-failure
+    environment:
+      APP_ID: Grace
+      PUBKEY: 302a300506032b6570032100a138dff556c8230e726127048e22705fad83e5035a7ffba53e05538abba81cf1
+      ROLES: AUDITOR
+      PAYMENT_ACCOUNT_DETAILS: 10-32-52 55424452
+      COLOR: 941100
+      SIGNKEY: 302e020100300506032b6570042204207b6b76d13e93000ceca338454cc25ecdc917001313129c9039739f872c37aaaf
+    ports:
+      - 8087:8087
+    volumes:
+      - ./config:/hedera-hcs-sxc-java/hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config
+#  Henry:
+#    container_name: Henry
+#    image: settlement-demo:latest
+#    restart: on-failure
+#    environment:
+#      APP_ID: Henry
+#      PUBKEY: 302a300506032b657003210040d1526fedcd8f19aa6ebbfa53daaefc2170afc087731f54435a3c2f4acda7ad
+#      ROLES: PAYCHANNEL
+#      PAYMENT_ACCOUNT_DETAILS: 10-21-33 98321542
+#      COLOR: FFFC79
+#      SIGNKEY: 302e020100300506032b657004220420bc41a44fc0e0e7db5dd51d2158a2577fc678fc8238dd8b6f051d60d9229c5d6a
+#    ports:
+#    - 8088:8088
+#    volumes:
+#      - ./config:/hedera-hcs-sxc-java/hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config

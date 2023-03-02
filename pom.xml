@@ -31,16 +31,6 @@
         </license>
     </licenses>
 
-    <modules>
-        <module>hcs-sxc-java-core</module>
-        <module>hcs-sxc-java-relay</module>
-        <module>hcs-sxc-java-interfaces</module>
-        <module>hcs-sxc-java-examples</module>
-        <module>hcs-sxc-java-proto</module>
-        <module>hcs-sxc-java-plugins</module>
-        <module>hcs-sxc-java-coverage</module>
-    </modules>
-
     <organization>
         <name>Hedera Hashgraph, LLC</name>
         <url>https://hedera.com</url>
@@ -48,9 +38,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>10</maven.compiler.source>
-        <maven.compiler.target>10</maven.compiler.target>
-        <java.version>10</java.version>
+        <maven.compiler.source>14</maven.compiler.source>
+        <maven.compiler.target>14</maven.compiler.target>
+        <java.version>14</java.version>
         <!-- for jacoco -->
         <argLine>-Xms512m</argLine>
 
@@ -91,7 +81,7 @@
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
         <maven-shade-plugin.version>3.2.0</maven-shade-plugin.version>
-        
+
         <operadriver.version>1.5</operadriver.version>
         <os-maven-plugin.version>1.6.1</os-maven-plugin.version>
 
@@ -223,7 +213,7 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <!-- To update license headers: ./mvnw license:update-file-header 
+                    <!-- To update license headers: ./mvnw license:update-file-header
                         -N -->
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>license-maven-plugin</artifactId>
@@ -242,7 +232,7 @@
                         <roots>
                             <root>.</root>
                         </roots>
-                        <!-- These contain unprintable characters to suppress 
+                        <!-- These contain unprintable characters to suppress
                             showing the delimiters -->
                         <processEndTag>‍</processEndTag>
                         <processStartTag>‌</processStartTag>
@@ -282,6 +272,35 @@
         </pluginManagement>
     </build>
     <profiles>
+        <profile>
+            <id>examples-all</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>hcs-sxc-java-core</module>
+                <module>hcs-sxc-java-relay</module>
+                <module>hcs-sxc-java-interfaces</module>
+                <module>hcs-sxc-java-examples</module>
+                <module>hcs-sxc-java-proto</module>
+                <module>hcs-sxc-java-plugins</module>
+                <module>hcs-sxc-java-coverage</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>examples-settlement</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>hcs-sxc-java-core</module>
+                <module>hcs-sxc-java-relay</module>
+                <module>hcs-sxc-java-interfaces</module>
+                <module>hcs-sxc-java-examples</module>
+                <module>hcs-sxc-java-proto</module>
+                <module>hcs-sxc-java-plugins</module>
+            </modules>
+        </profile>
         <profile>
             <id>ci</id>
             <build>

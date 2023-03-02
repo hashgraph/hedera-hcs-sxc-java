@@ -28,7 +28,7 @@ import com.hedera.hcs.sxc.consensus.CreateHCSTopic;
 
 public class CreateTopic {
 
-    public static void main(String[] args) throws HederaStatusException, HederaNetworkException {
+    public static void main(String[] args) throws Exception {
 //        createTopic();
         HCSCore hcsCore = new HCSCore().builder();
         // create topics on HCS

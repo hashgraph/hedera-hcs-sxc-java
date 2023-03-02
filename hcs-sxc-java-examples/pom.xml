@@ -14,11 +14,28 @@
     <name>hcs-sxc-java-examples</name>
     <description>HCS SXC Examples</description>
 
-    <modules>
-        <module>hcs-sxc-java-simple-message-demo</module>
-        <module>hcs-sxc-java-settlement-demo</module>
-        <module>hcs-sxc-java-token-demo</module>
-        <module>hcs-sxc-java-queue-consumer</module>
-    <module>hcs-sxc-java-cloudwatch</module>
-  </modules>
+    <profiles>
+        <profile>
+            <id>examples-all</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>hcs-sxc-java-simple-message-demo</module>
+                <module>hcs-sxc-java-settlement-demo</module>
+                <module>hcs-sxc-java-token-demo</module>
+                <module>hcs-sxc-java-queue-consumer</module>
+                <module>hcs-sxc-java-cloudwatch</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>examples-settlement</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>hcs-sxc-java-settlement-demo</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>

@@ -14,7 +14,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
+        <spring-boot.version>2.5.12</spring-boot.version>
         <spring-messaging.version>5.2.0.RELEASE</spring-messaging.version>
         <spring-websocket.version>5.2.0.RELEASE</spring-websocket.version>
     </properties>

@@ -1,3 +1,3 @@
 #!/bin/sh
 
-docker build -t settlement-demo .
+docker build --no-cache -t settlement-demo .

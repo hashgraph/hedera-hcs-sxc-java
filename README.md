@@ -516,7 +516,7 @@ These are merely sample lines of code, please refer to the example projects for 
 
 ### Pre-requisites
 
-- The project is built on java 10.
+- The project is built on java 14.
 - [Protobuf compiler](https://github.com/protocolbuffers/protobuf) version 3.11.2. (check with `protoc --version` in a command prompt).
 - Docker and Docker-Compose
 

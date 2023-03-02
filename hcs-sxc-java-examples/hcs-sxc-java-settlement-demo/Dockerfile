@@ -9,8 +9,6 @@ RUN apt-get -y install git
 
 # Fetch the code
 RUN git clone https://github.com/hashgraph/hedera-hcs-sxc-java.git
-RUN cd /hedera-hcs-sxc-java && git fetch
-RUN cd /hedera-hcs-sxc-java && git checkout settlement-docker
 
 # Remove config folder (it's mapped as a volume)
 RUN rm -rf /hedera-hcs-sxc-java/hcs-sxc-java-examples/hcs-sxc-java-settlement-demo/config

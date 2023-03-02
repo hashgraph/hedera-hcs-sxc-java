@@ -29,14 +29,19 @@ import com.hedera.hcs.sxc.consensus.CreateHCSTopic;
 public class CreateTopic {
 
     public static void main(String[] args) throws HederaStatusException, HederaNetworkException {
-        createTopic();
-    }
-
-    public static void createTopic() throws HederaStatusException, HederaNetworkException {
+//        createTopic();
         HCSCore hcsCore = new HCSCore().builder();
         // create topics on HCS
         ConsensusTopicId topicId = new CreateHCSTopic(hcsCore)
                 .execute();
         System.out.println(topicId.toString());
+    }
+
+    public static void createTopic() throws HederaStatusException, HederaNetworkException {
+//        HCSCore hcsCore = new HCSCore().builder();
+//        // create topics on HCS
+//        ConsensusTopicId topicId = new CreateHCSTopic(hcsCore)
+//                .execute();
+//        System.out.println(topicId.toString());
     }
 }

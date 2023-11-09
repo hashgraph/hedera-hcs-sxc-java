@@ -20,7 +20,7 @@
         <javax.inject.version>1</javax.inject.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <org.hibernate.validator.version>6.1.5.Final</org.hibernate.validator.version>
-        <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
+        <spring-boot.version>2.5.12</spring-boot.version>
         <spring-messaging.version>5.2.0.RELEASE</spring-messaging.version>
         <spring-websocket.version>5.2.0.RELEASE</spring-websocket.version>
     </properties>

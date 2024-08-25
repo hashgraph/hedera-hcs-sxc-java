@@ -26,3 +26,6 @@
 # Git Ignore definitions
 **/.gitignore                                   @hashgraph/devops-ci @hashgraph/release-engineering-managers @hashgraph/devops-ci-committers
 **/.gitignore.*                                 @hashgraph/devops-ci @hashgraph/release-engineering-managers @hashgraph/devops-ci-committers
+
+# Legacy CI
+/.circleci/                                     @hashgraph/devops-ci @hashgraph/release-engineering-managers

@@ -52,7 +52,7 @@
 
         <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
 
-        <classgraph.version>4.8.52</classgraph.version>
+        <classgraph.version>4.8.174</classgraph.version>
         <commons.version>1.9</commons.version>
         <commons-lang3.version>3.9</commons-lang3.version>
 
